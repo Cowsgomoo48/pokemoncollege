@@ -1,0 +1,565 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#172c43"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="PokémonCollege"><meta name="mobile-web-app-capable" content="yes"><link rel="manifest" href="./manifest.webmanifest"><link rel="apple-touch-icon" href="./icon-180.png"><link rel="icon" href="./icon-192.png" type="image/png"><title>PokémonCollege</title>
+<style>
+:root{--navy:#193148;--steel:#4d718a;--coral:#de5559;--pale:#f7f7eb;--aqua:#4ac8ca;--dark:#152538;--cream:#f4f1e6;--green:#56b490;--line:#bdcbd0}
+*{box-sizing:border-box}html{background:#142334}body{margin:0;color:var(--navy);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;-webkit-tap-highlight-color:transparent}button,input,select,textarea{font:inherit}button{cursor:pointer;touch-action:manipulation}button:disabled{opacity:.45;cursor:not-allowed}.app{min-height:100dvh;max-width:590px;margin:auto;padding:env(safe-area-inset-top) 9px calc(env(safe-area-inset-bottom) + 14px);background:linear-gradient(135deg,#304a65,#162a42)}.frame{min-height:calc(100dvh - 17px);border:4px solid #0b1d31;border-radius:22px;overflow:hidden;background:linear-gradient(#f6f5e9,#dfe8e7);box-shadow:0 7px 0 #0a1928,inset 0 0 0 2px white}.header{padding:13px 14px;background:linear-gradient(#de6466,#b43e4c);color:#fff;display:flex;align-items:center;justify-content:space-between;border-bottom:5px solid #203a52}.logo{font-size:19px;font-weight:1000;letter-spacing:-.8px;text-shadow:2px 2px #943844}.logocap{display:block;font-size:10px;letter-spacing:2.6px;font-weight:750;text-shadow:none}.headerbtn{font-weight:800;color:#fff;border:2px solid #fbe1d8;background:#ffffff29;padding:7px 10px;border-radius:9px}.pad{padding:12px}.section{display:none}.section.current{display:block;animation:slide .2s ease}@keyframes slide{from{opacity:.7;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}.bar{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:12px;padding:8px 10px;background:#223e56;border:3px solid #122a3d;border-radius:9px;box-shadow:inset 0 0 0 2px #537187;color:#fff;font-size:13px;font-weight:950;letter-spacing:1px}.small{font-size:11px}.muted{color:#617686}.notice{border:2px solid #c3d1ce;border-left:5px solid var(--coral);padding:12px;border-radius:9px;background:#fff9e9;font-size:12px;line-height:1.5;margin:12px 0}.btn{border:3px solid #1f394d;background:linear-gradient(#fff,#e0ebe8);border-radius:10px;padding:10px 12px;color:#203c50;font-weight:850;font-size:13px;box-shadow:inset 0 0 0 2px #b4c7cc,0 3px 0 #a1b5b5}.btn:active{transform:translateY(2px);box-shadow:inset 0 0 0 2px #b4c7cc}.btn.red{background:linear-gradient(#ec7977,#c64854);color:white;box-shadow:inset 0 0 0 2px #ffb8ad,0 3px #8b3b48}.btn.blue{background:linear-gradient(#72c7d0,#318ba2);color:white;box-shadow:inset 0 0 0 2px #a2e5e4,0 3px #286a80}.btn.smallbtn{padding:6px 9px;font-size:11px}.row{display:flex;gap:8px;align-items:center}.row.between{justify-content:space-between}.wrap{flex-wrap:wrap}.stretch{flex:1}.habitat{padding:8px;border:5px solid #607b8c;border-radius:13px;background:#f7fdfb;box-shadow:inset 0 0 0 2px #d5e6de,0 4px #afc6ca}.habtop{display:flex;justify-content:space-between;align-items:center;padding:5px 4px 9px;font-size:11px;font-weight:1000;letter-spacing:1px}.grassbox{height:173px;border:3px solid #7ca9a5;border-radius:7px;position:relative;overflow:hidden;background:repeating-linear-gradient(0deg,transparent 0 23px,#9acfc355 23px 24px),linear-gradient(#a5dbe4 0%,#d8e9d6 61%,#99c294 61%,#75ad81 100%)}.grassbox:after{content:'✦  ✧  ✦';position:absolute;top:12px;right:10px;color:white;font-size:18px;opacity:.65}.hills{position:absolute;bottom:30px;width:100%;height:26px;border-radius:50% 50% 0 0;background:#83bc94}.buddy{position:absolute;bottom:24px;left:38%;animation:meander 12s ease-in-out infinite alternate;display:flex;align-items:center;flex-direction:column;filter:drop-shadow(2px 4px 0 #244a4950);z-index:2}@keyframes meander{0%{left:13%}45%{left:59%}100%{left:32%}}.buddyimg{height:85px;width:85px;object-fit:contain;image-rendering:pixelated;transform:scale(1.25)}.fallback{height:85px;width:85px;display:grid;place-items:center;font-size:49px;animation:bob 1.7s ease-in-out infinite alternate}@keyframes bob{to{transform:translateY(-6px)}}.buddyname{font-size:10px;font-weight:900;background:#ffffffc9;padding:3px 8px;border-radius:10px}.groundlabel{position:absolute;right:7px;bottom:5px;font-size:10px;color:#366451;font-weight:850}.stats{margin:12px 0;background:#fffef6;border:3px solid #688096;border-radius:10px;padding:10px;box-shadow:inset 0 0 0 2px #d4e4df}.xpbar{height:15px;border:3px solid #283e55;border-radius:8px;background:#263d4f;overflow:hidden;margin:6px 0}.xpfill{height:100%;background:linear-gradient(90deg,#3ea5d1,#68ded5);transition:width .4s}.wallet{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-top:11px}.token{border:2px solid #b6c8c6;background:#f6faf8;border-radius:7px;display:flex;gap:5px;align-items:center;padding:6px 4px;min-width:0}.token .symbol{font-size:20px}.token strong{display:block;font-size:13px}.token small{font-size:9px;color:#627880}.menu{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.menu button{border:3px solid #173045;border-radius:11px;min-height:93px;background:linear-gradient(#fff,#dfebec);display:flex;text-align:left;align-items:center;gap:9px;padding:9px;box-shadow:inset 0 0 0 2px #becfd2,0 4px #a6b9bc;color:#1f3b4e}.menu button b{font-size:14px}.menu button small{font-size:10px;color:#5b7584;display:block;margin-top:3px}.menu .pic{font-size:32px}.fullbtn{width:100%;margin-top:9px;padding:13px;background:linear-gradient(#2b7e99,#17556f);color:white;border:3px solid #10374d;border-radius:10px;font-weight:950;letter-spacing:1.8px;box-shadow:inset 0 0 0 2px #81cbdb}.secondaryMenu{display:flex;gap:7px;margin-top:9px}.secondaryMenu button{flex:1}.foot{text-align:center;color:#65808b;font-size:10px;margin:16px 0 5px}.tasktree{border:3px solid #78a096;background:#e2f0dd;padding:10px;border-radius:10px;display:flex;gap:9px;align-items:center;margin-bottom:11px}.treeart{font-size:54px;line-height:1;transform-origin:bottom;transition:transform .3s}.taskcard{display:flex;gap:10px;align-items:flex-start;padding:11px;border:2px solid #d3dddb;border-radius:14px;background:#fff;margin-bottom:9px;box-shadow:0 3px #d2dfdf}.check{border:2px solid #95a9ae;border-radius:50%;width:29px;height:29px;background:white;flex-shrink:0}.taskinfo{flex:1;min-width:0}.taskinfo strong{font-size:15px;display:block;word-break:break-word}.taskinfo p{color:#6b7f85;font-size:12px;margin:4px 0;white-space:pre-wrap}.duedate{font-size:11px;font-weight:850;color:#986625}.duedate.late{color:#c64c59}.editbtn{font-size:11px;background:none;border:0;color:#4d7890;font-weight:800;padding:7px}.empty{border:2px dashed #b2c6c7;border-radius:12px;color:#627d86;text-align:center;padding:26px 13px;line-height:1.6;font-size:13px}.item{border:2px solid #cad8dc;border-radius:10px;padding:10px;background:#fff;display:flex;gap:10px;align-items:center;margin-bottom:9px}.iteminfo{flex:1;min-width:0}.iteminfo strong{display:block;font-size:13px;overflow-wrap:anywhere}.iteminfo small{display:block;font-size:10px;color:#73858d;margin-top:3px}.field{margin:9px 0;display:grid;gap:5px}.field label{font-weight:800;font-size:12px}.field input,.field textarea,.field select{border:2px solid #aebfc7;border-radius:8px;background:white;padding:10px;width:100%;font-size:15px;color:#1b3649}.field textarea{min-height:88px;resize:vertical}.modal{display:none;position:fixed;inset:0;background:#081b2bd1;z-index:80;align-items:flex-end;justify-content:center;padding:10px}.modal.open{display:flex}.sheet{max-width:565px;width:100%;max-height:89dvh;overflow-y:auto;background:#f5f7ef;border:5px solid #1a344d;border-radius:17px;padding:14px;box-shadow:0 14px 45px #0006}.sheethead{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}.sheethead b{font-size:18px}.close{background:none;border:0;color:#4a687b;font-size:26px}.actions{display:flex;gap:8px;margin-top:12px}.actions .btn{flex:1}.shopitem{border:2px solid #b6c6c8;border-radius:11px;background:#fff;padding:10px;display:flex;gap:8px;align-items:center;margin:8px 0}.shopicon{font-size:31px;min-width:34px}.shopmain{flex:1}.shopmain b{display:block;font-size:14px}.shopmain small{font-size:10px;color:#72848e}.badge{border-radius:6px;background:#d8e8eb;color:#345366;font-size:10px;font-weight:900;padding:4px 7px;display:inline-block}.safari{border:4px solid #577e87;border-radius:13px;background:linear-gradient(#bbdfe4 0 48%,#b4d69c 48%);padding:17px 7px 12px;margin-bottom:13px;min-height:193px;overflow:hidden;position:relative}.safari h3{font-size:12px;letter-spacing:1.5px;text-align:center;color:#254e61;margin:0 0 8px}.balls{display:flex;justify-content:space-around;align-items:flex-end;margin-top:12px;gap:9px}.ball{min-width:0;flex:1;border:0;background:transparent;display:grid;gap:5px;justify-items:center;color:#28465b;font-size:11px;font-weight:950}.ball-icon{border:4px solid #173043;border-radius:50%;height:70px;width:70px;max-width:100%;background:linear-gradient(#d75462 0 45%,#202e39 45% 53%,#fffdf7 53% 100%);display:grid;place-items:center;font-size:29px;color:#183348;box-shadow:0 6px #527b64;animation:ballpop .45s both}.ball:nth-child(2) .ball-icon{animation-delay:.18s}.ball:nth-child(3) .ball-icon{animation-delay:.36s}@keyframes ballpop{from{transform:translateY(90px) rotate(-30deg);opacity:.3}to{transform:translateY(0) rotate(0);opacity:1}}.ball-icon:before{content:'';width:19px;height:19px;background:#fff;border:4px solid #182939;border-radius:50%;box-shadow:inset 0 0 0 3px #c4ced3}.ball:active .ball-icon{transform:scale(.92)}.pokemon-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}.poke{background:linear-gradient(#e6f5f1,#cddfe7);border:3px solid #7999aa;border-radius:12px;min-height:120px;padding:7px 5px;display:flex;align-items:center;flex-direction:column;justify-content:center;gap:4px;color:#263d51}.poke.activepoke{border-color:#dfbf62;box-shadow:inset 0 0 0 2px #f9e3a0}.poke img,.revealimg{width:68px;height:68px;object-fit:contain;image-rendering:pixelated}.poke strong{font-size:11px;word-break:break-word;text-align:center}.poke small{font-size:10px;color:#4f6c80}.reveal{text-align:center;padding:17px 10px;background:radial-gradient(circle,#fff9d7,#daeff0);border:3px solid #8badae;border-radius:12px}.reveal.shiny{background:radial-gradient(circle,#fff6af,#ffd4eb,#c1e2f4);animation:shinyflash 1.6s ease-in-out infinite alternate}@keyframes shinyflash{to{filter:brightness(1.11)}}.revealimg{height:135px;width:135px;animation:revealpop .55s cubic-bezier(.2,1.7,.4,1) both}@keyframes revealpop{from{transform:scale(.2) rotate(-15deg);opacity:0}to{transform:scale(1);opacity:1}}.glitter{font-size:20px;letter-spacing:9px;animation:bob .4s ease-in-out infinite alternate}.pokestats{margin-top:12px;font-size:12px;text-align:left;background:#fff9;padding:10px;border-radius:9px}.progress{height:13px;background:#1b344a;border-radius:7px;overflow:hidden;margin:7px 0}.progress>div{height:100%;background:linear-gradient(90deg,#6dc6cf,#85dcc0)}.answer{display:block;width:100%;text-align:left;background:#fff;border:2px solid #9ebbc3;border-radius:9px;padding:11px;margin:7px 0;color:#28485c;font-weight:750}.answer.correct{background:#c8eed8}.answer.wrong{background:#f9d9d2}.toast{position:fixed;bottom:calc(env(safe-area-inset-bottom) + 24px);left:50%;transform:translateX(-50%);z-index:100;background:#18334a;color:white;padding:12px 15px;border:3px solid #addbd2;border-radius:13px;box-shadow:0 8px 25px #0005;max-width:90%;width:max-content;font-size:13px;font-weight:850;pointer-events:none;animation:toastin .24s ease}@keyframes toastin{from{opacity:0;transform:translate(-50%,14px)}to{opacity:1;transform:translate(-50%,0)}}.plainlist{padding-left:20px;font-size:12px;line-height:1.7}.smallsplit{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+
+/* Pokémon Box: inspired by the six-across green box and lower details in the user's sketch. */
+.pokemon-grid{grid-template-columns:repeat(5,minmax(0,1fr));gap:5px;padding:10px 6px;background:linear-gradient(155deg,#a0e883,#d2f6a8 52%,#8bd8a4);border:4px solid #5b9994;border-radius:14px;max-height:330px;overflow:auto}
+.poke{min-height:75px;border-width:2px;border-color:#6cbe89;border-radius:8px;background:#f0ffc79e;padding:4px 2px;gap:2px;box-shadow:0 2px #70ac80}
+.poke img{width:38px!important;height:38px!important;object-fit:contain;image-rendering:pixelated}
+.poke strong{font-size:9px;line-height:1.2;max-width:100%;white-space:nowrap;text-overflow:ellipsis;overflow:hidden}.poke small{font-size:8px;line-height:1.2}.poke.activepoke{border-color:#db9e33;background:#fff6c3}
+.poke-detail{margin-top:13px}.moncard{background:#fdfcf6;border:4px solid #29465d;border-radius:16px;padding:12px;box-shadow:inset 0 0 0 2px #afc8cf,0 4px #a3bbbc}
+.moncard-top{display:grid;grid-template-columns:115px minmax(0,1fr);gap:12px;align-items:center}
+.monportrait{min-height:132px;border:3px solid #7e9db2;background:linear-gradient(#e4f7f8,#bfdfa7);border-radius:10px;display:grid;place-items:center}
+.monportrait img{height:97px;width:97px;object-fit:contain;image-rendering:pixelated}
+.monbio{font-size:11px;line-height:1.55;overflow-wrap:anywhere}.monbio h3{font-size:19px;margin:0 0 5px}.monbio .badge{margin:1px}
+.monstatbox{border:3px solid #b2c7c5;border-radius:10px;background:#f4f8f5;margin-top:10px;padding:10px;font-size:12px}.monstatbox .row{margin-top:5px}
+.discaction{border:0;background:none;display:flex;flex-direction:column;align-items:center;margin:-2px auto 0;padding:7px 10px;gap:5px;color:#264357;font-size:12px;font-weight:1000;max-width:100%}
+.disc{width:83px;height:83px;border:4px solid #5e7895;border-radius:50%;position:relative;background:conic-gradient(#e9b3ea,#a9e7f6,#fcf2b9,#9bbdff,#f4aadd,#e9b3ea);box-shadow:inset 0 0 0 11px #ffffff60,0 4px #a5b4c2;animation:discspin 7s linear infinite}
+.disc:before{content:'';position:absolute;inset:29px;border:7px solid #d9a95e;background:#fff;border-radius:50%;box-shadow:0 0 0 3px #37445a}
+@keyframes discspin{to{transform:rotate(360deg)}}.discname{display:block;padding:5px 9px;border:2px solid #b6c9d3;background:#eef8fb;border-radius:7px;text-align:center}
+.pasture{display:grid;grid-template-columns:32% 1fr;gap:8px;align-items:end;min-height:300px;background:linear-gradient(#d7edfc,#d9f3e1 48%,#95c58d 48%);border:4px solid #557d84;border-radius:14px;padding:10px;overflow:hidden;position:relative;margin-bottom:13px}
+.pasture:before{content:'✦ ✧';position:absolute;left:12px;top:24px;color:#fff;font-size:24px}.pasture-grass{position:absolute;bottom:0;height:25px;left:0;right:0;background:repeating-linear-gradient(100deg,#6dba7a 0 7px,#9ed88e 7px 14px)}
+.pasture-mon{z-index:2;align-self:center;min-height:115px;display:grid;place-items:center;animation:arrival .75s ease-out both}
+.pasture-mon img{height:98px;width:98px;max-width:100%;image-rendering:pixelated;object-fit:contain}
+@keyframes arrival{0%{opacity:0;transform:translate(95px,-45px) scale(.25);filter:brightness(4)}60%{opacity:1;filter:brightness(2)}100%{transform:translate(0,0) scale(1);filter:brightness(1)}}
+.lab-monitor{z-index:2;background:linear-gradient(#173549,#1e5261);border:5px solid #526b89;border-radius:11px;padding:7px;min-height:245px;box-shadow:0 7px #203943,inset 0 0 0 2px #80a4ac;color:white;animation:monenter .4s .15s backwards}
+@keyframes monenter{from{opacity:.4;transform:translateY(15px)}to{opacity:1;transform:translateY(0)}}
+.monitor-top{display:flex;justify-content:space-between;gap:4px;font-size:9px;letter-spacing:.4px;font-weight:950;border-bottom:2px solid #85cfd4;padding:3px 0 7px}.monitor-top span{white-space:nowrap}
+.tm-list{max-height:350px;overflow:auto;margin-top:7px}.tm-item{background:#f1f9f4;color:#203d4d;border:2px solid #82b2b5;border-radius:7px;padding:6px;margin-bottom:6px;display:grid;gap:3px;font-size:10px}
+.tm-item strong{font-size:11px}.tm-item small{font-size:9px;color:#577784}.tm-item .btn{font-size:9px;padding:4px 6px;justify-self:end}.tm-empty{font-size:11px;line-height:1.5;color:#e4eae9}
+@media(max-width:370px){.moncard-top{grid-template-columns:96px minmax(0,1fr);gap:8px}.monportrait{min-height:114px}.monportrait img{height:83px;width:83px}.monbio h3{font-size:16px}.lab-monitor{padding:4px}}
+@media(prefers-reduced-motion:reduce){.disc,.pasture-mon,.lab-monitor{animation:none}}
+
+
+/* PokémonCollege v0.3 • tactile, edge-to-edge game dashboard */
+:root{--navy:#152943;--steel:#59718d;--coral:#ff6679;--aqua:#5fe3dd;--dark:#0b1729;--cream:#f8fafb;--green:#59cda5;--line:#dce9ef}
+html{background:#061220;}
+body{background:#081624;color:#233650;font-family:-apple-system,BlinkMacSystemFont,system-ui,'Segoe UI',sans-serif;font-size:14px;-webkit-font-smoothing:antialiased}
+button{min-height:42px;outline-offset:2px}
+button:focus-visible{outline:3px solid #43d9d2}
+.app{min-height:100dvh;max-width:none;margin:0;padding:0;background:radial-gradient(ellipse at 15% -5%,#375b88 0%,transparent 40%),#081624}
+.frame{max-width:610px;min-height:100dvh;margin:auto;border:0;border-radius:0;overflow:visible;background:linear-gradient(180deg,#edf5fa 0,#fafbff 30%,#e9f0f7 100%);box-shadow:none}
+.header{position:sticky;top:0;z-index:40;min-height:76px;padding:calc(10px + env(safe-area-inset-top)) 19px 12px;background:linear-gradient(122deg,#14263f 0%,#1c3858 59%,#102943 100%);border-bottom:1px solid #43607c;box-shadow:0 6px 25px #091b303b;gap:10px}
+.header:before{content:'';position:absolute;right:12%;bottom:0;top:0;width:60px;opacity:.16;background:repeating-linear-gradient(-45deg,transparent 0 9px,#8dc6fb 9px 10px);pointer-events:none}
+.brand{display:flex;align-items:center;gap:11px;min-width:0}
+.brandorb{width:40px;height:40px;border-radius:50%;border:3px solid #e1edf6;background:linear-gradient(#ff7588 0 46%,#163146 47% 55%,#fbfbf3 56%);box-shadow:0 0 0 3px #3b5474,0 4px 12px #0003;display:grid;place-items:center;flex-shrink:0}
+.brandorb i{display:block;width:12px;height:12px;border:3px solid #254057;border-radius:50%;background:#fff;box-shadow:0 0 0 1px #c8dbe1}
+.logo{display:flex;flex-direction:column;letter-spacing:.15px;font-size:19px;line-height:.99;font-weight:900;color:#fff;text-shadow:none;min-width:0}
+.logo>span:first-child{font-size:13px;letter-spacing:1.8px;color:#abdcf4;font-weight:850}
+.logo>b{font-size:21px;letter-spacing:1.8px;color:#fff}
+.logo>.logocap{font-size:8px;line-height:1.7;letter-spacing:1.6px;color:#8daac7;font-weight:750;margin-top:3px}
+.header-side{display:flex;gap:9px;align-items:center;justify-content:flex-end}
+.topcontext{color:#a3d3ed;font-size:9px;letter-spacing:1.35px;font-weight:900;white-space:nowrap}
+.headerbtn{background:#ffffff14;border:1px solid #6e93ac;color:#fff;border-radius:12px;min-height:38px;min-width:40px;padding:6px;font-size:25px;font-weight:700}
+.headersettings{width:36px;min-width:36px;height:36px;min-height:36px;display:grid;place-items:center;border:1px solid #6c8fad;border-radius:11px;color:#def5ff;background:#ffffff12;font-size:21px;box-shadow:inset 0 1px #ffffff1c}
+.pad{padding:18px 16px calc(116px + env(safe-area-inset-bottom))}
+.section.current{animation:sectionin .23s cubic-bezier(.2,.75,.3,1)}
+@keyframes sectionin{from{opacity:.2;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.habitat{background:linear-gradient(128deg,#182e4c,#2a5570);border:1px solid #355772;border-radius:22px;padding:12px 12px 13px;box-shadow:0 12px 26px #243f5a2c,inset 0 1px #ffffff2a;position:relative;overflow:hidden}
+.habitat:before{content:'';position:absolute;top:-30px;right:-30px;width:130px;height:130px;border:20px solid #72cfe61c;border-radius:50%;pointer-events:none}
+.habtop{color:#e2fbff;padding:0 2px 9px;letter-spacing:1.4px;font-size:10px;font-weight:850;position:relative;z-index:1}
+.habtop span:last-child{background:#ffffff24;border:1px solid #ffffff24;padding:5px 9px;border-radius:8px;font-size:10px;letter-spacing:.5px}
+.grassbox{height:178px;border:2px solid #97cbd3;border-radius:13px;background:linear-gradient(178deg,#81cde4 0%,#c5eff0 58%,#a5d4b6 59%,#93bd9a 100%);box-shadow:inset 0 0 24px #ffffff39,0 5px #0e345f36;isolation:isolate}
+.grassbox:before{content:'';position:absolute;inset:0;z-index:0;background:radial-gradient(circle at 77% 18%,#f7fbdb 0 20px,#f7fbdb77 22px,transparent 49px),linear-gradient(156deg,transparent 0 50%,#c2dfbd66 50% 56%,transparent 56%);pointer-events:none}
+.grassbox:after{content:'✦';top:10px;right:15px;color:#fff9d9;font-size:26px;opacity:.9}
+.hills{background:linear-gradient(135deg,#80c29f,#4b9e82);bottom:11px;height:47px;border-radius:52% 40% 0 0;opacity:.7}
+.buddy{bottom:29px;filter:drop-shadow(0 7px 3px #174f4b41)}
+.buddyimg{height:110px;width:110px;image-rendering:pixelated;transform:scale(1.08)}
+.fallback{font-size:55px;background:#ffffff4f;border:2px dashed #e6fffb9c;border-radius:22px;width:83px;height:83px;box-shadow:0 4px 12px #104b3530}
+.buddyname{font-size:11px;font-weight:850;border-radius:9px;padding:4px 10px;color:#24445b;background:#f4fffc;box-shadow:0 2px 0 #4f9087}
+.groundlabel{font-size:8px;letter-spacing:1px;right:10px;bottom:6px;color:#2d6657}
+.stats{margin:12px 0 10px;border:1px solid #dae5ed;border-radius:18px;background:#fff;padding:12px 14px 13px;box-shadow:0 5px 16px #2543660e}
+.stats .row strong{font-size:12px;letter-spacing:1.1px;color:#253e59}
+.stats .row small{font-size:11px;font-weight:750;color:#7b8a9b}
+.xpbar{height:9px;background:#e6eef4;border:0;border-radius:7px;margin:8px 0 10px}
+.xpfill{background:linear-gradient(90deg,#39b5d8,#44dec2);border-radius:10px;box-shadow:inset 0 -2px #087a8670}
+.wallet{gap:8px;margin-top:0}
+.token{border:0;background:#eff5f9;border-radius:10px;padding:8px;min-height:51px;gap:5px}
+.token .symbol{font-size:20px}
+.token strong{font-size:14px;color:#19334b;line-height:1.1}
+.token small{font-size:8px;color:#65819b;letter-spacing:.6px;font-weight:850}
+.nextup{display:flex;align-items:center;width:100%;gap:11px;padding:11px 13px;margin:11px 0 19px;background:linear-gradient(115deg,#263f65,#344c78);color:#fff;text-align:left;border:1px solid #42679a;border-radius:15px;box-shadow:0 7px 16px #233e6933}
+.nextglyph{width:36px;height:36px;display:grid;place-items:center;font-size:23px;border-radius:11px;background:#ffffff22;color:#72e4e2;flex-shrink:0}
+.nextdetail{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.nextdetail small{font-size:9px;letter-spacing:1.7px;color:#92dfde;font-weight:900}
+.nextdetail strong{font-size:15px;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nextdetail em{font-size:10px;font-style:normal;color:#c8d8ee}
+.nextarrow{font-size:29px;color:#88f7eb}
+.home-section-head{display:flex;align-items:center;justify-content:space-between;margin:0 3px 10px;font-size:11px;letter-spacing:1.5px;font-weight:950;color:#526989}
+.head-decoration{font-size:17px;color:#91afc6;letter-spacing:3px}
+.menu{gap:10px}
+.menu button{border:0;border-radius:16px;min-height:107px;padding:16px 12px;position:relative;overflow:hidden;box-shadow:0 6px 16px #2b557121;transition:transform .13s ease;text-align:left;align-items:flex-start;gap:9px}
+.menu button:before{content:'';position:absolute;right:-20px;top:-30px;width:100px;height:100px;border:17px solid #fff6;border-radius:50%;opacity:.44}
+.menu button:active,.fullbtn:active,.nextup:active{transform:scale(.976)}
+.menu button span{position:relative;z-index:1}
+.menu .pic{font-size:29px;background:#ffffff8f;width:43px;height:43px;display:grid;place-items:center;border-radius:13px;flex-shrink:0;box-shadow:0 3px 0 #ffffff59}
+.menu button b{font-size:15px;color:#1c3550;font-weight:900;line-height:1.2}
+.menu button small{font-size:10px;color:#516f80;line-height:1.4;margin-top:6px;font-weight:650}
+.menu .tile-task{background:linear-gradient(145deg,#b5f4d5,#7ed1b6)}
+.menu .tile-chat{background:linear-gradient(145deg,#c6dbff,#a0c0f4)}
+.menu .tile-pics{background:linear-gradient(145deg,#fce4b1,#f6c88d)}
+.menu .tile-games{background:linear-gradient(145deg,#e3cbff,#c3a8f1)}
+.fullbtn{margin-top:12px;background:linear-gradient(115deg,#273f77,#5364ae);border:0;border-radius:15px;padding:15px;box-shadow:0 8px 19px #3649972e;color:white;letter-spacing:1.5px;font-size:13px;text-align:center}
+.secondaryMenu{gap:9px;margin-top:10px}
+.secondaryMenu .btn{margin:0;flex:1;min-width:0;font-size:11px;padding:13px 7px;border-radius:13px}
+.foot{font-size:9px;color:#8193a5;letter-spacing:.5px;margin-top:18px}
+.bar{border:0;border-radius:15px;background:linear-gradient(115deg,#243b5b,#3c597c);box-shadow:0 8px 15px #122d4b1f;min-height:56px;padding:13px 14px;color:#fff;font-size:12px;letter-spacing:1.1px;line-height:1.3}
+.bar span{background:#ffffff1c;border:1px solid #ffffff1f;border-radius:7px;padding:5px 8px;font-size:10px;letter-spacing:.3px;white-space:nowrap}
+.btn{background:#fff;border:1px solid #d5e3e8;border-radius:12px;color:#263d58;box-shadow:0 4px 12px #1d435011;font-size:12px;font-weight:800;min-height:42px}
+.btn:active{transform:scale(.97);box-shadow:0 4px 12px #1d435011}
+.btn.red{background:linear-gradient(130deg,#ed586f,#d84765);color:white;border:0;box-shadow:0 5px 15px #d847653a}
+.btn.blue{background:linear-gradient(130deg,#3093b0,#2879a3);color:white;border:0;box-shadow:0 5px 15px #387fa53a}
+.btn.smallbtn{font-size:10px;border-radius:10px}
+.tasktree{border:0;border-radius:16px;background:linear-gradient(140deg,#d9f8e5,#c2ecdb);padding:14px;box-shadow:0 6px 16px #1d654018}
+.taskcard{border:1px solid #e0e8ec;border-radius:16px;box-shadow:0 4px 13px #1c365011;background:#fff;padding:14px 12px;margin-bottom:10px}
+.check{border:2px solid #aabdc9;width:31px;height:31px}
+.taskinfo strong{font-size:14px;color:#213b56}
+.taskinfo p{color:#778ba0;font-size:12px;line-height:1.45}
+.duedate{font-size:10px}
+.item,.shopitem{border:1px solid #dfe7ed;border-radius:15px;background:#fff;padding:13px;box-shadow:0 5px 15px #16334e12}
+.iteminfo strong,.shopmain b{font-size:13px;color:#1a344f}
+.notice{border:0;border-left:4px solid #6cb7cc;border-radius:12px;color:#446178;background:#e5f1f6;line-height:1.6;font-size:12px}
+.empty{background:#fff;border:1px dashed #aec4d1;border-radius:14px;padding:25px;color:#60758a;font-size:13px}
+.badge{background:#e1f0f6;color:#3c6883;border-radius:7px}
+.safari{border:0;border-radius:19px;min-height:200px;box-shadow:0 9px 23px #2d715c21;overflow:hidden}
+.pokemon-grid{border:0;border-radius:16px;box-shadow:0 6px 20px #2b755a26;gap:5px}
+.poke{border:1px solid #69bc87;box-shadow:0 2px #83c298}
+.poke-detail{margin-top:15px}
+.moncard{border:0;border-radius:20px;background:#fff;box-shadow:0 8px 25px #2b4f6330;padding:15px}
+.monportrait{border:1px solid #c4e0e4;border-radius:16px}
+.monstatbox{background:#f1f6f8;border:0;border-radius:13px}
+.discname{border:0;border-radius:11px;background:#e6f5f6}
+.pasture{border:0;box-shadow:0 6px 18px #2f756521;border-radius:18px}
+.lab-monitor{border-radius:15px}
+.answer{background:#fff;border:1px solid #d5e3e9;border-radius:13px;padding:14px}
+.answer.correct{background:#c2f3df}
+.answer.wrong{background:#ffdce4}
+.modal{background:#061220ae;padding:0 0 env(safe-area-inset-bottom)}
+.sheet{border:0;border-radius:24px 24px 0 0;max-width:610px;background:#f8fbff;padding:22px 17px 28px;box-shadow:0 -10px 38px #051a2966;max-height:91dvh}
+.sheet:before{content:'';display:block;width:43px;height:5px;border-radius:9px;background:#c4d1dc;margin:-9px auto 17px}
+.sheethead b{font-size:19px;font-weight:900;color:#233d59}
+.field input,.field textarea,.field select{border:1px solid #c9d7e3;border-radius:12px;padding:13px;font-size:16px}
+.field label{color:#506884;font-size:11px;letter-spacing:.4px}
+.toast{bottom:calc(96px + env(safe-area-inset-bottom));border:0;border-radius:14px;box-shadow:0 9px 24px #00142966}
+.dock{position:fixed;bottom:0;left:0;right:0;z-index:55;display:flex;gap:3px;justify-content:space-around;align-items:flex-start;padding:8px max(13px,env(safe-area-inset-left)) calc(8px + env(safe-area-inset-bottom));background:#11243afa;border-top:1px solid #ffffff2d;box-shadow:0 -7px 21px #0e274441;-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);max-width:610px;margin:auto}
+.dockbtn{flex:1;min-width:0;min-height:55px;border:0;background:transparent;color:#839cba;border-radius:14px;display:flex;align-items:center;flex-direction:column;justify-content:center;gap:2px;font-weight:800;padding:6px 2px;transition:background .15s,color .15s}
+.dockbtn small{font-size:10px;line-height:1.1}
+.dockico{display:grid;place-items:center;width:31px;height:26px;font-size:23px;font-weight:800;line-height:1}
+.dockbtn.active{color:#bbfff3;background:#2d5466}
+.dockbtn.active .dockico{color:#78eadd}
+@media(max-width:365px){.pad{padding-left:11px;padding-right:11px}.topcontext{display:none}.menu button{padding:12px 8px;min-height:100px}.menu .pic{font-size:24px;width:38px;height:38px}.menu button b{font-size:13px}.menu button small{font-size:9px}.token{padding:6px 4px}.token .symbol{font-size:16px}.token small{font-size:7px}}
+@media(min-width:611px){.dock{border-radius:22px 22px 0 0}.frame{box-shadow:0 0 40px #0006}.header{border-radius:0}}
+@media(prefers-reduced-motion:reduce){.buddy,.buddyimg,.fallback,.section.current,.revealimg,.ball-icon{animation:none!important}*{scroll-behavior:auto!important}}
+
+
+/* Home Screen Edition: edge-to-edge iPhone layout */
+html{height:100%;overscroll-behavior-y:none;background:#142334}
+body{min-height:100%;overscroll-behavior-y:contain;-webkit-text-size-adjust:100%;user-select:none;-webkit-user-select:none}
+input,textarea,select,[contenteditable]{user-select:text;-webkit-user-select:text}
+.app{max-width:610px;min-height:100dvh;padding:env(safe-area-inset-top) 0 0;background:linear-gradient(150deg,#24425f,#182b44)}
+.frame{border:0;border-radius:0;min-height:100dvh;box-shadow:none;overflow:visible;background:linear-gradient(#f8faf2,#e0e9e6)}
+.header{position:sticky;top:0;z-index:45;padding:12px 15px;border-bottom:3px solid #203a52}
+main.pad{padding:15px 13px calc(88px + env(safe-area-inset-bottom))}
+.dock{max-width:610px}
+@media(min-width:611px){.frame{box-shadow:none}.dock{border-radius:0}}
+@media(display-mode:standalone){.header{padding-top:13px}.app{padding-top:env(safe-area-inset-top)}}
+#pcOffline{position:fixed;z-index:99;top:calc(8px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);display:none;background:#ffedc7;color:#593d1f;padding:6px 12px;border-radius:30px;font-size:11px;font-weight:850;box-shadow:0 4px 16px #0003;white-space:nowrap;pointer-events:none}
+
+</style></head><body>
+<div id="pcOffline" aria-live="polite">OFFLINE · SAVED ON DEVICE</div><div class="app"><div class="frame"><div class="header">
+  <div class="brand"><span class="brandorb" aria-hidden="true"><i></i></span><div class="logo"><span>POKÉMON</span><b>COLLEGE</b><span class="logocap">YOUR PERSONAL POKÉDEX</span></div></div>
+  <div class="header-side"><span id="topContext" class="topcontext">HOME</span><button class="headersettings" onclick="go('settings')" aria-label="Settings and backups">⚙</button><button class="headerbtn" id="navHome" onclick="go('home')" aria-label="Return home">↶</button></div>
+</div><main class="pad">
+<section class="section current" id="home"><div class="habitat"><div class="habtop"><span>◉ COMPANION HABITAT</span><span id="companionTitle">MAGEARNA</span></div><div class="grassbox"><div class="hills"></div><div class="buddy"><img class="buddyimg" id="buddyImg" alt="Companion Pokémon"><div class="fallback" id="buddyFallback">⚙️</div><div class="buddyname" id="buddyName">Magearna</div></div><div class="groundlabel">BOX • FIELD</div></div></div><div class="stats"><div class="row between"><strong id="level">LEVEL 1</strong><small id="xpCounter">0 / 100 EXP</small></div><div class="xpbar"><div class="xpfill" id="xpfill"></div></div><div class="wallet"><div class="token"><span class="symbol">⚙️</span><div><strong id="balance">0</strong><small>COGS</small></div></div><div class="token"><span class="symbol">🧁</span><div><strong id="puffs">0</strong><small>POKÉPUFFS</small></div></div><div class="token"><span class="symbol">🍬</span><div><strong id="candies">0</strong><small>RARE CANDIES</small></div></div></div></div><button class="nextup" onclick="go('tasks')" aria-label="Open upcoming tasks">
+  <span class="nextglyph" aria-hidden="true">↗</span>
+  <span class="nextdetail"><small>YOUR NEXT QUEST</small><strong id="homeNextTitle">Ready for today?</strong><em id="homeNextMeta">Add a task to get started</em></span>
+  <span class="nextarrow" aria-hidden="true">›</span>
+</button>
+<div class="home-section-head"><span>QUICK ACCESS</span><span class="head-decoration" aria-hidden="true">✧ • ✧</span></div>
+<div class="menu"><button class="tile-task" onclick="go('tasks')"><span class="pic">🌳</span><span><b>Sutodo List</b><small>Plan your assignments</small></span></button><button class="tile-chat" onclick="go('chat')"><span class="pic">🎙️</span><span><b>ChatTalk</b><small>Record & transcribe</small></span></button><button class="tile-pics" onclick="go('pics')"><span class="pic">📷</span><span><b>PokéPics</b><small>Photo study library</small></span></button><button class="tile-games" onclick="go('minigames')"><span class="pic">🎮</span><span><b>Minigames</b><small>Study and play</small></span></button></div><button class="fullbtn" onclick="go('summaries')">📚 SUMMARIES</button><div class="secondaryMenu"><button class="btn stretch" onclick="go('safari')">🌿 POKÉSAFARI</button><button class="btn stretch" onclick="go('collection')">▦ POKÉMON BOX</button></div><div class="secondaryMenu"><button class="btn stretch" onclick="go('focus')">⏱ FOCUS</button><button class="btn stretch" onclick="go('shop')">🛒 COG SHOP</button></div><div class="foot">ON-DEVICE PROGRESS • FAN PROJECT</div><div class="notice" id="installHint" style="display:none">To use PokémonCollege like an app: in Safari, tap Share → Add to Home Screen → enable Open as Web App. Open PokémonCollege from its new icon.</div></section>
+<section class="section" id="shop"><div class="bar">🛒 KECLEON'S COG SHOP <span id="shopBalance">0 ⚙</span></div><div class="notice">Cogs are earned from studying and completing tasks. Nothing here costs real money. Your purchases are saved on-device.</div><div class="shopitem"><span class="shopicon">🍬</span><div class="shopmain"><b>Rare Candy</b><small>Used to evolve your Pokémon. Initial shop price.</small></div><button class="btn smallbtn" onclick="buyItem('candy')">12 ⚙</button></div><div class="shopitem"><span class="shopicon">🧁</span><div class="shopmain"><b>Poképuff</b><small>A collectible treat for your companion. Feeding mechanics come later.</small></div><button class="btn smallbtn" onclick="buyItem('puff')">5 ⚙</button></div><div class="bar" style="margin-top:17px">💿 DAILY TM SHOP <span id="tmShopDate"></span></div><div id="tmDailyShop"></div><p class="small muted">The stock rotates each day based on your iPhone's calendar date. TMs are saved in your collection, even after the shop rotates.</p><button class="btn blue" style="width:100%" onclick="go('safari')">🎟️ BUY SAFARI TICKETS →</button></section>
+
+<section class="section" id="tasks"><div class="bar">🌳 SUTODO LIST <span id="taskCount">0 OPEN</span></div><div class="tasktree"><span class="treeart" id="tree">🌳</span><div><strong id="treeTitle">YOUR TASK TREE</strong><div class="small muted" id="treeSubtitle">Add tasks to grow your Sudowoodo!</div></div></div><div class="row between" style="margin-bottom:12px"><button class="btn red" onclick="taskForm()">＋ ADD TASK</button><button class="btn smallbtn" onclick="showUnavailable('ChatTalk task extraction')">⇧ IMPORT FROM CHATTALK</button></div><div id="taskList"></div><button class="btn" style="width:100%;margin-top:10px" onclick="toggleDone()" id="doneToggle">SHOW COMPLETED</button></section>
+<section class="section" id="safari"><div class="bar">🌿 POKÉSAFARI <span>3 MYSTERY BALLS</span></div><div id="safariArea"></div></section>
+<section class="section" id="collection"><div class="bar">▦ POKÉMON COLLECTION <span id="pokeCount">0</span></div><div class="row wrap" style="margin-bottom:12px"><select id="boxSort" class="btn stretch" onchange="drawCollection()" aria-label="Sort Pokémon"><option value="newest">Newest first</option><option value="species">Species</option><option value="rarity">Rarity</option><option value="size">Size</option><option value="shiny">Shiny first</option></select><button class="btn smallbtn" onclick="go('safari')">+ SAFARI</button></div><div id="boxGrid" class="pokemon-grid"></div><div id="pokeDetail" class="poke-detail"></div></section>
+<section class="section" id="tmlab"><div class="bar">💿 TM TRANSFER STATION <span>MOVE LAB</span></div>
+<div class="pasture"><div class="pasture-grass"></div><div class="pasture-mon" id="labPokemon">◉</div><div class="lab-monitor"><div class="monitor-top">▤ TM LIBRARY <span id="tmInventoryCount">0 DISCS</span></div><div id="tmList" class="tm-list"></div></div></div>
+<div class="notice">Discs replace either the Basic Attack (Fast Move) or Disc Move (Charged Move) of compatible Pokémon. Equipping uses one collected TM Disc. Pokémon GO-inspired move choices and approximate power values are used in this early build.</div><button class="btn" style="width:100%" onclick="go('collection')">← BACK TO POKÉMON BOX</button></section>
+<section class="section" id="focus"><div class="bar">⏱ FOCUS SESSION <span>+10 ⚙</span></div><div id="focusArea"></div></section>
+<section class="section" id="summaries"><div class="bar">📚 SUMMARIES <span id="summaryCount">0</span></div><div class="row" style="margin-bottom:12px"><button class="btn red stretch" onclick="summaryForm()">＋ ADD NOTES</button><button class="btn stretch" onclick="go('minigames')">PLAY QUIZ ↗</button></div><div class="notice">In this first build, summaries are written manually and stored on-device. Automatic lecture and photo summarization will come later.</div><div id="summaryList"></div></section>
+<section class="section" id="minigames"><div class="bar">🎮 STUDY MINIGAMES <span>+5 ⚙</span></div><div class="notice">First minigame: a flashcard-style quiz based on your summaries. Add lines like <b>Gravity: The attraction between objects with mass</b> to a summary, then choose it below.</div><div id="quizArea"></div></section>
+<section class="section" id="chat"><div class="bar">🎙 CHATTALK <span>COMING LATER</span></div><div class="empty" style="font-size:40px">🎙️</div><div class="notice"><b>Not yet recording.</b> This phase will need a recording solution that works with iPhone's locked-screen restrictions, plus transcription and permission-aware lecture capture. The screen is a placeholder, not a working recorder.</div></section>
+<section class="section" id="pics"><div class="bar">📷 POKÉPICS <span>COMING LATER</span></div><div class="empty" style="font-size:40px">📸</div><div class="notice"><b>Not yet importing photos.</b> The gallery, image reading and automatically updated bound summaries will be built with durable file storage rather than temporary browser uploads.</div></section>
+<section class="section" id="settings"><div class="bar">⚙ SETTINGS & SAVE <span>LOCAL</span></div><div class="notice" style="border-left-color:#56b490"><b>Stored on this iPhone:</b> every task, task history, Cog balance, Pokémon, Safari ticket in progress, nickname, summary, and focus session. Saved to this installed Home Screen app’s local storage, with a recovery copy. Export backups to Files regularly.</div><div class="item"><span style="font-size:28px">💾</span><div class="iteminfo"><strong>Export your backup</strong><small>Save the entire collection and tasks as a JSON file in Files.</small></div><button class="btn smallbtn" onclick="exportSave()">EXPORT</button></div><div class="item"><span style="font-size:28px">📥</span><div class="iteminfo"><strong>Import a backup</strong><small>Replace current data after confirmation.</small></div><button class="btn smallbtn" onclick="importSave()">IMPORT</button></div><div class="item"><span style="font-size:28px">🎨</span><div class="iteminfo"><strong>Sprite credits</strong><small>PMD Sprite Repository and its contributing artists.</small></div><button class="btn smallbtn" onclick="credits()">VIEW</button></div><p class="small muted">The local save survives normal app closes and phone restarts. Removing this Home Screen app, clearing its website data, device storage cleanup, or losing the iPhone can erase local data. Export backups to Files regularly. Safari tabs and the installed app keep separate saves.</p><p class="small muted" id="saveStatus">Save status: preparing local storage…</p><button class="btn" style="width:100%;margin-top:12px" onclick="requestDurability()">CHECK DEVICE STORAGE PROTECTION</button><p class="small muted" id="persistStatus">Local storage is separate from Scriptable. Backups remain important.</p></section>
+</main></div></div>
+<nav class="dock" aria-label="Primary navigation">
+  <button class="dockbtn active" data-page="home" onclick="go('home')" aria-label="Home"><span class="dockico">⌂</span><small>Home</small></button>
+  <button class="dockbtn" data-page="tasks" onclick="go('tasks')" aria-label="Tasks"><span class="dockico">☑</span><small>Tasks</small></button>
+  <button class="dockbtn" data-page="safari" onclick="go('safari')" aria-label="Safari"><span class="dockico">◉</span><small>Safari</small></button>
+  <button class="dockbtn" data-page="collection" onclick="go('collection')" aria-label="Pokémon Box"><span class="dockico">▦</span><small>Box</small></button>
+  <button class="dockbtn" data-page="shop" onclick="go('shop')" aria-label="Cog Shop"><span class="dockico">✦</span><small>Shop</small></button>
+</nav>
+<div class="modal" id="modal"><div class="sheet"><div class="sheethead"><b id="modalTitle">DETAILS</b><button class="close" onclick="closeModal()" aria-label="Close">×</button></div><div id="modalBody"></div></div></div><div id="toastMount"></div>
+<script>
+'use strict';
+function showBootError(message){
+  try{
+    var error=document.getElementById('pcBootError');
+    if(!error){error=document.createElement('div');error.id='pcBootError';
+      error.style.cssText='position:fixed;inset:0;z-index:9999;background:#17273b;color:#fff;padding:36px 20px;font:16px -apple-system,sans-serif;overflow:auto;white-space:pre-wrap';
+      document.body.appendChild(error);}
+    error.textContent='PokémonCollege could not finish loading.\n\n'+String(message).slice(0,1000)+'\n\nYour save files have not been erased.';
+  }catch(e){}
+}
+window.addEventListener('error',function(e){showBootError(e.message||'Unknown script error')});
+window.addEventListener('unhandledrejection',function(e){showBootError(e.reason||'Unhandled app error')});
+// PokémonCollege PWA local save bridge. No server receives saved progress.
+const STORAGE_MAIN='PokemonCollege-PWA-save-v1';
+const STORAGE_RECOVERY='PokemonCollege-PWA-recovery-v1';
+let saveWarning='';
+let pcStorageReady=true;
+function goodSave(p){return p&&p.schema===1&&Array.isArray(p.tasks)&&Array.isArray(p.pokemon)&&Array.isArray(p.summaries)&&Number.isFinite(p.cogs)}
+function parseSaved(raw){if(!raw)return null;try{let v=JSON.parse(raw);return goodSave(v)?v:null}catch(e){return null}}
+function blankSave(){return {schema:1,createdAt:new Date().toISOString(),updatedAt:null,cogs:0,xp:0,puffs:0,candies:0,completedTasks:0,tasks:[],pokemon:[],mainId:null,pendingSafari:null,summaries:[],focus:null,tmDiscs:[],tmBought:{},levelRewardBaseline:0}}
+function chooseStartupSave(){
+ try{
+  const saved=localStorage.getItem(STORAGE_MAIN);
+  const recovered=localStorage.getItem(STORAGE_RECOVERY);
+  const first=parseSaved(saved),second=parseSaved(recovered);
+  if(first)return first;
+  if(second){saveWarning='Recovery copy was loaded. Please export a backup.';return second}
+  if(saved!==null||recovered!==null){pcStorageReady=false;saveWarning='Existing saved data could not be read. Nothing was overwritten. Import a backup.';return blankSave()}
+  return blankSave();
+ }catch(e){pcStorageReady=false;saveWarning='iPhone storage is blocked: '+String(e.message||e);return blankSave()}
+}
+const initialData=chooseStartupSave();
+// Write the recovery copy before replacing the primary copy.
+function persistNow(){
+ if(!pcStorageReady)throw Error('Local storage unavailable. Export/import backup first.');
+ if(!goodSave(db))throw Error('Invalid save data; existing save preserved.');
+ const next=JSON.stringify(db);
+ const previous=localStorage.getItem(STORAGE_MAIN);
+ if(previous!==null && parseSaved(previous))localStorage.setItem(STORAGE_RECOVERY,previous);
+ localStorage.setItem(STORAGE_MAIN,next);
+ // Extra IndexedDB mirror for non-blocking recovery; browser may evict both under storage pressure.
+ mirrorToIndexedDB(next);
+}
+let pcIDB=null;
+function idbOpen(){
+ if(!('indexedDB' in window))return Promise.resolve(null);
+ return new Promise(resolve=>{
+  let req;try{req=indexedDB.open('PokemonCollegeBackups',1)}catch(e){resolve(null);return}
+  req.onupgradeneeded=()=>{try{req.result.createObjectStore('data')}catch(e){}};
+  req.onsuccess=()=>resolve(req.result);
+  req.onerror=()=>resolve(null);
+  req.onblocked=()=>resolve(null);
+ });
+}
+function mirrorToIndexedDB(value){
+ if(pcIDB===null)return;
+ try{const tr=pcIDB.transaction('data','readwrite');tr.objectStore('data').put(value,'latest')}catch(e){}
+}
+function getMirrored(){
+ return new Promise(resolve=>{
+  if(!pcIDB){resolve(null);return}
+  try{const req=pcIDB.transaction('data').objectStore('data').get('latest');req.onsuccess=()=>resolve(parseSaved(req.result));req.onerror=()=>resolve(null)}catch(e){resolve(null)}
+ });
+}
+async function checkBackupMirror(){
+ pcIDB=await idbOpen();
+ const mirrored=await getMirrored();
+ // Restore from the additional mirror when this Home Screen app has no valid main save.
+ if(!parseSaved(safeGet(STORAGE_MAIN))&&mirrored&&pcStorageReady){
+  const s=JSON.stringify(mirrored);localStorage.setItem(STORAGE_MAIN,s);db=mirrored;saveWarning='Recovered progress from an additional local copy. Export a backup.';
+ }
+ if(pcStorageReady&&!safeGet(STORAGE_MAIN)){
+  try{persistNow()}catch(e){pcStorageReady=false;saveWarning='Local save failed: '+e.message}
+ }
+}
+function safeGet(key){try{return localStorage.getItem(key)}catch(e){return null}}
+function deviceStatus(msg,success=true){const el=document.getElementById('saveStatus');if(el)el.textContent='Save status: '+msg;if(!success)toast(msg)}
+function exportDataText(){return JSON.stringify(db,null,2)}
+async function pwaExport(){
+ const name='PokemonCollege-backup-'+new Date().toISOString().slice(0,10)+'.json';
+ const file=new File([exportDataText()],name,{type:'application/json'});
+ try{
+  if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:'PokémonCollege backup'});deviceStatus('Backup shared. Choose Save to Files to keep it.');return}
+ }catch(e){if(e.name==='AbortError')return}
+ const url=URL.createObjectURL(file);const a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),30000);
+ deviceStatus('Backup download requested. Check Files → Downloads.');
+}
+function pwaImport(){const file=document.getElementById('backupPicker');if(file){file.value='';file.click()}}
+async function onPickedBackup(input){
+ const file=input.files&&input.files[0];if(!file)return;
+ try{
+  if(file.size>15000000)throw Error('Backup too large');
+  const candidate=parseSaved(await file.text());if(!candidate)throw Error('Not a compatible PokémonCollege JSON save');
+  if(!confirm('Replace this app’s saved tasks, Pokémon, Cogs and everything else with the selected backup?'))return;
+  if(!pcStorageReady){ // Allow an explicit user-approved recovery/import when previous local data was invalid.
+   pcStorageReady=true;
+  }
+  const old=db;
+  db=candidate;
+  if(!Array.isArray(db.tmDiscs))db.tmDiscs=[];
+  if(!db.tmBought || typeof db.tmBought!=="object")db.tmBought={};
+  if(!Number.isFinite(db.levelRewardBaseline))db.levelRewardBaseline=Math.floor((db.xp||0)/100);
+  try{persistNow()}catch(e){db=old;throw e}
+  quiz=null;closeModal();go('home');deviceStatus('Backup imported and saved on iPhone ✓');toast('Welcome back! PokémonCollege data restored.');
+ }catch(e){deviceStatus('Import failed: '+e.message,false)}
+}
+async function requestDurability(){
+ const el=document.getElementById('persistStatus');
+ if(!navigator.storage||!navigator.storage.persist){el.textContent='Device storage protection is unavailable here. Export backups regularly.';return}
+ try{const granted=await navigator.storage.persist();el.textContent=granted?'This app has persistent storage protection on this device. Keep backups anyway.':'Persistent storage protection was not granted. Export backups to Files regularly.'}catch(e){el.textContent='Storage check unavailable. Export backups regularly.'}
+}
+
+let db=initialData;let currentPage='home',showDone=false,quiz=null,quizAwarded=false,activeToast=null,selectedMonId=null;
+const fallbackSpecies='⚙️';
+const RARITIES=['Common','Uncommon','Rare','Very Rare','Legendary'];
+// Pokédex numbers / PMD Collab portrait paths. Rarities and weights are editable in later builds.
+const MONS=[
+['Squirtle',7,0],['Wartortle',8,1],['Blastoise',9,3],['Beedrill',15,2],['Poliwag',60,0],['Poliwhirl',61,1],['Poliwrath',62,2],['Shellder',90,0],['Cloyster',91,2],['Krabby',98,0],['Kingler',99,2],['Scyther',123,2],['Mew',151,4],['Sudowoodo',185,2],['Wooper',194,0],['Quagsire',195,1],['Slugma',218,0],['Magcargo',219,1],['Skarmory',227,2],['Larvitar',246,1],['Pupitar',247,2],['Celebi',251,4],['Mudkip',258,0],['Marshtomp',259,1],['Swampert',260,3],['Ralts',280,0],['Gardevoir',282,3],['Mawile',303,2],['Aron',304,0],['Lairon',305,1],['Aggron',306,3],['Wailmer',320,1],['Wailord',321,3],['Torkoal',324,2],['Trapinch',328,1],['Vibrava',329,2],['Flygon',330,3],['Barboach',339,0],['Whiscash',340,1],['Corphish',341,0],['Crawdaunt',342,2],['Lileep',345,1],['Cradily',346,2],['Snorunt',361,0],['Froslass',478,3],['Beldum',374,1],['Metang',375,2],['Metagross',376,3],['Regirock',377,4],['Regice',378,4],['Registeel',379,4],['Kyogre',382,4],['Jirachi',385,4],['Shellos',422,0],['Gastrodon',423,1],['Snover',459,0],['Abomasnow',460,2],['Magnemite',81,0],['Magneton',82,1],['Magnezone',462,3],['Roggenrola',524,0],['Boldore',525,1],['Gigalith',526,3],['Petilil',548,0],['Lilligant',549,3],['Yamask',562,0],['Cofagrigus',563,2],['Tirtouga',564,1],['Carracosta',565,2],['Elgyem',605,1],['Tynamo',602,0],['Eelektrik',603,1],['Eelektross',604,3],['Litwick',607,0],['Lampent',608,1],['Chandelure',609,3],['Larvesta',636,2],['Volcarona',637,3],['Genesect',649,4],['Honedge',679,1],['Doublade',680,2],['Aegislash',681,3],['Phantump',708,0],['Trevenant',709,2],['Noibat',714,0],['Noivern',715,3],['Mimikyu',778,3],['Pyukumuku',771,1],['Xurkitree',796,4],['Celesteela',797,4],['Magearna',801,4],['Marshadow',802,4],['Meltan',808,4],['Melmetal',809,4],['Runerigus',867,3],['Falinks',870,2],['Snom',872,0],['Frosmoth',873,3],['Regieleki',894,4],['Regidrago',895,4],['Fuecoco',909,0],['Crocalor',910,1],['Skeledirge',911,3],['Charcadet',935,1],['Armarouge',936,3],['Ceruledge',937,3],['Tinkatink',957,0],['Tinkatuff',958,1],['Tinkaton',959,3],['Clodsire',980,2],['Slither Wing',988,4],['Iron Moth',994,4],['Wo-Chien',1001,4],['Chien-Pao',1002,4],['Chi-Yu',1004,4],['Iron Valiant',1006,4],['Ogerpon',1017,4],['Duraludon',884,2],['Archaludon',1018,3]];
+const INDEX=Object.fromEntries(MONS.map(m=>[m[0],{species:m[0],number:m[1],tier:m[2]}]));
+const EVO={Squirtle:[['Wartortle',25]],Wartortle:[['Blastoise',100]],Poliwag:[['Poliwhirl',25]],Poliwhirl:[['Poliwrath',100]],Shellder:[['Cloyster',50]],Krabby:[['Kingler',50]],Wooper:[['Quagsire',50]],Slugma:[['Magcargo',50]],Larvitar:[['Pupitar',25]],Mudkip:[['Marshtomp',25]],Marshtomp:[['Swampert',100]],Ralts:[['Gardevoir',100]],Aron:[['Lairon',25]],Lairon:[['Aggron',100]],Wailmer:[['Wailord',100]],Trapinch:[['Vibrava',25]],Vibrava:[['Flygon',100]],Barboach:[['Whiscash',50]],Corphish:[['Crawdaunt',50]],Lileep:[['Cradily',50]],Snorunt:[['Froslass',100]],Beldum:[['Metang',25]],Metang:[['Metagross',100]],Shellos:[['Gastrodon',50]],Snover:[['Abomasnow',50]],Magnemite:[['Magneton',25]],Magneton:[['Magnezone',100]],Roggenrola:[['Boldore',25]],Boldore:[['Gigalith',100]],Petilil:[['Lilligant',50]],Yamask:[['Cofagrigus',50],['Runerigus',100]],Tirtouga:[['Carracosta',50]],Tynamo:[['Eelektrik',25]],Eelektrik:[['Eelektross',100]],Litwick:[['Lampent',25]],Lampent:[['Chandelure',100]],Honedge:[['Doublade',25]],Doublade:[['Aegislash',100]],Phantump:[['Trevenant',50]],Noibat:[['Noivern',50]],Meltan:[['Melmetal',400]],Snom:[['Frosmoth',50]],Fuecoco:[['Crocalor',25]],Crocalor:[['Skeledirge',100]],Charcadet:[['Armarouge',50],['Ceruledge',50]],Tinkatink:[['Tinkatuff',25]],Tinkatuff:[['Tinkaton',100]],Larvesta:[['Volcarona',100]],Duraludon:[['Archaludon',100]]};
+
+// First playable move set uses Pokémon GO's Fast vs Charged move model.
+// Curated species pools are supplemented by family/type fallbacks in this v0.2.
+// Displayed power is representative GO-style damage, not battle simulation.
+const MOVE_STATS={
+'Tackle':['Normal',5,5,'fast'],'Pound':['Normal',7,6,'fast'],'Scratch':['Normal',6,4,'fast'],'Quick Attack':['Normal',8,10,'fast'],
+'Water Gun':['Water',5,5,'fast'],'Bubble':['Water',12,14,'fast'],'Mud Shot':['Ground',5,9,'fast'],'Waterfall':['Water',16,8,'fast'],
+'Vine Whip':['Grass',7,6,'fast'],'Razor Leaf':['Grass',13,7,'fast'],'Bullet Seed':['Grass',8,12,'fast'],
+'Ember':['Fire',10,10,'fast'],'Fire Spin':['Fire',14,10,'fast'],'Incinerate':['Fire',20,20,'fast'],
+'Powder Snow':['Ice',6,15,'fast'],'Frost Breath':['Ice',10,8,'fast'],'Ice Shard':['Ice',12,12,'fast'],
+'Bug Bite':['Bug',5,6,'fast'],'Struggle Bug':['Bug',15,15,'fast'],'Infestation':['Bug',10,14,'fast'],
+'Metal Claw':['Steel',8,7,'fast'],'Bullet Punch':['Steel',9,10,'fast'],'Iron Tail':['Steel',15,7,'fast'],
+'Confusion':['Psychic',20,15,'fast'],'Psycho Cut':['Psychic',5,8,'fast'],'Zen Headbutt':['Psychic',12,10,'fast'],
+'Fairy Wind':['Fairy',3,9,'fast'],'Charm':['Fairy',20,11,'fast'],'Rock Smash':['Fighting',15,10,'fast'],
+'Bite':['Dark',6,4,'fast'],'Snarl':['Dark',12,14,'fast'],'Shadow Claw':['Ghost',9,6,'fast'],'Hex':['Ghost',10,15,'fast'],
+'Rock Throw':['Rock',12,7,'fast'],'Smack Down':['Rock',16,8,'fast'],'Thunder Shock':['Electric',5,8,'fast'],'Spark':['Electric',6,9,'fast'],
+'Dragon Breath':['Dragon',6,4,'fast'],'Air Slash':['Flying',14,10,'fast'],'Wing Attack':['Flying',8,9,'fast'],
+'Poison Jab':['Poison',13,7,'fast'],'Poison Sting':['Poison',5,7,'fast'],'Mud-Slap':['Ground',18,12,'fast'],
+'Water Pulse':['Water',70,50,'charged'],'Aqua Tail':['Water',50,35,'charged'],'Hydro Pump':['Water',130,75,'charged'],
+'Surf':['Water',65,40,'charged'],'Scald':['Water',80,50,'charged'],'Ice Beam':['Ice',90,55,'charged'],
+'Blizzard':['Ice',130,75,'charged'],'Icy Wind':['Ice',60,45,'charged'],'Avalanche':['Ice',90,45,'charged'],
+'Flamethrower':['Fire',90,55,'charged'],'Fire Blast':['Fire',140,80,'charged'],'Overheat':['Fire',160,80,'charged'],
+'Fire Punch':['Fire',55,40,'charged'],'Heat Wave':['Fire',95,75,'charged'],
+'Energy Ball':['Grass',90,55,'charged'],'Leaf Blade':['Grass',70,35,'charged'],'Solar Beam':['Grass',180,80,'charged'],
+'Power Whip':['Grass',90,50,'charged'],'Seed Bomb':['Grass',55,40,'charged'],
+'Rock Slide':['Rock',75,45,'charged'],'Stone Edge':['Rock',100,55,'charged'],'Rock Blast':['Rock',50,40,'charged'],
+'Earthquake':['Ground',110,65,'charged'],'Earth Power':['Ground',90,55,'charged'],'Dig':['Ground',100,55,'charged'],
+'Shadow Ball':['Ghost',100,55,'charged'],'Shadow Punch':['Ghost',40,35,'charged'],'Dark Pulse':['Dark',80,50,'charged'],
+'Brutal Swing':['Dark',65,40,'charged'],'Night Slash':['Dark',50,35,'charged'],
+'Dazzling Gleam':['Fairy',100,70,'charged'],'Play Rough':['Fairy',90,60,'charged'],'Moonblast':['Fairy',110,60,'charged'],
+'Flash Cannon':['Steel',110,70,'charged'],'Iron Head':['Steel',60,50,'charged'],'Heavy Slam':['Steel',70,50,'charged'],
+'Magnet Bomb':['Steel',70,45,'charged'],'Meteor Mash':['Steel',100,50,'charged'],
+'Thunderbolt':['Electric',90,55,'charged'],'Thunder':['Electric',100,60,'charged'],'Discharge':['Electric',65,45,'charged'],
+'Wild Charge':['Electric',100,45,'charged'],'Zap Cannon':['Electric',140,80,'charged'],
+'Psychic':['Psychic',75,55,'charged'],'Psyshock':['Psychic',65,45,'charged'],'Future Sight':['Psychic',120,65,'charged'],
+'Bug Buzz':['Bug',100,60,'charged'],'X-Scissor':['Bug',45,35,'charged'],'Signal Beam':['Bug',75,55,'charged'],
+'Sludge Bomb':['Poison',80,50,'charged'],'Sludge Wave':['Poison',110,65,'charged'],'Cross Poison':['Poison',50,35,'charged'],
+'Dragon Pulse':['Dragon',90,60,'charged'],'Dragon Claw':['Dragon',50,35,'charged'],'Outrage':['Dragon',110,60,'charged'],
+'Close Combat':['Fighting',100,45,'charged'],'Dynamic Punch':['Fighting',90,50,'charged'],'Focus Blast':['Fighting',140,75,'charged'],
+'Aerial Ace':['Flying',55,40,'charged'],'Hurricane':['Flying',110,65,'charged'],'Sky Attack':['Flying',80,45,'charged'],
+'Body Slam':['Normal',60,35,'charged'],'Swift':['Normal',60,50,'charged'],'Hyper Beam':['Normal',150,80,'charged']};
+// Curated priority picks for Pokémon especially important to the user's roster.
+const MOVE_POOLS={
+'Magearna':[['Metal Claw','Zen Headbutt'],['Dazzling Gleam','Flash Cannon','Iron Head']],
+'Lilligant':[['Charm','Razor Leaf'],['Leaf Blade','Solar Beam','Energy Ball']],
+'Petilil':[['Charm','Razor Leaf'],['Seed Bomb','Energy Ball']],
+'Snom':[['Powder Snow','Struggle Bug'],['Icy Wind','Bug Buzz']],
+'Frosmoth':[['Powder Snow','Bug Bite'],['Ice Beam','Bug Buzz','Hurricane']],
+'Tinkatink':[['Fairy Wind','Rock Smash'],['Play Rough','Flash Cannon']],
+'Tinkatuff':[['Fairy Wind','Rock Smash'],['Play Rough','Heavy Slam']],
+'Tinkaton':[['Fairy Wind','Rock Smash'],['Play Rough','Heavy Slam','Brutal Swing']],
+'Larvesta':[['Ember','Bug Bite'],['Bug Buzz','Flamethrower']],
+'Volcarona':[['Fire Spin','Bug Bite'],['Bug Buzz','Overheat','Hurricane']],
+'Slither Wing':[['Bug Bite','Rock Smash'],['Bug Buzz','Close Combat']],
+'Iron Moth':[['Fire Spin','Poison Jab'],['Overheat','Sludge Wave']],
+'Squirtle':[['Bubble','Tackle'],['Aqua Tail','Water Pulse']],
+'Wartortle':[['Water Gun','Bite'],['Hydro Pump','Ice Beam']],
+'Blastoise':[['Water Gun','Bite'],['Hydro Pump','Flash Cannon','Ice Beam']],
+'Mudkip':[['Water Gun','Tackle'],['Sludge Wave','Dig']],
+'Swampert':[['Mud Shot','Water Gun'],['Earthquake','Surf','Sludge Wave']],
+'Mew':[['Shadow Claw','Psycho Cut'],['Psychic','Ice Beam','Thunderbolt','Flamethrower']],
+'Celebi':[['Confusion','Magical Leaf'],['Psychic','Seed Bomb']],
+'Jirachi':[['Confusion','Charge Beam'],['Dazzling Gleam','Psychic']],
+'Fuecoco':[['Incinerate','Bite'],['Flamethrower','Crunch']],
+'Skeledirge':[['Incinerate','Bite'],['Shadow Ball','Flamethrower']],
+'Honedge':[['Shadow Claw','Metal Claw'],['Iron Head','Shadow Ball']],
+'Litwick':[['Ember','Hex'],['Flamethrower','Shadow Ball']],
+'Wooper':[['Mud Shot','Water Gun'],['Body Slam','Mud Bomb']],
+'Clodsire':[['Poison Sting','Mud Shot'],['Earthquake','Sludge Bomb']],
+};
+// A minimal type-based fallback gives the entire current roster playable moves
+// while species-perfect GO learnsets are being audited for a later release.
+const TYPE_MOVES={
+'Water':[['Water Gun','Bubble'],['Water Pulse','Surf']], 'Fire':[['Ember','Fire Spin'],['Flamethrower','Fire Blast']],
+'Grass':[['Vine Whip','Razor Leaf'],['Energy Ball','Seed Bomb']], 'Ice':[['Powder Snow','Ice Shard'],['Ice Beam','Icy Wind']],
+'Steel':[['Metal Claw','Bullet Punch'],['Iron Head','Flash Cannon']], 'Rock':[['Rock Throw','Smack Down'],['Rock Slide','Stone Edge']],
+'Ground':[['Mud Shot','Mud-Slap'],['Earth Power','Dig']], 'Electric':[['Thunder Shock','Spark'],['Thunderbolt','Discharge']],
+'Fairy':[['Fairy Wind','Charm'],['Dazzling Gleam','Play Rough']], 'Psychic':[['Confusion','Psycho Cut'],['Psychic','Psyshock']],
+'Bug':[['Bug Bite','Struggle Bug'],['Bug Buzz','X-Scissor']], 'Ghost':[['Hex','Shadow Claw'],['Shadow Ball','Shadow Punch']],
+'Fighting':[['Rock Smash','Quick Attack'],['Dynamic Punch','Close Combat']], 'Flying':[['Wing Attack','Air Slash'],['Aerial Ace','Hurricane']],
+'Dark':[['Bite','Snarl'],['Dark Pulse','Night Slash']], 'Poison':[['Poison Jab','Poison Sting'],['Sludge Bomb','Cross Poison']],
+'Dragon':[['Dragon Breath','Quick Attack'],['Dragon Pulse','Outrage']], 'Normal':[['Tackle','Quick Attack'],['Body Slam','Swift']]};
+const SPECIES_TYPE={};
+[['Water','Squirtle Wartortle Blastoise Poliwag Poliwhirl Poliwrath Shellder Cloyster Krabby Kingler Wooper Quagsire Mudkip Marshtomp Swampert Wailmer Wailord Barboach Whiscash Corphish Crawdaunt Kyogre Shellos Gastrodon Tirtouga Carracosta Pyukumuku'],
+['Fire','Slugma Magcargo Torkoal Litwick Lampent Chandelure Fuecoco Crocalor Skeledirge Charcadet Armarouge Ceruledge Larvesta Volcarona Iron Moth Chi-Yu'],
+['Grass','Celebi Sudowoodo Lileep Cradily Snover Abomasnow Petilil Lilligant Phantump Trevenant Wo-Chien Ogerpon'],
+['Ice','Snorunt Froslass Snom Frosmoth Regice Chien-Pao'],
+['Steel','Skarmory Aron Lairon Aggron Beldum Metang Metagross Registeel Magnezone Magnemite Magneton Honedge Doublade Aegislash Magearna Meltan Melmetal Celesteela Tinkatink Tinkatuff Tinkaton Duraludon Archaludon'],
+['Rock','Larvitar Pupitar Regirock Roggenrola Boldore Gigalith'],
+['Ground','Trapinch Vibrava Flygon Runerigus Clodsire'],
+['Electric','Tynamo Eelektrik Eelektross Xurkitree Regieleki'],
+['Fairy','Ralts Gardevoir Mawile Mimikyu Iron_Valiant'],
+['Psychic','Mew Jirachi Elgyem Beheeyem'],
+['Bug','Beedrill Scyther Genesect Slither_Wing'],
+['Ghost','Yamask Cofagrigus Marshadow'],
+['Dragon','Regidrago Noibat Noivern'],
+['Fighting','Falinks'],['Normal','Magearna']].forEach(([type,entries])=>entries.split(' ').forEach(n=>{SPECIES_TYPE[n.replaceAll('_',' ')]=type}));
+// Add data for two move names represented in priority pools.
+Object.assign(MOVE_STATS,{'Magical Leaf':['Grass',16,12,'fast'],'Charge Beam':['Electric',7,13,'fast'],'Crunch':['Dark',70,45,'charged'],'Mud Bomb':['Ground',55,40,'charged']});
+function compatiblePools(species){return MOVE_POOLS[species]||TYPE_MOVES[SPECIES_TYPE[species]||'Normal']}
+function choice(xs){return xs[Math.floor(Math.random()*xs.length)]}
+function rollMoves(species){const pool=compatiblePools(species);return {fastMove:choice(pool[0]),discMove:choice(pool[1])}}
+function moveText(name){const d=MOVE_STATS[name];if(!d)return esc(name||'Unknown Move');return '<b>'+esc(name)+'</b> · '+d[0]+' · '+d[1]+' Power'+(d[3]==='fast'?' · +'+d[2]+' energy':' · -'+d[2]+' energy')}
+function makeTM(slot,move,source){return {id:uid(),slot,move,source,obtainedAt:stamp()}}
+function grantXp(x){let previous=Math.floor((db.xp||0)/100);db.xp=(db.xp||0)+x;const after=Math.floor(db.xp/100);if(!Array.isArray(db.tmDiscs))db.tmDiscs=[];for(let l=previous+1;l<=after;l++){if((l+1)%5===0){const slot=Math.random()<.35?'fast':'charged';const possible=Object.entries(MOVE_STATS).filter(x=>x[1][3]===slot);db.tmDiscs.push(makeTM(slot,choice(possible)[0],'Level '+(l+1)+' reward'))}}}
+function localDay(){let d=new Date();return [d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-')}
+function seededRand(seed){let x=2166136261;for(let i=0;i<seed.length;i++){x^=seed.charCodeAt(i);x=Math.imul(x,16777619)}return () => {x^=x<<13;x^=x>>>17;x^=x<<5;return (x>>>0)/4294967296}}
+function dailyTMs(){const rng=seededRand('PokémonCollege TM '+localDay());const all=Object.entries(MOVE_STATS);const selected=[];for(const slot of ['fast','charged','charged']){const pool=all.filter(x=>x[1][3]===slot && !selected.some(v=>v.move===x[0]));selected.push({slot,move:pool[Math.floor(rng()*pool.length)][0],price:slot==='fast'?15:25})}return selected}
+function ensureMoveData(){let changed=false;if(!Array.isArray(db.tmDiscs)){db.tmDiscs=[];changed=true}if(!db.tmBought || typeof db.tmBought!=='object'){db.tmBought={};changed=true}if(!Number.isFinite(db.levelRewardBaseline)){db.levelRewardBaseline=Math.floor((db.xp||0)/100);changed=true}for(const p of db.pokemon){if(!p.fastMove||!p.discMove){Object.assign(p,rollMoves(p.species));changed=true}}if(changed)save()}
+function drawDailyShop(){const root=$('tmDailyShop');$('tmShopDate').textContent=localDay();const bought=db.tmBought[localDay()]||[];root.innerHTML=dailyTMs().map((t,i)=>'<div class="shopitem"><div class="shopicon">💿</div><div class="shopmain"><b>'+esc(t.move)+'</b><small>'+(t.slot==='fast'?'Basic Attack · Fast':'Disc Move · Charged')+' · '+moveText(t.move)+'</small></div><button class="btn smallbtn" '+(bought.includes(i)||db.cogs<t.price?'disabled':'')+' onclick="buyDailyTM('+i+')">'+(bought.includes(i)?'SOLD':t.price+' ⚙')+'</button></div>').join('')}
+function buyDailyTM(index){const t=dailyTMs()[index];if(!t)return;const key=localDay();const bought=db.tmBought[key]||[];if(bought.includes(index)||db.cogs<t.price)return;db.cogs=Math.round((db.cogs-t.price)*100)/100;db.tmDiscs.push(makeTM(t.slot,t.move,'Daily Shop'));db.tmBought[key]=[...bought,index];save();render();toast(t.move+' TM added to your inventory!')}
+function discSlotText(p){return (p.fastMove||'Tackle')+' · '+(p.discMove||'Swift')}
+function showTmLab(id){selectedMonId=id;go('tmlab');}
+function drawTmLab(){
+  const p=db.pokemon.find(x=>x.id===selectedMonId)||db.pokemon.find(x=>x.id===db.mainId);
+  $('tmInventoryCount').textContent=db.tmDiscs.length+' DISCS';
+  if(!p){$('tmList').innerHTML='<p class="tm-empty">Select a Pokémon from the Box first.</p>';$('labPokemon').textContent='◉';return}
+  $('labPokemon').innerHTML=portraitHTML(p.species);
+  const pools=compatiblePools(p.species);
+  const list=db.tmDiscs.length?db.tmDiscs.map(d=>{
+    const correct=pools[d.slot==='fast'?0:1].includes(d.move);
+    const same=p[d.slot==='fast'?'fastMove':'discMove']===d.move;
+    return `<div class="tm-item"><strong>💿 ${esc(d.move)}</strong><small>${d.slot==='fast'?'BASIC':'DISC'} · ${moveText(d.move)}</small><button class="btn" ${!correct||same?'disabled':''} onclick="equipTM('${p.id}','${d.id}')">${same?'EQUIPPED':correct?'EQUIP':'INCOMPATIBLE'}</button></div>`;
+  }).join(''):'<p class="tm-empty">No TM Discs yet. Find them in Kecleon’s Daily Shop or as level rewards.</p>';
+  $('tmList').innerHTML=`<div style="font-size:9px;line-height:1.5;margin-bottom:8px">${esc(p.nickname||p.species)}<br>FAST: ${esc(p.fastMove)}<br>DISC: ${esc(p.discMove)}</div>`+list;
+}
+function equipTM(monId,tmId){
+  const p=db.pokemon.find(x=>x.id===monId),d=db.tmDiscs.find(x=>x.id===tmId);
+  if(!p||!d)return;
+  const pos=d.slot==='fast'?0:1;
+  if(!compatiblePools(p.species)[pos].includes(d.move)){toast('This Pokémon cannot learn that move');return}
+  const key=d.slot==='fast'?'fastMove':'discMove';if(p[key]===d.move)return;
+  modal('TEACH '+d.move.toUpperCase(),`<p>Replace <b>${esc(p[key])}</b> with <b>${esc(d.move)}</b> on ${esc(p.nickname||p.species)}?</p><p class="small muted">The TM Disc will be consumed.</p><div class="actions"><button class="btn" onclick="closeModal()">CANCEL</button><button class="btn red" onclick="finishEquip('${monId}','${tmId}')">EQUIP</button></div>`);
+}
+function finishEquip(monId,tmId){const p=db.pokemon.find(x=>x.id===monId),i=db.tmDiscs.findIndex(x=>x.id===tmId);if(!p||i<0)return;const d=db.tmDiscs[i],key=d.slot==='fast'?'fastMove':'discMove';if(!compatiblePools(p.species)[d.slot==='fast'?0:1].includes(d.move))return;p[key]=d.move;db.tmDiscs.splice(i,1);save();closeModal();render();toast('💿 '+p.species+' learned '+d.move+'!')}
+function $(id){return document.getElementById(id)}function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function uid(){return 'pc_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,9)}
+function money(v){return (Math.round(v*100)/100).toLocaleString(undefined,{maximumFractionDigits:2})}
+function stamp(){return new Date().toISOString()}
+function localDate(when=new Date()){const d=new Date(when);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function dateStart(s){if(!s)return null;const p=s.split('-').map(Number);return new Date(p[0],p[1]-1,p[2])}
+function daysFrom(s,at){if(!s)return 0;const d=dateStart(s),t=new Date(at);t.setHours(0,0,0,0);return Math.round((d-t)/86400000)}
+function native(op,payload={}){if(op==='focusNotification')toast('Focus started. Return to claim rewards; background alerts are not active.')}
+function save(){db.updatedAt=stamp();try{persistNow();deviceStatus('saved on this iPhone ✓')}catch(e){deviceStatus('SAVE FAILED: '+e.message,false)}}
+function toast(msg){if(activeToast)clearTimeout(activeToast);$('toastMount').innerHTML='<div class="toast">'+esc(msg)+'</div>';activeToast=setTimeout(()=>$('toastMount').innerHTML='',3200)}
+window.nativeNotice=function(message,ok){$('saveStatus').textContent='Save status: '+message;if(!ok)toast('Save issue: '+message)};
+function go(page){if(!$(page))return;currentPage=page;
+ document.querySelectorAll('.section').forEach(x=>x.classList.toggle('current',x.id===page));
+ $('navHome').style.display=page==='home'?'none':'block';
+ const pageNames={home:'HOME',tasks:'SUTODO',safari:'SAFARI',collection:'POKÉMON BOX',shop:'COG SHOP',tmlab:'TM LAB',focus:'FOCUS',summaries:'SUMMARIES',minigames:'MINIGAMES',chat:'CHATTALK',pics:'POKÉPICS',settings:'SETTINGS'};
+ $('topContext').textContent=pageNames[page]||'POKÉDEX';
+ document.querySelectorAll('.dockbtn').forEach(b=>{const active=b.dataset.page===page;b.classList.toggle('active',active);if(active)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')});
+ closeModal();render();window.scrollTo({top:0,behavior:'instant'})}
+function modal(title,body){$('modalTitle').textContent=title;$('modalBody').innerHTML=body;$('modal').classList.add('open')}
+function closeModal(){$('modal').classList.remove('open')}
+function showUnavailable(feature){modal(feature,'<div class="notice">This capability is scheduled for a later build. The current version does not pretend to record or analyze anything.</div><button class="btn" onclick="closeModal()">OK</button>')}
+function credits(){modal('ARTIST CREDITS','<p class="small">Pokémon portrait URLs point to the noncommercial PMD Sprite Repository. Contributor credit belongs to the individual artists on each species page. Official Pokémon artwork and names belong to their respective owners.</p><p class="small">Visit <b>sprites.pmdcollab.org</b> for contributor credits and licensing information. Portraits need internet access in this first build; offline fallback icons will appear otherwise.</p><button class="btn" onclick="closeModal()">CLOSE</button>')}
+let spritesEnabled=false;
+window.enableSprites=function(){if(spritesEnabled)return;spritesEnabled=true;render()};
+function portrait(name){const m=INDEX[name];return spritesEnabled&&m?'https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/portrait/'+String(m.number).padStart(4,'0')+'/Normal.png':''}
+function portraitHTML(name,cls=''){const src=portrait(name);if(!src)return '<span class="'+cls+'" style="display:inline-grid;place-items:center;font-size:30px">◉</span>';return '<img class="'+cls+'" src="'+src+'" alt="'+esc(name)+'" loading="lazy" onerror="this.outerHTML=\'<span style=&quot;font-size:34px&quot;>◉</span>\'">'}
+function refreshHome(){const main=db.pokemon.find(p=>p.id===db.mainId);const name=main?main.species:'Magearna';$('companionTitle').textContent=name.toUpperCase();$('buddyName').textContent=main?(main.nickname||main.species):'Magearna';const spriteSrc=portrait(name),img=$('buddyImg'),fallback=$('buddyFallback');
+const showFallback=()=>{fallback.style.display='grid';img.style.display='none'};
+if(!spriteSrc){showFallback()}else{
+ img.onload=()=>{if(img.src===spriteSrc){img.style.display='';fallback.style.display='none'}};
+ img.onerror=showFallback;
+ if(img.src!==spriteSrc){showFallback();img.src=spriteSrc}
+ else if(img.complete&&img.naturalWidth>0){img.style.display='';fallback.style.display='none'}
+ else showFallback();
+}const level=1+Math.floor((db.xp||0)/100);$('level').textContent='LEVEL '+level;$('xpCounter').textContent=Math.floor(db.xp%100)+' / 100 EXP';$('xpfill').style.width=(db.xp%100)+'%';$('balance').textContent=money(db.cogs);$('puffs').textContent=db.puffs||0;$('candies').textContent=db.candies||0;
+ const upcoming=db.tasks.filter(t=>!t.done).sort((a,b)=>(a.due||'9999-99-99').localeCompare(b.due||'9999-99-99'));
+ const task=upcoming[0];$('homeNextTitle').textContent=task?task.title:'You’re all caught up!';
+ $('homeNextMeta').textContent=task?(task.due?'Due '+new Date(task.due+'T12:00:00').toLocaleDateString(undefined,{month:'short',day:'numeric'}):'No deadline')+'  ·  '+upcoming.length+' open task'+(upcoming.length===1?'':'s'):'Add a task or enjoy the Safari.';
+}
+function render(){refreshHome();$('shopBalance').textContent=money(db.cogs)+' ⚙';drawTasks();drawSafari();drawCollection();drawTmLab();drawDailyShop();drawFocus();drawSummaries();drawMinigame()}
+function drawTasks(){let open=db.tasks.filter(x=>!x.done),done=db.tasks.filter(x=>x.done);$('taskCount').textContent=open.length+' OPEN';$('tree').style.transform='scale('+Math.min(1.5,.8+open.length*.045)+')';$('treeTitle').textContent=open.length+' TASK'+(open.length===1?'':'S')+' ON YOUR TREE';$('treeSubtitle').textContent=open.length?'Your Sudowoodo grows with your schedule.':'Your task tree is resting.';let list=open.sort((a,b)=>(a.due||'9999').localeCompare(b.due||'9999')).concat(showDone?done:[]);$('taskList').innerHTML=list.length?list.map(t=>'<div class="taskcard"><button class="check" aria-label="'+(t.done?'Completed':'Complete task')+'" onclick="'+(t.done?'void(0)':'completeTask(\''+t.id+'\')')+'">'+(t.done?'✓':'')+'</button><div class="taskinfo"><strong>'+esc(t.title)+'</strong>'+(t.description?'<p>'+esc(t.description)+'</p>':'')+'<span class="duedate '+(daysFrom(t.due,Date.now())<0&&!t.done?'late':'')+'">'+(t.done?'✓ COMPLETED':t.due?'▣ '+esc(t.due):'NO DEADLINE')+(t.assignment?' • ASSIGNMENT':'')+(t.priority?' • ★ PRIORITY':'')+'</span></div><button class="editbtn" onclick="taskForm(\''+t.id+'\')">EDIT</button></div>').join(''):'<div class="empty">🌱 No active tasks yet.<br>Add a responsibility to grow your Sudowoodo!</div>';$('doneToggle').textContent=showDone?'HIDE COMPLETED':'SHOW COMPLETED ('+done.length+')'}
+function toggleDone(){showDone=!showDone;drawTasks()}
+function taskForm(id=''){const t=db.tasks.find(x=>x.id===id)||{title:'',description:'',due:'',priority:false,assignment:true};modal(id?'EDIT TASK':'ADD TASK','<form onsubmit="storeTask(event,\''+id+'\')"><div class="field"><label>Task name</label><input name="title" maxlength="140" required placeholder="e.g. Chemistry homework" value="'+esc(t.title)+'"></div><div class="field"><label>Description / notes</label><textarea name="description" placeholder="Pages, instructions, reminders...">'+esc(t.description)+'</textarea></div><div class="field"><label>Due date</label><input name="due" type="date" value="'+esc(t.due)+'"></div><div class="field"><label>Task type</label><select name="assignment"><option value="1" '+(t.assignment?'selected':'')+'>Assignment (eligible for early bonus)</option><option value="0" '+(!t.assignment?'selected':'')+'>General task / responsibility</option></select></div><label class="small"><input name="priority" type="checkbox" '+(t.priority?'checked':'')+'> High priority</label><div class="notice">Task Cogs = 1.5 × days remaining, capped at the original value. Assignments finished at least 24 hours early also receive +20 Cogs.</div><div class="actions">'+(id?'<button class="btn" type="button" onclick="deleteTask(\''+id+'\')">DELETE</button>':'')+'<button class="btn red" type="submit">SAVE TASK</button></div></form>')}
+function storeTask(e,id){e.preventDefault();const f=new FormData(e.target);const due=String(f.get('due')||'');const n={title:String(f.get('title')||'').trim(),description:String(f.get('description')||'').trim(),due,priority:f.has('priority'),assignment:f.get('assignment')==='1'};if(!n.title)return;let t=db.tasks.find(x=>x.id===id);if(t){const dueChanged=t.due!==due;Object.assign(t,n);if(dueChanged){t.rewardCap=due?1.5*Math.max(0,daysFrom(due,Date.now())):0;t.rewardSetAt=stamp()}}else db.tasks.push({...n,id:uid(),createdAt:stamp(),rewardSetAt:stamp(),rewardCap:due?1.5*Math.max(0,daysFrom(due,Date.now())):0,done:false});save();closeModal();render();toast('Task saved to your iPhone ✓')}
+function deleteTask(id){if(!confirm('Delete this task?'))return;db.tasks=db.tasks.filter(t=>t.id!==id);save();closeModal();render();toast('Task deleted')}
+function completeTask(id){let t=db.tasks.find(x=>x.id===id);if(!t||t.done)return;const remaining=daysFrom(t.due,Date.now());const coins=t.due?Math.min(Math.max(0,t.rewardCap||0),1.5*Math.max(0,remaining)):0;const dueEnd=t.due?new Date(t.due+'T23:59:59').getTime():0;const early=t.assignment&&dueEnd-Date.now()>=86400000?20:0;t.done=true;t.completedAt=stamp();t.cogsEarned=coins+early;db.cogs=Math.round((db.cogs+coins+early)*100)/100;grantXp(20);db.puffs+=1;db.completedTasks=(db.completedTasks||0)+1;if(db.completedTasks%8===0)db.candies++;save();render();toast('🎉 +'+money(coins+early)+' Cogs · +20 EXP'+(early?' · Early bonus!':''))}
+function buyItem(kind){const price=kind==='candy'?12:5;if(db.cogs<price){toast('Not enough Cogs');return}db.cogs=Math.round((db.cogs-price)*100)/100;if(kind==='candy')db.candies++;else db.puffs++;save();render();toast(kind==='candy'?'Rare Candy acquired!':'Poképuff acquired!')}
+function buyItem(kind){const price=kind==='candy'?12:5;if(db.cogs<price){toast('Not enough Cogs');return}db.cogs=Math.round((db.cogs-price)*100)/100;if(kind==='candy')db.candies++;else db.puffs++;save();render();toast(kind==='candy'?'Rare Candy acquired!':'Poképuff acquired!')}
+function tierDraw(tier){const choices=MONS.filter(m=>m[2]===tier);return choices[Math.floor(Math.random()*choices.length)]}
+function rollMon(deluxe=false){const weights=[47,29,15,7,2];let r=Math.random()*100,tier=0;for(let i=0;i<weights.length;i++){r-=weights[i];if(r<0){tier=i;break}}let m=tierDraw(tier);if(deluxe&&tier<=1){const raised=Math.random()<.42;tier=Math.min(4,tier+(raised?1:0));m=tierDraw(tier)}return {species:m[0],tier,shiny:false,size:Math.max(0.72,Math.min(1.28,1+(Math.random()+Math.random()+Math.random()-1.5)*.24))}}
+function buySafari(kind){if(db.pendingSafari){toast('Finish the current Safari pull first');return}const costs={standard:20,shiny:50,deluxe:100};const price=costs[kind];if(db.cogs<price){toast('Not enough Cogs yet');return}if(!confirm('Spend '+price+' Cogs on this Safari Ticket?'))return;db.cogs=Math.round((db.cogs-price)*100)/100;const chance=kind==='standard'?4096:2048;db.pendingSafari={id:uid(),kind,createdAt:stamp(),balls:[rollMon(kind==='deluxe'),rollMon(kind==='deluxe'),rollMon(kind==='deluxe')].map(m=>({...m,shiny:Math.floor(Math.random()*chance)===0}))};save();render();toast('Three Poké Balls appeared!')}
+function chooseBall(idx){const pending=db.pendingSafari;if(!pending||!pending.balls[idx])return;let m=pending.balls[idx];const entry={id:uid(),species:m.species,nickname:'',shiny:m.shiny,size:m.size,rarity:RARITIES[m.tier],obtainedAt:stamp(),mainSeconds:0,mainSince:null,...rollMoves(m.species)};db.pokemon.push(entry);db.pendingSafari=null;grantXp(5);save();render();const msg=m.shiny?'✨ SHINY '+m.species+'! ✨':'You found '+m.species+'!';modal('SAFARI REVEAL','<div class="reveal '+(m.shiny?'shiny':'')+'">'+(m.shiny?'<div class="glitter">✨ ✦ 🌟 ✦ ✨</div>':'')+portraitHTML(m.species,'revealimg')+'<h2>'+esc(msg)+'</h2><span class="badge">'+esc(entry.rarity)+'</span> <span class="badge">SIZE '+(entry.size*100).toFixed(1)+'%</span><p class="small">Added to your Pokémon Box!</p></div><div class="actions"><button class="btn blue" onclick="closeModal();go(\'collection\')">MY BOX</button><button class="btn red" onclick="closeModal();go(\'safari\')">BACK TO SAFARI</button></div>')}
+function drawSafari(){const el=$('safariArea');if(db.pendingSafari){el.innerHTML='<div class="safari"><h3>THREE POKÉ BALLS BURST FROM THE GRASS!</h3><div class="balls">'+[0,1,2].map(i=>'<button class="ball" onclick="chooseBall('+i+')"><span class="ball-icon"></span><span>CHOOSE '+(i+1)+'</span></button>').join('')+'</div></div><div class="notice">Choose one Poké Ball to reveal your Pokémon. The current encounter is saved; you can return after closing the app.</div>';return}el.innerHTML='<div class="safari"><h3>THE TALL GRASS IS RUSTLING...</h3><p style="text-align:center;font-size:58px;margin:25px 0 5px">🌾 🌿 🌾</p><p class="small" style="text-align:center">Spend Cogs to reveal three mystery Poké Balls.</p></div>'+[{id:'standard',title:'Safari Ticket',cost:20,info:'Standard shiny odds • 1 / 4,096',icon:'🎟️'},{id:'shiny',title:'Shiny Safari Ticket',cost:50,info:'Double shiny odds • 1 / 2,048',icon:'✨'},{id:'deluxe',title:'Deluxe Safari Ticket',cost:100,info:'Double shiny odds • deluxe presentation',icon:'🏅'}].map(t=>'<div class="shopitem"><span class="shopicon">'+t.icon+'</span><div class="shopmain"><b>'+t.title+'</b><small>'+t.info+'</small></div><button class="btn smallbtn" '+(db.cogs<t.cost?'disabled':'')+' onclick="buySafari(\''+t.id+'\')">'+t.cost+' ⚙</button></div>').join('')+'<p class="small muted">All Pokémon are in one permanent general pool. Tickets use earned Cogs only, never real money.</p>'}
+function mainSeconds(p){return (p.mainSeconds||0)+(p.id===db.mainId&&p.mainSince?Math.max(0,(Date.now()-new Date(p.mainSince))/1000):0)}
+function drawCollection(){
+ let mons=[...db.pokemon];const sort=$('boxSort').value;
+ mons.sort((a,b)=>sort==='species'?a.species.localeCompare(b.species):sort==='rarity'?RARITIES.indexOf(b.rarity)-RARITIES.indexOf(a.rarity):sort==='size'?b.size-a.size:sort==='shiny'?Number(b.shiny)-Number(a.shiny):new Date(b.obtainedAt)-new Date(a.obtainedAt));
+ $('pokeCount').textContent=mons.length+' CAUGHT';
+ if(!selectedMonId&&mons.length)selectedMonId=mons[0].id;
+ if(selectedMonId&&!mons.some(m=>m.id===selectedMonId))selectedMonId=mons[0]?.id||null;
+ $('boxGrid').innerHTML=mons.length?mons.map(p=>`<button class="poke ${selectedMonId===p.id?'activepoke':''}" onclick="viewMon('${p.id}')">${portraitHTML(p.species)}<strong>${p.shiny?'✨ ':''}${esc(p.nickname||p.species)}</strong><small>${esc(p.rarity)}${db.mainId===p.id?' ★':''}</small></button>`).join(''):'<div class="empty" style="grid-column:1/-1">Your Box is empty.<br>Visit PokéSafari to find your first Pokémon!</div>';
+ const p=db.pokemon.find(x=>x.id===selectedMonId);const target=$('pokeDetail');if(!p){target.innerHTML='';return}
+ const date=new Date(p.obtainedAt).toLocaleDateString(),secs=Math.floor(mainSeconds(p)),evolves=EVO[p.species]||[];
+ target.innerHTML=`<div class="moncard"><div class="moncard-top"><div class="monportrait">${portraitHTML(p.species)}</div><div class="monbio"><h3>${esc(p.nickname||p.species)}${p.shiny?' ✨':''}</h3><div><b>Species:</b> ${esc(p.species)}</div><div><b>Rarity:</b> ${esc(p.rarity)}</div><div><b>Size:</b> ${(p.size*100).toFixed(1)}%</div><div><b>Shiny:</b> ${p.shiny?'Yes ✨':'No'}</div><div><b>Main:</b> ${db.mainId===p.id?'★ Selected':'No'}</div></div></div><div class="monstatbox"><b>POKÉMON RECORD</b><div class="small">Obtained: ${esc(date)} · Companion: ${Math.floor(secs/3600)}h ${Math.floor((secs%3600)/60)}m</div><div class="small"><b>Basic:</b> ${moveText(p.fastMove)}</div><div class="small"><b>Disc:</b> ${moveText(p.discMove)}</div></div><div class="actions"><button class="btn" onclick="renameMon('${p.id}')">RENAME</button><button class="btn blue" onclick="setMain('${p.id}')">SET MAIN</button></div><div class="actions">${evolves.length?`<button class="btn" onclick="evolveMenu('${p.id}')">🍬 EVOLVE</button>`:''}<button class="btn" onclick="releaseMon('${p.id}')">RELEASE</button></div><button class="discaction" onclick="showTmLab('${p.id}')" aria-label="Open TM Disc move lab"><span class="disc" aria-hidden="true"></span><span class="discname">💿 ${esc(p.discMove)} ↗ TM MOVE LAB</span></button></div>`;
+}
+function viewMon(id){selectedMonId=id;drawCollection();const node=$('pokeDetail');if(node&&node.scrollIntoView)node.scrollIntoView({behavior:'smooth',block:'nearest'})}
+function renameMon(id){const p=db.pokemon.find(x=>x.id===id);if(!p)return;const n=prompt('Nickname your Pokémon (blank to reset):',p.nickname||p.species);if(n===null)return;p.nickname=n.trim().slice(0,36);save();viewMon(id);render()}
+function setMain(id){for(const p of db.pokemon){if(p.id===db.mainId&&p.mainSince){p.mainSeconds=mainSeconds(p);p.mainSince=null}}let p=db.pokemon.find(x=>x.id===id);if(!p)return;db.mainId=id;p.mainSince=stamp();save();closeModal();go('home');toast((p.nickname||p.species)+' is your companion!')}
+function evolveMenu(id){const p=db.pokemon.find(x=>x.id===id);if(!p)return;const evol=EVO[p.species]||[];modal('EVOLVE '+p.species.toUpperCase(),'<div class="notice">Evolution keeps this Pokémon’s shiny status, nickname, size, collection date, and companion time. Your Rare Candies: <b>'+db.candies+'</b>.</div>'+evol.map(([name,cost])=>'<div class="shopitem">'+portraitHTML(name)+'<div class="shopmain"><b>'+esc(name)+'</b><small>'+cost+' Rare Candies</small></div><button class="btn smallbtn" '+(db.candies<cost?'disabled':'')+' onclick="evolveMon(\''+id+'\',\''+name+'\','+cost+')">EVOLVE</button></div>').join(''))}
+function evolveMon(id,name,cost){const p=db.pokemon.find(x=>x.id===id);if(!p||!(EVO[p.species]||[]).some(x=>x[0]===name&&x[1]===cost)||db.candies<cost)return;if(!confirm('Spend '+cost+' Rare Candies to evolve '+p.species+' into '+name+'?'))return;db.candies-=cost;p.species=name;p.rarity=RARITIES[INDEX[name].tier];const mp=compatiblePools(name);if(!mp[0].includes(p.fastMove))p.fastMove=choice(mp[0]);if(!mp[1].includes(p.discMove))p.discMove=choice(mp[1]);grantXp(15);save();render();viewMon(id);toast('✨ Evolution complete!')}
+function releaseMon(id){const p=db.pokemon.find(x=>x.id===id);if(!p)return;const reward=[3,6,12,25,50][RARITIES.indexOf(p.rarity)]||3;if(!confirm('Release '+(p.nickname||p.species)+' for '+reward+' Cogs? This cannot be undone.'))return;if(db.mainId===id){p.mainSeconds=mainSeconds(p);db.mainId=null}db.pokemon=db.pokemon.filter(x=>x.id!==id);db.cogs=Math.round((db.cogs+reward)*100)/100;save();closeModal();render();toast('Pokémon released · +'+reward+' Cogs')}
+function drawFocus(){const f=db.focus;if(!f){$('focusArea').innerHTML='<div class="notice">A completed focus session gives <b>10 Cogs</b> and 20 EXP. You can close the app; the session start is saved and The countdown is saved, but background alerts are not supported in this free version.</div><div class="smallsplit"><button class="btn blue" onclick="startFocus(15)">START 15 MIN</button><button class="btn blue" onclick="startFocus(25)">START 25 MIN</button></div>';return}const left=Math.max(0,new Date(f.startedAt).getTime()+f.minutes*60000-Date.now());$('focusArea').innerHTML='<div class="reveal"><div style="font-size:48px">⏳</div><h2>'+Math.ceil(left/60000)+' MINUTES '+(left?'REMAINING':'COMPLETE!')+'</h2><div class="progress"><div style="width:'+(100-Math.min(100,left/(f.minutes*60000)*100))+'%"></div></div><p class="small">Started '+new Date(f.startedAt).toLocaleTimeString()+' · '+f.minutes+' minute session</p></div><div class="actions">'+(left===0?'<button class="btn red" onclick="claimFocus()">CLAIM 10 COGS</button>':'')+'<button class="btn" onclick="cancelFocus()">CANCEL SESSION</button></div>'}
+function startFocus(minutes){if(db.focus)return;db.focus={startedAt:stamp(),minutes};save();native('focusNotification',{minutes,at:new Date(Date.now()+minutes*60000).toISOString()});render();toast('Focus session started!')}
+function claimFocus(){const f=db.focus;if(!f||Date.now()<new Date(f.startedAt).getTime()+f.minutes*60000)return;db.focus=null;db.cogs=Math.round((db.cogs+10)*100)/100;grantXp(20);save();render();toast('⭐ Session complete: +10 Cogs!')}
+function cancelFocus(){if(!confirm('Cancel this focus session? No reward will be given.'))return;db.focus=null;save();native('cancelFocus');render()}
+function drawSummaries(){$('summaryCount').textContent=db.summaries.length+' NOTES';$('summaryList').innerHTML=db.summaries.length?db.summaries.map(s=>'<div class="item"><span style="font-size:28px">📘</span><div class="iteminfo"><strong>'+esc(s.title)+'</strong><small>'+esc((s.body||'').slice(0,86))+'</small></div><button class="btn smallbtn" onclick="summaryForm(\''+s.id+'\')">OPEN</button></div>').join(''):'<div class="empty">No summaries yet.<br>Add notes for your first study minigame!</div>'}
+function summaryForm(id=''){const s=db.summaries.find(x=>x.id===id)||{title:'',body:''};modal(id?'EDIT SUMMARY':'NEW SUMMARY','<form onsubmit="storeSummary(event,\''+id+'\')"><div class="field"><label>Title</label><input required maxlength="130" name="title" value="'+esc(s.title)+'"></div><div class="field"><label>Summary and terms</label><textarea name="body" style="min-height:210px" placeholder="Gravity: The attraction between objects with mass\nVelocity: Speed in a given direction">'+esc(s.body)+'</textarea></div><p class="small muted">Write “Term: Definition” on separate lines to make quiz questions. Writing a summary grants no Cogs.</p><div class="actions">'+(id?'<button class="btn" type="button" onclick="removeSummary(\''+id+'\')">DELETE</button>':'')+'<button type="submit" class="btn red">SAVE</button></div></form>')}
+function storeSummary(e,id){e.preventDefault();const f=new FormData(e.target),v={title:String(f.get('title')||'').trim(),body:String(f.get('body')||'').trim()};if(!v.title)return;const s=db.summaries.find(x=>x.id===id);if(s)Object.assign(s,v);else db.summaries.push({...v,id:uid(),createdAt:stamp()});save();closeModal();render();toast('Summary stored locally ✓')}
+function removeSummary(id){if(!confirm('Delete this summary?'))return;db.summaries=db.summaries.filter(s=>s.id!==id);save();closeModal();render()}
+function termsFor(s){return s.body.split(/\n/).map(line=>{const n=line.indexOf(':');return n>0?{term:line.slice(0,n).trim(),definition:line.slice(n+1).trim()}:null}).filter(x=>x&&x.term&&x.definition)}
+function drawMinigame(){if(quiz){drawQuestion();return}const choices=db.summaries.filter(s=>termsFor(s).length>0);$('quizArea').innerHTML=choices.length?'<div class="notice">Choose a study set. You earn 5 Cogs when you finish a set of questions.</div>'+choices.map(s=>'<div class="item"><span style="font-size:26px">🎴</span><div class="iteminfo"><strong>'+esc(s.title)+'</strong><small>'+termsFor(s).length+' study terms</small></div><button class="btn smallbtn" onclick="startQuiz(\''+s.id+'\')">PLAY</button></div>').join(''):'<div class="empty">No quiz-ready summaries yet.<br>Add “Term: Definition” lines to a summary first.</div>'}
+function shuffle(a){for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function startQuiz(id){const s=db.summaries.find(x=>x.id===id);if(!s)return;const terms=termsFor(s);if(!terms.length)return;quiz={questions:shuffle([...terms]).slice(0,Math.min(10,terms.length)),pool:terms,index:0,correct:0,answered:false,choices:[],selected:-1};drawQuestion()}
+function drawQuestion(){const el=$('quizArea');if(!quiz)return;if(quiz.index>=quiz.questions.length){const correct=quiz.correct,total=quiz.questions.length;db.cogs=Math.round((db.cogs+5)*100)/100;grantXp(15);save();quiz=null;el.innerHTML='<div class="reveal"><h2>🎉 STUDY SET COMPLETE</h2><p>'+correct+' / '+total+' correct</p><h3>+5 COGS · +15 EXP</h3><button class="btn blue" onclick="render()">BACK TO GAMES</button></div>';toast('Study complete! +5 Cogs');return}const q=quiz.questions[quiz.index];if(!quiz.choices.length){const distract=shuffle(quiz.pool.filter(x=>x.term!==q.term)).slice(0,3);quiz.choices=shuffle([q,...distract])}el.innerHTML='<div class="item" style="display:block"><div class="row between"><span class="badge">QUESTION '+(quiz.index+1)+' / '+quiz.questions.length+'</span><span class="small">'+quiz.correct+' CORRECT</span></div><h3>'+esc(q.definition)+'</h3><p class="small muted">Which term matches this definition?</p>'+quiz.choices.map((o,i)=>'<button class="answer '+(quiz.answered?(o.term===q.term?'correct':quiz.selected===i?'wrong':''):'')+'" '+(quiz.answered?'disabled':'')+' onclick="answerQuiz('+i+')">'+esc(o.term)+'</button>').join('')+(quiz.answered?'<button class="btn red" style="width:100%" onclick="nextQuiz()">NEXT →</button>':'')+'</div>'}
+function answerQuiz(i){if(!quiz||quiz.answered)return;quiz.selected=i;quiz.answered=true;if(quiz.choices[i].term===quiz.questions[quiz.index].term)quiz.correct++;drawQuestion()}
+function nextQuiz(){if(!quiz)return;quiz.index++;quiz.answered=false;quiz.selected=-1;quiz.choices=[];drawQuestion()}
+function exportSave(){pwaExport()}
+function importSave(){pwaImport()}
+function nativeRestore(payload){if(!payload||!Array.isArray(payload.tasks)||!Array.isArray(payload.pokemon)||!Array.isArray(payload.summaries))return false;db=payload;quiz=null;closeModal();go('home');toast('Backup restored!');return true}
+window.nativeRestore=nativeRestore;
+$('navHome').style.display='none';
+(async()=>{
+ await checkBackupMirror();
+ // Damaged saves must not be overwritten by the move-data migration.
+ if(pcStorageReady)ensureMoveData();
+ render();
+ if(saveWarning)deviceStatus(saveWarning,false);else deviceStatus('saved on this iPhone ✓');
+ const hint=$('installHint');if(hint)hint.style.display=(window.matchMedia('(display-mode: standalone)').matches||navigator.standalone)?'none':'block';
+ const offline=$('pcOffline');const updateNetwork=()=>{offline.style.display=navigator.onLine?'none':'block'};
+ addEventListener('online',updateNetwork);addEventListener('offline',updateNetwork);updateNetwork();
+ if('serviceWorker' in navigator){try{await navigator.serviceWorker.register('./sw.js',{scope:'./'})}catch(e){console.warn('Offline installation not available',e)}}
+ if(window.enableSprites)window.enableSprites();
+ setInterval(()=>{if(currentPage==='focus')drawFocus();if(currentPage==='home')refreshHome()},15000);
+})().catch(showBootError);
+</script><input type="file" id="backupPicker" accept=".json,application/json" style="display:none" onchange="onPickedBackup(this)"></body></html>
