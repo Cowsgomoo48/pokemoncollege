@@ -1,0 +1,6 @@
+node_modules/
+build/
+Payload/
+*.ipa
+*.json.bak
+PokemonCollege-backup*.json
