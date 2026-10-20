@@ -23,6 +23,17 @@ jobs:
         run: |
           if [ ! -d ios ]; then npx cap add ios; fi
 
+      - name: Make sure the www folder exists
+        run: |
+          if [ ! -d www ]; then
+            mkdir www
+            cp index.html manifest.webmanifest sw.js icon-180.png icon-192.png icon-512.png www/
+          fi
+          if [ ! -f resources/icon-512.png ]; then
+            mkdir -p resources
+            cp www/icon-512.png resources/icon-512.png
+          fi
+
       - name: Use the PokémonCollege icon
         run: |
           ICON=ios/App/App/Assets.xcassets/AppIcon.appiconset/AppIcon-512@2x.png
