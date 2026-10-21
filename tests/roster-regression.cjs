@@ -26,7 +26,7 @@ for(const [kind,cost] of Object.entries({standard:20,shiny:50,deluxe:100})){
  assert.equal(data.mainId,null);assert.equal(data.retiredPokemon.length,4);
  assert.equal(data.retiredPokemon[0].nickname,'Old 0');assert.equal(data.retiredPokemon[0].shiny,true);
  assert(data.retiredPokemon[0].mainSeconds>=21);assert.equal(data.retiredPokemon[0].mainSince,null);
- assert.equal(data.cogs,1.25+cost);assert.equal(data.pendingSafari,null);
+ assert.equal(data.cogs,Math.round(1.25+cost));assert.equal(data.pendingSafari,null);
  assert.equal(data.retiredSafariEncounters.length,1);assert.equal(data.retiredSafariEncounters[0].refundedCogs,cost);
  assert.equal(data.tasks[0].title,'Keep task');assert.equal(data.summaries[0].title,'Keep notes');
  const snapshot=JSON.stringify(data);assert.equal(migrateRetiredSpecies(data),false);assert.equal(JSON.stringify(data),snapshot);

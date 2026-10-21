@@ -11,4 +11,7 @@ Pod::Spec.new do |s|
   s.dependency 'Capacitor'
   s.swift_version = '5.1'
   s.frameworks = 'AVFoundation', 'Speech', 'Vision'
+  # On-device AI (iOS 26 SDK). Weak-linked so the app still opens on older iOS; skipped if the SDK doesn't have it.
+  sdk = `xcrun --sdk iphoneos --show-sdk-path 2>/dev/null`.strip
+  s.weak_frameworks = 'FoundationModels' if !sdk.empty? && File.exist?(File.join(sdk, 'System/Library/Frameworks/FoundationModels.framework'))
 end

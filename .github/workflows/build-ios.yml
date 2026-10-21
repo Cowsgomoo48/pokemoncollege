@@ -16,6 +16,12 @@ jobs:
         with:
           node-version: 20
 
+      - name: Use the newest Xcode on the runner (needed for the on-device AI)
+        run: |
+          X=$(ls -d /Applications/Xcode_*.app 2>/dev/null | sort -V | tail -1)
+          if [ -n "$X" ]; then sudo xcode-select -s "$X"; fi
+          xcodebuild -version
+
       - name: Install dependencies
         run: npm install
 
@@ -38,7 +44,8 @@ jobs:
         run: |
           ICON=ios/App/App/Assets.xcassets/AppIcon.appiconset/AppIcon-512@2x.png
           if [ -f "$ICON" ]; then
-            sips -z 1024 1024 resources/icon-512.png --out "$ICON"
+            SRC=resources/icon-1024.png; [ -f "$SRC" ] || SRC=resources/icon-512.png
+            sips -z 1024 1024 "$SRC" --out "$ICON"
           fi
 
       - name: Allow microphone, camera, photos, speech recognition and recording with the screen locked

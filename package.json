@@ -1,6 +1,6 @@
 {
   "name": "pokemoncollege",
-  "version": "0.15.2",
+  "version": "0.22.0",
   "private": true,
   "description": "PokémonCollege: a Pokémon-inspired study companion (PWA + iPhone app via Capacitor)",
   "scripts": {
