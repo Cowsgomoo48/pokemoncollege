@@ -1,0 +1,53 @@
+{
+ "hats": {
+  "witch": {
+   "name": "Witch Hat",
+   "w": 20,
+   "h": 17,
+   "seat": 15,
+   "url": "./assets/costume/witch.png"
+  },
+  "grad": {
+   "name": "Graduation Cap",
+   "w": 20,
+   "h": 10,
+   "seat": 9,
+   "url": "./assets/costume/grad.png"
+  },
+  "beanie": {
+   "name": "Winter Beanie",
+   "w": 20,
+   "h": 12,
+   "seat": 11,
+   "url": "./assets/costume/beanie.png"
+  },
+  "flowers": {
+   "name": "Flower Crown",
+   "w": 20,
+   "h": 7,
+   "seat": 6,
+   "url": "./assets/costume/flowers.png"
+  },
+  "sunhat": {
+   "name": "Sun Hat",
+   "w": 20,
+   "h": 10,
+   "seat": 9,
+   "url": "./assets/costume/sunhat.png"
+  }
+ },
+ "season": {
+  "1": "beanie",
+  "2": "beanie",
+  "3": "flowers",
+  "4": "flowers",
+  "5": "grad",
+  "6": "grad",
+  "7": "sunhat",
+  "8": "sunhat",
+  "9": "grad",
+  "10": "witch",
+  "11": "beanie",
+  "12": "beanie"
+ }
+}

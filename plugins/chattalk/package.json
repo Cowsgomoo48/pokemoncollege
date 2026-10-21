@@ -1,0 +1,7 @@
+{
+  "name": "capacitor-chattalk",
+  "version": "0.1.0",
+  "private": true,
+  "description": "PokemonCollege ChatTalk: background lecture recording and on-device transcription (iOS)",
+  "capacitor": { "ios": { "src": "ios" } }
+}

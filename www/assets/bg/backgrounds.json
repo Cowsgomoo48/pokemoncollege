@@ -1,0 +1,284 @@
+[
+{
+"id": "bg_a01",
+"name": "Grass Grid",
+"tier": 1,
+"url": "./assets/bg/a01.jpg"
+},
+{
+"id": "bg_a02",
+"name": "Stone Bricks",
+"tier": 1,
+"url": "./assets/bg/a02.jpg"
+},
+{
+"id": "bg_a03",
+"name": "Desert Sand",
+"tier": 1,
+"url": "./assets/bg/a03.jpg"
+},
+{
+"id": "bg_a04",
+"name": "Savanna",
+"tier": 1,
+"url": "./assets/bg/a04.jpg"
+},
+{
+"id": "bg_a05",
+"name": "Purple Rock",
+"tier": 1,
+"url": "./assets/bg/a05.jpg"
+},
+{
+"id": "bg_a06",
+"name": "Red Clay",
+"tier": 1,
+"url": "./assets/bg/a06.jpg"
+},
+{
+"id": "bg_a07",
+"name": "Frost Waves",
+"tier": 1,
+"url": "./assets/bg/a07.jpg"
+},
+{
+"id": "bg_a08",
+"name": "Muddy Ground",
+"tier": 1,
+"url": "./assets/bg/a08.jpg"
+},
+{
+"id": "bg_a09",
+"name": "Sunny Beach",
+"tier": 1,
+"url": "./assets/bg/a09.jpg"
+},
+{
+"id": "bg_a10",
+"name": "Deep Sea",
+"tier": 1,
+"url": "./assets/bg/a10.jpg"
+},
+{
+"id": "bg_a11",
+"name": "Shallows",
+"tier": 2,
+"url": "./assets/bg/a11.jpg"
+},
+{
+"id": "bg_a12",
+"name": "Open Sky",
+"tier": 2,
+"url": "./assets/bg/a12.jpg"
+},
+{
+"id": "bg_a13",
+"name": "Orange Ball Mat",
+"tier": 2,
+"url": "./assets/bg/a13.jpg"
+},
+{
+"id": "bg_a14",
+"name": "Slate Tiles",
+"tier": 1,
+"url": "./assets/bg/a14.jpg"
+},
+{
+"id": "bg_a15",
+"name": "Pink Gingham",
+"tier": 1,
+"url": "./assets/bg/a15.jpg"
+},
+{
+"id": "bg_a16",
+"name": "Meadow Frame",
+"tier": 1,
+"url": "./assets/bg/a16.jpg"
+},
+{
+"id": "bg_a17",
+"name": "Outer Space",
+"tier": 2,
+"url": "./assets/bg/a17.jpg"
+},
+{
+"id": "bg_a19",
+"name": "Retro Route",
+"tier": 2,
+"url": "./assets/bg/a19.jpg"
+},
+{
+"id": "bg_a20",
+"name": "Orange Bird",
+"tier": 3,
+"url": "./assets/bg/a20.jpg"
+},
+{
+"id": "bg_a21",
+"name": "Purple Pals",
+"tier": 3,
+"url": "./assets/bg/a21.jpg"
+},
+{
+"id": "bg_a22",
+"name": "Electric Pals",
+"tier": 3,
+"url": "./assets/bg/a22.jpg"
+},
+{
+"id": "bg_a23",
+"name": "Cosmic Burst",
+"tier": 2,
+"url": "./assets/bg/a23.jpg"
+},
+{
+"id": "bg_a24",
+"name": "Blue Bolt",
+"tier": 2,
+"url": "./assets/bg/a24.jpg"
+},
+{
+"id": "bg_a25",
+"name": "Night Cliffs",
+"tier": 2,
+"url": "./assets/bg/a25.jpg"
+},
+{
+"id": "bg_a26",
+"name": "Forest Friends",
+"tier": 3,
+"url": "./assets/bg/a26.jpg"
+},
+{
+"id": "bg_a27",
+"name": "Contest Stage",
+"tier": 2,
+"url": "./assets/bg/a27.jpg"
+},
+{
+"id": "bg_a28",
+"name": "Electric Family",
+"tier": 3,
+"url": "./assets/bg/a28.jpg"
+},
+{
+"id": "bg_a29",
+"name": "Retro House",
+"tier": 2,
+"url": "./assets/bg/a29.jpg"
+},
+{
+"id": "bg_a30",
+"name": "Crimson Shadows",
+"tier": 3,
+"url": "./assets/bg/a30.jpg"
+},
+{
+"id": "bg_a31",
+"name": "Grinning Frog",
+"tier": 3,
+"url": "./assets/bg/a31.jpg"
+},
+{
+"id": "bg_a32",
+"name": "Night Squad",
+"tier": 3,
+"url": "./assets/bg/a32.jpg"
+},
+{
+"id": "bg_waves",
+"name": "Ball Waves",
+"tier": 2,
+"url": "./assets/bg/waves.jpg"
+},
+{
+"id": "bg_b01",
+"name": "Gray Fade",
+"tier": 1,
+"url": "./assets/bg/b01.jpg"
+},
+{
+"id": "bg_b02",
+"name": "Blue Fade",
+"tier": 1,
+"url": "./assets/bg/b02.jpg"
+},
+{
+"id": "bg_b03",
+"name": "Red Fade",
+"tier": 1,
+"url": "./assets/bg/b03.jpg"
+},
+{
+"id": "bg_b04",
+"name": "Yellow Pals",
+"tier": 3,
+"url": "./assets/bg/b04.jpg"
+},
+{
+"id": "bg_b05",
+"name": "Gift Grid",
+"tier": 2,
+"url": "./assets/bg/b05.jpg"
+},
+{
+"id": "bg_b06",
+"name": "Fox Pattern",
+"tier": 3,
+"url": "./assets/bg/b06.jpg"
+},
+{
+"id": "bg_b07",
+"name": "Checker Plate",
+"tier": 1,
+"url": "./assets/bg/b07.jpg"
+},
+{
+"id": "bg_b08",
+"name": "Sunny Pals",
+"tier": 3,
+"url": "./assets/bg/b08.jpg"
+},
+{
+"id": "bg_b09",
+"name": "Bamboo",
+"tier": 1,
+"url": "./assets/bg/b09.jpg"
+},
+{
+"id": "bg_b10",
+"name": "Pink Bubbles",
+"tier": 2,
+"url": "./assets/bg/b10.jpg"
+},
+{
+"id": "bg_b11",
+"name": "Laurel",
+"tier": 2,
+"url": "./assets/bg/b11.jpg"
+},
+{
+"id": "bg_b12",
+"name": "Forest Clearing",
+"tier": 2,
+"url": "./assets/bg/b12.jpg"
+},
+{
+"id": "bg_b13",
+"name": "Ball Pattern",
+"tier": 2,
+"url": "./assets/bg/b13.jpg"
+},
+{
+"id": "bg_b14",
+"name": "Arena",
+"tier": 3,
+"url": "./assets/bg/b14.jpg"
+},
+{
+"id": "bg_b15",
+"name": "Carbon",
+"tier": 1,
+"url": "./assets/bg/b15.jpg"
+}
+]

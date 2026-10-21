@@ -41,6 +41,21 @@ jobs:
             sips -z 1024 1024 resources/icon-512.png --out "$ICON"
           fi
 
+      - name: Allow microphone, camera, photos, speech recognition and recording with the screen locked
+        run: |
+          PL=ios/App/App/Info.plist
+          /usr/libexec/PlistBuddy -c "Delete :NSMicrophoneUsageDescription" $PL 2>/dev/null || true
+          /usr/libexec/PlistBuddy -c "Add :NSMicrophoneUsageDescription string ChatTalk records your lectures so they can be transcribed on this iPhone." $PL
+          /usr/libexec/PlistBuddy -c "Delete :NSSpeechRecognitionUsageDescription" $PL 2>/dev/null || true
+          /usr/libexec/PlistBuddy -c "Add :NSSpeechRecognitionUsageDescription string ChatTalk turns your recordings into text on this iPhone, without sending them anywhere." $PL
+          /usr/libexec/PlistBuddy -c "Delete :NSCameraUsageDescription" $PL 2>/dev/null || true
+          /usr/libexec/PlistBuddy -c "Add :NSCameraUsageDescription string PokéPics takes photos of notes and slides so their text can be read on this iPhone." $PL
+          /usr/libexec/PlistBuddy -c "Delete :NSPhotoLibraryUsageDescription" $PL 2>/dev/null || true
+          /usr/libexec/PlistBuddy -c "Add :NSPhotoLibraryUsageDescription string PokéPics adds photos of notes and slides from your library." $PL
+          /usr/libexec/PlistBuddy -c "Delete :UIBackgroundModes" $PL 2>/dev/null || true
+          /usr/libexec/PlistBuddy -c "Add :UIBackgroundModes array" $PL
+          /usr/libexec/PlistBuddy -c "Add :UIBackgroundModes:0 string audio" $PL
+
       - name: Copy web files into the app
         run: npx cap sync ios
 

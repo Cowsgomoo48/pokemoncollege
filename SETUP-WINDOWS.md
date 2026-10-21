@@ -10,7 +10,7 @@ so GitHub's free cloud Mac does the compiling, and you install the result from y
    Public means the *code* is visible. Your tasks, Pokémon and backups are never in the repo.
 2. Upload everything in this folder to the repo. On the repo page choose Add file > Upload files, then DRAG the
    folders and files in from File Explorer (the "choose your files" button flattens folders). Check afterwards that the
-   repo shows `www` (with `assets/sudo` inside) and `.github/workflows/build-ios.yml`.
+   repo shows `www` (with `assets/sudo` inside), `plugins/chattalk` and `.github/workflows/build-ios.yml`.
 3. On your laptop, install **Sideloadly** (sideloadly.io). Sideloadly also needs the Apple-provided
    iTunes and iCloud for Windows; download those from Apple's site, not the Microsoft Store versions
    if Sideloadly's page says otherwise. Follow Sideloadly's current instructions, since they change.
