@@ -309,7 +309,7 @@ main.pad{padding:15px 13px calc(88px + env(safe-area-inset-bottom))}
 .deal em{font-style:normal;font-size:11px;font-weight:900;background:#fff3dc;color:#5b3a17;border-radius:8px;padding:2px 8px;margin-top:2px}.deal.sold{opacity:.45}
 .deal-ico{width:46px;height:46px;display:grid;place-items:center;border-radius:12px;background:#ffffff26}.deal.t2 .deal-ico{background:#7fd0ff40}.deal.t3 .deal-ico{background:#ffd76a55;box-shadow:0 0 0 2px #ffd76a}
 .shelf-refresh{width:100%;margin-top:6px;background:#fff3dc;color:#5b3a17;border:0}
-.it-ico{width:34px;height:34px;object-fit:contain}.it-ico.big{width:56px;height:56px}.it-emoji{font-size:28px}
+.it-ico{width:34px;height:34px;object-fit:contain}.it-ico.px{image-rendering:pixelated}.it-ico.big{width:56px;height:56px}.it-emoji{font-size:28px}
 .it-bg{display:block;width:40px;height:30px;border-radius:6px;background:#9be08c center/cover;border:2px solid #fff}.it-bg.big{width:72px;height:54px}
 .it-mon{width:40px!important;height:40px!important;object-fit:contain;image-rendering:pixelated;border-radius:8px}
 .boxitem .it-ico{margin-right:4px}
@@ -343,8 +343,8 @@ main.pad{padding:15px 13px calc(88px + env(safe-area-inset-bottom))}
 @media(prefers-reduced-motion:reduce){.shop-mag,.ball .spk,.wander.buffed:before,.wander.buffed:after,.bx-orb.buffed:before,.bx-orb.buffed:after{animation:none!important}}
 .grassbox{touch-action:manipulation;transition:height .35s cubic-bezier(.2,.9,.3,1)}.habitat.big .grassbox{height:330px}
 .hab-bg{position:absolute;inset:0;z-index:0;background:center/cover no-repeat;image-rendering:pixelated}
-.hab-decor{position:absolute;inset:0;z-index:1}.hab-small{position:absolute;width:30px;transform:translate(-50%,-100%);pointer-events:none}
-.hab-med{position:absolute;width:58px;transform:translate(-50%,-100%);pointer-events:none;transform-origin:50% 100%}.hab-dummy.hit{animation:dumhit .35s}@keyframes dumhit{30%{transform:translate(-50%,-100%) rotate(-9deg)}65%{transform:translate(-50%,-100%) rotate(6deg)}}
+.hab-decor{position:absolute;inset:0;z-index:1}.hab-small{position:absolute;width:30px;transform:translate(-50%,-100%);image-rendering:pixelated;pointer-events:none}
+.hab-med{position:absolute;width:58px;transform:translate(-50%,-100%);image-rendering:pixelated;pointer-events:none;transform-origin:50% 100%}.hab-dummy.hit{animation:dumhit .35s}@keyframes dumhit{30%{transform:translate(-50%,-100%) rotate(-9deg)}65%{transform:translate(-50%,-100%) rotate(6deg)}}
 .habitat.editing .hab-small,.habitat.editing .hab-med{pointer-events:auto;cursor:grab;filter:drop-shadow(0 0 2px #fff)}
 .hab-slot{position:absolute;width:56px;height:26px;transform:translate(-50%,-100%);border:2px dashed #ffffffb0;border-radius:50%;pointer-events:none}
 .hab-night{position:absolute;inset:0;z-index:3;background:radial-gradient(circle at 70% 20%,#0b1d4a55,#050b2acc);opacity:0;transition:opacity 1.2s;pointer-events:none}.hab-night.on{opacity:1}
@@ -1023,6 +1023,58 @@ const ITEMS={
  bowl:{name:'Feeding Bowl',kind:'medium',tier:1,desc:'Medium decor. Your Pokémon will wander over to eat from it.'},
  dummy:{name:'Training Dummy',kind:'medium',tier:1,desc:'Medium decor. Your Pokémon will practice attacks on it.'},
  bed:{name:'Cozy Bed',kind:'medium',tier:2,desc:'Medium decor. Your Pokémon sleeps here at night.'},
+ d_pot_flowers:{name:'Potted Flowers',kind:'small',tier:0,w:.35,desc:'A small ceramic pot containing colorful flowers. Small decor.'},
+ d_berry_basket:{name:'Berry Basket',kind:'small',tier:1,w:.35,desc:'A woven basket filled with assorted berries. Small decor.'},
+ d_books:{name:'Stack of Books',kind:'small',tier:0,w:.35,desc:'A small collection of colorful textbooks stacked unevenly. Small decor.'},
+ d_desk_lamp:{name:'Desk Lamp',kind:'small',tier:1,w:.35,desc:'A miniature lamp that produces a warm, gentle glow. Small decor.'},
+ d_stool:{name:'Wooden Stool',kind:'small',tier:0,w:.35,desc:'A simple round stool with four wooden legs. Small decor.'},
+ d_cactus:{name:'Tiny Cactus',kind:'small',tier:0,w:.35,desc:'A little cactus growing inside a painted clay pot. Small decor.'},
+ d_clock:{name:'Table Clock',kind:'small',tier:1,w:.35,desc:'A small analog clock that displays the current time. Small decor.'},
+ d_succulent:{name:'Potted Succulent',kind:'small',tier:0,w:.35,desc:'A leafy succulent planted inside a square ceramic pot. Small decor.'},
+ d_lantern2:{name:'Decorative Lantern',kind:'small',tier:1,w:.35,desc:'A small lantern that illuminates its surroundings at night. Small decor.'},
+ d_vase:{name:'Flower Vase',kind:'small',tier:1,w:.35,desc:'A glass vase containing a bouquet of freshly picked flowers. Small decor.'},
+ d_shells:{name:'Seashell Collection',kind:'small',tier:1,w:.35,desc:'Several colorful seashells arranged on a little tray. Small decor.'},
+ d_puff_plate:{name:'Poké Puff Plate',kind:'small',tier:1,w:.35,desc:'A plate displaying several colorful Poké Puffs. Small decor.'},
+ d_hourglass:{name:'Hourglass',kind:'small',tier:1,w:.35,desc:'A decorative glass hourglass filled with golden sand. Small decor.'},
+ d_terrarium:{name:'Tiny Terrarium',kind:'small',tier:2,w:.35,desc:'A miniature glass enclosure containing moss and tiny plants. Small decor.'},
+ d_notebook:{name:'Study Notebook',kind:'small',tier:0,w:.35,desc:'An open notebook with handwritten notes and doodles. Small decor.'},
+ d_candle2:{name:'Decorative Candle',kind:'small',tier:0,w:.35,desc:'A little candle with a softly flickering flame. Small decor.'},
+ d_windmill:{name:'Miniature Windmill',kind:'small',tier:2,w:.35,desc:'A tiny decorative windmill with slowly rotating blades. Small decor.'},
+ d_snow_globe:{name:'Snow Globe',kind:'small',tier:2,w:.35,desc:'A glass globe containing a snowy miniature landscape. Small decor.'},
+ d_train:{name:'Toy Train',kind:'small',tier:2,w:.35,desc:'A small wooden train with colorful connecting carriages. Small decor.'},
+ d_globe:{name:'Miniature Globe',kind:'small',tier:2,w:.35,desc:'A tiny rotating globe mounted on a wooden base. Small decor.'},
+ d_music_box:{name:'Music Box',kind:'small',tier:2,w:.35,desc:'A wind-up music box that plays a gentle melody when activated. Small decor.'},
+ d_ribbons:{name:'Ribbon Display',kind:'small',tier:2,w:.35,desc:'A decorative stand displaying several colorful ribbons. Small decor.'},
+ d_bonsai:{name:'Miniature Bonsai',kind:'small',tier:3,w:.35,desc:'A carefully trimmed little tree growing in a shallow pot. Small decor.'},
+ d_mug:{name:'Coffee Mug',kind:'small',tier:0,w:.35,desc:'A ceramic mug with a cute paw-print design. Small decor.'},
+ m_bookshelf:{name:'Wooden Bookshelf',kind:'medium',tier:1,w:.35,desc:'A tall wooden shelf filled with books and small decorations. Medium decor.'},
+ m_armchair:{name:'Cozy Armchair',kind:'medium',tier:1,w:.35,desc:'A cushioned armchair that Pokémon can occasionally sit in. Medium decor.'},
+ m_berry_tree:{name:'Berry Tree',kind:'medium',tier:1,w:.35,desc:'A small tree bearing colorful berries that sway gently in the breeze. Medium decor.'},
+ m_fountain:{name:'Garden Fountain',kind:'medium',tier:2,w:.35,desc:'A stone fountain with flowing water. Medium decor.'},
+ m_picnic:{name:'Picnic Table',kind:'medium',tier:0,w:.35,desc:'A wooden outdoor table with attached benches and a colorful tablecloth. Medium decor.'},
+ m_aquarium:{name:'Aquarium Tank',kind:'medium',tier:2,w:.35,desc:'A glass aquarium containing aquatic plants, bubbles, and decorative rocks. Medium decor.'},
+ m_arcade:{name:'Arcade Cabinet',kind:'medium',tier:2,w:.35,desc:'A colorful arcade machine with a glowing screen. Medium decor.'},
+ m_flower_bed:{name:'Flower Garden',kind:'medium',tier:0,w:.35,desc:'A rectangular garden bed filled with blooming flowers. Medium decor.'},
+ m_swing:{name:'Wooden Swing',kind:'medium',tier:1,w:.35,desc:'A little wooden swing suspended from a sturdy frame. Medium decor.'},
+ m_campfire:{name:'Campfire',kind:'medium',tier:0,w:.35,desc:'A small campfire surrounded by stones, with gently flickering flames. Medium decor.'},
+ m_desk:{name:'Study Desk',kind:'medium',tier:1,w:.35,desc:'A wooden desk equipped with books, writing supplies, and a lamp. Medium decor.'},
+ m_greenhouse:{name:'Miniature Greenhouse',kind:'medium',tier:2,w:.35,desc:'A glass greenhouse containing several potted plants. Medium decor.'},
+ m_mush_patch:{name:'Mushroom Patch',kind:'medium',tier:0,w:.35,desc:'A cluster of oversized mushrooms growing together in a patch of grass. Medium decor.'},
+ m_waterfall:{name:'Decorative Waterfall',kind:'medium',tier:3,w:.35,desc:'A small artificial waterfall cascading into a rocky pool. Medium decor.'},
+ m_vending:{name:'Vending Machine',kind:'medium',tier:2,w:.35,desc:'A brightly colored machine displaying drinks and snacks. Medium decor.'},
+ m_playhouse:{name:'Pokémon Playhouse',kind:'medium',tier:2,w:.35,desc:'A small wooden house with an entrance sized for Pokémon. Medium decor.'},
+ m_telescope:{name:'Telescope Stand',kind:'medium',tier:1,w:.35,desc:'A large telescope mounted on an adjustable tripod. Medium decor.'},
+ m_hammock:{name:'Hammock',kind:'medium',tier:1,w:.35,desc:'A suspended fabric hammock where Pokémon can take naps. Medium decor.'},
+ m_bench:{name:'Outdoor Bench',kind:'medium',tier:0,w:.35,desc:'A decorative park bench with wooden seating and metal supports. Medium decor.'},
+ m_crystals:{name:'Crystal Formation',kind:'medium',tier:2,w:.35,desc:'A large cluster of glowing crystals emerging from the ground. Medium decor.'},
+ m_turbine:{name:'Miniature Wind Turbine',kind:'medium',tier:3,w:.35,desc:'A compact wind turbine with slowly rotating blades. Medium decor.'},
+ m_arch:{name:'Flower Archway',kind:'medium',tier:2,w:.35,desc:'A curved wooden arch covered in blooming flowers and vines. Medium decor.'},
+ m_chest:{name:'Treasure Chest',kind:'medium',tier:2,w:.35,desc:'A decorative wooden chest overflowing with colorful treasures. Medium decor.'},
+ m_koi:{name:'Koi Pond',kind:'medium',tier:2,w:.35,desc:'A small ornamental pond containing lily pads and koi. Medium decor.'},
+ m_clockwork:{name:'Clockwork Machine',kind:'medium',tier:3,w:.35,desc:'A mechanical device with exposed gears, rotating wheels, and moving pistons. Medium decor.'},
+ m_tent:{name:'Camping Tent',kind:'medium',tier:1,w:.35,desc:'A colorful fabric tent with a small entrance and sleeping mat. Medium decor.'},
+ m_piano:{name:'Grand Piano',kind:'medium',tier:3,w:.35,desc:'A polished miniature piano that occasionally plays musical notes. Medium decor.'},
+ m_ruins:{name:'Ancient Ruins',kind:'medium',tier:3,w:.35,desc:'A collection of weathered stone pillars covered in moss and mysterious markings. Medium decor.'},
  t_standard:{name:'Safari Ticket',kind:'ticket',ticket:'standard',tier:0,icon:'ticket',desc:'A free standard Safari pull.'},
  t_shiny:{name:'Shiny Safari Ticket',kind:'ticket',ticket:'shiny',tier:1,icon:'ticket',desc:'A free Shiny Safari pull (double shiny odds).'},
  t_deluxe:{name:'Deluxe Safari Ticket',kind:'ticket',ticket:'deluxe',tier:2,icon:'ticket',desc:'A free Deluxe Safari pull.'},
@@ -1034,7 +1086,7 @@ const ITEMS={
 };
 BGS.forEach(b=>ITEMS[b.id]={name:b.name,kind:'bg',tier:b.tier,url:b.url,desc:'A habitat background.'});
 const TIER_NAMES=['Common','Uncommon','Rare','Legendary'];
-function itemIcon(id,cls=''){const it=ITEMS[id];if(!it)return '❔';if(it.kind==='bg')return '<span class="it-bg '+cls+'" style="background-image:url('+(it.url||'')+')">'+(it.url?'':'🌿')+'</span>';return '<img class="it-ico '+cls+'" src="./assets/items/'+(it.icon||id)+'.png" alt="">'}
+function itemIcon(id,cls=''){const it=ITEMS[id];if(!it)return '❔';if(it.kind==='bg')return '<span class="it-bg '+cls+'" style="background-image:url('+(it.url||'')+')">'+(it.url?'':'🌿')+'</span>';return '<img class="it-ico '+(it.kind==='small'||it.kind==='medium'?'px ':'')+cls+'" src="./assets/items/'+(it.icon||id)+'.png" alt="">'}
 function inv(){return db.inv||(db.inv={})}
 function invAdd(id,n=1){const v=inv();v[id]=(v[id]||0)+n;if(v[id]<=0)delete v[id]}
 // ---- Snack buffs: extra companion EXP while active, counting down even when not the main Pokémon ----
@@ -1055,6 +1107,7 @@ const LOOT=[
  ...['honey','riceball','ball','yarn','candle','lantern','mushroom','sign','bowl','dummy','t_shiny'].map(id=>({id,tier:1})),{cogs:50,tier:1},{candy:1,tier:1},
  ...['cake','plush','crystal','bed','t_deluxe','shinyticket'].map(id=>({id,tier:2})),{cogs:120,tier:2},{candy:3,tier:2},{mon:'any',tier:2,w:.6},
  ...['goldapple'].map(id=>({id,tier:3})),{cogs:300,tier:3},{candy:8,tier:3},{mon:'rare',tier:3},{mon:'shiny',tier:3,w:.12},{mon:'costume',tier:3,w:.12},
+ ...Object.keys(ITEMS).filter(id=>/^[dm]_/.test(id)).map(id=>({id,tier:ITEMS[id].tier,w:ITEMS[id].w})),
  ...BGS.map(b=>({id:b.id,tier:Math.min(3,b.tier),w:b.tier===1?.25:.35}))];
 function pickWeighted(list,rnd=Math.random){const tot=list.reduce((a,x)=>a+(x.w??1),0);let r=rnd()*tot;for(const x of list){r-=(x.w??1);if(r<0)return x}return list[list.length-1]}
 function rollTier(odds,rnd=Math.random){let r=rnd()*100;for(let i=0;i<odds.length;i++){r-=odds[i];if(r<0)return i}return odds.length-1}
@@ -1082,7 +1135,7 @@ function dealsList(){const rnd=seededRand('deals|'+dealKey()),out=[],used=new Se
   if(r<.12){const slot=rnd()<.4?'fast':'charged',all=Object.entries(MOVE_STATS).filter(x=>x[1][3]===slot),mv=all[Math.floor(rnd()*all.length)][0];d={type:'tm',slot,move:mv,cost:slot==='fast'?30:50,key:'tm'+mv}}
   else if(r<.22){const k=['poke','greater','ultra'][rollTier([55,32,13],rnd)];d={type:'box',box:k,cost:{poke:50,greater:100,ultra:150}[k],key:'box'+k}}
   else if(r<.26){const tier=rollTier([45,30,17,7,1],rnd),ch=MONS.filter(m=>m[2]===tier),m=ch[Math.floor(rnd()*ch.length)];d={type:'mon',species:m[0],tier,cost:[90,150,240,380,600][tier],key:'mon'+m[0]}}
-  else{const tier=rollTier([40,32,20,8],rnd),pool=Object.keys(ITEMS).filter(id=>ITEMS[id].tier===tier&&ITEMS[id].kind!=='box'&&id!=='bg_default');const id=pool[Math.floor(rnd()*pool.length)];if(!id)continue;d={type:'item',id,cost:Math.round(price[tier]*(.85+rnd()*.3)),key:'it'+id}}
+  else{const tier=rollTier([40,32,20,8],rnd),pool=Object.keys(ITEMS).filter(id=>ITEMS[id].tier===tier&&ITEMS[id].kind!=='box'&&id!=='bg_default').map(id=>({id,w:ITEMS[id].w??1}));const id=pool.length?pickWeighted(pool,rnd).id:null;if(!id)continue;d={type:'item',id,cost:Math.round(price[tier]*(.85+rnd()*.3)),key:'it'+id}}
   if(used.has(d.key))continue;used.add(d.key);out.push(d)}return out}
 function dealBought(){const k=dealKey();if(!db.dealBought||db.dealBought.key!==k)db.dealBought={key:k,list:[]};return db.dealBought.list}
 function buyDeal(i){const d=dealsList()[i],b=dealBought();if(!d||b.includes(i))return;if(db.cogs<d.cost){toast('Not enough Cogs');magBroke();return}db.cogs=Math.round(db.cogs-d.cost);b.push(i);

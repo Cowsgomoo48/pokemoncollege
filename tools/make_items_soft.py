@@ -96,6 +96,7 @@ ITEMS = {
  'box_ultra': gift('#3b3c4a', '#eceff4', '#ffd34d', [(F, rr(58, 100, 50, 10, 5), '#ffd34d'), (F, rr(148, 100, 50, 10, 5), '#ffd34d')]),
 }
 BIG = {'bowl', 'dummy', 'bed'}
+DECOR = {'grass','rock','flower','path','candle','lantern','mushroom','sign','crystal','bowl','dummy','bed'}  # drawn as pixel art by make_decor_pixel.py
 
 PAGE = r"""<!doctype html><html><body style="margin:0;background:transparent"><div id="root"></div><script>
 let seed=7;const rnd=()=>{seed=(seed*16807)%2147483647;return seed/2147483647};
@@ -141,8 +142,9 @@ def main():
  await b.close() })();""" % (html, json.dumps(list(ITEMS)), tmp))
     subprocess.run(['node', js], check=True)
     for n in ITEMS:
+        if n in DECOR: continue
         im = Image.open(os.path.join(tmp, n + '.png')).convert('RGBA'); bb = im.getchannel('A').point(lambda a: 255 if a > 8 else 0).getbbox()
         im = im.crop((max(0, bb[0] - 4), max(0, bb[1] - 4), min(im.width, bb[2] + 4), min(im.height, bb[3] + 4)))
         mx = 220 if n in BIG else 160; k = mx / max(im.size); im = im.resize((round(im.width * k), round(im.height * k)), Image.LANCZOS)
         im.save(os.path.join(OUT, n + '.png'), optimize=True); print(n, im.size)
-main()
+if __name__ == '__main__': main()
