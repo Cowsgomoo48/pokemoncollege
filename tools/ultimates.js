@@ -21,9 +21,12 @@ const ULTS={
  'Iron Moth':{move:'Ion Flare',type:'Fire',t:'all',fx:'plasma',desc:'Hits all foes and Melts them: +15% damage taken from everything for 2 rounds.'},
  'Chi-Yu':{move:'Ruination Blaze',type:'Fire',t:'all',fx:'ruin',desc:'Hits all foes; any foe above half HP drops to at most half.'},
  'Iron Valiant':{move:'Mirror Edge',type:'Fairy',t:'one',fx:'blade',desc:'Always a critical hit, on top of what the attack bar gives.'},
- 'Ogerpon':{move:'Ivy Cudgel',type:'best:Grass,Water,Fire,Rock',t:'one',fx:'cudgel',desc:'Becomes whichever of Grass, Water, Fire or Rock hits hardest. Your attack bar moves 25% slower for it.'}};
+ 'Ogerpon':{move:'Ivy Cudgel',type:'best:Grass,Water,Fire,Rock',t:'one',fx:'cudgel',desc:'Becomes whichever of Grass, Water, Fire or Rock hits hardest. Your attack bar moves 25% slower for it.'},
+ 'Groudon':{move:'Precipice Blades',type:'Ground',t:'all',fx:'blades',desc:'A row of earthen blades tears across the field, hitting all foes.'},
+ 'Regigigas':{move:'Display of Power',type:'Normal',t:'all',fx:'mountain',desc:'Hits all foes. On your next turn your team takes 2 less damage from every attack, restores 6 Stamina, and the attack bar moves 10% slower. Regigigas must rest that turn.'},
+ 'Diancie':{move:'Diamond Storm',type:'Rock',t:'all',fx:'diamonds',desc:'Hits all foes but is never super effective. A diamond shield protects your whole team from all damage during the enemy\'s turn.'}};
 // physical or special, matching each signature move
-const ULT_CAT={'Genetic Implosion':'S','Earthen Barricade':'P','Permafrost':'S','Corkscrew Cannon':'P','Origin Pulse':'S','Doom Desire':'S','Techno Blast':'S','Overload Surge':'S','Orbital Strike':'P','Fleur Cannon':'S','Spectral Thief':'P','Hex Nut Swarm':'P','Double Iron Bash':'P','Thunder Cage':'S','Dragon Energy':'S','Ancient Wingbeat':'P','Ion Flare':'S','Ruination Blaze':'S','Mirror Edge':'P','Ivy Cudgel':'P'};
+const ULT_CAT={'Genetic Implosion':'S','Earthen Barricade':'P','Permafrost':'S','Corkscrew Cannon':'P','Origin Pulse':'S','Doom Desire':'S','Techno Blast':'S','Overload Surge':'S','Orbital Strike':'P','Fleur Cannon':'S','Spectral Thief':'P','Hex Nut Swarm':'P','Double Iron Bash':'P','Thunder Cage':'S','Dragon Energy':'S','Ancient Wingbeat':'P','Ion Flare':'S','Ruination Blaze':'S','Mirror Edge':'P','Ivy Cudgel':'P','Precipice Blades':'P','Display of Power':'P','Diamond Storm':'P'};
 function ultOf(p){return p&&p.ult?ULTS[p.species]||null:null}
 function ultType(U,e){if(!U.type.startsWith('best:'))return U.type;const opts=U.type.slice(5).split(',');return opts.reduce((a,t)=>typeEff(t,e.types)>typeEff(a,e.types)?t:a,opts[0])}
 // ---- Box: show / unlock the Ultimate ----
@@ -82,9 +85,24 @@ async function ultFx(U,slot,tis,col,allyIs){const A=fxA(slot),T=tis.map(fxF).fil
  case 'ruin':{fxOver('crimson',1100);for(let k=0;k<16;k++){const t=T[k%Math.max(1,T.length)]||top;setTimeout(()=>fxFly({x:A.x,y:A.y-10},{x:t.x+(Math.random()-.5)*40,y:t.y+(Math.random()-.5)*30},'bead',360,{},'ease-out'),k*40)}await S(16*40+380);T.forEach(t=>fxBoom(t,'#8b1020',80));await S(250);break}
  case 'blade':{const t=T[0];fxSpr(aSel,'u-dash',600);if(t){fxBeam(A,t,'#ffffff',380,6);await S(300);fxGone(fxEl('xslash',{left:t.x+'px',top:t.y+'px'}),600);fxShake()}await S(550);break}
  case 'cudgel':{const t=T[0],c=col||'#7ac74c';fxSpr(aSel,'u-masks',700);await S(650);if(t){fxGone(fxEl('club',{left:t.x+'px',top:(t.y-40)+'px'}),500);await S(260);fxBoom(t,c,96);fxShake()}await S(380);break}
+ case 'blades':{fxSpr(aSel,'u-roar',800);fxRing(A,'#e0683c',700,5);await S(820);fxSpr(aSel,'u-slamw',1000);await S(680);fxShake();fxRing({x:A.x,y:A.b},'#c9763a',500,6);
+  const n=7,st=95,ground={x:A.x,y:A.b};T.forEach(t=>{const tg={x:t.x,y:t.b};for(let k=1;k<=n;k++){const f=k/n,p={x:ground.x+(tg.x-ground.x)*f,y:ground.y+(tg.y-ground.y)*f};setTimeout(()=>fxGone(fxEl('blade',{left:p.x+'px',top:p.y+'px','--h':Math.round(30+f*34)+'px'}),620),k*st)}
+   setTimeout(()=>{fxGone(fxEl('blade big',{left:t.x+'px',top:(t.b+4)+'px','--h':Math.round(Math.max(90,t.h*1.25))+'px'}),760);fxBoom(t,'#e0683c',88);fxShake()},(n+1)*st)});await S((n+1)*st+700);break}
+ case 'mountain':{fxSpr(aSel,'u-hop',560);await S(360);fxShake();const mt=fxEl('mount',{left:A.x+'px',top:(A.y-A.h/2+4)+'px','--w':Math.round(Math.max(110,A.w*1.6))+'px'});fxSpr(aSel,'u-lift',1300);await S(650);
+  if(mt){mt.animate([{transform:'translate(-50%,-100%) rotate(0)'},{transform:'translate(-50%,-100%) translateY(-30px) rotate(-8deg)',offset:.25},{transform:'translate(-50%,-100%) translateY(-'+(A.y+260)+'px) rotate(14deg) scale(.6)'}],{duration:520,easing:'ease-in',fill:'forwards'});fxGone(mt,540)}
+  await S(800);const F=fxField(),W=F?F.clientWidth:400,cx=T.length?T.reduce((a,t)=>a+t.x,0)/T.length:W*.7,gy=T.length?Math.max(...T.map(t=>t.b)):A.y,big=fxEl('mount big',{left:cx+'px',top:gy+'px','--w':Math.round(W*.95)+'px'});
+  if(big){big.animate([{transform:'translate(-50%,-100%) translateY(-'+(gy+40)+'px)'},{transform:'translate(-50%,-100%) translateY(0)',offset:.55},{transform:'translate(-50%,-100%) translateY(0) scale(1.03,.97)',offset:.7},{transform:'translate(-50%,-100%) translateY(0)',opacity:1,offset:.85},{transform:'translate(-50%,-100%) translateY(10px)',opacity:0}],{duration:900,easing:'ease-in',fill:'forwards'});fxGone(big,920)}
+  await S(500);fxShake();T.forEach(t=>{fxBoom(t,'#a8a77a',96);fxGone(fxEl('dust',{left:t.x+'px',top:t.b+'px'}),700)});await S(650);break}
+ case 'diamonds':{fxSpr(aSel,'u-rise',2600);fxRing(A,'#ffc2e6',700,4);await S(300);for(let k=0;k<22;k++){const a=Math.random()*6.28,d=70+Math.random()*50;setTimeout(()=>fxFly({x:A.x+Math.cos(a)*d,y:A.y-26+Math.sin(a)*d},{x:A.x,y:A.y-26},'dia',360,{'--z':(6+Math.random()*5)+'px'},'ease-in'),k*22)}
+  await S(22*22+380);fxGone(fxEl('charge',{left:A.x+'px',top:(A.y-26)+'px','--c':'#ff9fd6'}),500);await S(380);const F=fxField(),W=F?F.clientWidth:400,H=F?F.clientHeight:600,half=H*.52,D=half+70;fxOver('glint',1900);
+  const N=190,gap=8;for(let k=0;k<N;k++){const x0=-D+Math.random()*(W+D),y0=-40-Math.random()*30,ms=420+Math.random()*180;setTimeout(()=>fxFly({x:x0,y:y0},{x:x0+D,y:y0+D},'shard',ms,{'--z':(9+Math.random()*8)+'px'},'linear'),k*gap)}
+  T.forEach((t,j)=>[350,700,1050,1400].forEach(ms=>setTimeout(()=>fxBoom(t,'#ffc2e6',56),ms+j*40)));await S(N*gap+560);break}
  default:await S(400)}}
 // ---- running an Ultimate ----
-function dgBarSlow(b){return b&&b.slowBar===b.round?.9:1}
+function dgBarSlow(b){return b&&(b.slowBar===b.round||b.gigas===b.round)?.9:1}
+// damage your team takes from an enemy attack this round: Diamond Storm blocks it all, Display of Power takes 2 off (to a minimum of 0)
+function ultGuardDmg(b,dmg){if(!b||!dmg)return dmg;if(b.diamond===b.round)return 0;if(b.gigas===b.round)return Math.max(0,dmg-2);return dmg}
+function ultResting(b,m){return !!(b&&m&&m.hp>0&&m.rest===b.round)}
 async function dgUltimate(slot,ti,mult,res){const r=runOf(),b=r&&r.battle,m=b&&r.party[slot],p=partyMon(m),U=ultOf(p);if(!U||!b){dgAfterAction();return}
  const c=combatant(p),who='<b style="color:'+SLOT_COLORS[slot]+'">'+esc(p.nickname||p.species)+'</b>';
  if(U.t==='none'&&res==='fail'){if(DG)DG.msg=who+' tried <b>'+esc(U.move)+'</b>… but it fizzled! (Stamina kept)';dgDrawBattle();await dgSleep(1000);dgAfterAction();return}
@@ -103,6 +121,7 @@ async function dgUltimate(slot,ti,mult,res){const r=runOf(),b=r&&r.battle,m=b&&r
  else if(sp==='Time Warp'){b.skip=true;b.warp=true;note=' Time itself bends: every enemy will skip its next turn!'}
  else if(sp==='Doom Desire'&&t0){b.doom={ti:targets[0][1],atk:att.atk,spa:att.spa,types:att.types,mult,extra};note=' A wish-star rises… it will fall at the start of your next turn.'}
  else if(sp==='Double Iron Bash'&&t0){strike(t0,targets[0][1],90,mult);strike(t0,targets[0][1],90,mult);if(t0.hp>0){t0.flinch=true;note=' '+esc(t0.species)+' flinched!'}}
+ else if(sp==='Diamond Storm'){targets.forEach(([e,i])=>strike(e,i,180,mult,Math.min(1,typeEff('Rock',e.types))));b.diamond=b.round;note=' A diamond shield forms: your team takes no damage this enemy turn!'}
  else if(sp==='Mirror Edge'&&t0){strike(t0,targets[0][1],180,(mult>=2?2:mult)*2);note=' <span class="t-crit">Critical hit!</span>'}
  else{const pw=sp==='Dragon Energy'?Math.round(90+90*Math.max(0,m.hp)/c.hp):180;
   targets.forEach(([e,i])=>{const before=e.hp;strike(e,i,pw,mult);if(sp==='Ruination Blaze'&&e.hp>0&&e.hp>Math.floor(e.maxhp/2)&&before>e.maxhp/2){const h=hits[hits.length-1],cut=e.hp-Math.floor(e.maxhp/2);e.hp-=cut;h.dmg+=cut}
@@ -112,6 +131,7 @@ async function dgUltimate(slot,ti,mult,res){const r=runOf(),b=r&&r.battle,m=b&&r
   if(sp==='Corkscrew Cannon'){b.steelRegen=b.round;note=' Your team will restore 10 Stamina next turn.'}
   if(sp==='Orbital Strike'){m.sky=b.round;note=' '+esc(p.species)+' stays up in orbit for the enemy\'s turn.'}
   if(sp==='Fleur Cannon'&&t0&&t0.hp<=0){b.teamBoost=(b.teamBoost||0)+.1;note=' Soul-Heart! Your team deals +10% damage for the rest of the battle.'}
+  if(sp==='Display of Power'){b.gigas=b.round+1;m.rest=b.round+1;note=' Next turn your team takes 2 less damage, restores 6 Stamina and the bar slows by 10%. '+esc(p.species)+' will need to rest.'}
   if(sp==='Ancient Wingbeat'){b.teamBoost=(b.teamBoost||0)+.1;note=' Your team deals +10% damage for the rest of the battle.'}
   if(sp==='Ion Flare')note=' The foes are Melted (+15% damage taken for 2 rounds).';
   if(sp==='Spectral Thief'&&t0){const st=t0.energy||0;t0.energy=0;const alive=r.party.filter(x=>x.hp>0);alive.forEach(x=>x.energy=Math.min(100,(x.energy||0)+Math.round(st/Math.max(1,alive.length))));note=st?' Stole '+st+' Stamina and shared it with the team!':' '+esc(t0.species)+' had no Stamina to steal.'}
@@ -128,5 +148,7 @@ async function ultEndOfRound(r,b){let any=false;
  if(b.doom){const d=b.doom,e=b.enemies[d.ti];b.doom=null;if(e&&e.hp>0){const tp='Steel',eff=Math.max(1,typeEff(tp,e.types)),{dmg:raw,eff:e0}=dgDamage({atk:d.atk,spa:d.spa,types:d.types},{def:e.def,spd:e.spd,types:e.types},[tp,180,0,'charged'],d.mult,d.extra,'S'),dmg=Math.max(1,Math.round(raw/Math.max(.01,e0)*eff*(e.melt>0?1.15:1)));e.hp=Math.max(0,e.hp-dmg);
    r.party.forEach(x=>{if(x.hp>0){const c=combatant(partyMon(x));x.hp=Math.min(c.hp,x.hp+Math.round(c.hp*.15))}});save();dgDrawBattle();const fp=fxF(d.ti);if(fp){fxGone(fxEl('column',{left:fp.x+'px'}),700);await dgSleep(250);fxBoom(fp,'#fff4a8',100);fxShake()}
    const s='.dg-foe[data-i="'+d.ti+'"]';dgHit(s,true);dgFloat(s,'-'+dmg,'crit');if(DG)DG.msg='🌠 Doom Desire falls on '+esc(e.species)+'! <b>−'+dmg+'</b> · your team recovers 15% HP.';dgSay(DG.msg);if(e.hp<=0)setTimeout(()=>dgFaint(s),380);await dgSleep(1100)}}
+ if(b.gigas===b.round+1){r.party.forEach(x=>{if(x.hp>0)x.energy=Math.min(100,(x.energy||0)+6)});if(DG)DG.msg='⛰ Display of Power: your team restores 6 Stamina and braces (−2 damage this turn).';any=true}
+ if(b.diamond===b.round){document.querySelectorAll('.dg-ally.dshield').forEach(x=>x.classList.add('dfade'));await dgSleep(550)}
  b.warp=false;if(any){save();dgDrawBattle();await dgSleep(700)}}
 
