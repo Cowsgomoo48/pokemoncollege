@@ -8,3 +8,10 @@
 # v0.24.1
 - TM shelf is now super compact: each shelf cell holds a stack of 11 TMs lying flat (rim = rarity, centre = type), filling a cell top to bottom before moving to the next; 44 TMs per shelf row.
 - The selected TM's slot is highlighted with a yellow outline and glow. TMs the Pokémon can't learn (or already knows) are dimmed; details are on the monitor.
+
+# v0.24.2
+- TM discs redrawn to look like real discs seen slightly from above: visible edge thickness, grooved outer ring (rarity colour), type-coloured label, silver hub with a centre hole, and a light glint.
+
+# v0.24.3
+- TM discs restyled as shiny CD-style discs: pinwheel slices of the move's type colour and white, dark outline and edge, white centre hub. The rarity-coloured outer ring is gone.
+- Rarity extras: Common = plain disc; Uncommon = subtle metallic sheen; Rare = silver ring on the inner edge; Legendary = gold ring on the inner edge.
