@@ -1,0 +1,63 @@
+/* ---- Legendary Ultimates ---- */
+.btn.ult{background:linear-gradient(135deg,#2b1b4a,#6b2fa8 55%,#d9a630);color:#fff;border-color:#f4cf55;box-shadow:0 0 10px #f4cf5588}.btn.ult:disabled{background:#4a4458;border-color:#7a7488;box-shadow:none;color:#bbb}
+.bx-ult{background:linear-gradient(135deg,#2b1b4a,#5a2a8a);color:#fff}.bx-ult small{color:#f4cf55!important}.bx-ult p,.bx-ultlock p{font-size:10px;line-height:1.3;margin:2px 0 0;opacity:.85}.bx-ult span{color:#f4cf55}
+.bx-ultlock{display:flex;gap:8px;align-items:center;background:#ece6f6;border:2px dashed #9a7fd0;border-radius:10px;padding:8px}.bx-ultlock div{flex:1;min-width:0}.bx-ultlock small{display:block;font-size:8px;letter-spacing:.7px;color:#6b4fa8;font-weight:800}.bx-ultlock .btn{min-height:40px;font-size:11px;padding:0 8px;white-space:nowrap}
+.ult-splash{position:fixed;inset:0;z-index:9500;display:grid;place-items:center;background:#0008;pointer-events:none}
+.ult-band{position:relative;width:min(98vw,580px);aspect-ratio:1200/436;animation:ultin .26s cubic-bezier(.2,1.4,.4,1) both}.ult-splash.out .ult-band{animation:ultout .3s ease-in forwards}
+.ult-bandimg{position:absolute;inset:0;width:100%;height:100%}
+.ult-clip{position:absolute;inset:0;-webkit-mask:url(assets/ult/band_mask.png) 0 0/100% 100% no-repeat;mask:url(assets/ult/band_mask.png) 0 0/100% 100% no-repeat;overflow:hidden}
+.ult-head{position:absolute;height:92%;aspect-ratio:1;left:40%;top:4%;image-rendering:pixelated;animation:ulthead 1.9s cubic-bezier(.4,.1,.3,1) .1s forwards;filter:drop-shadow(0 0 6px #000)}
+@keyframes ulthead{0%{left:42%;top:8%;transform:scale(1.15)}30%{left:36%;top:14%;transform:scale(1.15)}100%{left:2%;top:34%;transform:scale(1)}}
+.ult-txt{position:absolute;left:0;top:44%;white-space:nowrap;color:#fff;transform:rotate(-11deg);transform-origin:0 50%;animation:ultscroll 1.9s linear forwards}
+.ult-txt b{display:block;font:900 italic clamp(22px,7vw,38px)/1 inherit;letter-spacing:1px;text-shadow:3px 3px 0 #c2183c,0 0 12px #000}.ult-txt small{display:block;font:800 11px/1.4 inherit;letter-spacing:3px;color:#f4cf55;margin-left:30px}
+@keyframes ultscroll{from{transform:translateX(110%) rotate(-11deg)}to{transform:translateX(18%) rotate(-11deg)}}
+@keyframes ultin{from{transform:scale(1.15,.02);filter:brightness(3)}to{transform:none;filter:none}}@keyframes ultout{0%{transform:none}60%{transform:scale(1.04,.04);filter:brightness(2.5)}100%{transform:scale(0,.02);opacity:0}}
+.ufx{position:absolute;pointer-events:none;z-index:7}
+.ufx.boom{width:var(--s);height:var(--s);border-radius:50%;background:radial-gradient(circle,#fff 0 18%,var(--c) 42%,transparent 70%);transform:translate(-50%,-50%) scale(.2);animation:uboom .55s ease-out forwards}
+@keyframes uboom{60%{transform:translate(-50%,-50%) scale(1.15);opacity:1}100%{transform:translate(-50%,-50%) scale(1.4);opacity:0}}
+.ufx.ring{width:40px;height:40px;border-radius:50%;border:4px solid var(--c);transform:translate(-50%,-50%) scale(.1);box-shadow:0 0 14px var(--c)}
+@keyframes uring{to{transform:translate(-50%,-50%) scale(var(--k));opacity:0}}
+.ufx.ov{inset:0;animation:uov var(--ms) ease-out forwards}@keyframes uov{0%{opacity:0}15%{opacity:1}75%{opacity:1}100%{opacity:0}}
+.ufx.beam{height:var(--t);margin-top:calc(var(--t)/-2);transform-origin:0 50%;border-radius:var(--t);background:linear-gradient(90deg,#fff,var(--c) 30%,var(--c) 80%,#fff);box-shadow:0 0 18px var(--c),0 0 4px #fff}
+@keyframes ubeam{0%{clip-path:inset(0 100% 0 0);opacity:1}35%{clip-path:inset(0 0 0 0);opacity:1}100%{clip-path:inset(0 0 0 0);opacity:0;filter:blur(3px)}}
+.ufx.orbring{width:0;height:0;animation:uspin .8s linear}.ufx.orbring i,.ufx.orb{position:absolute;width:12px;height:12px;margin:-6px;border-radius:50%;background:var(--c);box-shadow:0 0 8px var(--c),inset 0 0 3px #fff}
+@keyframes uspin{from{transform:rotate(0) scale(.3)}to{transform:rotate(540deg) scale(1)}}
+.ufx.spikes{width:70px;height:46px;transform:translate(-50%,-100%);background:var(--c);clip-path:polygon(0 100%,12% 30%,24% 100%,36% 0,50% 100%,64% 10%,78% 100%,88% 40%,100% 100%);animation:uspike .7s ease-out forwards;filter:drop-shadow(0 0 2px #000)}
+@keyframes uspike{0%{transform:translate(-50%,-100%) scaleY(0);transform-origin:50% 100%}30%{transform:translate(-50%,-100%) scaleY(1.15)}70%{transform:translate(-50%,-100%) scaleY(1)}100%{transform:translate(-50%,-100%) scaleY(0);opacity:0}}
+.ufx.ov.blizzard{background:radial-gradient(circle,#fff 0 1.5px,transparent 2.5px) 0 0/22px 22px,radial-gradient(circle,#e8fbff 0 2px,transparent 3px) 11px 7px/31px 31px,#bfefff55;animation:uov var(--ms) ease-out forwards,usnow .5s linear infinite}
+@keyframes usnow{to{background-position:-22px 44px,-20px 62px,0 0}}
+.ufx.gball{width:30px;height:30px;margin:-15px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fff,#9aa3ae 45%,#4a5160);animation:ugrow .45s ease-out}@keyframes ugrow{from{transform:scale(0)}}
+.ufx.drill{width:34px;height:18px;background:linear-gradient(90deg,#8d96a3,#dfe4ea);clip-path:polygon(0 0,100% 50%,0 100%)}
+.ufx.ov.wave{background:linear-gradient(transparent 0,transparent 30%,#5b9dff99 45%,#2f6fe0cc 70%,#1e4fb0);animation:uwave var(--ms) ease-in-out forwards}
+@keyframes uwave{0%{transform:translateY(100%)}45%{transform:translateY(-10%)}75%{transform:translateY(-35%);opacity:1}100%{transform:translateY(-60%);opacity:0}}
+.ufx.star{width:26px;height:26px;background:#fff4a8;clip-path:polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);filter:drop-shadow(0 0 8px #fff27a)}
+.ufx.column{top:0;bottom:0;width:60px;margin-left:-30px;background:linear-gradient(90deg,transparent,#fff8c8,#fff,#fff8c8,transparent);animation:ucol .7s ease-out forwards}@keyframes ucol{0%{transform:scaleX(0);opacity:1}30%{transform:scaleX(1)}100%{opacity:0}}
+.ufx.charge{width:40px;height:40px;margin:-20px;border-radius:50%;background:radial-gradient(circle,#fff 0 25%,var(--c) 55%,transparent 72%);animation:ucharge .5s ease-in forwards}.ufx.charge.big{width:80px;height:80px;margin:-40px}
+@keyframes ucharge{from{transform:scale(.1)}to{transform:scale(1.2)}}
+.ufx.petal{width:10px;height:7px;border-radius:60% 0;background:var(--c)}
+.ufx.zap{inset:0}.ufx.ov.flicker{background:#fff27a33;animation:uflick .8s steps(6) forwards}@keyframes uflick{0%,40%,80%{opacity:1}20%,60%,100%{opacity:0}}
+.ufx.streak{width:8px;height:44px;margin:-22px -4px;border-radius:6px;background:linear-gradient(transparent,#dfe4ea,#fff);transform:rotate(-20deg)}
+.ufx.shade{width:70px;height:20px;margin:-10px -35px;border-radius:50%;background:radial-gradient(#2a1b40,transparent 70%);animation:uov .9s forwards}
+.ufx.nut{width:12px;height:12px;margin:-6px;background:#b7b7ce;clip-path:polygon(25% 5%,75% 5%,100% 50%,75% 95%,25% 95%,0 50%);box-shadow:inset 0 0 0 3px #6d6f82}
+.ufx.cagebars{width:70px;height:80px;margin:-40px -35px;background:repeating-linear-gradient(90deg,#fff27a 0 4px,transparent 4px 14px);border-top:4px solid #fff27a;border-bottom:4px solid #fff27a;box-shadow:0 0 12px #f7d02c;animation:uov 1.1s forwards}
+.ufx.ov.dblast{background:radial-gradient(ellipse at 50% 100%,#c084fc,#8b5cf6aa 30%,#e11d4855 55%,transparent 75%);animation:uwave var(--ms) ease-out forwards}
+.ufx.ov.heat{backdrop-filter:blur(1px) saturate(1.4);background:#ff8a3c22}.ufx.ember{width:7px;height:7px;margin:-3px;border-radius:50%;background:radial-gradient(#fff3b0,#ff7a2c);box-shadow:0 0 6px #ff7a2c}
+.ufx.ov.plasmawave{background:linear-gradient(transparent 20%,#ff9a3caa 50%,#ff4a7a66 70%,transparent);animation:uwave var(--ms) ease-out forwards}
+.ufx.ov.crimson{background:#5a001488;mix-blend-mode:multiply}.ufx.bead{width:11px;height:11px;margin:-5px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#ffb3b3,#c2183c 50%,#5a0014);box-shadow:0 0 8px #c2183c}
+.ufx.xslash{width:90px;height:90px;margin:-45px;background:linear-gradient(45deg,transparent 46%,#fff 48%,#ffd6f0 50%,#fff 52%,transparent 54%),linear-gradient(-45deg,transparent 46%,#fff 48%,#ffd6f0 50%,#fff 52%,transparent 54%);filter:drop-shadow(0 0 8px #ff9fc9);animation:uslash .6s ease-out forwards}
+@keyframes uslash{0%{transform:scale(.2) rotate(-30deg);opacity:1}40%{transform:scale(1.1) rotate(0)}100%{transform:scale(1.2);opacity:0}}
+.ufx.club{width:26px;height:64px;margin-left:-13px;border-radius:12px 12px 6px 6px;background:linear-gradient(90deg,#6b4224,#a8723f 50%,#6b4224);transform-origin:50% 100%;animation:uclub .5s ease-in forwards}@keyframes uclub{from{transform:rotate(-120deg)}70%{transform:rotate(10deg)}to{transform:rotate(0)}}
+.dg-field.negfx{filter:invert(1) hue-rotate(180deg)}
+.u-bounce{animation:ubounce .5s!important}@keyframes ubounce{40%{translate:0 -14px}}
+.dg-spr.u-slam,.dg-spr.u-widen,.dg-spr.u-roar,.dg-spr.u-glow,.dg-spr.u-launch,.dg-spr.u-sink,.dg-spr.u-pop,.dg-spr.u-dash,.dg-spr.u-flap,.dg-spr.u-masks,.dg-spr.lunge{transform-origin:50% 100%}
+.u-slam{animation:uslam .95s!important}@keyframes uslam{25%{translate:0 -46px;scale:1}55%{translate:0 -50px}68%{translate:0 0;scale:1.35 .65}82%{scale:.9 1.12}100%{translate:0 0;scale:1}}
+.u-widen{animation:uwiden 1.1s!important}@keyframes uwiden{20%,75%{scale:1.4 1.05;filter:drop-shadow(0 0 10px #cdf3ff)}}
+.u-roar{animation:uroar .8s!important}@keyframes uroar{30%{translate:0 10px;scale:.95}60%{translate:0 -18px;scale:1.1}}
+.u-glow{animation:uglow .7s!important}@keyframes uglow{50%{filter:drop-shadow(0 0 12px #fff27a) brightness(1.4)}}
+.u-launch{animation:ulaunch .9s forwards!important}@keyframes ulaunch{20%{translate:0 8px;scale:.95 1.05}100%{translate:0 -420px;opacity:0}}
+.dg-ally.sky .dg-spr{translate:0 -60px;opacity:.15}
+.u-sink{animation:usink 1.3s!important}@keyframes usink{25%,75%{scale:1.2 0;opacity:0}}
+.u-pop{animation:upop .6s!important}@keyframes upop{30%{scale:1.4;opacity:.2}}
+.u-dash{animation:udash .6s!important}@keyframes udash{30%{translate:0 -70px;filter:blur(3px);opacity:.4}60%{translate:0 -70px;opacity:0}100%{translate:0 0;opacity:1}}
+.u-flap{animation:uflap .9s!important}@keyframes uflap{20%,60%{scale:1.15 .9}40%,80%{scale:.95 1.1}}
+.u-masks{animation:umasks .7s!important}@keyframes umasks{0%{filter:hue-rotate(0)}25%{filter:hue-rotate(90deg) saturate(2)}50%{filter:hue-rotate(200deg) saturate(2)}75%{filter:hue-rotate(300deg) saturate(2)}100%{filter:none}}

@@ -62,6 +62,11 @@ jobs:
           /usr/libexec/PlistBuddy -c "Delete :UIBackgroundModes" $PL 2>/dev/null || true
           /usr/libexec/PlistBuddy -c "Add :UIBackgroundModes array" $PL
           /usr/libexec/PlistBuddy -c "Add :UIBackgroundModes:0 string audio" $PL
+          # let the Files app see this app's Documents folder (automatic backups live in PokémonCollege/Backups)
+          /usr/libexec/PlistBuddy -c "Delete :UIFileSharingEnabled" $PL 2>/dev/null || true
+          /usr/libexec/PlistBuddy -c "Add :UIFileSharingEnabled bool true" $PL
+          /usr/libexec/PlistBuddy -c "Delete :LSSupportsOpeningDocumentsInPlace" $PL 2>/dev/null || true
+          /usr/libexec/PlistBuddy -c "Add :LSSupportsOpeningDocumentsInPlace bool true" $PL
 
       - name: Copy web files into the app
         run: npx cap sync ios
