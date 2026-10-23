@@ -79,11 +79,13 @@ function dgBossChoice(){const r=runOf();if(r.diff==='easy'||Math.random()>.45){d
  $('dgStage').innerHTML='<div class="dg-room"><span class="dg-big">'+(alpha?'🔺':'🌀')+'</span><h3>'+(alpha?'An Alpha stirs ahead…':'A Totem Pokémon blocks the way…')+'</h3><p class="small">'+(alpha?'Alphas are far stronger and attack twice a turn.':'Totems fight with 2–3 allies.')+' Beat it to also bring home its pre-evolution.</p><div class="actions"><button class="btn" onclick="dgBattle(\'boss\')">FIGHT THE NORMAL BOSS</button><button class="btn red" onclick="dgBattle(\''+(alpha?'alpha':'totem')+'\')">FACE THE '+(alpha?'ALPHA':'TOTEM')+'</button></div></div>';$('dgPanel').innerHTML=dgPanelMap()}
 // ---------- battle setup ----------
 function dgBattle(kind){const r=runOf(),bump=dgGamey(r)?(r.floor||0)*(DIFF[r.diff].step||2):0,avg=partyAvgLv()+bump,cap=avg+DIFF[r.diff].cap,lv=(lo,hi)=>Math.max(1,lo+Math.floor(Math.random()*(hi-lo+1))),en=[];
- if(kind==='battle'){const n=1+Math.floor(Math.random()*(r.diff==='easy'?3:4));for(let i=0;i<n;i++)en.push(makeEnemy(speciesOfTier(0,2),lv(Math.max(1,avg-2),cap),{hpMul:1.35,atkMul:1.1}))}
- else if(kind==='swarm'){const sp=speciesOfTier(0,0),n=4+Math.floor(Math.random()*4);for(let i=0;i<n;i++)en.push(makeEnemy(sp,lv(Math.max(1,avg-5),Math.max(1,avg-2)),{hpMul:.7,atkMul:.75}))}
+ // levels spread around a centre (most near it, a few well above or below), clamped to a range
+ const spread=(mid,sd,lo,hi)=>{const g=(Math.random()+Math.random()+Math.random()-1.5)*2;return Math.max(1,Math.min(hi,Math.max(lo,Math.round(mid+g*sd))))},sd=r.diff==='hard'?3.5:r.diff==='easy'?2.5:3;
+ if(kind==='battle'){const n=1+Math.floor(Math.random()*(r.diff==='easy'?3:4));for(let i=0;i<n;i++)en.push(makeEnemy(speciesOfTier(0,2),spread(avg+(cap-avg)*.4,sd,avg-6,cap+3),{hpMul:1.35,atkMul:1.1}))}
+ else if(kind==='swarm'){const sp=speciesOfTier(0,0),n=4+Math.floor(Math.random()*4);for(let i=0;i<n;i++)en.push(makeEnemy(sp,spread(avg-6,2,avg-10,avg-3),{hpMul:.7,atkMul:.75}))}
  else{const evolved=MONS.filter(m=>PRE_EVO[m[0]]&&m[2]>=1);const sp=kind==='boss'?speciesOfTier(2,4):evolved[Math.floor(Math.random()*evolved.length)][0];
-  if(kind==='alpha')en.push(makeEnemy(sp,cap+2,{hpMul:DIFF[r.diff].bh*1.2,atkMul:1.3,boss:'alpha',twice:true}));
-  else{en.push(makeEnemy(sp,cap+1,{hpMul:DIFF[r.diff].bh*(kind==='totem'?.85:1),atkMul:1.2,boss:kind}));if(kind==='totem'){const pre=PRE_EVO[sp]||sp,n=2+Math.floor(Math.random()*2);for(let i=0;i<n;i++)en.push(makeEnemy(pre,Math.max(1,avg-2),{hpMul:.8}))}}}
+  if(kind==='alpha')en.push(makeEnemy(sp,cap+1+lv(0,2),{hpMul:DIFF[r.diff].bh*1.2,atkMul:1.3,boss:'alpha',twice:true}));
+  else{en.push(makeEnemy(sp,cap+lv(0,2),{hpMul:DIFF[r.diff].bh*(kind==='totem'?.85:1),atkMul:1.2,boss:kind}));if(kind==='totem'){const pre=PRE_EVO[sp]||sp,n=2+Math.floor(Math.random()*2);for(let i=0;i<n;i++)en.push(makeEnemy(pre,spread(avg-2,2,avg-6,avg+1),{hpMul:.8}))}}}
  r.battle={kind,enemies:en,turn:0,round:1,overclock:0,skip:false,guard:{},done:false};save();dgDrawBattle(true)}
 function dgSpriteHTML(species,row,cls,costumeP,size){return '<div class="dg-spr '+cls+'" data-sp="'+esc(species)+'" data-row="'+row+'" data-sz="'+(+size||1)+'"></div>'}
 const DG_SPRITE_SCALE=1.3; // every Pokémon is drawn at the same scale, so real size differences show
