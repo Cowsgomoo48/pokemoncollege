@@ -94,6 +94,22 @@ ITEMS = {
  'box_poke': gift('#ef4b4b', '#f7f3ee', '#ffd34d'),
  'box_greater': gift('#4a7fe0', '#f7f3ee', '#ef4b4b', [(F, rr(62, 98, 22, 24, 6), '#ef4b4b'), (F, rr(172, 98, 22, 24, 6), '#ef4b4b')]),
  'box_ultra': gift('#3b3c4a', '#eceff4', '#ffd34d', [(F, rr(58, 100, 50, 10, 5), '#ffd34d'), (F, rr(148, 100, 50, 10, 5), '#ffd34d')]),
+ 'costumeticket': [(G, TICKET, '#c9a0ff'), (L, 'M170 88 L170 168', '#a97ce8', 4, '8 7'), (F, rr(56, 106, 96, 44, 12), '#ff8fc8'),
+                   (F, 'M104 128 L82 112 L84 144 Z', '#ffffff'), (F, 'M104 128 L126 112 L124 144 Z', '#ffffff'), (F, circ(104, 128, 7), '#ffe0f0'), (F, star4(196, 128, 12), '#ffffff')],
+ 'rerollticket': [(G, TICKET, '#7ee0d0'), (L, 'M170 88 L170 168', '#4fbcaa', 4, '8 7'), (F, rr(56, 106, 96, 44, 12), '#3a9ad8'),
+                  (L, 'M86 124 A18 18 0 0 1 118 118', '#ffffff', 6), (F, 'M114 108 L126 120 L110 124 Z', '#ffffff'),
+                  (L, 'M122 132 A18 18 0 0 1 90 138', '#ffffff', 6), (F, 'M94 148 L82 136 L98 132 Z', '#ffffff')],
+ 'shinyconv': [(G, TICKET, '#fff0a8'), (L, 'M170 88 L170 168', '#e8c84a', 4, '8 7'), (F, rr(56, 106, 96, 44, 12), '#ffc93a'),
+               (F, star4(104, 128, 22), '#ffffff'), (F, star4(132, 112, 8), '#fff8d0'), (F, star4(196, 112, 11), '#ffb81c'), (F, star4(30, 70, 12), '#ffd34d'), (F, star4(228, 188, 10), '#ffd34d')],
+ 'cap_copper': [(G, gear(128, 128, 98, 86, 24), '#c97a45'), (G, circ(128, 128, 62), '#e3a06e'), (L, 'M84 128 A44 44 0 0 1 128 84', '#fff0e0', 5)],
+ 'cap_silver': [(G, gear(128, 128, 98, 86, 24), '#aab5c2'), (G, circ(128, 128, 62), '#dfe5ec'), (L, 'M84 128 A44 44 0 0 1 128 84', '#ffffff', 5)],
+ 'cap_gold': [(G, gear(128, 128, 98, 86, 24), '#e8b222'), (G, circ(128, 128, 62), '#ffd966'), (L, 'M84 128 A44 44 0 0 1 128 84', '#fffbe0', 5), (F, star4(204, 52, 12), '#fff4b0')],
+ 'cap_stellar': [(W, '', '#c9b6ff', (128, 128, 120)), (G, gear(128, 128, 98, 86, 24), '#8fb4ff'), (G, circ(128, 128, 62), '#e3d6ff'), (F, star5(128, 128, 36, 15), '#ffffff'),
+                 (F, star4(40, 44, 14), '#ffe9a8'), (F, star4(214, 54, 12), '#bff0ff'), (F, star4(222, 206, 14), '#ffd6f0'), (F, star4(36, 210, 10), '#ffffff')],
+ 'exp_t1': [(G, TICKET, '#9ee08a'), (L, 'M170 88 L170 168', '#6cbf5a', 4, '8 7'), (F, rr(56, 106, 96, 44, 12), '#4caf50'), (F, 'M104 108 L124 130 L112 130 L112 148 L96 148 L96 130 L84 130 Z', '#ffffff')],
+ 'exp_t2': [(G, TICKET, '#8ec1ff'), (L, 'M170 88 L170 168', '#5b95e0', 4, '8 7'), (F, rr(56, 106, 96, 44, 12), '#3a7be0'), (F, 'M92 110 L110 130 L100 130 L100 148 L84 148 L84 130 L74 130 Z', '#ffffff'), (F, 'M118 110 L136 130 L126 130 L126 148 L110 148 L110 130 L100 130 Z', '#ffffff')],
+ 'exp_t3': [(G, TICKET, '#d7a8ff'), (L, 'M170 88 L170 168', '#a97ce8', 4, '8 7'), (F, rr(56, 106, 96, 44, 12), '#f2b52b'), (F, 'M104 106 L126 130 L113 130 L113 150 L95 150 L95 130 L82 130 Z', '#ffffff'),
+            (F, star4(196, 128, 13), '#ffe066'), (F, star4(32, 72, 12), '#fff4b0'), (F, star4(226, 190, 10), '#fff4b0')],
 }
 BIG = {'bowl', 'dummy', 'bed'}
 DECOR = {'grass','rock','flower','path','candle','lantern','mushroom','sign','crystal','bowl','dummy','bed'}  # drawn as pixel art by make_decor_pixel.py
@@ -141,8 +157,9 @@ def main():
  for (const n of names) await p.locator('#' + n).screenshot({ path: '%s/' + n + '.png', omitBackground: true });
  await b.close() })();""" % (html, json.dumps(list(ITEMS)), tmp))
     subprocess.run(['node', js], check=True)
+    ONLY = set(sys.argv[1].split(',')) if len(sys.argv) > 1 else None
     for n in ITEMS:
-        if n in DECOR: continue
+        if n in DECOR or (ONLY and n not in ONLY): continue
         im = Image.open(os.path.join(tmp, n + '.png')).convert('RGBA'); bb = im.getchannel('A').point(lambda a: 255 if a > 8 else 0).getbbox()
         im = im.crop((max(0, bb[0] - 4), max(0, bb[1] - 4), min(im.width, bb[2] + 4), min(im.height, bb[3] + 4)))
         mx = 220 if n in BIG else 160; k = mx / max(im.size); im = im.resize((round(im.width * k), round(im.height * k)), Image.LANCZOS)
