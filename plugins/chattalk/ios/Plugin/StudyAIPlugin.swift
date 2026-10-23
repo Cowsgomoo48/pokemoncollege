@@ -15,7 +15,8 @@ public class StudyAIPlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "status", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "summarize", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "quiz", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "tasks", returnType: CAPPluginReturnPromise)
+        CAPPluginMethod(name: "tasks", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "studyGuide", returnType: CAPPluginReturnPromise)
     ]
 
     @objc func status(_ call: CAPPluginCall) {
@@ -101,7 +102,69 @@ public class StudyAIPlugin: CAPPlugin, CAPBridgedPlugin {
         call.reject("unavailable")
     }
 
+    // Study guide: reads the whole set piece by piece and lists the problem types, formulas,
+    // concepts and worked examples it covers. Nothing is summarized away first, so big sets keep
+    // their coverage; the page merges the lists and removes duplicates.
+    @objc func studyGuide(_ call: CAPPluginCall) {
+        let text = call.getString("text") ?? ""
+        #if canImport(FoundationModels)
+        if #available(iOS 26.0, *) {
+            Task {
+                let pieces = StudyAIPlugin.split(text, limit: 5000, maxParts: 24)
+                var types: [[String: String]] = []
+                var formulas: [[String: String]] = []
+                var concepts: [[String: String]] = []
+                var examples: [String] = []
+                var done = 0
+                for (i, piece) in pieces.enumerated() {
+                    do {
+                        let session = LanguageModelSession(instructions: "You help a college student plan their studying. You describe what kinds of problems, formulas and ideas the material covers, not the specific questions. Only use what is in the material.")
+                        let r = try await session.respond(to: "List the problem types, formulas, concepts and a few worked examples in this part of the study material:\n\n" + piece, generating: AIGuidePart.self).content
+                        types += r.problemTypes.map { ["name": $0.name, "how": $0.howTo] }
+                        formulas += r.formulas.map { ["name": $0.name, "formula": $0.formula, "use": $0.use] }
+                        concepts += r.concepts.map { ["name": $0.name, "meaning": $0.meaning] }
+                        examples += r.examples
+                        done += 1
+                    } catch {
+                        // skip a piece the model refuses or fails on; the rest still count
+                    }
+                    self.notifyListeners("guideProgress", data: ["done": i + 1, "total": pieces.count])
+                }
+                if done == 0 {
+                    call.reject("AI study guide failed")
+                    return
+                }
+                var overview = ""
+                do {
+                    let topics = (types.map { $0["name"] ?? "" } + formulas.map { $0["name"] ?? "" } + concepts.map { $0["name"] ?? "" }).joined(separator: "; ")
+                    let session = LanguageModelSession(instructions: "You help a college student study. Write in plain, friendly English.")
+                    overview = try await session.respond(to: "In 3 to 5 sentences, describe what this study set covers and what the student must be able to do. Topics: " + String(topics.prefix(3500))).content
+                } catch {
+                    overview = ""
+                }
+                call.resolve(["overview": overview, "problemTypes": types, "formulas": formulas, "concepts": concepts, "examples": examples, "parts": pieces.count])
+            }
+            return
+        }
+        #endif
+        call.reject("unavailable")
+    }
+
     #if canImport(FoundationModels)
+    // cut text into pieces of at most `limit` characters, ending at a sentence or line break where possible
+    static func split(_ text: String, limit: Int, maxParts: Int) -> [String] {
+        let clean = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        var parts: [String] = []
+        var rest = Substring(clean)
+        while !rest.isEmpty && parts.count < maxParts {
+            var piece = rest.prefix(limit)
+            if piece.count == limit, let cut = piece.lastIndex(where: { ".!?\n".contains($0) }) { piece = rest[rest.startIndex...cut] }
+            parts.append(String(piece))
+            rest = rest.dropFirst(piece.count)
+        }
+        return parts
+    }
+
     // The on-device model has a small context window (about 4,096 tokens), so long text is
     // summarized piece by piece first and the pieces are combined.
     @available(iOS 26.0, *)
@@ -161,6 +224,48 @@ struct AIQuestion {
 struct AIQuiz {
     @Guide(description: "The questions", .count(1...10))
     var questions: [AIQuestion]
+}
+
+@available(iOS 26.0, *)
+@Generable
+struct AIProblemType {
+    @Guide(description: "A kind of problem the student must be able to solve, like 'Two-step linear equations' or 'Converting grams to moles'")
+    var name: String
+    @Guide(description: "One sentence on how to solve this kind of problem")
+    var howTo: String
+}
+
+@available(iOS 26.0, *)
+@Generable
+struct AIFormula {
+    @Guide(description: "The formula's name, like 'Ideal gas law'")
+    var name: String
+    @Guide(description: "The formula in plain text, like 'PV = nRT'")
+    var formula: String
+    @Guide(description: "When to use it, in one short sentence")
+    var use: String
+}
+
+@available(iOS 26.0, *)
+@Generable
+struct AIConcept {
+    @Guide(description: "A concept or idea the student must understand, 1 to 5 words")
+    var name: String
+    @Guide(description: "What it means, in one clear sentence")
+    var meaning: String
+}
+
+@available(iOS 26.0, *)
+@Generable
+struct AIGuidePart {
+    @Guide(description: "The kinds of problems in this material", .count(0...8))
+    var problemTypes: [AIProblemType]
+    @Guide(description: "Formulas and equations used in this material", .count(0...8))
+    var formulas: [AIFormula]
+    @Guide(description: "Important concepts in this material", .count(0...8))
+    var concepts: [AIConcept]
+    @Guide(description: "Up to 3 short worked examples from the material, each written as 'problem → answer'", .count(0...3))
+    var examples: [String]
 }
 
 @available(iOS 26.0, *)

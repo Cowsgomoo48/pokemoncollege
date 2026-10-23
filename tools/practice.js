@@ -1,0 +1,207 @@
+// ===================== PRACTICE PROBLEMS =====================
+// Problems made in code: the numbers are random every time and the answer is worked out by the app, so the answer key is always right.
+// Each type has keywords so it can be matched to what a study set covers (AI-listed problem types, formulas, or the notes themselves).
+const PR={};
+function prDef(id,subject,name,kw,make){PR[id]={id,subject,name,kw,make}}
+const prR=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const prNZ=(a,b)=>{let v=0;while(!v)v=prR(a,b);return v};
+const prPick=a=>a[Math.floor(Math.random()*a.length)];
+const prGcd=(a,b)=>{a=Math.abs(a);b=Math.abs(b);while(b){const t=a%b;a=b;b=t}return a||1};
+function prFrac(n,d){if(!d)return 'undefined';if(d<0){n=-n;d=-d}const g=prGcd(n,d);n/=g;d/=g;return d===1?String(n):n+'/'+d}
+function prNum(x,dp=2){if(!isFinite(x))return 'undefined';const v=+(+x).toFixed(dp);return String(Object.is(v,-0)?0:v)}
+function prSig(x,n=3){if(!isFinite(x)||x===0)return String(x);const a=Math.abs(x);if(a>=1e-3&&a<1e5)return String(+x.toPrecision(n));const e=Math.floor(Math.log10(a)),m=+(x/10**e).toPrecision(n);return m+' × 10'+prSup(e)}
+const PR_SUP={'0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹','-':'⁻'},PR_SUB={'0':'₀','1':'₁','2':'₂','3':'₃','4':'₄','5':'₅','6':'₆','7':'₇','8':'₈','9':'₉'};
+const prSup=n=>String(n).split('').map(c=>PR_SUP[c]||c).join('');
+const prSub=s=>String(s).replace(/\d/g,c=>PR_SUB[c]);
+function prMono(c,p,v='x'){if(p===0)return String(c);const k=c===1?'':c===-1?'-':String(c);return k+v+(p===1?'':prSup(p))}
+function prPoly(t,v='x'){let s='';for(const [c,p] of t){if(!c)continue;const m=prMono(Math.abs(c),p,v);s+=s?(c<0?' - ':' + ')+m:(c<0?'-':'')+m}return s||'0'}
+const prLin=(a,b,v='x')=>prPoly([[a,1],[b,0]],v);
+const prPt=(x,y)=>'('+x+', '+y+')';
+const prOk=s=>s!==''&&s!=null&&!/NaN|undefined|Infinity/.test(String(s));
+// one multiple-choice problem: the answer, likely mistakes first, then nearby values until there are three wrong answers
+function prMC(q,a,cands,perturb,ex){a=String(a);const w=[],seen=new Set([a]);
+ const add=c=>{const s=String(c);if(prOk(s)&&!seen.has(s)&&w.length<3){seen.add(s);w.push(s)}};
+ (cands||[]).forEach(add);for(let k=0;w.length<3&&k<80;k++)add(perturb(k));return {q,a,w,ex}}
+const prNear=(v,k,f=x=>String(x))=>f(v+(k%2?1:-1)*(1+Math.floor(k/2)));
+// ---------------- Arithmetic ----------------
+prDef('frac_add','Arithmetic','Adding & subtracting fractions',/(add|subtract|sum|common denominator)[^.\n]{0,40}fraction|fraction[^.\n]{0,40}(add|subtract|sum|differen)/i,()=>{
+ const b=prR(2,9),d=prPick([2,3,4,5,6,8,9,10,12].filter(x=>x!==b)),a=prR(1,b-1),c=prR(1,d-1),op=prPick(['+','-']),s=op==='+'?1:-1,n=a*d+s*c*b,den=b*d,ans=prFrac(n,den);
+ return prMC(a+'/'+b+' '+op+' '+c+'/'+d+' = ? (simplest form)',ans,[prFrac(a+s*c,b+d),prFrac(a*d-s*c*b,den),prFrac(a+s*c,b*d)],k=>prFrac(n+(k%2?1:-1)*(1+(k>>1)),den),'Common denominator '+den+': '+(a*d)+'/'+den+' '+op+' '+(c*b)+'/'+den+' = '+n+'/'+den+' = '+ans)});
+prDef('frac_mul','Arithmetic','Multiplying & dividing fractions',/(multipl|divid|product|quotient|reciprocal)[^.\n]{0,40}fraction|fraction[^.\n]{0,40}(multipl|divi)/i,()=>{
+ const a=prR(1,9),b=prR(2,9),c=prR(1,9),d=prR(2,9),div=Math.random()<.5,ans=div?prFrac(a*d,b*c):prFrac(a*c,b*d);
+ return prMC(a+'/'+b+(div?' ÷ ':' × ')+c+'/'+d+' = ? (simplest form)',ans,[div?prFrac(a*c,b*d):prFrac(a*d,b*c),div?prFrac(b*c,a*d):prFrac(a+c,b+d),prFrac(a+c,b+d),prFrac(a*c,b+d)],k=>prFrac((div?a*d:a*c)+(k%2?1:-1)*(1+(k>>1)),div?b*c:b*d),div?'Flip the second fraction and multiply: '+a+'/'+b+' × '+d+'/'+c+' = '+ans:'Multiply straight across: '+(a*c)+'/'+(b*d)+' = '+ans)});
+prDef('pct_of','Arithmetic','Percent of a number',/percent of|% of|finding (a |the )?percent|percentages?/i,()=>{
+ const p=prPick([5,10,12,15,20,25,30,35,40,45,60,75,80,120,150]),n=prR(2,40)*10,ans=prNum(n*p/100);
+ return prMC('What is '+p+'% of '+n+'?',ans,[prNum(n*p/10),prNum(n*(100-p)/100),prNum(n+p),prNum(n/p)],k=>prNum(n*p/100+(k%2?1:-1)*(1+(k>>1))*(p%10?.5:1)),p+'% of '+n+' = '+(p/100)+' × '+n+' = '+ans)});
+prDef('pct_change','Arithmetic','Percent increase & decrease',/percent(age)? (increase|decrease|change)|% (increase|decrease|change)/i,()=>{
+ const p=prPick([10,20,25,30,40,50,60,75]),o=prR(2,20)*20,up=Math.random()<.5,nw=o*(up?100+p:100-p)/100,diff=Math.abs(nw-o),ans=p+'% '+(up?'increase':'decrease');
+ return prMC('A value goes from '+o+' to '+nw+'. What is the percent change?',ans,[p+'% '+(up?'decrease':'increase'),prNum(diff/nw*100,1)+'% '+(up?'increase':'decrease'),diff+'% '+(up?'increase':'decrease')],k=>(p+(k+1)*5)+'% '+(up?'increase':'decrease'),'Change ÷ original = '+diff+' ÷ '+o+' = '+(p/100)+' → '+ans)});
+prDef('order_ops','Arithmetic','Order of operations',/order of operations|pemdas|gemdas|bedmas|bodmas/i,()=>{
+ const t=prR(0,3),a=prR(2,12),b=prR(2,9),c=prR(2,9);let q,ans,c1;
+ if(t===0){q=a+' + '+b+' × '+c;ans=a+b*c;c1=[(a+b)*c,a+b+c,a*b+c]}
+ else if(t===1){const d=prR(1,9);q='('+a+' + '+b+') × '+c+' - '+d;ans=(a+b)*c-d;c1=[a+b*c-d,(a+b)*(c-d),a+b*c]}
+ else if(t===2){const d=prPick([2,3,4,5]),cc=d*prR(1,6);q=a+' × '+b+' - '+cc+' ÷ '+d;ans=a*b-cc/d;c1=[(a*b-cc)/d,a*b-cc,a*(b-cc/d)]}
+ else{q=a+' - '+b+' + '+c;ans=a-b+c;c1=[a-(b+c),a+b+c,a-b-c]}
+ return prMC(q+' = ?',ans,c1.filter(Number.isInteger),k=>prNear(ans,k),'Multiply and divide before adding and subtracting, left to right: '+q+' = '+ans)});
+prDef('proportion','Arithmetic','Solving proportions',/proportion|cross[- ]multipl|ratios?\b/i,()=>{
+ const a=prR(1,9),b=prR(2,9),k=prR(2,6),x=a*k,d=b*k;
+ return prMC('Solve for x: '+a+'/'+b+' = x/'+d,'x = '+x,['x = '+prFrac(b*d,a),'x = '+(a+d-b),'x = '+prFrac(d,a),'x = '+(d-b+a+1)],j=>'x = '+(x+(j%2?1:-1)*(1+(j>>1))),'Cross-multiply: '+b+'x = '+a+' × '+d+' = '+(a*d)+', so x = '+x)});
+prDef('sci_note','Arithmetic','Scientific notation',/scientific notation|standard form/i,()=>{
+ const m=prR(11,99)/10,e=prPick([-6,-5,-4,-3,-2,-1,1,2,3,4,5,6,7]),v=m*10**e,txt=e>0?Math.round(v).toLocaleString('en-US'):v.toFixed(-e+1).replace(/0+$/,''),ans=m+' × 10'+prSup(e);
+ return prMC('Write '+txt+' in scientific notation.',ans,[m+' × 10'+prSup(-e),m+' × 10'+prSup(e+1),m+' × 10'+prSup(e-1),(m*10)+' × 10'+prSup(e-1)],k=>m+' × 10'+prSup(e+(k%2?2:-2)*(1+(k>>1))),'Move the decimal so one digit is before it: '+ans)});
+// ---------------- Algebra ----------------
+prDef('lin_one','Algebra','One-step equations',/one[- ]step equation/i,()=>{
+ const x=prR(-12,12),a=prR(2,9),t=prR(0,3);let q,c1,ex;
+ if(t===0){const b=x+a;q='x + '+a+' = '+b;c1=[b+a,a-b,b];ex='Subtract '+a+' from both sides.'}
+ else if(t===1){const b=x-a;q='x - '+a+' = '+b;c1=[b-a,a-b,b];ex='Add '+a+' to both sides.'}
+ else if(t===2){const b=a*x;q=a+'x = '+b;c1=[b-a,b+a,b*a];ex='Divide both sides by '+a+'.'}
+ else{const b=x;q='x/'+a+' = '+b;c1=[prFrac(b,a),b-a,b+a];ex='Multiply both sides by '+a+'.';return prMC('Solve: '+q,'x = '+(a*b),c1.map(v=>'x = '+v),k=>'x = '+(a*b+(k%2?1:-1)*(1+(k>>1))),ex+' x = '+(a*b))}
+ return prMC('Solve: '+q,'x = '+x,c1.map(v=>'x = '+v),k=>'x = '+(x+(k%2?1:-1)*(1+(k>>1))),ex+' x = '+x)});
+prDef('lin_two','Algebra','Two-step equations',/two[- ]step equation|linear equations?|solv(e|ing) (for x|equations)/i,()=>{
+ const x=prR(-9,9),a=prNZ(-9,9)||2,b=prNZ(-15,15),c=a*x+b;
+ return prMC('Solve: '+prLin(a,b)+' = '+c,'x = '+x,['x = '+prFrac(c+b,a),'x = '+prFrac(c,a)+'','x = '+prFrac(c-b,-a),'x = '+((c-b)*a)],k=>'x = '+(x+(k%2?1:-1)*(1+(k>>1))),(b<0?'Add '+(-b):'Subtract '+b)+' on both sides: '+a+'x = '+(c-b)+'. Divide by '+a+': x = '+x)});
+prDef('lin_multi','Algebra','Multi-step equations (distributing, variables on both sides)',/distribut|multi[- ]step|variables? on both sides/i,()=>{
+ let a,c,b,x,d;do{a=prR(2,7);c=prNZ(-6,6);b=prNZ(-8,8);x=prR(-8,8)}while(a===c);d=a*(x+b)-c*x;
+ return prMC('Solve: '+a+'(x '+(b<0?'- '+(-b):'+ '+b)+') = '+prLin(c,d),'x = '+x,['x = '+prFrac(d-b,a-c),'x = '+prFrac(d-a*b,a+c),'x = '+prFrac(d+a*b,a-c)],k=>'x = '+(x+(k%2?1:-1)*(1+(k>>1))),'Distribute: '+prLin(a,a*b)+' = '+prLin(c,d)+'. Collect x: '+(a-c)+'x = '+(d-a*b)+', so x = '+x)});
+prDef('lin_ineq','Algebra','Linear inequalities',/inequalit/i,()=>{
+ const syms=['<','>','≤','≥'],flip={'<':'>','>':'<','≤':'≥','≥':'≤'},s=prPick(syms),a=prNZ(-7,7),b=prNZ(-12,12),x=prR(-8,8),c=a*x+b,fs=a<0?flip[s]:s,ans='x '+fs+' '+x;
+ return prMC('Solve: '+prLin(a,b)+' '+s+' '+c,ans,['x '+(a<0?s:flip[s])+' '+x,'x '+fs+' '+(-x),'x '+fs+' '+prFrac(c+b,a)],k=>'x '+fs+' '+(x+(k%2?1:-1)*(1+(k>>1))),'Solve like an equation: x = '+x+'.'+(a<0?' Dividing by a negative ('+a+') flips the sign.':'')+' Answer: '+ans)});
+prDef('slope','Algebra','Slope from two points',/slope/i,()=>{
+ let x1,x2,y1,y2;do{x1=prR(-8,8);x2=prR(-8,8);y1=prR(-8,8);y2=prR(-8,8)}while(x1===x2||y1===y2);const dy=y2-y1,dx=x2-x1,ans=prFrac(dy,dx);
+ return prMC('Find the slope of the line through '+prPt(x1,y1)+' and '+prPt(x2,y2)+'.',ans,[prFrac(dx,dy),prFrac(-dy,dx),prFrac(y2+y1,x2+x1)],k=>prFrac(dy+(k%2?1:-1)*(1+(k>>1)),dx),'m = (y₂ - y₁)/(x₂ - x₁) = '+dy+'/'+dx+' = '+ans)});
+prDef('line_eq','Algebra','Equation of a line (y = mx + b)',/slope[- ]intercept|y ?= ?mx|point[- ]slope|equation of (a|the) line/i,()=>{
+ const m=prNZ(-5,5),b=prNZ(-9,9);let x1=prR(-4,4),x2;do x2=prR(-4,4);while(x2===x1);const y1=m*x1+b,y2=m*x2+b,ans='y = '+prLin(m,b);
+ return prMC('Write the equation of the line through '+prPt(x1,y1)+' and '+prPt(x2,y2)+'.',ans,['y = '+prLin(m,-b),'y = '+prLin(-m,b),'y = '+prLin(b,m),'y = '+prLin(m,y1)],k=>'y = '+prLin(m,b+(k%2?1:-1)*(1+(k>>1))),'Slope m = '+m+'. Plug in '+prPt(x1,y1)+': '+y1+' = '+m+'('+x1+') + b, so b = '+b+'. '+ans)});
+prDef('sys2','Algebra','Systems of equations (two variables)',/systems? of (linear )?equations|elimination method|substitution method|solv(e|ing) (the )?system/i,()=>{
+ let a1,b1,a2,b2;do{a1=prNZ(-5,5);b1=prNZ(-5,5);a2=prNZ(-5,5);b2=prNZ(-5,5)}while(a1*b2-a2*b1===0);const x=prR(-6,6),y=prR(-6,6),c1=a1*x+b1*y,c2=a2*x+b2*y,ans=prPt(x,y);
+ const eq=(a,b,c)=>prPoly([[a,1]])+(b<0?' - ':' + ')+prMono(Math.abs(b),1,'y')+' = '+c;
+ return prMC('Solve the system: '+eq(a1,b1,c1)+'  and  '+eq(a2,b2,c2),ans,[prPt(y,x),prPt(-x,y),prPt(x,-y),prPt(x+1,y-1)],k=>prPt(x+(k%2?1:-1)*(1+(k>>1)),y),'Eliminate one variable, solve for the other, then substitute back: x = '+x+', y = '+y+'.')});
+prDef('quad_factor','Algebra','Factoring quadratics',/factor(ing|ise|ize)?[^.\n]{0,30}(quadratic|trinomial|polynomial|x²|x\^2)|(quadratic|trinomial)s?[^.\n]{0,30}factor/i,()=>{
+ let p,q;do{p=prNZ(-9,9);q=prNZ(-9,9)}while(p===-q);const f=(u,v)=>'(x '+(u<0?'- '+(-u):'+ '+u)+')(x '+(v<0?'- '+(-v):'+ '+v)+')',ans=f(p,q);
+ return prMC('Factor: '+prPoly([[1,2],[p+q,1],[p*q,0]]),ans,[f(-p,-q),f(-p,q),f(p,-q),f(p*q,1)],k=>f(p+(k%2?1:-1)*(1+(k>>1)),q),'Find two numbers that multiply to '+(p*q)+' and add to '+(p+q)+': '+p+' and '+q+'. '+ans)});
+prDef('quad_solve','Algebra','Solving quadratic equations',/quadratic (formula|equation)|discriminant|roots? of|zeros of|solv(e|ing) quadratic/i,()=>{
+ const a=prPick([1,1,2,3]),r1=prR(-7,7),r2=prR(-7,7),B=-a*(r1+r2),C=a*r1*r2,eqn=prPoly([[a,2],[B,1],[C,0]])+' = 0';
+ if(Math.random()<.3){const D=B*B-4*a*C;return prMC('What is the discriminant of '+eqn+'?',String(D),[String(B*B+4*a*C),String(B-4*a*C),String(-B*B-4*a*C),String(B*B-4*C)],k=>prNear(D,k),'b² - 4ac = ('+B+')² - 4('+a+')('+C+') = '+D)}
+ const ro=(u,v)=>u===v?'x = '+u:'x = '+Math.min(u,v)+' or x = '+Math.max(u,v),ans=ro(r1,r2);
+ return prMC('Solve: '+eqn,ans,[ro(-r1,-r2),ro(r1,-r2),ro(-r1,r2),ro(r1*a,r2*a),ro(r1+1,r2)],k=>ro(r1+(k%2?1:-1)*(1+(k>>1)),r2),'It factors as '+(a>1?a:'')+'(x '+(r1<0?'+ '+(-r1):'- '+r1)+')(x '+(r2<0?'+ '+(-r2):'- '+r2)+') = 0, so '+ans)});
+prDef('exp_rules','Algebra','Exponent rules',/exponents? (rule|law|propert)|laws of (exponents|indices)|simplif[^.\n]{0,30}exponent|product of powers|power of a power|quotient of powers/i,()=>{
+ const t=prR(0,2),a=prR(2,8),b=prR(2,6),c1=prR(1,6),c2=prR(1,6);let q,ans,cs,ex;
+ if(t===0){q='('+prMono(c1,a)+')('+prMono(c2,b)+')';ans=prMono(c1*c2,a+b);cs=[prMono(c1*c2,a*b),prMono(c1+c2,a+b),prMono(c1*c2,Math.abs(a-b)||1)];ex='Multiply the numbers, add the exponents: '+ans}
+ else if(t===1){q='('+prMono(c1,a)+')'+prSup(b);ans=prMono(c1**b,a*b);cs=[prMono(c1**b,a+b),prMono(c1*b,a*b),prMono(c1,a*b)];ex='Raise the number to the power and multiply the exponents: '+ans}
+ else{const k=prR(1,4),n=c1*k;q=prMono(n,a+b)+' ÷ '+prMono(k,b);ans=prMono(c1,a);cs=[prMono(c1,a+2*b),prMono(c1,(a+b)/b===Math.floor((a+b)/b)?(a+b)/b:a+1),prMono(n-k,a)];ex='Divide the numbers, subtract the exponents: '+ans}
+ return prMC('Simplify: '+q,ans,cs,k=>prMono(c1,(t===2?a:t===1?a*b:a+b)+(k%2?1:-1)*(1+(k>>1))),ex)});
+prDef('func_eval','Algebra','Evaluating functions',/evaluat(e|ing) (a |the )?functions?|function notation|f\(\s*-?\d+\s*\)/i,()=>{
+ const a=prNZ(-4,4),b=prR(-6,6),c=prR(-9,9),x=prNZ(-4,4),f=a*x*x+b*x+c;
+ return prMC('If f(x) = '+prPoly([[a,2],[b,1],[c,0]])+', find f('+x+').',String(f),[String(a*2*x+b*x+c),String(-a*x*x+b*x+c),String(a*x*x+b+c),String(a*x*x-b*x+c)],k=>prNear(f,k),'Replace x with '+x+': '+a+'('+x+')² + '+b+'('+x+') + '+c+' = '+f)});
+prDef('logs','Algebra','Evaluating logarithms',/logarithm|\blog\s*[_₂₃₅(]|\blog\b|\bln\b/i,()=>{
+ const b=prPick([2,3,4,5,10]),n=prR(-2,4),val=n>=0?String(b**n):'1/'+(b**-n),base=b===10?'log':'log'+prSub(b),ans=String(n);
+ return prMC('Evaluate: '+base+'('+val+')',ans,[String(n+1),String(-n),n>=0?String(b**n/b):String(n-1),String(b*n)],k=>prNear(n,k),b+' raised to '+n+' is '+val+', so the log is '+n+'.')});
+prDef('dist_mid','Geometry','Distance & midpoint',/distance formula|midpoint|distance between (two )?points/i,()=>{
+ const x1=prR(-6,6),y1=prR(-6,6);if(Math.random()<.5){const [p,q,h]=prPick([[3,4,5],[5,12,13],[6,8,10],[8,15,17],[9,12,15]]),sw=Math.random()<.5,dx=(sw?q:p)*(Math.random()<.5?-1:1),dy=(sw?p:q)*(Math.random()<.5?-1:1);
+  return prMC('Find the distance between '+prPt(x1,y1)+' and '+prPt(x1+dx,y1+dy)+'.',String(h),[String(p+q),String(Math.abs(dx+dy)||h+2),String(h*h)],k=>prNear(h,k),'d = √(('+dx+')² + ('+dy+')²) = √'+(h*h)+' = '+h)}
+ const x2=prR(-6,6),y2=prR(-6,6),M=(u,v)=>'('+prFrac(u,2)+', '+prFrac(v,2)+')',ans=M(x1+x2,y1+y2);
+ return prMC('Find the midpoint of '+prPt(x1,y1)+' and '+prPt(x2,y2)+'.',ans,[M(x2-x1,y2-y1),'('+(x1+x2)+', '+(y1+y2)+')',M(x1+y1,x2+y2)],k=>M(x1+x2+(k%2?2:-2)*(1+(k>>1)),y1+y2),'Average the x’s and the y’s: '+ans)});
+prDef('pythag','Geometry','Pythagorean theorem',/pythag|hypotenuse|right triangles?/i,()=>{
+ const [p,q,h]=prPick([[3,4,5],[5,12,13],[8,15,17],[7,24,25],[20,21,29]]),k=prR(1,3),a=p*k,b=q*k,c=h*k;
+ if(Math.random()<.5)return prMC('A right triangle has legs '+a+' and '+b+'. How long is the hypotenuse?',String(c),[String(a+b),String(c*c),String(Math.abs(b-a))],j=>prNear(c,j),'c = √('+a+'² + '+b+'²) = √'+(c*c)+' = '+c);
+ return prMC('A right triangle has hypotenuse '+c+' and one leg '+a+'. How long is the other leg?',String(b),[String(c-a),prNum(Math.sqrt(c*c+a*a),2),String(c+a)],j=>prNear(b,j),'b = √('+c+'² - '+a+'²) = √'+(b*b)+' = '+b)});
+prDef('area','Geometry','Area & perimeter',/area of (a |the )?(circle|triangle|rectangle|square|trapezoid|shape)|perimeter|circumference/i,()=>{
+ const t=prR(0,4),w=prR(2,15),h=prR(2,15),r=prR(2,12);
+ if(t===0)return prMC('A rectangle is '+w+' by '+h+'. What is its area?',String(w*h),[String(2*(w+h)),String(w+h),String(w*h/2)],k=>prNear(w*h,k),'Area = length × width = '+(w*h));
+ if(t===1)return prMC('A rectangle is '+w+' by '+h+'. What is its perimeter?',String(2*(w+h)),[String(w*h),String(w+h),String(4*w)],k=>prNear(2*(w+h),k),'Perimeter = 2(l + w) = '+(2*(w+h)));
+ if(t===2){const b=2*prR(1,8);return prMC('A triangle has base '+b+' and height '+h+'. What is its area?',String(b*h/2),[String(b*h),String(b+h),String(2*b*h)],k=>prNear(b*h/2,k),'Area = ½ × base × height = '+(b*h/2))}
+ if(t===3)return prMC('A circle has radius '+r+'. What is its area?',(r*r)+'π',[(2*r)+'π',(2*r*r)+'π',(r)+'π'],k=>(r*r+(k%2?1:-1)*(1+(k>>1)))+'π','A = πr² = π('+r+')² = '+(r*r)+'π');
+ return prMC('A circle has radius '+r+'. What is its circumference?',(2*r)+'π',[(r*r)+'π',r+'π',(4*r)+'π'],k=>(2*r+(k%2?1:-1)*(1+(k>>1)))+'π','C = 2πr = '+(2*r)+'π')});
+// ---------------- Calculus ----------------
+prDef('deriv_poly','Calculus','Derivatives (power rule)',/derivative|differentiat|power rule|d\/dx|f['′]\s*\(x\)/i,()=>{
+ const n=prR(3,6),m=prR(2,n-1),a=prNZ(-6,6),b=prNZ(-6,6),c=prR(-9,9),d=prNZ(-9,9),f=prPoly([[a,n],[b,m],[c,1],[d,0]]),ans=prPoly([[n*a,n-1],[m*b,m-1],[c,0]]);
+ return prMC('f(x) = '+f+'. Find f′(x).',ans,[prPoly([[n*a,n],[m*b,m],[c,0]]),prPoly([[a,n-1],[b,m-1],[c,0]]),prPoly([[n*a,n-1],[m*b,m-1],[c,0],[d,0]].reduce((t,[k,p])=>{const e=t.find(z=>z[1]===p);if(e)e[0]+=k;else t.push([k,p]);return t},[])),prPoly([[n*a,n-1],[m*b,m-1],[c,1]])],k=>prPoly([[n*a,n-1],[m*b+(k%2?1:-1)*(1+(k>>1)),m-1],[c,0]]),'Bring each exponent down and lower it by one; constants disappear: '+ans)});
+prDef('deriv_chain','Calculus','Chain rule',/chain rule|composite functions?/i,()=>{
+ const a=prR(2,6),b=prNZ(-7,7),n=prR(2,5),inner='('+prLin(a,b)+')',P=e=>e===1?'':prSup(e),K=k=>k===1?'':String(k),ans=K(n*a)+inner+P(n-1);
+ return prMC('f(x) = '+inner+prSup(n)+'. Find f′(x).',ans,[K(n)+inner+P(n-1),K(n*a)+inner+P(n),K(a)+inner+P(n-1),K(n*a)+'x'+P(n-1)],k=>K(n*a+(k%2?1:-1)*(1+(k>>1)))+inner+P(n-1),'Outside: '+n+inner+P(n-1)+'. Times the inside’s derivative, '+a+': '+ans)});
+prDef('deriv_point','Calculus','Derivative at a point / tangent slope',/tangent line|instantaneous rate|derivative at|slope of the (curve|tangent)/i,()=>{
+ const a=prNZ(-4,4),b=prR(-6,6),c=prR(-9,9),x=prNZ(-3,3),v=2*a*x+b;
+ return prMC('f(x) = '+prPoly([[a,2],[b,1],[c,0]])+'. Find f′('+x+').',String(v),[String(a*x*x+b*x+c),String(a*x+b),String(2*a+b)],k=>prNear(v,k),'f′(x) = '+prPoly([[2*a,1],[b,0]])+', so f′('+x+') = '+v)});
+prDef('integ_def','Calculus','Definite integrals',/integral|integrat|antiderivative|area under (the )?curve/i,()=>{
+ const p=prR(-3,4)||1,q=prR(-6,6),r=prR(-5,5),a=prR(-2,2),b=a+prR(1,3),F6=x=>2*p*x**3+3*q*x*x+6*r*x,f=x=>p*x*x+q*x+r,ans=prFrac(F6(b)-F6(a),6);
+ return prMC('Evaluate ∫ from '+a+' to '+b+' of ('+prPoly([[p,2],[q,1],[r,0]])+') dx',ans,[String(f(b)-f(a)),prFrac(F6(a)-F6(b),6),prFrac(F6(b),6),prFrac(3*(F6(b)-F6(a)),6)],k=>prFrac(F6(b)-F6(a)+6*(k%2?1:-1)*(1+(k>>1)),6),'Antiderivative F(x) = ('+prFrac(p,3)+')x³ + ('+prFrac(q,2)+')x² + ('+r+')x. Then F('+b+') - F('+a+') = '+ans)});
+prDef('limits','Calculus','Limits (removable discontinuities)',/\blimits?\b|\blim\b|x ?(→|->) ?/i,()=>{
+ const r=prNZ(-6,6);let s;do s=prNZ(-6,6);while(s===r);const num=prPoly([[1,2],[-(r+s),1],[r*s,0]]),den=prLin(1,-r),ans=String(r-s);
+ return prMC('Find the limit as x → '+r+' of ('+num+') / ('+den+')',ans,['0','Does not exist',String(r+s),String(s-r)],k=>prNear(r-s,k),'Factor: (x '+(r<0?'+ '+(-r):'- '+r)+')(x '+(s<0?'+ '+(-s):'- '+s)+') / (x '+(r<0?'+ '+(-r):'- '+r)+') = '+prLin(1,-s)+'. Plug in '+r+': '+ans)});
+// ---------------- Statistics ----------------
+prDef('center','Statistics','Mean, median, mode & range',/\bmean\b|\bmedian\b|\bmode\b|\baverage\b|measures? of (center|central tendency|spread)|\brange\b of (the|a) data/i,()=>{
+ const n=prPick([5,6,7]),d=Array.from({length:n-1},()=>prR(1,20));d.push(d[prR(0,n-2)]);const s=[...d].sort((x,y)=>x-y),cnt={};s.forEach(v=>cnt[v]=(cnt[v]||0)+1);
+ const top=Math.max(...Object.values(cnt)),modes=Object.keys(cnt).filter(k=>cnt[k]===top).map(Number);
+ const mean=prNum(s.reduce((x,y)=>x+y,0)/n),med=n%2?String(s[(n-1)/2]):prNum((s[n/2-1]+s[n/2])/2),rng=String(s[n-1]-s[0]),mode=modes.length===1?String(modes[0]):null;
+ const opts=[['mean',mean],['median',med],['range',rng]].concat(mode?[['mode',mode]]:[]),[nm,ans]=prPick(opts),others=opts.filter(o=>o[1]!==ans).map(o=>o[1]);
+ return prMC('Find the '+nm+' of: '+d.join(', '),ans,others.concat([String(s[Math.floor(n/2)]+1)]),k=>prNear(+ans,k,v=>prNum(v)),'Sorted: '+s.join(', ')+'. Mean '+mean+', median '+med+(mode?', mode '+mode:'')+', range '+rng+'.')});
+prDef('prob','Statistics','Basic probability',/probabilit|chance of|likelihood/i,()=>{
+ const r=prR(2,8),b=prR(2,8),g=prR(1,6),t=r+b+g;
+ if(Math.random()<.5)return prMC('A bag has '+r+' red, '+b+' blue and '+g+' green marbles. What is the probability of drawing a red one?',prFrac(r,t),[prFrac(r,t-r),prFrac(b+g,t),prFrac(1,t),prFrac(r,b+g+1)],k=>prFrac(r+(k%2?1:-1)*(1+(k>>1)),t),'Red ÷ total = '+r+'/'+t+' = '+prFrac(r,t));
+ return prMC('A bag has '+r+' red, '+b+' blue and '+g+' green marbles. Two are drawn without putting the first back. What is the probability both are red?',prFrac(r*(r-1),t*(t-1)),[prFrac(r*r,t*t),prFrac(2*r,t),prFrac(r*(r-1),t*t),prFrac(r-1,t-1)],k=>prFrac(r*(r-1)+(k%2?1:-1)*(1+(k>>1)),t*(t-1)),r+'/'+t+' × '+(r-1)+'/'+(t-1)+' = '+prFrac(r*(r-1),t*(t-1)))});
+prDef('zscore','Statistics','Z-scores',/z[- ]scores?|standard scores?|standardi[sz]/i,()=>{
+ const mu=prR(10,90),sd=prR(2,15),z=prR(-5,5)/2,x=mu+z*sd,ans=prNum(z);
+ return prMC('Mean = '+mu+', standard deviation = '+sd+'. What is the z-score of '+x+'?',ans,[prNum(-z),prNum((x-mu)*sd),prNum(sd/(x-mu||1)),prNum(z+1)],k=>prNum(z+(k%2?.5:-.5)*(1+(k>>1))),'z = (x - μ)/σ = ('+x+' - '+mu+')/'+sd+' = '+ans)});
+// ---------------- Chemistry ----------------
+const PR_AT={H:1.008,C:12.011,N:14.007,O:15.999,Na:22.99,Mg:24.305,Al:26.982,P:30.974,S:32.06,Cl:35.45,K:39.098,Ca:40.078,Fe:55.845};
+const PR_ATZ={H:1,C:6,N:7,O:8,Na:11,Mg:12,Al:13,P:15,S:16,Cl:17,K:19,Ca:20,Fe:26};
+const PR_CMP=[['H2O',{H:2,O:1}],['CO2',{C:1,O:2}],['NaCl',{Na:1,Cl:1}],['C6H12O6',{C:6,H:12,O:6}],['NH3',{N:1,H:3}],['CH4',{C:1,H:4}],['H2SO4',{H:2,S:1,O:4}],['CaCO3',{Ca:1,C:1,O:3}],['NaOH',{Na:1,O:1,H:1}],['KCl',{K:1,Cl:1}],['MgO',{Mg:1,O:1}],['HCl',{H:1,Cl:1}],['O2',{O:2}],['Fe2O3',{Fe:2,O:3}],['Al2O3',{Al:2,O:3}],['NaHCO3',{Na:1,H:1,C:1,O:3}],['KNO3',{K:1,N:1,O:3}],['MgCl2',{Mg:1,Cl:2}],['C2H6O',{C:2,H:6,O:1}],['H3PO4',{H:3,P:1,O:4}]];
+const prMM=c=>Object.entries(c).reduce((s,[e,n])=>s+PR_AT[e]*n,0);
+prDef('molar_mass','Chemistry','Molar mass',/molar mass|molecular (weight|mass)|formula (mass|weight)|g\/mol/i,()=>{
+ const [f,c]=prPick(PR_CMP),M=prMM(c),ans=prNum(M)+' g/mol';
+ return prMC('What is the molar mass of '+prSub(f)+'?',ans,[prNum(Object.keys(c).reduce((s,e)=>s+PR_AT[e],0))+' g/mol',prNum(Object.entries(c).reduce((s,[e,n])=>s+PR_ATZ[e]*n,0))+' g/mol',prNum(M+15.999)+' g/mol',prNum(M*2)+' g/mol'],k=>prNum(M+(k%2?1:-1)*(1+(k>>1))*1.008)+' g/mol','Add up each atom’s mass × how many there are: '+Object.entries(c).map(([e,n])=>n+'×'+PR_AT[e]).join(' + ')+' = '+ans)});
+prDef('grams_moles','Chemistry','Grams ↔ moles',/\bmoles?\b|\bmol\b|grams? to moles|moles? to grams|stoichiometr|avogadro/i,()=>{
+ const [f,c]=prPick(PR_CMP),M=prMM(c);
+ if(Math.random()<.5){const g=prR(5,200),n=g/M;return prMC('How many moles are in '+g+' g of '+prSub(f)+'? (molar mass '+prNum(M)+' g/mol)',prSig(n)+' mol',[prSig(g*M)+' mol',prSig(M/g)+' mol',prSig(n*10)+' mol'],k=>prSig(n*(1+(k%2?.15:-.15)*(1+(k>>1))))+' mol','moles = grams ÷ molar mass = '+g+' ÷ '+prNum(M)+' = '+prSig(n)+' mol')}
+ const n=prR(1,40)/4,g=n*M;return prMC('What is the mass of '+n+' mol of '+prSub(f)+'? (molar mass '+prNum(M)+' g/mol)',prSig(g)+' g',[prSig(n/M)+' g',prSig(M/n)+' g',prSig(g/10)+' g'],k=>prSig(g*(1+(k%2?.15:-.15)*(1+(k>>1))))+' g','grams = moles × molar mass = '+n+' × '+prNum(M)+' = '+prSig(g)+' g')});
+prDef('molarity','Chemistry','Molarity',/molarity|mol\/l|moles? per liter|concentration of (a |the )?solution/i,()=>{
+ const n=prR(1,30)/10,V=prPick([100,125,200,250,400,500,750,1000,1500]),M=n/(V/1000),ans=prSig(M)+' M';
+ return prMC(n+' mol of solute is dissolved to make '+V+' mL of solution. What is the molarity?',ans,[prSig(n/V)+' M',prSig(n*V/1000)+' M',prSig(V/1000/n)+' M'],k=>prSig(M*(1+(k%2?.2:-.2)*(1+(k>>1))))+' M','M = mol ÷ liters = '+n+' ÷ '+(V/1000)+' = '+ans)});
+prDef('dilution','Chemistry','Dilutions (M₁V₁ = M₂V₂)',/dilut|m1v1|m₁v₁|c1v1|c₁v₁/i,()=>{
+ const M1=prPick([0.5,1,1.5,2,2.5,3,4,6,12]),V1=prPick([10,20,25,50,100,150]),k=prPick([2,4,5,8,10]),V2=V1*k,M2=M1*V1/V2;
+ if(Math.random()<.5)return prMC(V1+' mL of '+M1+' M solution is diluted to '+V2+' mL. What is the new concentration?',prSig(M2)+' M',[prSig(M1*V2/V1)+' M',prSig(M1-M2)+' M',prSig(V1/(M1*V2))+' M'],j=>prSig(M2*(1+(j%2?.2:-.2)*(1+(j>>1))))+' M','M₂ = M₁V₁ ÷ V₂ = '+M1+' × '+V1+' ÷ '+V2+' = '+prSig(M2)+' M');
+ return prMC('How many mL of '+M1+' M stock are needed to make '+V2+' mL of '+prSig(M2)+' M solution?',prSig(V1)+' mL',[prSig(M1*V2/M2)+' mL',prSig(V2-V1)+' mL',prSig(M2*M1*V2)+' mL'],j=>prSig(V1*(1+(j%2?.2:-.2)*(1+(j>>1))))+' mL','V₁ = M₂V₂ ÷ M₁ = '+prSig(M2)+' × '+V2+' ÷ '+M1+' = '+V1+' mL')});
+prDef('gas','Chemistry','Ideal gas law (PV = nRT)',/ideal gas|pv ?= ?nrt|gas laws?\b/i,()=>{
+ const R=0.0821,n=prR(1,20)/4,Tc=prPick([0,10,20,25,27,37,50,100]),T=Tc+273,V=prPick([2,5,10,11.2,22.4,25]);
+ if(Math.random()<.5){const P=n*R*T/V;return prMC(n+' mol of gas is in a '+V+' L container at '+Tc+' °C. What is the pressure? (R = 0.0821 L·atm/(mol·K))',prSig(P)+' atm',[prSig(n*R*(Tc||1)/V)+' atm',prSig(V/(n*R*T))+' atm',prSig(n*R*T*V)+' atm'],j=>prSig(P*(1+(j%2?.15:-.15)*(1+(j>>1))))+' atm','Convert to kelvin: '+T+' K. P = nRT/V = '+n+' × 0.0821 × '+T+' ÷ '+V+' = '+prSig(P)+' atm')}
+ const P=prPick([0.5,1,1.5,2,2.5,3]),nn=P*V/(R*T);return prMC('A '+V+' L container holds gas at '+P+' atm and '+Tc+' °C. How many moles are there? (R = 0.0821)',prSig(nn)+' mol',[prSig(P*V/(R*(Tc||1)))+' mol',prSig(R*T/(P*V))+' mol',prSig(P*V*R*T)+' mol'],j=>prSig(nn*(1+(j%2?.15:-.15)*(1+(j>>1))))+' mol','n = PV/RT = '+P+' × '+V+' ÷ (0.0821 × '+T+') = '+prSig(nn)+' mol')});
+prDef('density','Chemistry','Density',/density|mass ?\/ ?volume|d ?= ?m ?\/ ?v/i,()=>{
+ const d=prPick([0.5,0.79,1,1.2,2.7,7.9,8.96,11.3,13.6,19.3]),V=prR(2,50),m=+(d*V).toFixed(2);
+ const t=prR(0,2);if(t===0)return prMC('An object has mass '+m+' g and volume '+V+' cm³. What is its density?',prSig(d)+' g/cm³',[prSig(V/m)+' g/cm³',prSig(m*V)+' g/cm³',prSig(m-V)+' g/cm³'],j=>prSig(d*(1+(j%2?.15:-.15)*(1+(j>>1))))+' g/cm³','d = m ÷ V = '+m+' ÷ '+V+' = '+prSig(d)+' g/cm³');
+ if(t===1)return prMC('A substance has density '+d+' g/cm³. What is the mass of '+V+' cm³?',prSig(m)+' g',[prSig(d/V)+' g',prSig(V/d)+' g',prSig(d+V)+' g'],j=>prSig(m*(1+(j%2?.15:-.15)*(1+(j>>1))))+' g','m = d × V = '+d+' × '+V+' = '+prSig(m)+' g');
+ return prMC('A substance has density '+d+' g/cm³. What volume does '+m+' g take up?',prSig(V)+' cm³',[prSig(m*d)+' cm³',prSig(d/m)+' cm³',prSig(m-d)+' cm³'],j=>prSig(V*(1+(j%2?.15:-.15)*(1+(j>>1))))+' cm³','V = m ÷ d = '+m+' ÷ '+d+' = '+prSig(V)+' cm³')});
+prDef('ph','Chemistry','pH and pOH',/\bph\b|\bpoh\b|hydrogen ion|hydronium|\[h\+\]|\[h3o\+\]/i,()=>{
+ const t=prR(0,2),n=prR(1,13);
+ if(t===0)return prMC('[H⁺] = 1 × 10'+prSup(-n)+' M. What is the pH?',String(n),[String(-n),String(14-n),String(n+1)],k=>prNear(n,k),'pH = -log[H⁺] = '+n);
+ if(t===1){const p=prR(10,130)/10;return prMC('A solution has pH '+p+'. What is its pOH?',prNum(14-p,1),[prNum(p,1),prNum(14+p,1),prNum(p-7,1)],k=>prNum(14-p+(k%2?1:-1)*(1+(k>>1)),1),'pH + pOH = 14, so pOH = '+prNum(14-p,1))}
+ const c=prR(2,9),ph=-Math.log10(c*10**-n);return prMC('[H⁺] = '+c+' × 10'+prSup(-n)+' M. What is the pH?',prNum(ph),[prNum(n+Math.log10(c)),String(n),prNum(14-ph)],k=>prNum(ph+(k%2?.5:-.5)*(1+(k>>1))),'pH = -log('+c+' × 10'+prSup(-n)+') = '+prNum(ph))});
+// ---------------- Physics ----------------
+prDef('kinematics','Physics','Kinematics (constant acceleration)',/kinematic|constant acceleration|v ?= ?v[0₀o]|displacement|free fall|\bsuvat\b/i,()=>{
+ const v0=prR(0,20),a=prNZ(-5,6),t=prR(1,10);
+ if(Math.random()<.5){const v=v0+a*t;return prMC('A car starts at '+v0+' m/s and accelerates at '+a+' m/s² for '+t+' s. What is its final velocity?',v+' m/s',[(v0*a*t)+' m/s',(a*t)+' m/s',(v0+a+t)+' m/s'],k=>(v+(k%2?1:-1)*(1+(k>>1)))+' m/s','v = v₀ + at = '+v0+' + ('+a+')('+t+') = '+v+' m/s')}
+ const a2=Math.abs(a),d=v0*t+a2*t*t/2;return prMC('An object starts at '+v0+' m/s and speeds up at '+a2+' m/s² for '+t+' s. How far does it travel?',prNum(d,1)+' m',[prNum(v0*t+a2*t*t,1)+' m',prNum(v0*t,1)+' m',prNum((v0+a2*t)*t,1)+' m'],k=>prNum(d+(k%2?2:-2)*(1+(k>>1)),1)+' m','d = v₀t + ½at² = '+(v0*t)+' + '+prNum(a2*t*t/2,1)+' = '+prNum(d,1)+' m')});
+prDef('newton2','Physics','Newton’s second law (F = ma)',/newton'?’?s second|f ?= ?ma|net force/i,()=>{
+ const m=prR(1,50),a=prR(1,12),F=m*a,t=prR(0,2);
+ if(t===0)return prMC('What net force accelerates a '+m+' kg mass at '+a+' m/s²?',F+' N',[(m+a)+' N',prNum(m/a)+' N',prNum(a/m)+' N'],k=>(F+(k%2?1:-1)*(1+(k>>1)))+' N','F = ma = '+m+' × '+a+' = '+F+' N');
+ if(t===1)return prMC('A '+F+' N net force acts on a '+m+' kg mass. What is its acceleration?',a+' m/s²',[(F*m)+' m/s²',prNum(m/F)+' m/s²',(F-m)+' m/s²'],k=>(a+(k%2?1:-1)*(1+(k>>1)))+' m/s²','a = F ÷ m = '+F+' ÷ '+m+' = '+a+' m/s²');
+ return prMC('A '+F+' N net force gives an object '+a+' m/s² of acceleration. What is its mass?',m+' kg',[(F*a)+' kg',prNum(a/F)+' kg',(F-a)+' kg'],k=>(m+(k%2?1:-1)*(1+(k>>1)))+' kg','m = F ÷ a = '+F+' ÷ '+a+' = '+m+' kg')});
+prDef('energy','Physics','Kinetic & potential energy',/kinetic energy|potential energy|\bke\b|\bgpe\b|mgh|½ ?mv|1\/2 ?mv/i,()=>{
+ const m=prR(1,40),v=prR(1,20),h=prR(1,50);
+ if(Math.random()<.5){const K=m*v*v/2;return prMC('What is the kinetic energy of a '+m+' kg object moving at '+v+' m/s?',prNum(K,1)+' J',[prNum(m*v*v,1)+' J',prNum(m*v/2,1)+' J',prNum(m*v,1)+' J'],k=>prNum(K+(k%2?5:-5)*(1+(k>>1)),1)+' J','KE = ½mv² = ½ × '+m+' × '+v+'² = '+prNum(K,1)+' J')}
+ const U=m*9.8*h;return prMC('What is the gravitational potential energy of a '+m+' kg object '+h+' m up? (g = 9.8 m/s²)',prNum(U,1)+' J',[prNum(m*h,1)+' J',prNum(m*9.8,1)+' J',prNum(m*9.8*h/2,1)+' J'],k=>prNum(U+(k%2?10:-10)*(1+(k>>1)),1)+' J','PE = mgh = '+m+' × 9.8 × '+h+' = '+prNum(U,1)+' J')});
+prDef('ohm','Physics','Ohm’s law (V = IR)',/ohm'?’?s law|v ?= ?ir|resistance[^.\n]{0,30}(current|voltage)|voltage[^.\n]{0,30}current/i,()=>{
+ const I=prR(1,20)/2,Rr=prR(2,60),V=I*Rr,t=prR(0,2);
+ if(t===0)return prMC('A current of '+I+' A flows through a '+Rr+' Ω resistor. What is the voltage?',prNum(V)+' V',[prNum(I/Rr,3)+' V',prNum(Rr/I)+' V',prNum(I+Rr)+' V'],k=>prNum(V+(k%2?1:-1)*(1+(k>>1)))+' V','V = IR = '+I+' × '+Rr+' = '+prNum(V)+' V');
+ if(t===1)return prMC('A '+prNum(V)+' V battery drives current through a '+Rr+' Ω resistor. What is the current?',prNum(I)+' A',[prNum(V*Rr)+' A',prNum(Rr/V,3)+' A',prNum(V-Rr)+' A'],k=>prNum(I+(k%2?.5:-.5)*(1+(k>>1)))+' A','I = V ÷ R = '+prNum(V)+' ÷ '+Rr+' = '+prNum(I)+' A');
+ return prMC(prNum(V)+' V pushes '+I+' A through a resistor. What is its resistance?',Rr+' Ω',[prNum(V*I)+' Ω',prNum(I/V,3)+' Ω',prNum(V-I)+' Ω'],k=>(Rr+(k%2?1:-1)*(1+(k>>1)))+' Ω','R = V ÷ I = '+prNum(V)+' ÷ '+I+' = '+Rr+' Ω')});
+// ---------------- using them ----------------
+// a fresh problem of a type (retries if a random draw ever comes out unusable)
+function prInstance(id){const T=PR[id];if(!T)return null;for(let k=0;k<12;k++){try{const p=T.make();if(p&&prOk(p.a)&&p.w.length===3&&!p.w.includes(p.a))return p}catch(e){}}return null}
+// which practice types a piece of text points to
+function prDetect(text){const t=String(text||'');return Object.values(PR).filter(T=>T.kw.test(t)).map(T=>T.id)}
+// the practice types a study set uses (chosen in the summary editor, or found automatically)
+// (until you pick in the summary editor, they're found automatically from the set's title, notes and source text)
+function prOf(s){if(!s)return [];const l=Array.isArray(s.practice)?s.practice:prDetect((s.title||'')+'\n'+(s.body||'')+'\n'+String(s.source||'').slice(0,30000));return l.filter(id=>PR[id])}
+// show a sample problem from the types ticked in the summary editor
+function prTry(){const ids=[...document.querySelectorAll('.pr-pick input[name=pr]:checked')].map(x=>x.value),el=$('prSample');if(!el)return;if(!ids.length){el.innerHTML='<p class="small muted">Tick a problem type first.</p>';return}const id=prPick(ids),p=prInstance(id);if(!p)return;el.innerHTML='<div class="notice"><small>'+esc(PR[id].name)+'</small><br><b>'+esc(p.q)+'</b><br>Answer: '+esc(p.a)+'<br><span class="small muted">'+esc(p.ex)+'</span></div>'}
+function prSubjects(){const out={};Object.values(PR).forEach(T=>(out[T.subject]=out[T.subject]||[]).push(T));return out}
