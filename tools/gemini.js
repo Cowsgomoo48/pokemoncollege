@@ -40,7 +40,8 @@ function gmPrompt(n,of){return 'You are building a study guide for a college stu
  +'- Work out which course and topics this covers. Handwriting may be messy: ignore crossed-out, cut-off or unreadable bits and never copy gibberish.\n'
  +'- Where the notes are incomplete or unclear but the topic is clear, fill in the standard, correct textbook facts so every item is complete.\n'
  +'- problemTypes: the kinds of problems the student must be able to solve, each with one sentence on how to solve it.\n'
- +'- formulas: name, the formula in plain text (use symbols like ², √, θ, π, Δ, ·), and when to use it. concepts: key ideas, one sentence each. examples: up to 4 short worked examples written as "problem → answer".\n'
+ +'- Write all math as plain text with Unicode symbols (½, ², ³, √, θ, π, Δ, μ, ·, ×, →, subscripts like v₀). Never use LaTeX, backslashes or $ signs.\n'
+ +'- formulas: name, the formula in plain text, and when to use it. concepts: key ideas, one sentence each. examples: up to 4 short worked examples written as "problem → answer".\n'
  +'- practice: choose ONLY from these practice-problem ids, the ones that clearly match the material (it is fine to choose none): '+Object.values(PR).map(T=>T.id+' = '+T.name).join('; ')+'.\n'
  +'- questions: 6 to 10 multiple-choice questions that test understanding of the concepts (not copied homework), each with the correct answer and exactly 3 plausible wrong answers.\n'
  +'- overview: 3 to 5 plain sentences on what this set covers and what the student must be able to do.'}

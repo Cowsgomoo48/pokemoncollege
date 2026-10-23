@@ -32,12 +32,12 @@ function mgQuestion(item,bank,variant){const others=bank.filter(b=>b!==item),pic
  return {prompt:'What does “'+item.front+'” mean?',sub:'Pick the best definition.',options:shuffle([{t:item.back,ok:true},...pick(terms,()=>true).map(b=>({t:b.back,ok:false}))]),explain:'“'+item.front+'” means: '+item.back}}
 // Shared question pop-up. Resolves 'full' (first try right), 'makeup' (Make-Up right) or 'fail'.
 function askQ(item,bank,opts={}){return new Promise(res=>{const ov=document.createElement('div');ov.className='mgq';document.body.appendChild(ov);const v0=Math.random()<.5?0:1;
- const show=(q,isMakeUp)=>{ov.innerHTML='<div class="mgq-card">'+(opts.title?'<span class="badge">'+esc(opts.title)+'</span> ':'')+(isMakeUp?'<span class="badge mk">MAKE-UP</span>':'')+'<h3>'+esc(q.prompt)+'</h3><p class="small muted">'+esc(q.sub)+'</p>'+(opts.hint&&!isMakeUp?'<button class="btn smallbtn mgq-hint">💡 Hint</button>':'')+q.options.map((o,i)=>'<button class="answer" data-i="'+i+'">'+esc(o.t)+'</button>').join('')+'</div>';
+ const show=(q,isMakeUp)=>{ov.innerHTML='<div class="mgq-card">'+(opts.title?'<span class="badge">'+esc(opts.title)+'</span> ':'')+(isMakeUp?'<span class="badge mk">MAKE-UP</span>':'')+'<h3>'+mathHTML(q.prompt)+'</h3><p class="small muted">'+esc(q.sub)+'</p>'+(opts.hint&&!isMakeUp?'<button class="btn smallbtn mgq-hint">💡 Hint</button>':'')+q.options.map((o,i)=>'<button class="answer" data-i="'+i+'">'+mathHTML(o.t)+'</button>').join('')+(mathy(q.prompt,...q.options.map(o=>o.t))?calcHTML():'')+'</div>';calcInit(ov);
   const hb=ov.querySelector('.mgq-hint');if(hb)hb.onclick=()=>{const wrong=[...ov.querySelectorAll('.answer')].filter(x=>!q.options[+x.dataset.i].ok);shuffle(wrong).slice(0,Math.max(1,wrong.length-1)).forEach(x=>x.classList.add('ans-gone'));hb.remove()};
   ov.querySelectorAll('.answer').forEach(b=>b.onclick=()=>{const o=q.options[+b.dataset.i];ov.querySelectorAll('.answer').forEach(x=>{x.disabled=true;if(q.options[+x.dataset.i].ok)x.classList.add('correct')});
    if(o.ok){qRecord(item,true);setTimeout(()=>{ov.remove();res(isMakeUp?'makeup':'full')},550);return}
    b.classList.add('wrong');qRecord(item,false);const card=ov.querySelector('.mgq-card');
-   card.insertAdjacentHTML('beforeend','<div class="notice mgq-ex">'+esc(q.explain)+'</div><button class="btn '+(isMakeUp||opts.makeUp===false?'blue':'red')+' mgq-go">'+(isMakeUp||opts.makeUp===false?'CONTINUE':'MAKE-UP QUESTION →')+'</button>');
+   card.insertAdjacentHTML('beforeend','<div class="notice mgq-ex">'+mathHTML(q.explain)+'</div><button class="btn '+(isMakeUp||opts.makeUp===false?'blue':'red')+' mgq-go">'+(isMakeUp||opts.makeUp===false?'CONTINUE':'MAKE-UP QUESTION →')+'</button>');
    card.querySelector('.mgq-go').onclick=()=>{if(isMakeUp||opts.makeUp===false){ov.remove();res('fail')}else show(mgQuestion(item,bank,1-v0),true)}})};
  show(mgQuestion(item,bank,v0),false)})}
 // ---------- menu & setup ----------
@@ -87,7 +87,7 @@ function mgHead(extra){return '<div class="mg-head"><button class="btn smallbtn"
 function flashStart(el){const S=mgState;if(S.C.queue)S.P.queue=S.C.queue.splice(0);S.count=0;S.right=0;S.limit=S.mode==='learn'?999:Math.min(20,Math.max(8,S.P.bank.length));const nextCard=()=>{if(!mgState)return;
   if(S.mode==='learn'&&S.P.done||S.mode!=='learn'&&S.count>=S.limit){mgFinish([S.right+' / '+S.count+' marked “Got it”'+(S.mode==='learn'?' · set learned ✓':'')]);return}
   const it=S.P.next();if(!it){mgFinish(['No cards left']);return}S.cur=it;S.count++;
-  el.innerHTML=mgHead(S.P.progress()||('Card '+S.count+' / '+S.limit))+'<div class="flash" onclick="this.classList.toggle(\'flip\')"><div class="flash-in"><div class="flash-face"><small>'+(it.kind!=='term'?'QUESTION':'TERM')+'</small><b>'+esc(it.front)+'</b><span class="small muted">Tap to flip</span></div><div class="flash-face back"><small>'+(it.kind!=='term'?'ANSWER':'MEANING')+'</small><b>'+esc(it.back)+'</b></div></div></div><div class="flash-btns"><button class="btn" id="fcNo">😵 Still learning</button><button class="btn blue" id="fcYes">✅ Got it</button></div>';
+  el.innerHTML=mgHead(S.P.progress()||('Card '+S.count+' / '+S.limit))+'<div class="flash" onclick="this.classList.toggle(\'flip\')"><div class="flash-in"><div class="flash-face"><small>'+(it.kind!=='term'?'QUESTION':'TERM')+'</small><b>'+mathHTML(it.front)+'</b><span class="small muted">Tap to flip</span></div><div class="flash-face back"><small>'+(it.kind!=='term'?'ANSWER':'MEANING')+'</small><b>'+mathHTML(it.back)+'</b></div></div></div><div class="flash-btns"><button class="btn" id="fcNo">😵 Still learning</button><button class="btn blue" id="fcYes">✅ Got it</button></div>';
   $('fcNo').onclick=()=>{qRecord(it,false);S.P.report(it,'fail');S.C.asked++;nextCard()};$('fcYes').onclick=()=>{qRecord(it,true);S.right++;S.P.report(it,'full');S.C.asked++;S.C.right++;nextCard()}};
  nextCard()}
 // ---------- Match-Up: 10 cards (5 pairs) on the table; clear them and 5 more pairs are dealt ----------
@@ -101,7 +101,7 @@ function matchStart(el){const S=mgState,C=S.C;S.pairs=0;S.misses=0;S.combo=0;S.b
   skipped.reverse().forEach(it=>C.putBack(it));
   if(!items.length){mgFinish(summary(),S.bonus);return}S.boards++;
   const cards=shuffle(items.flatMap((it,i)=>[{i,t:it.front,s:'f'},{i,t:it.back,s:'b'}])),missed=new Set();let sel=null,left=items.length;
-  el.innerHTML=mgHead('')+'<div class="mu-combo" id="muCombo"></div><div class="mu-grid">'+cards.map((c,k)=>'<button class="mu-card'+(c.s==='f'?' f':'')+'" data-k="'+k+'"><span>'+esc(c.t.length>120?c.t.slice(0,117)+'…':c.t)+'</span></button>').join('')+'</div><p class="small muted" style="text-align:center">Tap two cards that go together. Quick matches in a row earn bonus Cogs.</p>';
+  el.innerHTML=mgHead('')+'<div class="mu-combo" id="muCombo"></div><div class="mu-grid">'+cards.map((c,k)=>'<button class="mu-card'+(c.s==='f'?' f':'')+'" data-k="'+k+'"><span>'+mathHTML(c.t.length>120?c.t.slice(0,117)+'…':c.t)+'</span></button>').join('')+'</div><p class="small muted" style="text-align:center">Tap two cards that go together. Quick matches in a row earn bonus Cogs.</p>';
   const btns=[...el.querySelectorAll('.mu-card')];
   btns.forEach(b=>b.onclick=()=>{if(mgState!==S||b.classList.contains('done'))return;const k=+b.dataset.k;
    if(sel===null){sel=k;b.classList.add('sel');return}
@@ -119,13 +119,13 @@ function speedStart(el){const S=mgState,C=S.C,LIM=15000;S.score=0;S.right=0;S.n=
  S.finishNow=()=>mgFinish(summary(),Math.floor(S.score/1000));
  const next=()=>{if(mgState!==S)return;clearInterval(tick);if(C.over()){S.finishNow();return}const it=C.next();if(!it){S.finishNow();return}
   const q=mgQuestion(it,S.bank,Math.random()<.5?0:1),t0=performance.now();S.n++;let answered=false;
-  el.innerHTML=mgHead('')+'<div class="speed"><div class="sp-top"><span class="sp-q">Q'+S.n+(C.left()?' · '+C.left():'')+'</span><span class="sp-score">'+S.score.toLocaleString()+' pts</span></div><div class="sp-bar"><i id="spBar"></i></div><div class="sp-time" id="spTime">15</div><h3>'+esc(q.prompt)+'</h3>'+q.options.map((o,i)=>'<button class="answer sp-a'+i%4+'" data-i="'+i+'">'+esc(o.t)+'</button>').join('')+'<div class="sp-pts" id="spPts"></div></div>';
+  el.innerHTML=mgHead('')+'<div class="speed"><div class="sp-top"><span class="sp-q">Q'+S.n+(C.left()?' · '+C.left():'')+'</span><span class="sp-score">'+S.score.toLocaleString()+' pts</span></div><div class="sp-bar"><i id="spBar"></i></div><div class="sp-time" id="spTime">15</div><h3>'+mathHTML(q.prompt)+'</h3>'+q.options.map((o,i)=>'<button class="answer sp-a'+i%4+'" data-i="'+i+'">'+mathHTML(o.t)+'</button>').join('')+'<div class="sp-pts" id="spPts"></div>'+(mathy(q.prompt,...q.options.map(o=>o.t))?calcHTML():'')+'</div>';
   const done=(o,b)=>{if(answered||mgState!==S)return;answered=true;clearInterval(tick);const ms=performance.now()-t0,ok=!!(o&&o.ok);
    el.querySelectorAll('.answer').forEach(x=>{x.disabled=true;if(q.options[+x.dataset.i].ok)x.classList.add('correct')});qRecord(it,ok);C.report(it,ok?'full':'fail');
    const pts=ok?Math.max(1,Math.round(1000*(1-ms/LIM))):0;if(ok){S.right++;S.streak++;S.score+=pts}else{S.streak=0;if(b)b.classList.add('wrong')}
    const p=$('spPts');if(p){p.className='sp-pts '+(ok?'good':'bad');p.textContent=ok?'+'+pts+' pts':(o?'✗ Wrong':'⏰ Time’s up')}
    setTimeout(next,ok?900:1500)};
-  el.querySelectorAll('.answer').forEach(b=>b.onclick=()=>done(q.options[+b.dataset.i],b));
+  calcInit(el);el.querySelectorAll('.answer').forEach(b=>b.onclick=()=>done(q.options[+b.dataset.i],b));
   tick=setInterval(()=>{const left=Math.max(0,LIM-(performance.now()-t0)),bar=$('spBar'),tm=$('spTime');if(bar)bar.style.width=(left/LIM*100)+'%';if(tm)tm.textContent=Math.ceil(left/1000);if(left<=0)done(null,null)},100)};
  next()}
 // ---------- Luxor (marble chain) ----------

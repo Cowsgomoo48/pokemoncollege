@@ -171,7 +171,7 @@ public class StudyAIPlugin: CAPPlugin, CAPBridgedPlugin {
     }
 
     #if canImport(FoundationModels)
-    static let guideInstructions = "You help a college student plan their studying. The notes may come from photos of handwriting, so some words are garbled: ignore text that makes no sense, and where the notes clearly cover a standard textbook topic, fill in the standard facts so each item is complete and correct. Describe kinds of problems, formulas and ideas, not the specific homework questions."
+    static let guideInstructions = "You help a college student plan their studying. The notes may come from photos of handwriting, so some words are garbled: ignore text that makes no sense, and where the notes clearly cover a standard textbook topic, fill in the standard facts so each item is complete and correct. Describe kinds of problems, formulas and ideas, not the specific homework questions. Write math as plain text with Unicode symbols (½, ², √, θ, Δ, ·); never use LaTeX or backslashes. Replace the words after each label with real content."
     static let guidePrompt = "Write one item per line using exactly these formats and nothing else:\nTYPE: kind of problem | how to solve it in one sentence\nFORMULA: name | the formula | when to use it\nCONCEPT: idea | what it means in one sentence\nEXAMPLE: a short worked example\n\nStudy material:\n"
     // reads lines like "TYPE: name | how" back into lists
     static func parseGuide(_ text: String) -> (types: [[String: String]], formulas: [[String: String]], concepts: [[String: String]], examples: [String]) {
