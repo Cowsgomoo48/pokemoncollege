@@ -116,28 +116,48 @@ public class StudyAIPlugin: CAPPlugin, CAPBridgedPlugin {
                 var concepts: [[String: String]] = []
                 var examples: [String] = []
                 var done = 0
+                var lastError = ""
                 for (i, piece) in pieces.enumerated() {
+                    // 1st try: plain text with Apple's relaxed guardrails for transforming the user's own notes
+                    // (structured output keeps the strict guardrails, which were blocking ordinary class notes)
+                    var got = false
                     do {
-                        let session = LanguageModelSession(instructions: "You help a college student plan their studying. You describe what kinds of problems, formulas and ideas the material covers, not the specific questions. Only use what is in the material.")
-                        let r = try await session.respond(to: "List the problem types, formulas, concepts and a few worked examples in this part of the study material:\n\n" + piece, generating: AIGuidePart.self).content
-                        types += r.problemTypes.map { ["name": $0.name, "how": $0.howTo] }
-                        formulas += r.formulas.map { ["name": $0.name, "formula": $0.formula, "use": $0.use] }
-                        concepts += r.concepts.map { ["name": $0.name, "meaning": $0.meaning] }
-                        examples += r.examples
-                        done += 1
+                        let model = SystemLanguageModel(guardrails: .permissiveContentTransformations)
+                        let session = LanguageModelSession(model: model, instructions: StudyAIPlugin.guideInstructions)
+                        let r = try await session.respond(to: StudyAIPlugin.guidePrompt + piece)
+                        let part = StudyAIPlugin.parseGuide(r.content)
+                        if !(part.types.isEmpty && part.formulas.isEmpty && part.concepts.isEmpty) {
+                            types += part.types; formulas += part.formulas; concepts += part.concepts; examples += part.examples
+                            got = true
+                        }
                     } catch {
-                        // skip a piece the model refuses or fails on; the rest still count
+                        lastError = String(describing: error)
                     }
+                    // 2nd try: the structured version
+                    if !got {
+                        do {
+                            let session = LanguageModelSession(instructions: StudyAIPlugin.guideInstructions)
+                            let r = try await session.respond(to: StudyAIPlugin.guidePrompt + piece, generating: AIGuidePart.self).content
+                            types += r.problemTypes.map { ["name": $0.name, "how": $0.howTo] }
+                            formulas += r.formulas.map { ["name": $0.name, "formula": $0.formula, "use": $0.use] }
+                            concepts += r.concepts.map { ["name": $0.name, "meaning": $0.meaning] }
+                            examples += r.examples
+                            got = true
+                        } catch {
+                            lastError = String(describing: error)
+                        }
+                    }
+                    if got { done += 1 }
                     self.notifyListeners("guideProgress", data: ["done": i + 1, "total": pieces.count])
                 }
                 if done == 0 {
-                    call.reject("AI study guide failed")
+                    call.reject(lastError.lowercased().contains("guardrail") ? "Apple’s AI safety filter blocked these notes" : "AI study guide failed: " + String(lastError.prefix(120)))
                     return
                 }
                 var overview = ""
                 do {
                     let topics = (types.map { $0["name"] ?? "" } + formulas.map { $0["name"] ?? "" } + concepts.map { $0["name"] ?? "" }).joined(separator: "; ")
-                    let session = LanguageModelSession(instructions: "You help a college student study. Write in plain, friendly English.")
+                    let session = LanguageModelSession(model: SystemLanguageModel(guardrails: .permissiveContentTransformations), instructions: "You help a college student study. Write in plain, friendly English.")
                     overview = try await session.respond(to: "In 3 to 5 sentences, describe what this study set covers and what the student must be able to do. Topics: " + String(topics.prefix(3500))).content
                 } catch {
                     overview = ""
@@ -151,6 +171,30 @@ public class StudyAIPlugin: CAPPlugin, CAPBridgedPlugin {
     }
 
     #if canImport(FoundationModels)
+    static let guideInstructions = "You help a college student plan their studying. The notes may come from photos of handwriting, so some words are garbled: ignore text that makes no sense, and where the notes clearly cover a standard textbook topic, fill in the standard facts so each item is complete and correct. Describe kinds of problems, formulas and ideas, not the specific homework questions. Write math as plain text with Unicode symbols (½, ², √, θ, Δ, ·); never use LaTeX or backslashes. Replace the words after each label with real content."
+    static let guidePrompt = "Write one item per line using exactly these formats and nothing else:\nTYPE: kind of problem | how to solve it in one sentence\nFORMULA: name | the formula | when to use it\nCONCEPT: idea | what it means in one sentence\nEXAMPLE: a short worked example\n\nStudy material:\n"
+    // reads lines like "TYPE: name | how" back into lists
+    static func parseGuide(_ text: String) -> (types: [[String: String]], formulas: [[String: String]], concepts: [[String: String]], examples: [String]) {
+        var t: [[String: String]] = [], f: [[String: String]] = [], c: [[String: String]] = [], e: [String] = []
+        for raw in text.components(separatedBy: .newlines) {
+            var line = raw.trimmingCharacters(in: .whitespaces)
+            while line.hasPrefix("-") || line.hasPrefix("*") || line.hasPrefix("•") { line = String(line.dropFirst()).trimmingCharacters(in: .whitespaces) }
+            guard let colon = line.firstIndex(of: ":") else { continue }
+            let key = line[..<colon].uppercased().trimmingCharacters(in: .whitespaces)
+            let rest = line[line.index(after: colon)...].trimmingCharacters(in: .whitespaces)
+            let parts = rest.components(separatedBy: "|").map { $0.trimmingCharacters(in: .whitespaces) }
+            guard let first = parts.first, !first.isEmpty else { continue }
+            switch key {
+            case "TYPE": t.append(["name": first, "how": parts.count > 1 ? parts[1] : ""])
+            case "FORMULA": f.append(["name": first, "formula": parts.count > 1 ? parts[1] : "", "use": parts.count > 2 ? parts[2] : ""])
+            case "CONCEPT": c.append(["name": first, "meaning": parts.count > 1 ? parts[1] : ""])
+            case "EXAMPLE": e.append(rest)
+            default: continue
+            }
+        }
+        return (t, f, c, e)
+    }
+
     // cut text into pieces of at most `limit` characters, ending at a sentence or line break where possible
     static func split(_ text: String, limit: Int, maxParts: Int) -> [String] {
         let clean = text.trimmingCharacters(in: .whitespacesAndNewlines)

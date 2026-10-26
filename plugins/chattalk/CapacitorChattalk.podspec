@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
   s.name = 'CapacitorChattalk'
   s.version = '0.1.0'
-  s.summary = 'PokemonCollege native helpers: ChatTalk recorder/transcription and PokePics photo text reading'
+  s.summary = 'PokemonCollege native helpers: ChatTalk, PokePics, StudyAI and the app icon badge'
   s.license = 'Private'
   s.homepage = 'https://example.invalid/pokemoncollege'
   s.author = 'PokemonCollege'
