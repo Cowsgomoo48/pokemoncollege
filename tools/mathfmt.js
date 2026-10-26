@@ -26,10 +26,11 @@ function mathHTML(src){const s=mathFix(src);let i=0;
  try{return seq(null)}catch(e){return mEsc(s)}}
 // same idea, Unicode only (for textareas and plain text)
 const M_SUP={'0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹','-':'⁻','+':'⁺','n':'ⁿ','i':'ⁱ','x':'ˣ','(':'⁽',')':'⁾'},M_SUB={'0':'₀','1':'₁','2':'₂','3':'₃','4':'₄','5':'₅','6':'₆','7':'₇','8':'₈','9':'₉','a':'ₐ','e':'ₑ','o':'ₒ','x':'ₓ','i':'ᵢ','r':'ᵣ','u':'ᵤ','v':'ᵥ','k':'ₖ','s':'ₛ','t':'ₜ','n':'ₙ','m':'ₘ','p':'ₚ','f':'f','g':'g','y':'y','c':'c','d':'d'};
+const M_VULGAR={'1/2':'½','1/3':'⅓','2/3':'⅔','1/4':'¼','3/4':'¾','1/5':'⅕','1/6':'⅙','1/8':'⅛'};
 function mathPlain(src){const div=document.createElement('div');div.innerHTML=mathHTML(src);
- div.querySelectorAll('.mfrac').forEach(f=>{const [a,b]=[...f.children].map(x=>x.textContent);f.replaceWith((a.length>1?'('+a+')':a)+'/'+(b.length>1?'('+b+')':b))});
  div.querySelectorAll('sup').forEach(x=>{const t=x.textContent;x.replaceWith([...t].every(c=>M_SUP[c])?[...t].map(c=>M_SUP[c]).join(''):'^('+t+')')});
  div.querySelectorAll('sub').forEach(x=>{const t=x.textContent;x.replaceWith([...t].every(c=>M_SUB[c]&&!/[fgycd]/.test(c))?[...t].map(c=>M_SUB[c]).join(''):'_'+t)});
+ div.querySelectorAll('.mfrac').forEach(f=>{const [a,b]=[...f.children].map(x=>x.textContent.trim());const w=x=>/[\s+\-−=·×/]/.test(x)?'('+x+')':x;f.replaceWith(M_VULGAR[a+'/'+b]||(w(a)+'/'+w(b)))});
  div.querySelectorAll('.msqrt').forEach(x=>{const t=x.textContent;x.replaceWith(t.length>1?'('+t+')':t)});
  return div.textContent}
 // does this question involve numbers / equations? (then offer the calculator)

@@ -4,7 +4,7 @@ function mgBank(sids){const out=[];for(const s of db.summaries){if(!sids.include
  termsFor(s).forEach(t=>out.push({kind:'term',sid:s.id,key:s.id+'|t|'+t.term,front:t.term,back:t.definition}));
  (s.quiz||[]).forEach(q=>out.push({kind:'mc',sid:s.id,key:s.id+'|q|'+q.question,front:q.question,back:q.answer,wrong:(q.wrong||[]).slice(0,3)}));
  // practice problems made in code: two fresh ones per problem type each game
- prOf(s).forEach(id=>{for(let k=0;k<2;k++){const p=prInstance(id);if(p)out.push({kind:'gen',gid:id,sid:s.id,key:s.id+'|g|'+id+'|'+k,front:p.q,back:p.a,wrong:p.w,explain:p.ex})}})}return out}
+ prOf(s).forEach(id=>{for(let k=0;k<2;k++){const p=prInstance(id);if(p)out.push({kind:'gen',gid:id,sid:s.id,key:s.id+'|g|'+id+'|'+k,front:p.q,back:p.a,wrong:p.w,explain:p.ex,steps:p.steps})}})}return out}
 function qstat(key){const q=db.qstats||(db.qstats={});return q[key]||(q[key]={r:0,w:0,last:0,miss:0})}
 function qRecord(item,ok){const s=qstat(item.key);if(ok){s.r++;s.miss=Math.max(0,s.miss-1)}else{s.w++;s.miss=Math.min(5,s.miss+2)}s.last=Date.now()}
 function isWeak(item){const s=(db.qstats||{})[item.key];return !!s&&(s.miss>0||s.w>s.r/2)}
@@ -24,20 +24,27 @@ function mgPicker(bank,mode){const P={mode,bank,queue:[],phase:1,mastery:{},done
  return P}
 // Multiple-choice question for an item. variant 0 asks one way, 1 the other way (used for Make-Up questions).
 function mgQuestion(item,bank,variant){const others=bank.filter(b=>b!==item),pick=(arr,f)=>shuffle(arr.filter(f)).slice(0,3);
- if(item.kind==='gen'){const p=prInstance(item.gid)||{q:item.front,a:item.back,w:item.wrong,ex:item.explain};return {prompt:p.q,sub:(PR[item.gid]?PR[item.gid].name+' · ':'')+'work it out.',options:shuffle([{t:p.a,ok:true},...p.w.map(w=>({t:w,ok:false}))]),explain:p.ex}}
+ if(item.kind==='gen'){const p=prInstance(item.gid)||{q:item.front,a:item.back,w:item.wrong,ex:item.explain,steps:item.steps};return {prompt:p.q,sub:(PR[item.gid]?PR[item.gid].name+' · ':'')+'work it out.',options:shuffle([{t:p.a,ok:true},...p.w.map(w=>({t:w,ok:false}))]),explain:p.ex,short:p.a,steps:p.steps||[]}}
  if(item.kind==='mc'&&variant===0)return {prompt:item.front,sub:'Choose the right answer.',options:shuffle([{t:item.back,ok:true},...item.wrong.map(w=>({t:w,ok:false}))]),explain:'The answer is “'+item.back+'”.'};
  if(item.kind==='mc'){const tie=bank.find(b=>b.kind==='term'&&b.front.toLowerCase()===String(item.back).toLowerCase());if(tie)return mgQuestion(tie,bank,1);return {prompt:item.front,sub:'Make-Up: think it through once more.',options:shuffle([{t:item.back,ok:true},...item.wrong.map(w=>({t:w,ok:false}))]),explain:'The answer is “'+item.back+'”.'}}
  const terms=others.filter(b=>b.kind==='term');
  if(variant===0)return {prompt:item.back,sub:'Which term matches this definition?',options:shuffle([{t:item.front,ok:true},...pick(terms,()=>true).map(b=>({t:b.front,ok:false}))]),explain:'“'+item.front+'” means: '+item.back};
  return {prompt:'What does “'+item.front+'” mean?',sub:'Pick the best definition.',options:shuffle([{t:item.back,ok:true},...pick(terms,()=>true).map(b=>({t:b.back,ok:false}))]),explain:'“'+item.front+'” means: '+item.back}}
 // Shared question pop-up. Resolves 'full' (first try right), 'makeup' (Make-Up right) or 'fail'.
+// gentle hints for questions that have no worked steps: what the answer starts with, or a word it uses
+function mgHints(q){const a=String((q.options.find(o=>o.ok)||{}).t||'').trim();if(!a)return [];const words=a.split(/\s+/);
+ if(a.length<=60)return ['It starts with “'+a.charAt(0).toUpperCase()+'” and is '+words.length+' word'+(words.length>1?'s':'')+' long.'];
+ const pl=String(q.prompt).toLowerCase(),key=words.map(w=>w.replace(/[^A-Za-z0-9-]/g,'')).filter(w=>w.length>4&&!pl.includes(w.toLowerCase())).sort((x,y)=>y.length-x.length)[0];
+ return key?['The right answer mentions “'+key+'”.']:['Read each choice and rule out the ones that don’t fit the question.']}
 function askQ(item,bank,opts={}){return new Promise(res=>{const ov=document.createElement('div');ov.className='mgq';document.body.appendChild(ov);const v0=Math.random()<.5?0:1;
- const show=(q,isMakeUp)=>{ov.innerHTML='<div class="mgq-card">'+(opts.title?'<span class="badge">'+esc(opts.title)+'</span> ':'')+(isMakeUp?'<span class="badge mk">MAKE-UP</span>':'')+'<h3>'+mathHTML(q.prompt)+'</h3><p class="small muted">'+esc(q.sub)+'</p>'+(opts.hint&&!isMakeUp?'<button class="btn smallbtn mgq-hint">💡 Hint</button>':'')+q.options.map((o,i)=>'<button class="answer" data-i="'+i+'">'+mathHTML(o.t)+'</button>').join('')+(mathy(q.prompt,...q.options.map(o=>o.t))?calcHTML():'')+'</div>';calcInit(ov);
-  const hb=ov.querySelector('.mgq-hint');if(hb)hb.onclick=()=>{const wrong=[...ov.querySelectorAll('.answer')].filter(x=>!q.options[+x.dataset.i].ok);shuffle(wrong).slice(0,Math.max(1,wrong.length-1)).forEach(x=>x.classList.add('ans-gone'));hb.remove()};
-  ov.querySelectorAll('.answer').forEach(b=>b.onclick=()=>{const o=q.options[+b.dataset.i];ov.querySelectorAll('.answer').forEach(x=>{x.disabled=true;if(q.options[+x.dataset.i].ok)x.classList.add('correct')});
+ const show=(q,isMakeUp)=>{ov.innerHTML='<div class="mgq-card">'+(opts.title?'<span class="badge">'+esc(opts.title)+'</span> ':'')+(isMakeUp?'<span class="badge mk">MAKE-UP</span>':'')+'<h3>'+mathHTML(q.prompt)+'</h3><p class="small muted">'+esc(q.sub)+'</p>'+(opts.hint!==false?'<div class="mgq-hints"></div><button class="btn smallbtn mgq-hint">💡 Hint</button>':'')+q.options.map((o,i)=>'<button class="answer" data-i="'+i+'">'+mathHTML(o.t)+'</button>').join('')+(mathy(q.prompt,...q.options.map(o=>o.t))?calcHTML():'')+'</div>';calcInit(ov);
+  // hints come one step at a time; they explain the problem and never remove answers
+  const hb=ov.querySelector('.mgq-hint'),H=q.steps&&q.steps.length?q.steps.map(x=>x[0]):mgHints(q);let hi=0;
+  if(hb){if(H.length)hb.textContent='💡 Hint 1/'+H.length;hb.onclick=()=>{if(hi<H.length){ov.querySelector('.mgq-hints').insertAdjacentHTML('beforeend','<div class="mgq-step"><b>'+(H.length>1?'Step '+(hi+1)+'.':'Hint.')+'</b> '+mathHTML(H[hi])+'</div>');hi++;if(hi<H.length)hb.textContent='💡 Next hint '+(hi+1)+'/'+H.length;else hb.remove();return}hb.remove()}}
+  ov.querySelectorAll('.answer').forEach(b=>b.onclick=()=>{const o=q.options[+b.dataset.i];const hb2=ov.querySelector('.mgq-hint');if(hb2)hb2.remove();ov.querySelectorAll('.answer').forEach(x=>{x.disabled=true;if(q.options[+x.dataset.i].ok)x.classList.add('correct')});
    if(o.ok){qRecord(item,true);setTimeout(()=>{ov.remove();res(isMakeUp?'makeup':'full')},550);return}
    b.classList.add('wrong');qRecord(item,false);const card=ov.querySelector('.mgq-card');
-   card.insertAdjacentHTML('beforeend','<div class="notice mgq-ex">'+mathHTML(q.explain)+'</div><button class="btn '+(isMakeUp||opts.makeUp===false?'blue':'red')+' mgq-go">'+(isMakeUp||opts.makeUp===false?'CONTINUE':'MAKE-UP QUESTION →')+'</button>');
+   card.insertAdjacentHTML('beforeend',(q.steps&&q.steps.length?'<div class="notice mgq-ex"><b>Answer:</b> '+mathHTML(q.short)+'</div><details class="mgq-long" open><summary>Full solution</summary><ol>'+q.steps.map(x=>'<li>'+mathHTML(x[1])+'</li>').join('')+'</ol></details>':'<div class="notice mgq-ex">'+mathHTML(q.explain)+'</div>')+'<button class="btn '+(isMakeUp||opts.makeUp===false?'blue':'red')+' mgq-go">'+(isMakeUp||opts.makeUp===false?'CONTINUE':'MAKE-UP QUESTION →')+'</button>');
    card.querySelector('.mgq-go').onclick=()=>{if(isMakeUp||opts.makeUp===false){ov.remove();res('fail')}else show(mgQuestion(item,bank,1-v0),true)}})};
  show(mgQuestion(item,bank,v0),false)})}
 // ---------- menu & setup ----------
@@ -87,7 +94,7 @@ function mgHead(extra){return '<div class="mg-head"><button class="btn smallbtn"
 function flashStart(el){const S=mgState;if(S.C.queue)S.P.queue=S.C.queue.splice(0);S.count=0;S.right=0;S.limit=S.mode==='learn'?999:Math.min(20,Math.max(8,S.P.bank.length));const nextCard=()=>{if(!mgState)return;
   if(S.mode==='learn'&&S.P.done||S.mode!=='learn'&&S.count>=S.limit){mgFinish([S.right+' / '+S.count+' marked “Got it”'+(S.mode==='learn'?' · set learned ✓':'')]);return}
   const it=S.P.next();if(!it){mgFinish(['No cards left']);return}S.cur=it;S.count++;
-  el.innerHTML=mgHead(S.P.progress()||('Card '+S.count+' / '+S.limit))+'<div class="flash" onclick="this.classList.toggle(\'flip\')"><div class="flash-in"><div class="flash-face"><small>'+(it.kind!=='term'?'QUESTION':'TERM')+'</small><b>'+mathHTML(it.front)+'</b><span class="small muted">Tap to flip</span></div><div class="flash-face back"><small>'+(it.kind!=='term'?'ANSWER':'MEANING')+'</small><b>'+mathHTML(it.back)+'</b></div></div></div><div class="flash-btns"><button class="btn" id="fcNo">😵 Still learning</button><button class="btn blue" id="fcYes">✅ Got it</button></div>';
+  el.innerHTML=mgHead(S.P.progress()||('Card '+S.count+' / '+S.limit))+'<div class="flash" onclick="this.classList.toggle(\'flip\')"><div class="flash-in"><div class="flash-face"><small>'+(it.kind!=='term'?'QUESTION':'TERM')+'</small><b>'+mathHTML(it.front)+'</b><span class="small muted">Tap to flip</span></div><div class="flash-face back"><small>'+(it.kind!=='term'?'ANSWER':'MEANING')+'</small><b>'+mathHTML(it.back)+'</b>'+(it.steps&&it.steps.length?'<ol class="flash-steps">'+it.steps.map(x=>'<li>'+mathHTML(x[1])+'</li>').join('')+'</ol>':'')+'</div></div></div><div class="flash-btns"><button class="btn" id="fcNo">😵 Still learning</button><button class="btn blue" id="fcYes">✅ Got it</button></div>';
   $('fcNo').onclick=()=>{qRecord(it,false);S.P.report(it,'fail');S.C.asked++;nextCard()};$('fcYes').onclick=()=>{qRecord(it,true);S.right++;S.P.report(it,'full');S.C.asked++;S.C.right++;nextCard()}};
  nextCard()}
 // ---------- Match-Up: 10 cards (5 pairs) on the table; clear them and 5 more pairs are dealt ----------
