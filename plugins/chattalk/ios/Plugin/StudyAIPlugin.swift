@@ -16,8 +16,42 @@ public class StudyAIPlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "summarize", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "quiz", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "tasks", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "studyGuide", returnType: CAPPluginReturnPromise)
+        CAPPluginMethod(name: "studyGuide", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "tutor", returnType: CAPPluginReturnPromise)
     ]
+
+    // Tutor: step-by-step help for one question (a hint for each step, plus the step worked out)
+    @objc func tutor(_ call: CAPPluginCall) {
+        let question = call.getString("question") ?? ""
+        let answer = call.getString("answer") ?? ""
+        let choices = (call.getArray("choices", String.self) ?? []).joined(separator: " | ")
+        #if canImport(FoundationModels)
+        if #available(iOS 26.0, *) {
+            Task {
+                let prompt = "Question: \(question)\nCorrect answer: \(answer)" + (choices.isEmpty ? "" : "\nAnswer choices: \(choices)") + "\n\n" + StudyAIPlugin.tutorPrompt
+                var steps: [[String: String]] = []
+                var lastError = ""
+                for strict in [false, true] {
+                    do {
+                        let session = strict ? LanguageModelSession(instructions: StudyAIPlugin.tutorInstructions) : LanguageModelSession(model: SystemLanguageModel(guardrails: .permissiveContentTransformations), instructions: StudyAIPlugin.tutorInstructions)
+                        let r = try await session.respond(to: prompt)
+                        steps = StudyAIPlugin.parseSteps(r.content)
+                        if !steps.isEmpty { break }
+                    } catch {
+                        lastError = String(describing: error)
+                    }
+                }
+                if steps.isEmpty {
+                    call.reject("AI tutor failed: " + String(lastError.prefix(120)))
+                    return
+                }
+                call.resolve(["steps": steps])
+            }
+            return
+        }
+        #endif
+        call.reject("unavailable")
+    }
 
     @objc func status(_ call: CAPPluginCall) {
         #if canImport(FoundationModels)
@@ -171,6 +205,22 @@ public class StudyAIPlugin: CAPPlugin, CAPBridgedPlugin {
     }
 
     #if canImport(FoundationModels)
+    static let tutorInstructions = "You are a patient tutor for a college student. You explain how to solve problems one step at a time, the way a good teacher would at a whiteboard. Write math as plain text with Unicode symbols (½, ², √, θ, Δ, ·, ×); never use LaTeX or backslashes."
+    static let tutorPrompt = "Explain how to get from the question to the correct answer in 3 to 5 steps. Write one step per line using exactly this format and nothing else:\nSTEP: what to do next and why, without giving away the final answer | the same step worked out with the actual numbers\n\nThe first step says which idea or formula to use and why it fits. The last step finishes the work and ends with the correct answer. If the question is not a calculation, explain the reasoning that leads to the answer instead."
+    // reads lines like "STEP: hint | worked step" back into a list
+    static func parseSteps(_ text: String) -> [[String: String]] {
+        var out: [[String: String]] = []
+        for raw in text.components(separatedBy: .newlines) {
+            var line = raw.trimmingCharacters(in: .whitespaces)
+            while line.hasPrefix("-") || line.hasPrefix("*") || line.hasPrefix("•") { line = String(line.dropFirst()).trimmingCharacters(in: .whitespaces) }
+            guard line.uppercased().hasPrefix("STEP"), let colon = line.firstIndex(of: ":") else { continue }
+            let rest = line[line.index(after: colon)...].trimmingCharacters(in: .whitespaces)
+            let parts = rest.components(separatedBy: "|").map { $0.trimmingCharacters(in: .whitespaces) }
+            guard let first = parts.first, !first.isEmpty else { continue }
+            out.append(["hint": first, "work": parts.count > 1 ? parts[1...].joined(separator: " | ") : ""])
+        }
+        return Array(out.prefix(6))
+    }
     static let guideInstructions = "You help a college student plan their studying. The notes may come from photos of handwriting, so some words are garbled: ignore text that makes no sense, and where the notes clearly cover a standard textbook topic, fill in the standard facts so each item is complete and correct. Describe kinds of problems, formulas and ideas, not the specific homework questions. Write math as plain text with Unicode symbols (½, ², √, θ, Δ, ·); never use LaTeX or backslashes. Replace the words after each label with real content."
     static let guidePrompt = "Write one item per line using exactly these formats and nothing else:\nTYPE: kind of problem | how to solve it in one sentence\nFORMULA: name | the formula | when to use it\nCONCEPT: idea | what it means in one sentence\nEXAMPLE: a short worked example\n\nStudy material:\n"
     // reads lines like "TYPE: name | how" back into lists

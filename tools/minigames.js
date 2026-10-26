@@ -31,20 +31,36 @@ function mgQuestion(item,bank,variant){const others=bank.filter(b=>b!==item),pic
  if(variant===0)return {prompt:item.back,sub:'Which term matches this definition?',options:shuffle([{t:item.front,ok:true},...pick(terms,()=>true).map(b=>({t:b.front,ok:false}))]),explain:'“'+item.front+'” means: '+item.back};
  return {prompt:'What does “'+item.front+'” mean?',sub:'Pick the best definition.',options:shuffle([{t:item.back,ok:true},...pick(terms,()=>true).map(b=>({t:b.back,ok:false}))]),explain:'“'+item.front+'” means: '+item.back}}
 // Shared question pop-up. Resolves 'full' (first try right), 'makeup' (Make-Up right) or 'fail'.
-// gentle hints for questions that have no worked steps: what the answer starts with, or a word it uses
+// ---- AI tutor: step-by-step help for questions that don't come with built-in steps (AI quiz questions, terms) ----
+// Uses Gemini if a key is saved, otherwise Apple's on-device AI. Answers are saved, so each question is only worked out once.
+const TUTOR_SCHEMA={type:'OBJECT',properties:{steps:{type:'ARRAY',items:{type:'OBJECT',properties:{hint:{type:'STRING'},work:{type:'STRING'}},required:['hint','work']}}},required:['steps']};
+const TUTOR_RULES='Teach a college student how to get from the question to the correct answer, like a patient tutor at a whiteboard. Give 3 to 5 steps in order. For each step, "hint" tells the student what to do next and why, without stating the final answer, and "work" shows that same step done with the actual numbers or reasoning. The first step names the idea or formula to use and why it fits. The last step\'s work ends with the correct answer. If the question is not a calculation, the steps explain the reasoning that leads to the answer. Write math as plain text with Unicode symbols (½, ², √, θ, Δ, ·, ×); never use LaTeX or backslashes.';
+async function aiTutor(q,a,choices){db.tutor=db.tutor||{};const key=guideKey(q+' | '+a).slice(0,300);if(db.tutor[key])return db.tutor[key];let steps=null;
+ if(gmKey()){try{const r=await gmGenerate([{text:'Question: '+q+'\nCorrect answer: '+a+(choices&&choices.length?'\nAnswer choices: '+choices.join(' | '):'')+'\n\n'+TUTOR_RULES}],TUTOR_SCHEMA);steps=r.json.steps}catch(e){}}
+ if(!steps||!steps.length){try{steps=(await studyAI('tutor',{question:q,answer:a,choices:choices||[]})).steps}catch(e){}}
+ steps=(steps||[]).map(s=>[mathPlain(String(s.hint||'')).trim(),mathPlain(String(s.work||'')).trim()]).filter(s=>s[0]).slice(0,6);if(!steps.length)return null;
+ const ks=Object.keys(db.tutor);if(ks.length>400)delete db.tutor[ks[0]];db.tutor[key]=steps;save();return steps}
+// hints when no AI is available: problem-solving nudges for numeric answers, a gentle clue for word answers
 function mgHints(q){const a=String((q.options.find(o=>o.ok)||{}).t||'').trim();if(!a)return [];const words=a.split(/\s+/);
+ if(/\d/.test(a))return ['Write down what the question gives you (each number and its unit) and what it asks you to find.','Pick the formula or rule that connects those quantities. Rearrange it for the unknown before plugging in numbers.','Plug in, calculate, then check the units and size of your result against the choices.'];
  if(a.length<=60)return ['It starts with “'+a.charAt(0).toUpperCase()+'” and is '+words.length+' word'+(words.length>1?'s':'')+' long.'];
  const pl=String(q.prompt).toLowerCase(),key=words.map(w=>w.replace(/[^A-Za-z0-9-]/g,'')).filter(w=>w.length>4&&!pl.includes(w.toLowerCase())).sort((x,y)=>y.length-x.length)[0];
  return key?['The right answer mentions “'+key+'”.']:['Read each choice and rule out the ones that don’t fit the question.']}
 function askQ(item,bank,opts={}){return new Promise(res=>{const ov=document.createElement('div');ov.className='mgq';document.body.appendChild(ov);const v0=Math.random()<.5?0:1;
  const show=(q,isMakeUp)=>{ov.innerHTML='<div class="mgq-card">'+(opts.title?'<span class="badge">'+esc(opts.title)+'</span> ':'')+(isMakeUp?'<span class="badge mk">MAKE-UP</span>':'')+'<h3>'+mathHTML(q.prompt)+'</h3><p class="small muted">'+esc(q.sub)+'</p>'+(opts.hint!==false?'<div class="mgq-hints"></div><button class="btn smallbtn mgq-hint">💡 Hint</button>':'')+q.options.map((o,i)=>'<button class="answer" data-i="'+i+'">'+mathHTML(o.t)+'</button>').join('')+(mathy(q.prompt,...q.options.map(o=>o.t))?calcHTML():'')+'</div>';calcInit(ov);
-  // hints come one step at a time; they explain the problem and never remove answers
-  const hb=ov.querySelector('.mgq-hint'),H=q.steps&&q.steps.length?q.steps.map(x=>x[0]):mgHints(q);let hi=0;
-  if(hb){if(H.length)hb.textContent='💡 Hint 1/'+H.length;hb.onclick=()=>{if(hi<H.length){ov.querySelector('.mgq-hints').insertAdjacentHTML('beforeend','<div class="mgq-step"><b>'+(H.length>1?'Step '+(hi+1)+'.':'Hint.')+'</b> '+mathHTML(H[hi])+'</div>');hi++;if(hi<H.length)hb.textContent='💡 Next hint '+(hi+1)+'/'+H.length;else hb.remove();return}hb.remove()}}
+  // hints come one step at a time; they explain the problem and never remove answers.
+  // Questions without built-in steps ask the AI tutor to work out the steps the first time you tap.
+  const hb=ov.querySelector('.mgq-hint'),ans=String((q.options.find(o=>o.ok)||{}).t||'');let H=q.steps&&q.steps.length?q.steps.map(x=>x[0]):null,hi=0,busy=false;
+  const label=()=>{hb.textContent=(hi?'💡 Next hint ':'💡 Hint ')+(hi+1)+'/'+H.length};
+  const next=()=>{if(hi>=H.length){hb.remove();return}ov.querySelector('.mgq-hints').insertAdjacentHTML('beforeend','<div class="mgq-step"><b>'+(H.length>1?'Step '+(hi+1)+'.':'Hint.')+'</b> '+mathHTML(H[hi])+'</div>');hi++;if(hi<H.length)label();else hb.remove()};
+  if(hb){if(H)label();else hb.textContent=aiAny()?'💡 Walk me through it':'💡 Hint';
+   hb.onclick=async()=>{if(busy)return;if(!H){busy=true;if(aiAny()){hb.disabled=true;hb.textContent='💭 Working out the steps…';const st=await aiTutor(q.prompt,q.short||ans,q.options.map(o=>o.t));if(!ov.isConnected)return;hb.disabled=false;if(st){q.steps=st;H=st.map(x=>x[0])}}if(!H||!H.length)H=mgHints(q);busy=false;if(!H.length){hb.remove();return}}next()}}
   ov.querySelectorAll('.answer').forEach(b=>b.onclick=()=>{const o=q.options[+b.dataset.i];const hb2=ov.querySelector('.mgq-hint');if(hb2)hb2.remove();ov.querySelectorAll('.answer').forEach(x=>{x.disabled=true;if(q.options[+x.dataset.i].ok)x.classList.add('correct')});
    if(o.ok){qRecord(item,true);setTimeout(()=>{ov.remove();res(isMakeUp?'makeup':'full')},550);return}
    b.classList.add('wrong');qRecord(item,false);const card=ov.querySelector('.mgq-card');
-   card.insertAdjacentHTML('beforeend',(q.steps&&q.steps.length?'<div class="notice mgq-ex"><b>Answer:</b> '+mathHTML(q.short)+'</div><details class="mgq-long" open><summary>Full solution</summary><ol>'+q.steps.map(x=>'<li>'+mathHTML(x[1])+'</li>').join('')+'</ol></details>':'<div class="notice mgq-ex">'+mathHTML(q.explain)+'</div>')+'<button class="btn '+(isMakeUp||opts.makeUp===false?'blue':'red')+' mgq-go">'+(isMakeUp||opts.makeUp===false?'CONTINUE':'MAKE-UP QUESTION →')+'</button>');
+   const solOL=st=>'<ol>'+st.map(x=>'<li>'+mathHTML(x[0])+(x[1]?'<span class="mgq-work">'+mathHTML(x[1])+'</span>':'')+'</li>').join('')+'</ol>',tutorIt=!(q.steps&&q.steps.length)&&item.kind!=='term'&&aiAny();
+   card.insertAdjacentHTML('beforeend',(q.steps&&q.steps.length?'<div class="notice mgq-ex"><b>Answer:</b> '+mathHTML(q.short||ans)+'</div><details class="mgq-long" open><summary>Full solution</summary>'+solOL(q.steps)+'</details>':tutorIt?'<div class="notice mgq-ex"><b>Answer:</b> '+mathHTML(ans)+'</div><details class="mgq-long" open><summary>Full solution</summary><div class="mgq-sol small muted">💭 Working it out step by step…</div></details>':'<div class="notice mgq-ex">'+mathHTML(q.explain)+'</div>')+'<button class="btn '+(isMakeUp||opts.makeUp===false?'blue':'red')+' mgq-go">'+(isMakeUp||opts.makeUp===false?'CONTINUE':'MAKE-UP QUESTION →')+'</button>');
+   if(tutorIt)aiTutor(q.prompt,ans,q.options.map(o=>o.t)).then(st=>{const el=card.querySelector('.mgq-sol');if(!el)return;if(st)el.outerHTML=solOL(st);else el.textContent='The AI couldn’t work this one out right now.'});
    card.querySelector('.mgq-go').onclick=()=>{if(isMakeUp||opts.makeUp===false){ov.remove();res('fail')}else show(mgQuestion(item,bank,1-v0),true)}})};
  show(mgQuestion(item,bank,v0),false)})}
 // ---------- menu & setup ----------

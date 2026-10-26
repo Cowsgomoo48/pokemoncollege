@@ -1,0 +1,9 @@
+Armarouge — Base
+Source: https://github.com/PMDCollab/SpriteCollab/tree/f663e2331a5f83504d1e7a01573dc53a6708f4c7/sprite/0936
+
+Repository artist summary:
+Soulja — https://twitter.com/OlSoulja
+
+See credits.txt for the original per-animation contribution history.
+Original artwork and pixels unchanged. Repository license: CC BY-NC 4.0; see root LICENSE.md.
+Official game assets retain their original rights holders.
