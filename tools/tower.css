@@ -1,0 +1,41 @@
+/* ===================== BATTLE TOWER ===================== */
+.dg-field.tower{background-size:cover;background-position:center bottom}
+.dg-field.tower .dg-ticker{top:32px}
+.tw-tag{position:absolute;left:8px;top:6px;z-index:3;font-size:11px;font-weight:800;background:#0d1b2ecc;color:#fff;padding:3px 9px;border-radius:999px}
+.dg-banner.tw-chal{background:#fff1c4;color:#5a3f00}
+.tw-room{background-size:cover;background-position:center bottom;border-radius:14px;text-shadow:0 1px 3px #000a;color:#fff}
+.tw-room .notice{text-shadow:none}
+.tw-perkpick{display:grid;gap:8px;margin-top:8px}
+.tw-perkpick .btn{display:flex;flex-direction:column;align-items:flex-start;text-align:left;gap:2px;min-height:58px;text-shadow:none}
+.tw-perkpick small{font-weight:500;opacity:.8}
+.tw-perks{display:flex;gap:6px;flex-wrap:wrap;font-size:16px;margin:4px 0}
+.tw-rec{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px}
+.tw-rec div{background:#eef4f8;border-radius:10px;padding:8px 4px;text-align:center}
+.tw-rec b{display:block;font-size:20px;color:#17324d}
+.tw-rec small{font-size:10px;color:#5b6b7d}
+.mg-big.tw-big{margin-top:10px;background:linear-gradient(135deg,#3b2a6b,#7a3fa0)}
+/* climbing between floors */
+.tw-climb{position:absolute;inset:0;overflow:hidden;background:linear-gradient(#0d1730,#24365e 55%,#3d5480);cursor:pointer}
+.tw-climb::before{content:'';position:absolute;inset:0;background:radial-gradient(1px 1px at 20% 30%,#fff9,transparent),radial-gradient(1px 1px at 70% 12%,#fff8,transparent),radial-gradient(1.5px 1.5px at 85% 60%,#fff7,transparent),radial-gradient(1px 1px at 35% 80%,#fff6,transparent),radial-gradient(1px 1px at 55% 45%,#fff8,transparent)}
+.tw-cam{position:absolute;inset:0;transform-origin:50% 50%}
+.tw-stack{position:absolute;left:50%;top:0;width:min(78%,300px);margin-left:calc(min(78%,300px)/-2);display:flex;flex-direction:column;gap:8px;padding:0 10px;box-sizing:border-box}
+.tw-stack::before{content:'';position:absolute;inset:-2000px -10px;background:repeating-linear-gradient(90deg,#3a3550 0 18px,#433d5c 18px 20px);border-left:4px solid #2a2640;border-right:4px solid #2a2640;z-index:-1}
+.tw-slab{position:relative;height:84px;flex:none;border-radius:8px;background-size:cover;background-position:center 60%;box-shadow:inset 0 0 0 3px #0006,0 3px 0 #0005;display:flex;align-items:flex-end;justify-content:space-between;padding:6px 10px;box-sizing:border-box;color:#fff;text-shadow:0 1px 3px #000c;font-size:12px}
+.tw-slab b{font-size:16px}
+.tw-slab i{position:absolute;right:8px;top:6px;font-style:normal;font-size:16px}
+.tw-slab.done{filter:saturate(.45) brightness(.7)}
+.tw-slab.boss{box-shadow:inset 0 0 0 3px #ffcf4a,0 3px 0 #0005}
+.tw-slab.next{box-shadow:inset 0 0 0 3px #fff,0 0 18px #fff8}
+.tw-slab.arrive{animation:twpulse .7s ease-in-out 2}
+@keyframes twpulse{50%{box-shadow:inset 0 0 0 3px #fff,0 0 30px #fffc}}
+.tw-slab.ground{background:linear-gradient(#5d8a4a,#3f6a32);align-items:flex-end;justify-content:center}
+.tw-team{position:absolute;left:50%;top:50%;transform:translate(-50%,-6px);display:flex;gap:2px;z-index:2;filter:drop-shadow(0 2px 2px #0008);pointer-events:none}
+.tw-team img,.tw-team canvas{image-rendering:pixelated}
+.tw-team .ko{filter:grayscale(1);opacity:.6}
+.tw-banner{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);opacity:0;background:#0d1b2ee6;color:#fff;border-radius:14px;padding:10px 16px;text-align:center;min-width:60%;max-width:90%;display:flex;flex-direction:column;gap:6px;font-size:15px;box-shadow:0 4px 14px #0007}
+.tw-banner small{display:block;font-size:11px;opacity:.85;margin-top:2px}
+.tw-skip{position:absolute;right:8px;top:8px;color:#fff9;font-size:10px}
+/* King's Battlefield: the king glows gold */
+.dg-ally.tw-king .dg-spr,.dg-foe.tw-king .dg-spr{filter:drop-shadow(0 0 5px #ffd54a) drop-shadow(0 0 2px #fff3b0)}
+.dg-ally.tw-king::after,.dg-foe.tw-king::after{content:'✦ ✧ ✦';position:absolute;left:50%;top:-6px;transform:translateX(-50%);color:#ffd54a;font-size:13px;letter-spacing:6px;text-shadow:0 0 5px #ffb300;pointer-events:none;animation:twking 1.8s ease-in-out infinite;z-index:3}
+@keyframes twking{0%,100%{opacity:.5;transform:translate(-50%,0)}50%{opacity:1;transform:translate(-50%,-5px)}}

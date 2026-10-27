@@ -1,0 +1,51 @@
+/* ===================== MYSTERY DUNGEON · grid floors ===================== */
+.dg.gd .dg-stage{overflow:hidden;background:#05070d}
+.gd-field{position:relative;width:100%;height:100%;min-height:100%;overflow:hidden;display:block;padding:0;background:#05070d;touch-action:manipulation}
+.gd-map{position:absolute;left:0;top:0;transition:transform .18s ease-out;image-rendering:pixelated}
+.gd-map>canvas,.gd-map>div{position:absolute;left:0;top:0}
+.gd-tiles{image-rendering:pixelated}
+.gd-fog{pointer-events:none;z-index:50}
+.gd-objs{z-index:2}
+.gd-obj{position:absolute;width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-size:22px;filter:drop-shadow(0 2px 0 rgba(0,0,0,.35))}
+.gd-obj.stairs{font-size:26px;background:radial-gradient(circle,rgba(74,163,255,.45),transparent 70%)}
+.gd-obj.sp{animation:gdbob 1.6s ease-in-out infinite}
+@keyframes gdbob{50%{transform:translateY(-3px)}}
+.gd-hl{z-index:3;pointer-events:none}
+.gd-hl i{position:absolute;width:40px;height:40px;box-sizing:border-box;border-radius:4px}
+.gd-hl i.mv{background:rgba(74,163,255,.32);border:2px solid rgba(74,163,255,.85)}
+.gd-hl i.tg{background:rgba(255,77,77,.3);border:2px solid #ff4d4d;animation:gdpulse .8s ease-in-out infinite alternate}
+@keyframes gdpulse{to{background:rgba(255,77,77,.5)}}
+.gd-units{z-index:4}
+.gd-u{position:absolute;width:40px;height:40px;display:flex;align-items:flex-end;justify-content:center;transition:left .12s linear,top .12s linear;pointer-events:none}
+.gd-u::before{content:'';position:absolute;left:8px;right:8px;bottom:2px;height:8px;border-radius:50%;background:rgba(0,0,0,.28)}
+.gd-u.dg-ally::before{background:color-mix(in srgb,var(--c,#fff) 55%,transparent);box-shadow:0 0 0 2px color-mix(in srgb,var(--c,#fff) 80%,transparent)}
+.gd-u.active::before{animation:gdring 1s ease-in-out infinite alternate}
+@keyframes gdring{to{box-shadow:0 0 0 4px var(--c,#fff)}}
+.gd-u .dg-spr{position:relative;flex:none;margin-bottom:4px}
+.gd-u.done .dg-spr{filter:saturate(.55) brightness(.9)}
+.gd-u.ko .dg-spr{opacity:.35;filter:grayscale(1)}
+.gd-u.asleep .dg-spr{filter:brightness(.8)}
+.gd-u.asleep::after{content:'z';position:absolute;right:2px;top:-6px;font:700 12px/1 system-ui;color:#fff;text-shadow:0 1px 2px #000}
+.gd-u.guard::after{content:'🛡';position:absolute;right:-2px;top:-4px;font-size:13px}
+.gd-hp{position:absolute;left:6px;right:6px;top:-6px;height:4px;border-radius:2px;background:rgba(0,0,0,.55);overflow:hidden;z-index:2}
+.gd-hp i{display:block;height:100%;background:#4cd964;transition:width .3s}
+.gd-hp i.mid{background:#ffcc00}.gd-hp i.low{background:#ff3b30}
+.gd-u.big .gd-hp{left:-4px;right:-4px;height:5px}
+.gd-mini{position:absolute;right:8px;top:8px;z-index:60;background:rgba(5,7,13,.55);border-radius:6px;padding:3px;pointer-events:none;max-width:38%;image-rendering:pixelated}
+.gd-floor{position:absolute;left:8px;top:8px;z-index:60;background:rgba(5,7,13,.7);color:#fff;font:700 12px/1.2 system-ui;padding:5px 9px;border-radius:8px;pointer-events:none}
+.gd-field .dg-ticker{position:absolute;left:8px;right:8px;bottom:8px;top:auto;z-index:61;pointer-events:none}
+.gd-chips{display:flex;gap:6px;justify-content:center;margin:4px 0}
+.gd-chip{display:flex;flex-direction:column;align-items:center;gap:1px;border:2px solid transparent;background:var(--card,#fff);border-radius:10px;padding:3px 6px;min-width:52px;cursor:pointer;font:inherit}
+.gd-chip.on{border-color:var(--c)}
+.gd-chip.done{opacity:.55}
+.gd-chip.ko{filter:grayscale(1)}
+.gd-chip small{font-size:10px}
+.gd-acts{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.gd-acts .btn{padding-left:4px;padding-right:4px}
+.gd-acts .btn small{display:block;font-size:9px;opacity:.8}
+.gd-u.dg-ally,.gd-u.dg-foe{position:absolute;min-width:0;padding:0;border-radius:0;flex-direction:row;align-items:flex-end;justify-content:center;background:none;box-shadow:none;outline:none}
+.gd-u.dg-ally.rest::before{content:"";top:auto;right:8px;font-size:0}
+.dg.gd .dg-stage{flex:1 1 auto;min-height:0}
+.dg.gd .dg-panel{flex:none;min-height:0;padding-top:6px;padding-bottom:6px}
+.dg.gd .dg-msg{margin-bottom:2px}
+.gd-chip img,.gd-chip canvas{max-height:24px}

@@ -471,6 +471,101 @@ main.pad{padding:15px 13px calc(88px + env(safe-area-inset-bottom))}
 .mgq .ans-gone{opacity:.25;pointer-events:none;text-decoration:line-through}.mgq-hint{margin:4px 0 6px}
 .dg-acts .btn.dg-boost{box-shadow:0 0 0 2px #ff3b30,0 0 14px 4px rgba(255,59,48,.7);animation:dgBoost 1.1s ease-in-out infinite}@keyframes dgBoost{50%{box-shadow:0 0 0 2px #ff3b30,0 0 24px 9px rgba(255,59,48,.95)}}
 .dg-foe.snagging .dg-spr{animation:dgSnag .45s ease-in-out infinite!important;filter:brightness(1.6) saturate(.3)}@keyframes dgSnag{0%,100%{transform:rotate(0)}25%{transform:rotate(-10deg)}75%{transform:rotate(10deg)}}
+/* ===================== MYSTERY DUNGEON · grid floors ===================== */
+.dg.gd .dg-stage{overflow:hidden;background:#05070d}
+.gd-field{position:relative;width:100%;height:100%;min-height:100%;overflow:hidden;display:block;padding:0;background:#05070d;touch-action:manipulation}
+.gd-map{position:absolute;left:0;top:0;transition:transform .18s ease-out;image-rendering:pixelated}
+.gd-map>canvas,.gd-map>div{position:absolute;left:0;top:0}
+.gd-tiles{image-rendering:pixelated}
+.gd-fog{pointer-events:none;z-index:50}
+.gd-objs{z-index:2}
+.gd-obj{position:absolute;width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-size:22px;filter:drop-shadow(0 2px 0 rgba(0,0,0,.35))}
+.gd-obj.stairs{font-size:26px;background:radial-gradient(circle,rgba(74,163,255,.45),transparent 70%)}
+.gd-obj.sp{animation:gdbob 1.6s ease-in-out infinite}
+@keyframes gdbob{50%{transform:translateY(-3px)}}
+.gd-hl{z-index:3;pointer-events:none}
+.gd-hl i{position:absolute;width:40px;height:40px;box-sizing:border-box;border-radius:4px}
+.gd-hl i.mv{background:rgba(74,163,255,.32);border:2px solid rgba(74,163,255,.85)}
+.gd-hl i.tg{background:rgba(255,77,77,.3);border:2px solid #ff4d4d;animation:gdpulse .8s ease-in-out infinite alternate}
+@keyframes gdpulse{to{background:rgba(255,77,77,.5)}}
+.gd-units{z-index:4}
+.gd-u{position:absolute;width:40px;height:40px;display:flex;align-items:flex-end;justify-content:center;transition:left .12s linear,top .12s linear;pointer-events:none}
+.gd-u::before{content:'';position:absolute;left:8px;right:8px;bottom:2px;height:8px;border-radius:50%;background:rgba(0,0,0,.28)}
+.gd-u.dg-ally::before{background:color-mix(in srgb,var(--c,#fff) 55%,transparent);box-shadow:0 0 0 2px color-mix(in srgb,var(--c,#fff) 80%,transparent)}
+.gd-u.active::before{animation:gdring 1s ease-in-out infinite alternate}
+@keyframes gdring{to{box-shadow:0 0 0 4px var(--c,#fff)}}
+.gd-u .dg-spr{position:relative;flex:none;margin-bottom:4px}
+.gd-u.done .dg-spr{filter:saturate(.55) brightness(.9)}
+.gd-u.ko .dg-spr{opacity:.35;filter:grayscale(1)}
+.gd-u.asleep .dg-spr{filter:brightness(.8)}
+.gd-u.asleep::after{content:'z';position:absolute;right:2px;top:-6px;font:700 12px/1 system-ui;color:#fff;text-shadow:0 1px 2px #000}
+.gd-u.guard::after{content:'🛡';position:absolute;right:-2px;top:-4px;font-size:13px}
+.gd-hp{position:absolute;left:6px;right:6px;top:-6px;height:4px;border-radius:2px;background:rgba(0,0,0,.55);overflow:hidden;z-index:2}
+.gd-hp i{display:block;height:100%;background:#4cd964;transition:width .3s}
+.gd-hp i.mid{background:#ffcc00}.gd-hp i.low{background:#ff3b30}
+.gd-u.big .gd-hp{left:-4px;right:-4px;height:5px}
+.gd-mini{position:absolute;right:8px;top:8px;z-index:60;background:rgba(5,7,13,.55);border-radius:6px;padding:3px;pointer-events:none;max-width:38%;image-rendering:pixelated}
+.gd-floor{position:absolute;left:8px;top:8px;z-index:60;background:rgba(5,7,13,.7);color:#fff;font:700 12px/1.2 system-ui;padding:5px 9px;border-radius:8px;pointer-events:none}
+.gd-field .dg-ticker{position:absolute;left:8px;right:8px;bottom:8px;top:auto;z-index:61;pointer-events:none}
+.gd-chips{display:flex;gap:6px;justify-content:center;margin:4px 0}
+.gd-chip{display:flex;flex-direction:column;align-items:center;gap:1px;border:2px solid transparent;background:var(--card,#fff);border-radius:10px;padding:3px 6px;min-width:52px;cursor:pointer;font:inherit}
+.gd-chip.on{border-color:var(--c)}
+.gd-chip.done{opacity:.55}
+.gd-chip.ko{filter:grayscale(1)}
+.gd-chip small{font-size:10px}
+.gd-acts{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.gd-acts .btn{padding-left:4px;padding-right:4px}
+.gd-acts .btn small{display:block;font-size:9px;opacity:.8}
+.gd-u.dg-ally,.gd-u.dg-foe{position:absolute;min-width:0;padding:0;border-radius:0;flex-direction:row;align-items:flex-end;justify-content:center;background:none;box-shadow:none;outline:none}
+.gd-u.dg-ally.rest::before{content:"";top:auto;right:8px;font-size:0}
+.dg.gd .dg-stage{flex:1 1 auto;min-height:0}
+.dg.gd .dg-panel{flex:none;min-height:0;padding-top:6px;padding-bottom:6px}
+.dg.gd .dg-msg{margin-bottom:2px}
+.gd-chip img,.gd-chip canvas{max-height:24px}
+/* ===================== BATTLE TOWER ===================== */
+.dg-field.tower{background-size:cover;background-position:center bottom}
+.dg-field.tower .dg-ticker{top:32px}
+.tw-tag{position:absolute;left:8px;top:6px;z-index:3;font-size:11px;font-weight:800;background:#0d1b2ecc;color:#fff;padding:3px 9px;border-radius:999px}
+.dg-banner.tw-chal{background:#fff1c4;color:#5a3f00}
+.tw-room{background-size:cover;background-position:center bottom;border-radius:14px;text-shadow:0 1px 3px #000a;color:#fff}
+.tw-room .notice{text-shadow:none}
+.tw-perkpick{display:grid;gap:8px;margin-top:8px}
+.tw-perkpick .btn{display:flex;flex-direction:column;align-items:flex-start;text-align:left;gap:2px;min-height:58px;text-shadow:none}
+.tw-perkpick small{font-weight:500;opacity:.8}
+.tw-perks{display:flex;gap:6px;flex-wrap:wrap;font-size:16px;margin:4px 0}
+.tw-rec{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px}
+.tw-rec div{background:#eef4f8;border-radius:10px;padding:8px 4px;text-align:center}
+.tw-rec b{display:block;font-size:20px;color:#17324d}
+.tw-rec small{font-size:10px;color:#5b6b7d}
+.mg-big.tw-big{margin-top:10px;background:linear-gradient(135deg,#3b2a6b,#7a3fa0)}
+/* climbing between floors */
+.tw-climb{position:absolute;inset:0;overflow:hidden;background:linear-gradient(#0d1730,#24365e 55%,#3d5480);cursor:pointer}
+.tw-climb::before{content:'';position:absolute;inset:0;background:radial-gradient(1px 1px at 20% 30%,#fff9,transparent),radial-gradient(1px 1px at 70% 12%,#fff8,transparent),radial-gradient(1.5px 1.5px at 85% 60%,#fff7,transparent),radial-gradient(1px 1px at 35% 80%,#fff6,transparent),radial-gradient(1px 1px at 55% 45%,#fff8,transparent)}
+.tw-cam{position:absolute;inset:0;transform-origin:50% 50%}
+.tw-stack{position:absolute;left:50%;top:0;width:min(78%,300px);margin-left:calc(min(78%,300px)/-2);display:flex;flex-direction:column;gap:8px;padding:0 10px;box-sizing:border-box}
+.tw-stack::before{content:'';position:absolute;inset:-2000px -10px;background:repeating-linear-gradient(90deg,#3a3550 0 18px,#433d5c 18px 20px);border-left:4px solid #2a2640;border-right:4px solid #2a2640;z-index:-1}
+.tw-slab{position:relative;height:84px;flex:none;border-radius:8px;background-size:cover;background-position:center 60%;box-shadow:inset 0 0 0 3px #0006,0 3px 0 #0005;display:flex;align-items:flex-end;justify-content:space-between;padding:6px 10px;box-sizing:border-box;color:#fff;text-shadow:0 1px 3px #000c;font-size:12px}
+.tw-slab b{font-size:16px}
+.tw-slab i{position:absolute;right:8px;top:6px;font-style:normal;font-size:16px}
+.tw-slab.done{filter:saturate(.45) brightness(.7)}
+.tw-slab.boss{box-shadow:inset 0 0 0 3px #ffcf4a,0 3px 0 #0005}
+.tw-slab.next{box-shadow:inset 0 0 0 3px #fff,0 0 18px #fff8}
+.tw-slab.arrive{animation:twpulse .7s ease-in-out 2}
+@keyframes twpulse{50%{box-shadow:inset 0 0 0 3px #fff,0 0 30px #fffc}}
+.tw-slab.ground{background:linear-gradient(#5d8a4a,#3f6a32);align-items:flex-end;justify-content:center}
+.tw-team{position:absolute;left:50%;top:50%;transform:translate(-50%,-6px);display:flex;gap:2px;z-index:2;filter:drop-shadow(0 2px 2px #0008);pointer-events:none}
+.tw-team img,.tw-team canvas{image-rendering:pixelated}
+.tw-team .ko{filter:grayscale(1);opacity:.6}
+.tw-banner{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);opacity:0;background:#0d1b2ee6;color:#fff;border-radius:14px;padding:10px 16px;text-align:center;min-width:60%;max-width:90%;display:flex;flex-direction:column;gap:6px;font-size:15px;box-shadow:0 4px 14px #0007}
+.tw-banner small{display:block;font-size:11px;opacity:.85;margin-top:2px}
+.tw-skip{position:absolute;right:8px;top:8px;color:#fff9;font-size:10px}
+/* King's Battlefield: the king glows gold */
+.dg-ally.tw-king .dg-spr,.dg-foe.tw-king .dg-spr{filter:drop-shadow(0 0 5px #ffd54a) drop-shadow(0 0 2px #fff3b0)}
+.dg-ally.tw-king::after,.dg-foe.tw-king::after{content:'✦ ✧ ✦';position:absolute;left:50%;top:-6px;transform:translateX(-50%);color:#ffd54a;font-size:13px;letter-spacing:6px;text-shadow:0 0 5px #ffb300;pointer-events:none;animation:twking 1.8s ease-in-out infinite;z-index:3}
+@keyframes twking{0%,100%{opacity:.5;transform:translate(-50%,0)}50%{opacity:1;transform:translate(-50%,-5px)}}
+/* ===================== EXPORT STUDY DATA ===================== */
+.sd-sets{max-height:170px;overflow:auto}
+.sd-text{width:100%;box-sizing:border-box;min-height:200px;max-height:38vh;margin-top:10px;font:11px/1.4 ui-monospace,Menlo,monospace;border-radius:10px;border:1px solid #c9d4de;padding:8px;background:#f7f9fb;color:#17324d;white-space:pre-wrap;overflow:auto}
 /* ---- Legendary Ultimates ---- */
 .btn.ult{background:linear-gradient(135deg,#2b1b4a,#6b2fa8 55%,#d9a630);color:#fff;border-color:#f4cf55;box-shadow:0 0 10px #f4cf5588}.btn.ult:disabled{background:#4a4458;border-color:#7a7488;box-shadow:none;color:#bbb}
 .bx-ult{background:linear-gradient(135deg,#2b1b4a,#5a2a8a);color:#fff}.bx-ult small{color:#f4cf55!important}.bx-ult p,.bx-ultlock p{font-size:10px;line-height:1.3;margin:2px 0 0;opacity:.85}.bx-ult span{color:#f4cf55}
@@ -694,7 +789,7 @@ button.sd-done{min-height:0!important;padding:0;border:0;cursor:pointer}button.s
 <section class="section" id="collection"><div class="bx-top"><div class="bx-title"><b>▦ POKÉMON BOX</b><span id="pokeCount">0</span></div><div class="bx-tools"><select id="boxSort" onchange="boxPageNum=0;drawCollection()" aria-label="Sort Pokémon"><option value="newest">Newest first</option><option value="species">Species</option><option value="rarity">Rarity</option><option value="size">Size</option><option value="shiny">Shiny first</option></select><button class="btn smallbtn" onclick="go('safari')">+ SAFARI</button></div></div><div class="bx-pager"><button onclick="boxPage(-1)" aria-label="Previous box">‹</button><b id="boxPageLabel">BOX 1 / 1</b><button onclick="boxPage(1)" aria-label="Next box">›</button></div><div id="boxGrid" class="bx-grid"></div><div id="pokeDetail"></div></section>
 <section class="section" id="tmlab"><div class="tm-room" id="tmRoom"><img class="tm-scene" src="assets/tm/scene.png" alt="TM station: monitor and terrarium"><div class="tm-screen" id="tmScreen" aria-live="polite"></div><div class="tm-who" id="tmWho"></div><div class="tm-dome-mon" id="labPokemon"></div><img class="tm-glass" src="assets/tm/glass.png" alt=""><button class="tm-teach" id="tmTeach" disabled>SELECT A TM</button></div><div class="tm-cap"><span id="tmInventoryCount">0 TMs</span><select id="tmSort" aria-label="Sort TMs" onchange="tmSortBy=this.value;drawTmLab()"><option value="learn">Learnable first</option><option value="pow-d">Power ↓</option><option value="pow-a">Power ↑</option><option value="type-a">Type A–Z</option><option value="type-d">Type Z–A</option><option value="sta-a">Stamina ↑</option><option value="sta-d">Stamina ↓</option></select></div><div class="tm-shelf" id="tmList"></div><button class="btn" style="width:100%;margin-top:12px" onclick="go('collection')">← BACK TO POKÉMON BOX</button></section>
 <section class="section" id="focus"><div class="bar">⏱ FOCUS SESSION <span>+10 ⚙</span></div><div id="focusArea"></div></section>
-<section class="section" id="summaries"><div class="bar">📚 SUMMARIES <span id="summaryCount">0</span></div><div class="row" style="margin-bottom:12px"><button class="btn red stretch" onclick="summaryForm()">＋ ADD NOTES</button><button class="btn stretch" onclick="go('minigames')">MINIGAMES ↗</button></div><div class="notice">Summaries come from ChatTalk recordings, PokéPics folders, or notes you type. Each one is its own study set: its weak spots are tracked separately, and 🎯 reviews just that set’s weak spots.</div><div id="summaryList"></div></section>
+<section class="section" id="summaries"><div class="bar">📚 SUMMARIES <span id="summaryCount">0</span></div><div class="row" style="margin-bottom:12px"><button class="btn red stretch" onclick="summaryForm()">＋ ADD NOTES</button><button class="btn stretch" onclick="go('minigames')">MINIGAMES ↗</button><button class="btn stretch" onclick="sdOpen()">📊 STUDY DATA</button></div><div class="notice">Summaries come from ChatTalk recordings, PokéPics folders, or notes you type. Each one is its own study set: its weak spots are tracked separately, and 🎯 reviews just that set’s weak spots.</div><div id="summaryList"></div></section>
 <section class="section" id="minigames"><div class="bar">🎮 STUDY MINIGAMES <span>+5 ⚙</span></div><div id="mgArea"></div></section>
 <section class="section" id="chat"><div class="bar">🎙 CHATTALK <span id="ctCount">0 RECORDINGS</span></div><div class="ct-deck"><div class="ct-screen"><div class="ct-time" id="ctTime">00:00</div><div class="ct-meter"><i id="ctLevel"></i></div><div class="ct-state" id="ctState">READY</div></div><button class="ct-rec" id="ctRec" onclick="ctToggle()" aria-label="Start recording"><span></span></button><div class="ct-opts"><label class="small"><input type="checkbox" id="ctAuto" checked onchange="ctSaveOpts()"> Auto-stop after 30 s with no teacher-level voice</label><div class="ct-sens"><span class="small">Teacher is</span><select id="ctSens" onchange="ctSaveOpts()"><option value="-30">close</option><option value="-38" selected>normal distance</option><option value="-46">far away</option></select></div></div></div><div class="notice" id="ctNote">Recording keeps going with the screen locked. Transcripts are made on this iPhone and never leave it.</div><div id="ctList"></div></section>
 <section class="section" id="pics"><div class="bar">📷 POKÉPICS <span id="ppCount">0 PHOTOS</span></div><div id="ppArea"></div></section>
@@ -2531,7 +2626,11 @@ function mgBank(sids){const out=[];for(const s of db.summaries){if(!sids.include
  // practice problems made in code: two fresh ones per problem type each game
  prOf(s).forEach(id=>{for(let k=0;k<2;k++){const p=prInstance(id);if(p)out.push({kind:'gen',gid:id,sid:s.id,key:s.id+'|g|'+id+'|'+k,front:p.q,back:p.a,wrong:p.w,explain:p.ex,steps:p.steps})}})}return out}
 function qstat(key){const q=db.qstats||(db.qstats={});return q[key]||(q[key]={r:0,w:0,last:0,miss:0})}
-function qRecord(item,ok){const s=qstat(item.key);if(ok){s.r++;s.miss=Math.max(0,s.miss-1)}else{s.w++;s.miss=Math.min(5,s.miss+2)}s.last=Date.now()}
+// Every answer is recorded per item (r = right, w = wrong). The extra details (first try or Make-Up, hints used, which wrong
+// answer was picked, a day-by-day tally per study set) feed the Export Study Data sheet.
+function qRecord(item,ok,info){const s=qstat(item.key),I=info||{};if(ok){s.r++;s.miss=Math.max(0,s.miss-1);if(I.makeup)s.mk=(s.mk||0)+1;else if(I.first)s.ft=(s.ft||0)+1}else{s.w++;s.miss=Math.min(5,s.miss+2)}s.last=Date.now();if(!s.first)s.first=s.last;if(I.hints)s.h=(s.h||0)+1;
+ if(!ok&&I.pick!=null){s.wp=(s.wp||[]);s.wp.unshift({q:String(I.prompt||'').slice(0,240),p:String(I.pick).slice(0,160),a:String(I.answer||'').slice(0,160),at:s.last});s.wp.length=Math.min(s.wp.length,3)}
+ if(item.sid){const H=db.qhist||(db.qhist={}),d=localDay(),hs=H[item.sid]||(H[item.sid]={}),t=hs[d]||(hs[d]=[0,0]);t[ok?0:1]++;const days=Object.keys(hs).sort();while(days.length>90)delete hs[days.shift()]}}
 function isWeak(item){const s=(db.qstats||{})[item.key];return !!s&&(s.miss>0||s.w>s.r/2)}
 // Study modes: smart (broad pass first, then weak spots), learn (repeat each item until it's right twice), weak (weak points only)
 function mgPicker(bank,mode){const P={mode,bank,queue:[],phase:1,mastery:{},done:false,last:null};
@@ -2581,20 +2680,20 @@ function askQ(item,bank,opts={}){return new Promise(res=>{const ov=document.crea
   if(hb){if(H)label();else hb.textContent=aiAny()?'💡 Walk me through it':'💡 Hint';
    hb.onclick=async()=>{if(busy)return;if(!H){busy=true;if(aiAny()){hb.disabled=true;hb.textContent='💭 Working out the steps…';const st=await aiTutor(q.prompt,q.short||ans,q.options.map(o=>o.t));if(!ov.isConnected)return;hb.disabled=false;if(st){q.steps=st;H=st.map(x=>x[0])}}if(!H||!H.length)H=mgHints(q);busy=false;if(!H.length){hb.remove();return}}next()}}
   ov.querySelectorAll('.answer').forEach(b=>b.onclick=()=>{const o=q.options[+b.dataset.i];const hb2=ov.querySelector('.mgq-hint');if(hb2)hb2.remove();ov.querySelectorAll('.answer').forEach(x=>{x.disabled=true;if(q.options[+x.dataset.i].ok)x.classList.add('correct')});
-   if(o.ok){qRecord(item,true);setTimeout(()=>{ov.remove();res(isMakeUp?'makeup':'full')},550);return}
-   b.classList.add('wrong');qRecord(item,false);const card=ov.querySelector('.mgq-card');
+   if(o.ok){qRecord(item,true,{first:!isMakeUp,makeup:isMakeUp,hints:hi});setTimeout(()=>{ov.remove();res(isMakeUp?'makeup':'full')},550);return}
+   b.classList.add('wrong');qRecord(item,false,{pick:o.t,prompt:q.prompt,answer:q.short||ans,hints:hi});const card=ov.querySelector('.mgq-card');
    const solOL=st=>'<ol>'+st.map(x=>'<li>'+mathHTML(x[0])+(x[1]?'<span class="mgq-work">'+mathHTML(x[1])+'</span>':'')+'</li>').join('')+'</ol>',tutorIt=!(q.steps&&q.steps.length)&&item.kind!=='term'&&aiAny();
    card.insertAdjacentHTML('beforeend',(q.steps&&q.steps.length?'<div class="notice mgq-ex"><b>Answer:</b> '+mathHTML(q.short||ans)+'</div><details class="mgq-long" open><summary>Full solution</summary>'+solOL(q.steps)+'</details>':tutorIt?'<div class="notice mgq-ex"><b>Answer:</b> '+mathHTML(ans)+'</div><details class="mgq-long" open><summary>Full solution</summary><div class="mgq-sol small muted">💭 Working it out step by step…</div></details>':'<div class="notice mgq-ex">'+mathHTML(q.explain)+'</div>')+'<button class="btn '+(isMakeUp||opts.makeUp===false?'blue':'red')+' mgq-go">'+(isMakeUp||opts.makeUp===false?'CONTINUE':'MAKE-UP QUESTION →')+'</button>');
    if(tutorIt)aiTutor(q.prompt,ans,q.options.map(o=>o.t)).then(st=>{const el=card.querySelector('.mgq-sol');if(!el)return;if(st)el.outerHTML=solOL(st);else el.textContent='The AI couldn’t work this one out right now.'});
    card.querySelector('.mgq-go').onclick=()=>{if(isMakeUp||opts.makeUp===false){ov.remove();res('fail')}else show(mgQuestion(item,bank,1-v0),true)}})};
  show(mgQuestion(item,bank,v0),false)})}
 // ---------- menu & setup ----------
-const MG={dungeon:{name:'Mystery Dungeon',icon:'🏰',desc:'Lead up to 4 Pokémon through a study dungeon.'},luxor:{name:'Luxor',icon:'🔮',desc:'Fire type-marbles to break the chain. Questions push it back.'},flash:{name:'Flashcards',icon:'🎴',desc:'Flip, check yourself, repeat.'},match:{name:'Match-Up',icon:'🧩',desc:'Flip-free card matching: pair each term with its meaning.'},speed:{name:'Speed Round',icon:'⚡',desc:'15 seconds a question. Faster answers score more.'}};
+const MG={dungeon:{name:'Mystery Dungeon',icon:'🏰',desc:'Lead up to 4 Pokémon through a study dungeon.'},tower:{name:'Battle Tower',icon:'🗼',desc:'Non-stop battles. A boss every 10 floors. How high can you climb?'},luxor:{name:'Luxor',icon:'🔮',desc:'Fire type-marbles to break the chain. Questions push it back.'},flash:{name:'Flashcards',icon:'🎴',desc:'Flip, check yourself, repeat.'},match:{name:'Match-Up',icon:'🧩',desc:'Flip-free card matching: pair each term with its meaning.'},speed:{name:'Speed Round',icon:'⚡',desc:'15 seconds a question. Faster answers score more.'}};
 const MG_ENDLESS={luxor:1,match:1,speed:1};
 let mgState=null,mgLast=null;
 function drawMinigame(){const el=$('mgArea');if(!el||mgState)return;const k=Object.keys(MG);
- el.innerHTML='<button class="mg-big" '+(MG.dungeon.soon?'disabled':'')+' onclick="mgSetup(\'dungeon\')"><span>'+MG.dungeon.icon+'</span><b>'+MG.dungeon.name+'</b><small>'+(db.run?'🎒 Run in progress · tap to continue':MG.dungeon.desc)+'</small>'+(MG.dungeon.soon?'<em>COMING NEXT</em>':'')+'</button><div class="mg-grid">'+k.slice(1).map(g=>'<button class="mg-tile" onclick="mgSetup(\''+g+'\')"><span>'+MG[g].icon+'</span><b>'+MG[g].name+'</b><small>'+MG[g].desc+'</small></button>').join('')+'</div><p class="small muted">Games use your summaries (key terms and AI quiz questions). Finishing a game earns 5 Cogs and EXP, plus Poképuffs (grade ÷ 10) and Rare Candy (grade ÷ 28).</p>'}
-function mgSetup(game,presel,mode){if(game==='dungeon'){dungeonEntry();return}if(MG[game].soon)return;const sets=db.summaries.filter(s=>termsFor(s).length+(s.quiz?s.quiz.length:0)+prOf(s).length>0);
+ el.innerHTML='<button class="mg-big" '+(MG.dungeon.soon?'disabled':'')+' onclick="mgSetup(\'dungeon\')"><span>'+MG.dungeon.icon+'</span><b>'+MG.dungeon.name+'</b><small>'+(db.run?'🎒 Run in progress · tap to continue':MG.dungeon.desc)+'</small>'+(MG.dungeon.soon?'<em>COMING NEXT</em>':'')+'</button><button class="mg-big tw-big" onclick="mgSetup(\'tower\')"><span>'+MG.tower.icon+'</span><b>'+MG.tower.name+'</b><small>'+(db.tower?'🗼 Run in progress · floor '+db.tower.floor+' · tap to continue':MG.tower.desc+(twStats().best?' Best: floor '+twStats().best+'.':''))+'</small></button><div class="mg-grid">'+k.slice(2).map(g=>'<button class="mg-tile" onclick="mgSetup(\''+g+'\')"><span>'+MG[g].icon+'</span><b>'+MG[g].name+'</b><small>'+MG[g].desc+'</small></button>').join('')+'</div><p class="small muted">Games use your summaries (key terms and AI quiz questions). Finishing a game earns 5 Cogs and EXP, plus Poképuffs (grade ÷ 10) and Rare Candy (grade ÷ 28).</p>'}
+function mgSetup(game,presel,mode){if(game==='dungeon'){dungeonEntry();return}if(game==='tower'){towerEntry();return}if(MG[game].soon)return;const sets=db.summaries.filter(s=>termsFor(s).length+(s.quiz?s.quiz.length:0)+prOf(s).length>0);
  if(!sets.length){modal(MG[game].name.toUpperCase(),'<div class="notice">No study sets yet. Add “Term: Definition” lines to a summary, or let ChatTalk / PokéPics make one.</div><div class="actions"><button class="btn blue" onclick="closeModal();go(\'summaries\')">OPEN SUMMARIES</button></div>');return}
  const isSel=id=>!presel||presel===id||Array.isArray(presel)&&presel.includes(id);
  const learned=db.learned||{},opt=(game==='luxor'?'<div class="field"><label>Question every <b id="mgFreqV">'+(db.lxFreq||5)+'</b> seconds</label><input type="range" id="mgFreq" min="5" max="60" step="5" value="'+(db.lxFreq||5)+'" oninput="$(\'mgFreqV\').textContent=this.value"></div>':'')+(MG_ENDLESS[game]?'<label class="mg-endless"><input type="checkbox" id="mgEndless" '+(mgLast&&mgLast.game===game&&mgLast.endless?'checked':'')+'> <b>♾ Endless Mode</b><small>Keeps going after the set is covered. Leave any time with ✕ to collect your rewards.</small></label>':'');
@@ -2756,9 +2855,9 @@ function makeEnemy(species,L,opt={}){const growth=rollGrowth(),fake={id:'e'+uid(
 function speciesOfTier(min,max){const ch=MONS.filter(m=>m[2]>=min&&m[2]<=max);return ch[Math.floor(Math.random()*ch.length)][0]}
 const PRE_EVO={};Object.entries(EVO).forEach(([from,list])=>list.forEach(([to])=>{PRE_EVO[to]=from}));
 // ---------- run state ----------
-function runOf(){return db.run||null}
-function inRun(id){const r=runOf();return !!(r&&r.party.some(m=>m.id===id))}
-function runLock(id,what){if(inRun(id)){toast('🎒 This Pokémon is on a dungeon run. Finish or end the run to '+what+'.');return true}return false}
+function runOf(){return dgMode==='tower'?(db.tower||null):(db.run||null)}
+function inRun(id){return [db.run,db.tower].some(r=>r&&r.party.some(m=>m.id===id))}
+function runLock(id,what){if(inRun(id)){toast('🎒 This Pokémon is on a Mystery Dungeon or Battle Tower run. Finish or end the run to '+what+'.');return true}return false}
 function partyMon(m){return m?db.pokemon.find(p=>p.id===m.id):null}
 function partyAvgLv(){const r=runOf();const ls=r.party.map(m=>monLv(partyMon(m)||{}));return Math.round(ls.reduce((a,b)=>a+b,0)/ls.length)}
 function genMap(diff,depth){const D=DIFF[diff],floors=[],R=D.rows+Math.min(5,depth||0);for(let f=0;f<1;f++){const rows=[];for(let r=0;r<R;r++){
@@ -2770,16 +2869,16 @@ function genMap(diff,depth){const D=DIFF[diff],floors=[],R=D.rows+Math.min(5,dep
  floors.push(rows)}return floors}
 const ROOM_ICON={battle:'⚔️',swarm:'🐝',treasure:'💎',rest:'🔥',shop:'🛒',boss:'👑'};
 // ---------- entry & setup ----------
-function dungeonEntry(){const r=runOf();if(r){modal('MYSTERY DUNGEON','<div class="notice">You have a '+DIFF[r.diff].name+' run in progress (floor '+(r.floor+1)+', '+r.party.length+' Pokémon).</div><div class="actions"><button class="btn" onclick="if(confirm(\'Give up this run? You keep what you already earned.\')){closeModal();dgEnd(false,true)}">END RUN</button><button class="btn red" onclick="closeModal();dgOpen()">CONTINUE</button></div>');return}dgPickParty()}
+function dungeonEntry(){dgMode='dungeon';dgPickFor='dungeon';const r=runOf();if(r){modal('MYSTERY DUNGEON','<div class="notice">You have a '+DIFF[r.diff].name+' run in progress (floor '+(r.floor+1)+', '+r.party.length+' Pokémon).</div><div class="actions"><button class="btn" onclick="if(confirm(\'Give up this run? You keep what you already earned.\')){closeModal();dgEnd(false,true)}">END RUN</button><button class="btn red" onclick="closeModal();dgOpen()">CONTINUE</button></div>');return}dgPickParty()}
 let dgPick=[];
-function dgPickParty(){const mons=db.pokemon;if(!mons.length){toast('Catch a Pokémon in the Safari first');return}dgPick=dgPick.filter(id=>mons.some(p=>p.id===id));
+function dgPickParty(){const other=(dgPickFor==='tower'?db.run:db.tower),mons=db.pokemon.filter(p=>!(other&&other.party.some(m=>m.id===p.id)));if(!mons.length){toast(db.pokemon.length?'All your Pokémon are on your other run':'Catch a Pokémon in the Safari first');return}dgPick=dgPick.filter(id=>mons.some(p=>p.id===id));
  modal('CHOOSE YOUR TEAM','<p class="small">Pick 1–4 Pokémon. Your ★ companion can come too if you choose a new companion for while it’s away.</p><div class="dg-pick">'+mons.map(p=>'<button class="dg-pk'+(dgPick.includes(p.id)?' on':'')+'" onclick="dgToggle(\''+p.id+'\')">'+monSprite(p,'',48)+'<b>'+esc(p.nickname||p.species)+'</b><small>Lv '+monLv(p)+(db.mainId===p.id?' · ★':'')+'</small>'+(dgPick.includes(p.id)?'<i style="background:'+SLOT_COLORS[dgPick.indexOf(p.id)]+'">'+(dgPick.indexOf(p.id)+1)+'</i>':'')+'</button>').join('')+'</div><div class="actions"><button class="btn red" '+(dgPick.length?'':'disabled')+' onclick="dgConfirmParty()">CONFIRM ('+dgPick.length+'/4)</button></div>')}
 function dgToggle(id){const i=dgPick.indexOf(id);if(i>=0)dgPick.splice(i,1);else if(dgPick.length<4)dgPick.push(id);else toast('Up to 4 Pokémon');dgPickParty()}
 function dgConfirmParty(){if(!dgPick.length)return;if(dgPick.includes(db.mainId)){const others=db.pokemon.filter(p=>!dgPick.includes(p.id));if(!others.length){toast('Your companion needs someone to stay home. Leave one Pokémon out, or catch another.');return}
   modal('NEW COMPANION','<p class="small">Your ★ companion is joining the run. Who keeps you company at home?</p><div class="dg-pick">'+others.map(p=>'<button class="dg-pk" onclick="dgSwapMain(\''+p.id+'\')">'+monSprite(p,'',48)+'<b>'+esc(p.nickname||p.species)+'</b><small>Lv '+monLv(p)+'</small></button>').join('')+'</div>');return}dgSetupSets()}
 function dgSwapMain(id){{const fo=facOf(id);if(fo)facs()[fo].mon=null}for(const p of db.pokemon){if(p.id===db.mainId&&p.mainSince){buffBake(p);p.mainSeconds=mainSeconds(p);p.mainSince=null}}const p=db.pokemon.find(x=>x.id===id);db.mainId=id;p.mainSince=stamp();save();dgSetupSets()}
-function dgSetupSets(){const sets=db.summaries.filter(s=>termsFor(s).length+(s.quiz?s.quiz.length:0)+prOf(s).length>0);if(!sets.length){modal('MYSTERY DUNGEON','<div class="notice">The dungeon asks questions from your study sets. Add a summary with “Term: Definition” lines first.</div>');return}
- modal('STUDY SETS & DIFFICULTY','<div class="mg-sets">'+sets.map(s=>'<label><input type="checkbox" value="'+s.id+'" checked> <span>'+esc(s.title)+'<small>'+(termsFor(s).length+(s.quiz?s.quiz.length:0))+' items</small></span></label>').join('')+'</div><p class="small" style="margin-top:10px">Study mode</p><div class="mg-modes"><label><input type="radio" name="mgm" value="smart" checked> <b>Smart Study</b></label><label><input type="radio" name="mgm" value="learn"> <b>Learn</b></label><label><input type="radio" name="mgm" value="weak"> <b>Review Weak Points</b></label></div><p class="small" style="margin-top:10px">Run style</p><div class="mg-modes"><label><input type="radio" name="dgs" value="casual" checked> <b>Casual</b><small>Study mode: every floor plays the same, so you can keep going as long as you like</small></label><label><input type="radio" name="dgs" value="game"> <b>Videogamey</b><small>Each deeper floor is longer with stronger enemies; the floor bonus grows but is lost if your team faints</small></label></div><p class="small" style="margin-top:10px">Difficulty</p><div class="mg-modes">'+Object.entries(DIFF).map(([k,d],i)=>'<label><input type="radio" name="dgd" value="'+k+'" '+(i===0?'checked':'')+'> <b>'+d.name+'</b><small>'+d.rows+' rows per floor'+(k==='balanced'?' · Totem bosses possible':k==='hard'?' · Totem & Alpha bosses possible':'')+'</small></label>').join('')+'</div><div class="actions"><button class="btn red" onclick="dgStartRun()">ENTER THE DUNGEON</button></div>')}
+function dgSetupSets(){if(dgPickFor==='tower')return twSetupSets();const sets=db.summaries.filter(s=>termsFor(s).length+(s.quiz?s.quiz.length:0)+prOf(s).length>0);if(!sets.length){modal('MYSTERY DUNGEON','<div class="notice">The dungeon asks questions from your study sets. Add a summary with “Term: Definition” lines first.</div>');return}
+ modal('STUDY SETS & DIFFICULTY','<div class="mg-sets">'+sets.map(s=>'<label><input type="checkbox" value="'+s.id+'" checked> <span>'+esc(s.title)+'<small>'+(termsFor(s).length+(s.quiz?s.quiz.length:0))+' items</small></span></label>').join('')+'</div><p class="small" style="margin-top:10px">Study mode</p><div class="mg-modes"><label><input type="radio" name="mgm" value="smart" checked> <b>Smart Study</b></label><label><input type="radio" name="mgm" value="learn"> <b>Learn</b></label><label><input type="radio" name="mgm" value="weak"> <b>Review Weak Points</b></label></div><p class="small" style="margin-top:10px">Run style</p><div class="mg-modes"><label><input type="radio" name="dgs" value="casual" checked> <b>Casual</b><small>Study mode: the floors don’t get harder, so you can keep going as long as you like</small></label><label><input type="radio" name="dgs" value="game"> <b>Videogamey</b><small>Every boss you beat makes the floors below stronger; the boss bonus grows but is lost if your team faints</small></label></div><p class="small" style="margin-top:10px">Difficulty</p><div class="mg-modes">'+Object.entries(DIFF).map(([k,d],i)=>'<label><input type="radio" name="dgd" value="'+k+'" '+(i===0?'checked':'')+'> <b>'+d.name+'</b><small>'+(GD_DEPTH[k]||3)+' floors to each boss · '+(GD_SIZE[k]||[0,0,6])[2]+' rooms a floor'+(k==='balanced'?' · Totem bosses possible':k==='hard'?' · Totem & Alpha bosses possible':'')+'</small></label>').join('')+'</div><div class="actions"><button class="btn red" onclick="dgStartRun()">ENTER THE DUNGEON</button></div>')}
 function dgStartRun(){const sids=[...document.querySelectorAll('.mg-sets input:checked')].map(x=>x.value),mode=(document.querySelector('input[name=mgm]:checked')||{}).value||'smart',diff=(document.querySelector('input[name=dgd]:checked')||{}).value||'easy',style=(document.querySelector('input[name=dgs]:checked')||{}).value||'casual';if(!sids.length){toast('Pick at least one study set');return}
  if(mode==='weak'&&!sids.some(id=>(db.learned||{})[id])){toast('Finish Learn mode on one of these sets first');return}
  if(!mgPicker(mgBank(sids),mode).bank.length){toast('No questions for that mode here');return}
@@ -2787,12 +2886,12 @@ function dgStartRun(){const sids=[...document.querySelectorAll('.mg-sets input:c
 // ---------- screen ----------
 let DG=null,dgEpoch=0; // live (unsaved) UI state; dgEpoch stops old async turns after leaving/reopening
 function dgSleep(ms){const ep=dgEpoch;return new Promise(res=>setTimeout(()=>{if(ep===dgEpoch)res()},ms))}
-function dgOpen(){const r=runOf();if(!r)return;dgEpoch++;mgState={game:'dungeon',startedAt:Date.now(),stop:()=>{clearInterval(DG&&DG.clock);dgEpoch++;document.querySelectorAll('.mgq,.dg-slider').forEach(x=>x.remove());document.body.classList.remove('mg-on');DG=null}};DG={clock:setInterval(()=>{const rr=runOf();if(!rr||currentPage!=='minigames'||document.hidden)return;rr.studyMs+=1000;const t=$('dgTime');if(t)t.textContent=fmtMin(rr.studyMs)},1000),bank:mgBank(r.sids)};DG.P=mgPicker(DG.bank,r.mode);document.body.classList.add('mg-on');
- const el=$('mgArea');el.innerHTML='<div class="dg"><div class="dg-stage" id="dgStage"></div><div class="dg-panel" id="dgPanel"></div></div>';if(r.battle){dgDrawBattle();if(r.battle.enemyPhase)dgEnemyPhase()}else dgDrawMap()}
+function dgcOpen(mode){if(mode)dgMode=mode;const r=runOf();if(!r)return;dgEpoch++;mgState={game:dgMode==='tower'?'tower':'dungeon',startedAt:Date.now(),stop:()=>{clearInterval(DG&&DG.clock);dgEpoch++;document.querySelectorAll('.mgq,.dg-slider').forEach(x=>x.remove());document.body.classList.remove('mg-on');DG=null}};DG={clock:setInterval(()=>{const rr=runOf();if(!rr||currentPage!=='minigames'||document.hidden)return;rr.studyMs+=1000;const t=$('dgTime');if(t)t.textContent=fmtMin(rr.studyMs)},1000),bank:mgBank(r.sids)};DG.P=mgPicker(DG.bank,r.mode);document.body.classList.add('mg-on');
+ const el=$('mgArea');el.innerHTML='<div class="dg"><div class="dg-stage" id="dgStage"></div><div class="dg-panel" id="dgPanel"></div></div>';if(r.battle){dgDrawBattle();if(r.battle.enemyPhase)dgEnemyPhase()}else if(r.tower)twNext();else dgDrawMap()}
 function fmtMin(ms){const m=Math.floor(ms/60000),s=Math.floor(ms%60000/1000);return m+':'+String(s).padStart(2,'0')}
-function dgSaveExit(){save();mgQuit();toast('Run saved. Continue it from Minigames → Mystery Dungeon.')}
+function dgSaveExit(){save();mgQuit();toast('Run saved. Continue it from Minigames.')}
 function dgSettings(){const r=runOf();modal('RUN SETTINGS','<label class="small" style="display:flex;gap:8px;align-items:center"><input type="checkbox" '+(r.slider?'checked':'')+' onchange="runOf().slider=this.checked;save()"> Timing slider on attacks (off = random strength from the table)</label><p class="small muted">Study sets: '+r.sids.map(id=>esc((db.summaries.find(s=>s.id===id)||{}).title||'?')).join(', ')+' · '+({smart:'Smart Study',learn:'Learn',weak:'Review Weak Points'})[r.mode]+'</p><div class="actions"><button class="btn" onclick="if(confirm(\'End this run now? You keep what you earned so far.\')){closeModal();dgEnd(false,true)}">END RUN</button><button class="btn blue" onclick="closeModal()">CLOSE</button></div>')}
-function dgPanelMap(){const r=runOf();return '<div class="dg-row"><span>⏱ <b id="dgTime">'+fmtMin(r.studyMs)+'</b></span><span>B'+(r.floor+1)+'F</span><span>Room '+r.rooms+'</span><span>🎟️ '+(r.tickets||0)+'</span></div><div class="dg-partyrow">'+r.party.map((m,i)=>{const p=partyMon(m),c=combatant(p);return '<div class="dg-mini" style="--c:'+SLOT_COLORS[i]+'">'+monSprite(p,'',34)+'<span><i style="width:'+Math.max(0,m.hp/c.hp*100)+'%"></i></span><small>'+m.hp+'/'+c.hp+' · ⚡'+m.energy+'</small></div>'}).join('')+'</div><div class="dg-bag">'+(Object.keys(r.bag).filter(k=>r.bag[k]>0).map(k=>'<span title="'+DITEMS[k].name+'">'+DITEMS[k].icon+'×'+r.bag[k]+'</span>').join('')||'<span class="small muted">No items</span>')+'</div><div class="dg-row"><button class="btn smallbtn" onclick="dgSettings()">⚙</button><button class="btn smallbtn" onclick="dgSaveExit()">💾 SAVE & EXIT</button></div>'}
+function dgPanelMap(){const r=runOf();if(r&&r.tower)return twPanel();return '<div class="dg-row"><span>⏱ <b id="dgTime">'+fmtMin(r.studyMs)+'</b></span><span>B'+(r.floor+1)+'F</span><span>Room '+r.rooms+'</span><span>🎟️ '+(r.tickets||0)+'</span></div><div class="dg-partyrow">'+r.party.map((m,i)=>{const p=partyMon(m),c=combatant(p);return '<div class="dg-mini" style="--c:'+SLOT_COLORS[i]+'">'+monSprite(p,'',34)+'<span><i style="width:'+Math.max(0,m.hp/c.hp*100)+'%"></i></span><small>'+m.hp+'/'+c.hp+' · ⚡'+m.energy+'</small></div>'}).join('')+'</div><div class="dg-bag">'+(Object.keys(r.bag).filter(k=>r.bag[k]>0).map(k=>'<span title="'+DITEMS[k].name+'">'+DITEMS[k].icon+'×'+r.bag[k]+'</span>').join('')||'<span class="small muted">No items</span>')+'</div><div class="dg-row"><button class="btn smallbtn" onclick="dgSettings()">⚙</button><button class="btn smallbtn" onclick="dgSaveExit()">💾 SAVE & EXIT</button></div>'}
 // ---------- map ----------
 function dgDrawMap(){const r=runOf(),rows=r.map[r.floor],st=$('dgStage');
  const avail=r.row<0?rows[0].map((_,i)=>i):(rows[r.row][r.col].to||[]);
@@ -2817,7 +2916,7 @@ async function dgTreasure(){const r=runOf(),n=2+Math.floor(Math.random()*3);$('d
  const tp=Math.round((2+4*pct)*bonus),tc=Math.round((1+pct)*bonus);db.puffs=(db.puffs||0)+tp;db.candies=(db.candies||0)+tc;got.push('+'+tp+' 🧁 Poképuffs','+'+tc+' 🍬 Rare Cand'+(tc>1?'ies':'y'));save();
  $('dgStage').innerHTML='<div class="dg-room"><span class="dg-big">💎</span><h3>'+score+' / '+n+' correct</h3><p>'+got.join('<br>')+'</p><button class="btn red" onclick="dgNextRoom()">CONTINUE</button></div>';$('dgPanel').innerHTML=dgPanelMap()}
 function dgShop(){const r=runOf();if(!r.shopStock||r.shopAt!==r.rooms){const pool=Object.keys(DITEMS).map(id=>({id,w:DITEM_TIER_W[DITEMS[id].tier||0]})),st=[];while(st.length<4&&pool.length){const x=pickWeighted(pool);st.push(x.id);pool.splice(pool.indexOf(x),1)}r.shopStock=st;r.shopAt=r.rooms}
- $('dgStage').innerHTML='<div class="dg-room"><span class="dg-big">🛒</span><h3>Dungeon Shop</h3><p class="small">Pay with 🎟️ Tickets earned in this run. Leftover Tickets become Cogs when the run ends.</p><div class="dg-shop">'+r.shopStock.map(k=>'<div class="shopitem"><span class="shopicon">'+DITEMS[k].icon+'</span><div class="shopmain"><b>'+DITEMS[k].name+'</b><small>'+DITEMS[k].desc+'</small></div><button class="btn smallbtn" '+((r.tickets||0)<DITEMS[k].cost?'disabled':'')+' onclick="dgBuy(\''+k+'\')">'+DITEMS[k].cost+' 🎟️</button></div>').join('')+'</div><button class="btn red" onclick="dgNextRoom()">LEAVE</button></div>';$('dgPanel').innerHTML=dgPanelMap()}
+ $('dgStage').innerHTML='<div class="dg-room"><span class="dg-big">🛒</span><h3>Kecleon Shop</h3><p class="small">Pay with 🎟️ Tickets earned in this run. Leftover Tickets become Cogs when the run ends.</p><div class="dg-shop">'+r.shopStock.map(k=>'<div class="shopitem"><span class="shopicon">'+DITEMS[k].icon+'</span><div class="shopmain"><b>'+DITEMS[k].name+'</b><small>'+DITEMS[k].desc+'</small></div><button class="btn smallbtn" '+((r.tickets||0)<DITEMS[k].cost?'disabled':'')+' onclick="dgBuy(\''+k+'\')">'+DITEMS[k].cost+' 🎟️</button></div>').join('')+'</div><button class="btn red" onclick="dgNextRoom()">LEAVE</button></div>';$('dgPanel').innerHTML=dgPanelMap()}
 function dgBuy(k){const r=runOf();if((r.tickets||0)<DITEMS[k].cost)return;r.tickets-=DITEMS[k].cost;r.bag[k]=(r.bag[k]||0)+1;save();dgShop();toast(DITEMS[k].name+' added to the run bag')}
 function dgBossChoice(){const r=runOf();if(r.diff==='easy'||Math.random()>.45){dgBattle('boss');return}const alpha=r.diff==='hard'&&Math.random()<.5;
  $('dgStage').innerHTML='<div class="dg-room"><span class="dg-big">'+(alpha?'🔺':'🌀')+'</span><h3>'+(alpha?'An Alpha stirs ahead…':'A Totem Pokémon blocks the way…')+'</h3><p class="small">'+(alpha?'Alphas are far stronger and attack twice a turn.':'Totems fight with 2–3 allies.')+' Beat it to also bring home its pre-evolution.</p><div class="actions"><button class="btn" onclick="dgBattle(\'boss\')">FIGHT THE NORMAL BOSS</button><button class="btn red" onclick="dgBattle(\''+(alpha?'alpha':'totem')+'\')">FACE THE '+(alpha?'ALPHA':'TOTEM')+'</button></div></div>';$('dgPanel').innerHTML=dgPanelMap()}
@@ -2837,34 +2936,36 @@ async function dgFillSprites(){const els=document.querySelectorAll('.dg-spr:not(
   const an=a.Idle||a.Walk,r=row<(an.rows||8)?row:0,k=DG_SPRITE_SCALE*(+el.dataset.sz||1)*(el.closest('.dg-foe.big')?1.2:1),bb=await sprBounds(an,r),foot=Math.max(0,an.h-bb[3]-1);
   // stand the Pokémon on its feet: drop the empty strip under the body (tall frames like Gyarados have a lot of it)
   el.style.cssText='width:'+an.w+'px;height:'+an.h+'px;margin-bottom:'+(-foot)+'px;background-image:url('+an.url+');background-position:0 '+(-r*an.h)+'px;--fw:'+an.w+'px;--fn:'+an.frames+';animation:dsx '+(an.d.reduce((x,y)=>x+y,0)/60).toFixed(2)+'s steps('+an.frames+') infinite;zoom:'+k.toFixed(2)+';';el.classList.add('ok')}}
-function dgDrawBattle(entering){const r=runOf(),b=r&&r.battle,st=$('dgStage');if(!b||!st)return;if(entering)st.scrollTop=0;
+function dgcDrawBattle(entering){const r=runOf(),b=r&&r.battle,st=$('dgStage');if(!b||!st)return;twKingCheck(r,b);if(entering)st.scrollTop=0;
  const H=DG?(DG.hp||(DG.hp={})):{},bar=(k,pct)=>{pct=Math.max(0,Math.min(100,pct));const prev=H[k]??pct;H[k]=pct;return '<i class="'+(pct<=20?'low':pct<=50?'mid':'')+'" style="width:'+prev+'%" data-w="'+pct+'"></i>'};
- st.innerHTML='<div class="dg-field'+(b.kind!=='battle'&&b.kind!=='swarm'?' bossfield':'')+(b.warp?' negfx':'')+'">'+(DG&&DG.msg?'<div class="dg-ticker">'+DG.msg+'</div>':'')+'<div class="dg-enemies">'+b.enemies.map((e,i)=>'<div class="dg-foe'+(e.hp<=0?' ko':'')+(e.boss?' big':'')+'" data-i="'+i+'" onclick="dgTargetPick('+i+')">'+(e.boss?'<em class="dg-tag">'+({boss:'BOSS',totem:'TOTEM',alpha:'ALPHA'})[e.boss]+'</em>':'')+'<div class="dg-hpb"><span>'+bar('f'+i,e.hp/e.maxhp*100)+'</span><small>'+esc(e.species)+' Lv '+e.lv+'</small><b class="dg-xh"></b></div>'+dgSpriteHTML(e.species,0,'foe')+'</div>').join('')+'</div><div class="dg-team'+(entering?' enter':'')+'">'+r.party.map((m,i)=>{const p=partyMon(m),c=combatant(p);return '<div class="dg-ally'+(m.hp<=0?' ko':'')+(m.sky===b.round?' sky':'')+(b.diamond===b.round&&m.hp>0?' dshield':'')+(ultResting(b,m)?' rest':'')+(b.turn===i&&!b.enemyPhase?' active':'')+'" data-i="'+i+'" style="--c:'+SLOT_COLORS[i]+'" onclick="dgAllyPick('+i+')">'+dgSpriteHTML(p.species,4,'ally',null,p.size)+'<div class="dg-hpb"><span>'+bar('a'+i,m.hp/c.hp*100)+'</span><small>'+esc(p.nickname||p.species)+'<br>'+m.hp+'/'+c.hp+' HP · ⚡'+m.energy+'</small><b class="dg-xh"></b></div></div>'}).join('')+'</div>'+(b.charge?'<div class="dg-banner warn">⚠ '+esc((b.enemies.find(e=>e.boss&&e.hp>0)||{}).species||'The boss')+' is gathering power for a move that hits your whole team! 🛡 Guard to soften it.</div>':'')+(b.skip?'<div class="dg-banner">⏱ Time is frozen: enemies skip their turn</div>':'')+(b.overclock?'<div class="dg-banner oc">⚙️ Overclock +'+Math.round(b.overclock*100)+'% damage</div>':'')+'</div>';
+ st.innerHTML='<div class="dg-field'+(r.tower?' tower':b.kind!=='battle'&&b.kind!=='swarm'?' bossfield':'')+(b.warp?' negfx':'')+'"'+(r.tower?' style="background-image:url(./assets/tower/'+twEnvKey(r)+'.jpg)"':'')+'>'+(r.tower?'<div class="tw-tag">'+twEnv(r).icon+' '+twEnv(r).name+' · '+r.floor+'F'+(r.floor%10===0?' · 👑 BOSS':'')+'</div>':'')+(DG&&DG.msg?'<div class="dg-ticker">'+DG.msg+'</div>':'')+'<div class="dg-enemies">'+b.enemies.map((e,i)=>'<div class="dg-foe'+(e.hp<=0?' ko':'')+(twKingOn(e)?' tw-king':'')+(e.boss?' big':'')+'" data-i="'+i+'" onclick="dgTargetPick('+i+')">'+(e.boss?'<em class="dg-tag">'+({boss:'BOSS',totem:'TOTEM',alpha:'ALPHA'})[e.boss]+'</em>':'')+'<div class="dg-hpb"><span>'+bar('f'+i,e.hp/e.maxhp*100)+'</span><small>'+esc(e.species)+' Lv '+e.lv+'</small><b class="dg-xh"></b></div>'+dgSpriteHTML(e.species,0,'foe')+'</div>').join('')+'</div><div class="dg-team'+(entering?' enter':'')+'">'+r.party.map((m,i)=>{const p=partyMon(m),c=combatant(p);return '<div class="dg-ally'+(m.hp<=0?' ko':'')+(twKingOn(m)?' tw-king':'')+(m.sky===b.round?' sky':'')+(b.diamond===b.round&&m.hp>0?' dshield':'')+(ultResting(b,m)?' rest':'')+(b.turn===i&&!b.enemyPhase?' active':'')+'" data-i="'+i+'" style="--c:'+SLOT_COLORS[i]+'" onclick="dgAllyPick('+i+')">'+dgSpriteHTML(p.species,4,'ally',null,p.size)+'<div class="dg-hpb"><span>'+bar('a'+i,m.hp/c.hp*100)+'</span><small>'+esc(p.nickname||p.species)+'<br>'+m.hp+'/'+c.hp+' HP · ⚡'+m.energy+'</small><b class="dg-xh"></b></div></div>'}).join('')+'</div>'+(b.charge?'<div class="dg-banner warn">⚠ '+esc((b.enemies.find(e=>e.boss&&e.hp>0)||{}).species||'The boss')+' is gathering power for a move that hits your whole team! 🛡 Guard to soften it.</div>':'')+(b.challenge?'<div class="dg-banner tw-chal">🎯 '+TW_CHAL[b.challenge].t+'</div>':'')+(b.skip?'<div class="dg-banner">⏱ Time is frozen: enemies skip their turn</div>':'')+(b.overclock?'<div class="dg-banner oc">⚙️ Overclock +'+Math.round(b.overclock*100)+'% damage</div>':'')+'</div>';
  requestAnimationFrame(()=>requestAnimationFrame(()=>st.querySelectorAll('.dg-hpb i[data-w]').forEach(x=>x.style.width=x.dataset.w+'%')));
  dgFillSprites();if(DG&&DG.busy)$('dgPanel').innerHTML='<div class="dg-msg">…</div>';else dgPanelBattle()}
-function dgPanelBattle(msg){const r=runOf(),b=r.battle,m=r.party[b.turn],p=m&&partyMon(m);
+function dgcPanelBattle(msg){const r=runOf(),b=r.battle,m=r.party[b.turn],p=m&&partyMon(m);
  if(!b.enemyPhase&&ultResting(b,m)){const sl=b.turn;$('dgPanel').innerHTML='<div class="dg-msg"><b style="color:'+SLOT_COLORS[sl]+'">'+esc(p.nickname||p.species)+'</b> is resting after Display of Power and can’t act this turn.</div>';if(DG)DG.busy=1;setTimeout(()=>{const r2=runOf();if(r2&&r2.battle===b&&b.turn===sl&&!b.enemyPhase)dgAfterAction();else if(DG)DG.busy=0},1300);return}
  if(b.enemyPhase||!m){$('dgPanel').innerHTML='<div class="dg-msg">'+(msg||'…')+'</div>';return}
- $('dgPanel').innerHTML='<div class="dg-msg"><b style="color:'+SLOT_COLORS[b.turn]+'">'+esc(p.nickname||p.species)+'</b>'+(m.hp<=0?' has fainted.':'’s turn.')+(msg?' '+msg:'')+'</div>'+(m.hp<=0?'<div class="dg-acts"><button class="btn red" onclick="dgRevive()">ANSWER TO REVIVE</button></div>':'<div class="dg-acts"><button class="btn red" onclick="dgFight()">⚔️ FIGHT</button><button class="btn blue" onclick="dgItem()">🎒 ITEM</button><button class="btn" onclick="dgGuard()">🛡 GUARD</button></div>')+'<div class="dg-row"><span>⏱ <b id="dgTime">'+fmtMin(r.studyMs)+'</b></span><button class="btn smallbtn" onclick="dgSettings()">⚙</button><button class="btn smallbtn" onclick="dgSaveExit()">💾 SAVE & EXIT</button></div>'}
+ $('dgPanel').innerHTML='<div class="dg-msg"><b style="color:'+SLOT_COLORS[b.turn]+'">'+esc(p.nickname||p.species)+'</b>'+(m.hp<=0?' has fainted.':'’s turn.')+(msg?' '+msg:'')+'</div>'+(m.hp<=0?'<div class="dg-acts"><button class="btn red" onclick="dgRevive()">ANSWER TO REVIVE</button></div>':'<div class="dg-acts"><button class="btn red" onclick="dgFight()">⚔️ FIGHT</button><button class="btn blue" '+(dgEnvNoItems()?'disabled':'')+' onclick="dgItem()">🎒 ITEM</button><button class="btn" onclick="dgGuard()">🛡 GUARD</button></div>')+'<div class="dg-row"><span>⏱ <b id="dgTime">'+fmtMin(r.studyMs)+'</b></span><button class="btn smallbtn" onclick="dgSettings()">⚙</button><button class="btn smallbtn" onclick="dgSaveExit()">💾 SAVE & EXIT</button></div>'}
 // ---------- actions ----------
 let dgTarget=null;
 function dgTargetPick(i){if(dgTarget&&dgTarget.side==='foe'){const e=runOf().battle.enemies[i];if(e&&e.hp>0){const f=dgTarget.fn;dgTarget=null;document.querySelectorAll('.dg-foe').forEach(x=>x.classList.remove('pickable'));f(i)}}}
 function dgAllyPick(i){if(dgTarget&&dgTarget.side==='ally'){const f=dgTarget.fn;dgTarget=null;document.querySelectorAll('.dg-ally').forEach(x=>x.classList.remove('pickable'));f(i)}}
-function dgChooseFoe(fn){if(!runOf()||!runOf().battle)return;const b=runOf().battle,alive=b.enemies.map((e,i)=>e.hp>0?i:-1).filter(i=>i>=0);if(alive.length===1){fn(alive[0]);return}dgTarget={side:'foe',fn};document.querySelectorAll('.dg-foe:not(.ko)').forEach(x=>x.classList.add('pickable'));$('dgPanel').innerHTML='<div class="dg-msg">🎯 Tap an enemy to target.</div>'}
+function dgcChooseFoe(fn){if(!runOf()||!runOf().battle)return;const b=runOf().battle,alive=b.enemies.map((e,i)=>e.hp>0?i:-1).filter(i=>i>=0);if(alive.length===1){fn(alive[0]);return}dgTarget={side:'foe',fn};document.querySelectorAll('.dg-foe:not(.ko)').forEach(x=>x.classList.add('pickable'));$('dgPanel').innerHTML='<div class="dg-msg">🎯 Tap an enemy to target.</div>'}
 function dgCrosshair(side,i,slot){document.querySelectorAll('.dg-xh').forEach(x=>x.innerHTML='');const el=document.querySelector((side==='foe'?'.dg-foe':'.dg-ally')+'[data-i="'+i+'"] .dg-xh');if(el)el.innerHTML='<i style="border-color:'+SLOT_COLORS[slot]+'"></i>'}
-function dgQ(title,opts){const ep=dgEpoch,r0=runOf(),bt=r0&&r0.battle,tn=bt&&bt.turn,it=DG.P.next();return askQ(it,DG.bank,Object.assign({title},opts||{})).then(res=>{const r1=runOf();if(ep!==dgEpoch||!DG||!r1||(bt&&(r1.battle!==bt||bt.turn!==tn)))return new Promise(()=>{});DG.P.report(it,res);return res})}
-async function dgFight(){const _r=runOf(),_b=_r&&_r.battle;if(!_b||_b.enemyPhase||!_r.party[_b.turn])return;if(DG.busy)return;DG.busy=1;const r=runOf(),b=r.battle,m=r.party[b.turn],p=partyMon(m);const res=await dgQ('⚔️ FIGHT',{hint:true});
+function dgQ(title,opts){const ep=dgEpoch,r0=runOf(),bt=r0&&r0.battle,tn=bt&&bt.turn,it=DG.P.next();return askQ(it,DG.bank,Object.assign({title},opts||{})).then(res=>{const r1=runOf();if(ep!==dgEpoch||!DG||!r1||(bt&&(r1.battle!==bt||bt.turn!==tn)))return new Promise(()=>{});DG.P.report(it,res);if(bt&&res==='full')bt.qFull=(bt.qFull||0)+1;if(bt)bt.lastRes=res;return res})}
+async function dgcFight(){const _r=runOf(),_b=_r&&_r.battle;if(!_b||_b.enemyPhase||!_r.party[_b.turn])return;if(DG.busy)return;DG.busy=1;const r=runOf(),b=r.battle,m=r.party[b.turn],p=partyMon(m);const res=await dgQ('⚔️ FIGHT',{hint:true});
  const fast=MOVE_STATS[p.fastMove]||['Normal',8,8,'fast'],disc=MOVE_STATS[p.discMove]||['Normal',80,50,'charged'],X=dgCtx(b.turn);
  $('dgPanel').innerHTML='<div class="dg-msg">'+({full:'✅ Perfect! The timing will be easy.',makeup:'🟡 Got the Make-Up. Timing is a bit harder.',fail:'❌ Missed both. Timing is tough, but the attack still lands.'})[res]+' Choose a move:</div><div class="dg-acts">'+dgMoveBtn('dgM1','red',p.fastMove,fast,X,true)+dgMoveBtn('dgM2','blue',p.discMove,disc,X,m.energy>=disc[2])+''+(ultOf(p)?'<button class="btn ult" id="dgM3" '+(m.energy<100?'disabled':'')+'>✦ '+esc(ultOf(p).move)+'<small>ULTIMATE · 180 pw · '+(m.energy<100?m.energy+'/100⚡':'FULL ⚡')+'</small></button>':'')+'</div>';
- const go=(name,mv)=>(MOVE_SPREAD.has(name)?fn=>fn(b.enemies.findIndex(e=>e.hp>0)):dgChooseFoe)(async i=>{const sl=b.turn;dgCrosshair('foe',i,sl);const mult=r.slider?await dgSlider(res,dgBarSlow(b)):dgRandMult();const r2=runOf();if(!r2||r2.battle!==b||b.turn!==sl||!b.enemies[i])return;dgAttack(sl,i,name,mv,mult)});
+
+ // one attack per turn, even if a move button gets tapped twice
+ let fired=false;const go=(name,mv)=>(MOVE_SPREAD.has(name)?fn=>fn(b.enemies.findIndex(e=>e.hp>0)):dgChooseFoe)(async i=>{if(fired)return;fired=true;const sl=b.turn;dgCrosshair('foe',i,sl);const mult=r.slider?await dgSlider(res,dgBarSlow(b)):dgRandMult();const r2=runOf();if(!r2||r2.battle!==b||b.turn!==sl||!b.enemies[i])return;dgAttack(sl,i,name,mv,mult)});
  $('dgM1').onclick=()=>go(p.fastMove,fast);$('dgM2').onclick=()=>go(p.discMove,disc);
- const U=ultOf(p);if(U&&$('dgM3'))$('dgM3').onclick=()=>{const sl=b.turn,run=async i=>{if(i!=null)dgCrosshair('foe',i,sl);const mult=U.t==='none'?1:r.slider?await dgSlider(res,dgBarSlow(b)*(U.fx==='cudgel'?.75:1)):dgRandMult();const r2=runOf();if(!r2||r2.battle!==b||b.turn!==sl)return;dgUltimate(sl,i,mult,res)};if(U.t==='one')dgChooseFoe(run);else run(null)}}
+ const U=ultOf(p);if(U&&$('dgM3'))$('dgM3').onclick=()=>{const sl=b.turn,run=async i=>{if(fired)return;fired=true;if(i!=null)dgCrosshair('foe',i,sl);const mult=U.t==='none'?1:r.slider?await dgSlider(res,dgBarSlow(b)*(U.fx==='cudgel'?.75:1)):dgRandMult();const r2=runOf();if(!r2||r2.battle!==b||b.turn!==sl)return;dgUltimate(sl,i,mult,res)};if(U.t==='one')dgChooseFoe(run);else run(null)}}
 function dgRandMult(){const t=[[.75,2],[.8,4],[.9,6],[1,8],[1.05,4],[1.1,4],[1.15,3],[1.2,3],[1.25,2],[2,1]];let x=Math.random()*37;for(const [v,w] of t){x-=w;if(x<0)return v}return 1}
 function dgSlider(res,slow){return new Promise(done=>{const cfg=Object.assign({},{full:{sp:.45,crit:.09},makeup:{sp:.75,crit:.055},fail:{sp:1.3,crit:.025}}[res]);cfg.sp*=slow||1;const ov=document.createElement('div');ov.className='dg-slider';ov.innerHTML='<div class="dg-sl-card"><p>Tap to strike!</p><div class="dg-sl-bar"><i class="crit" style="left:'+(50-cfg.crit*50)+'%;width:'+(cfg.crit*100)+'%"></i><b></b></div><small>Center = critical hit · edges = weak hit</small></div>';document.body.appendChild(ov);
  const mk=ov.querySelector('b'),t0=performance.now();let pos=0,raf;const step=now=>{const ph=((now-t0)/1000*cfg.sp)%2;pos=ph<1?ph:2-ph;mk.style.left=(pos*100)+'%';raf=requestAnimationFrame(step)};raf=requestAnimationFrame(step);
  ov.onclick=()=>{cancelAnimationFrame(raf);const d=Math.abs(pos-.5)*2;const mult=d<=cfg.crit?2:+(1.25-.75*d).toFixed(2);mk.classList.add('hit');ov.querySelector('p').textContent=mult>=2?'CRITICAL HIT!':'×'+mult;setTimeout(()=>{ov.remove();done(mult)},550)}})}
 // Speed: your Pokémon can dodge enemy attacks; 0% unless faster than the attacker, rising to 25% at twice its Speed. Enemies never dodge yours.
-function dgDodge(mySpe,foeSpe){return Math.max(0,Math.min(.25,(mySpe-foeSpe)/Math.max(1,foeSpe)*.25))}
+function dgDodge(mySpe,foeSpe){mySpe+=twDodgeBonus();return Math.max(0,Math.min(.25,(mySpe-foeSpe)/Math.max(1,foeSpe)*.25))}
 function dgDamage(att,def,mv,mult,extra,catOv,cs,effOv){const [type,pw,,kind]=mv,k=cs??1;const base=kind==='fast'?pw/6+k:pw/18+2*k;const stab=(att.types||[]).includes(String(type).toLowerCase())?1.2:1;const eff=effOv??typeEff(type,def.types);
  // physical moves: Attack vs Defense; special moves: Sp. Atk vs Sp. Def (moves with no listed category use the attacker's better stat)
  const cat=catOv||moveCat(mv)||((att.spa||0)>(att.atk||0)?'S':'P'),a=cat==='S'?(att.spa??att.atk):att.atk,d=cat==='S'?(def.spd??def.def):def.def;
@@ -2936,19 +3037,22 @@ function moveNote(n){const S=MOVE_SPECIAL[n],h=MOVE_MULTI[n],d=MOVE_DRAIN[n],a=[
 function dgCtx(slot){const r=runOf(),b=r.battle,m=r.party[slot],p=partyMon(m);return {r,b,m,p,c:combatant(p),slot,log:(b.mlog||{})[slot]||null,e0:m.energy}}
 function dgBlock(n,x){const S=MOVE_SPECIAL[n];try{return S&&S.block?S.block(x):null}catch(e){return null}}
 function dgBoosted(n,x){const S=MOVE_SPECIAL[n];try{return !!(S&&S.boost&&S.boost(x))}catch(e){return false}}
-function dgHitPlan(n,x){const h=MOVE_MULTI[n];if(!h)return {ks:[1],S:1};
- if(h==='2-5'){const v=Math.random(),k=v<.35?2:v<.7?3:v<.85?4:5;return {ks:Array(k).fill(1),S:3.1}}
+function dgHitPlan(n,x){const h=MOVE_MULTI[n];if(!h||dgEnvSingle())return {ks:[1],S:1};
+ if(h==='2-5'){const v=Math.random();let k=v<.35?2:v<.7?3:v<.85?4:5;if(dgEnvDice())k=Math.max(3,k);return {ks:Array(k).fill(1),S:3.1}}
  if(h==='party'){const k=Math.max(1,x.r.party.filter(q=>q.hp>0).length);return {ks:Array(k).fill(1),S:k}}
  if(Array.isArray(h))return {ks:h,S:h.reduce((a,b)=>a+b,0)};return {ks:Array(h).fill(1),S:h}}
-function dgEnemyHits(n){const h=MOVE_MULTI[n];if(!h)return 1;if(Array.isArray(h))return h.reduce((a,b)=>a+b,0)/2;if(h==='party')return 2;return dgHitPlan(n,null).ks.length}
+function dgEnemyHits(n){const h=MOVE_MULTI[n];if(!h||dgEnvSingle())return 1;if(Array.isArray(h))return h.reduce((a,b)=>a+b,0)/2;if(h==='party')return 2;return dgHitPlan(n,null).ks.length}
 // one target: works out every hit, applies the damage and returns what happened
 function dgStrike(x,n,mv,e,mult,scale){const S=MOVE_SPECIAL[n]||{},sb=s=>x.m.starf&&x.m.starf.stat===s?2:0,att={atk:x.c.atk+sb('atk'),spa:x.c.spa+sb('spa'),types:x.c.types},def={def:e.def,spd:e.spd,types:e.types};
  const fail=S.fail&&S.fail(x,e);if(fail)return {dmg:0,eff:1,parts:[],tags:[],fail};
+ {const dk=twDarkDodge(x.b,e);if(dk)return {dmg:0,eff:1,parts:[],tags:[],fail:dk}}
  let eff=S.eff?S.eff(e):typeEff(mv[0],e.types),crit=mult>=2;const melt=e.melt>0?1.15:1,tags=[];if(S.crit){crit=true;if(mult<1.5)mult=1.5}
  const xm=S.x?S.x(x,e):1;if(xm>1)tags.push(S.xTag||'Power ×'+xm+'!');
  if(S.fixed){eff=eff<.5?eff:1;const d=Math.max(1,Math.round(S.fixed(x,e)*eff*melt));e.hp=Math.max(0,e.hp-d);e.hitR=x.b.round;return {dmg:d,eff,parts:[d],tags,crit:false}}
- const pw=S.pw?S.pw(x,e):mv[1],H=dgHitPlan(n,x),cat=moveCat(mv),extra=(1+(x.b.overclock||0)+(x.b.teamBoost||0))*xm,parts=[];
+ const pw=S.pw?S.pw(x,e):mv[1],H=dgHitPlan(n,x),cat=moveCat(mv),extra=(1+(x.b.overclock||0)+(x.b.teamBoost||0))*xm*dgEnvMult(mv[0])*twPowMult()*dgEnvAtk(x.c.types,x.p.species,x.m)*dgEnvDef(e.types,e.species,e),parts=[];
  for(const k of H.ks){if(e.hp<=0)break;const one=c=>dgDamage(att,def,[mv[0],pw*k,mv[2],mv[3]],mult*(scale||1),extra,c,k/H.S,eff).dmg;const d=Math.max(1,Math.round((S.best?Math.max(one('P'),one('S')):one(cat))*melt));e.hp=Math.max(0,e.hp-d);parts.push(d)}
+ {const fl=dgEnvFlat(x.c.types,x.c.hp);if(fl&&parts.length&&e.hp>0){const d=Math.min(e.hp,fl);e.hp-=d;parts[parts.length-1]+=d}}
+ {const sh=twSpookHeal(x.m,x.c.hp,parts);if(sh)tags.push('👻 +'+sh+' HP')}
  e.hitR=x.b.round;const t=S.hit&&S.hit(x,e);if(t)tags.push(t);
  return {dmg:parts.reduce((a,b)=>a+b,0),eff,parts,tags,crit}}
 // after the move: Stamina, healing, self-damage and what the move remembers for next time
@@ -2960,7 +3064,7 @@ function dgFinish(x,n,mv,R){const S=MOVE_SPECIAL[n]||{},m=x.m,out=[],failed=R.le
  const L=x.b.mlog=x.b.mlog||{},pr=L[x.slot];L[x.slot]={name:n,n:pr&&pr.name===n&&!failed?pr.n+1:1,failed};return out}
 function dgOutMsg(out){return out.map(([k,v])=>k==='heal'?' Restored '+v+' HP.':' It cost '+v+' HP!').join('')}
 function dgShowOut(slot,out){const s='.dg-ally[data-i="'+slot+'"]',m=runOf().party[slot];out.forEach(([k,v])=>{if(k==='heal')dgFloat(s,'+'+v+' HP','heal');else{dgHit(s);dgFloat(s,'-'+v,'weak')}});if(m&&m.hp<=0&&out.some(o=>o[0]==='self'))setTimeout(()=>dgFaint(s),380)}
-function dgHurt(b,m,d){if(d>0){m.hurt=(m.hurtR===b.round?m.hurt||0:0)+d;m.hurtR=b.round;if(m.hp<=0)m.koR=b.round}}
+function dgHurt(b,m,d){twSpookFoe(d);if(d>0){m.hurt=(m.hurtR===b.round?m.hurt||0:0)+d;m.hurtR=b.round;if(m.hp<=0){m.koR=b.round;b.koAny=1}}}
 function dgSaltTick(b){b.enemies.forEach((e,i)=>{if(e.hp>0&&e.salt){const f=((e.types||[]).some(t=>t==='water'||t==='steel')?.25:.125)*(e.boss?.5:1),d=Math.max(1,Math.round(e.maxhp*f)),s='.dg-foe[data-i="'+i+'"]';e.hp=Math.max(0,e.hp-d);setTimeout(()=>{dgFloat(s,'-'+d+' 🧂','super');dgHit(s);if(e.hp<=0)dgFaint(s)},60)}})}
 function dgMoveBtn(id,cls,n,mv,x,ok){const S=MOVE_SPECIAL[n]||{},blk=dgBlock(n,x),boost=!blk&&dgBoosted(n,x);let pw=mv[1];if(S.fixed)pw='fixed';else if(S.pw){try{pw=S.pw.length<2?S.pw(x):'var'}catch(e){}}
  return '<button class="btn '+cls+(boost?' dg-boost':'')+'" id="'+id+'" '+(!ok||blk?'disabled':'')+'>'+esc(n)+'<small>'+mv[0]+' · '+pw+(typeof pw==='number'?' pw':'')+(moveHitsTag(n)?' '+moveHitsTag(n):'')+' · '+(S.drainAll?'all':mv[3]==='fast'?'+'+mv[2]:'−'+mv[2])+'⚡'+(blk?' · '+blk:'')+'</small></button>'}
@@ -2984,10 +3088,10 @@ async function dgAttack(slot,ti,name,mv,mult){if(MOVE_SPREAD.has(name))return dg
  if(eff>1.2)dgFloat(fsel,'Super effective!','eff');else if(eff<.8)dgFloat(fsel,'Not very effective','eff');
  if(mv[3]==='fast')dgFloat(asel,'+⚡'+mv[2],'en');dgShowOut(slot,out);if(e.hp<=0)setTimeout(()=>dgFaint(fsel),380);
  await dgSleep(e.hp<=0?1000:800);dgAfterAction()}
-async function dgRevive(){const _r=runOf(),_b=_r&&_r.battle;if(!_b||_b.enemyPhase||!_r.party[_b.turn])return;if(DG.busy)return;DG.busy=1;const r=runOf(),b=r.battle,m=r.party[b.turn];const res=await dgQ('💫 REVIVE');if(res!=='fail'){m.hp=1;save();dgDrawBattle();dgFloat('.dg-ally[data-i="'+b.turn+'"]','Back up! (1 HP)','eff');await dgSleep(700)}else{toast('Still fainted. Try again next turn.')}dgAfterAction()}
-function dgItem(){const _r=runOf(),_b=_r&&_r.battle;if(!_b||_b.enemyPhase||!_r.party[_b.turn])return;if(DG.busy)return;DG.busy=1;const r=runOf(),b=r.battle,ks=Object.keys(r.bag).filter(k=>r.bag[k]>0);if(!ks.length){DG.busy=0;toast('The run bag is empty. Shops and treasure rooms have items.');return}
+async function dgcRevive(){const _r=runOf(),_b=_r&&_r.battle;if(!_b||_b.enemyPhase||!_r.party[_b.turn])return;if(DG.busy)return;DG.busy=1;const r=runOf(),b=r.battle,m=r.party[b.turn];const res=await dgQ('💫 REVIVE');if(res!=='fail'){m.hp=twReviveHp(m);save();dgDrawBattle();dgFloat('.dg-ally[data-i="'+b.turn+'"]','Back up! ('+m.hp+' HP)','eff');await dgSleep(700)}else{toast('Still fainted. Try again next turn.')}dgAfterAction()}
+function dgItem(){const _r=runOf(),_b=_r&&_r.battle;if(!_b||_b.enemyPhase||!_r.party[_b.turn])return;if(DG.busy)return;if(dgEnvNoItems()){toast('🌙 Sleepless Hollow: items can’t be used here');return}DG.busy=1;const r=runOf(),b=r.battle,ks=Object.keys(r.bag).filter(k=>r.bag[k]>0);if(!ks.length){DG.busy=0;toast('The run bag is empty. Pick up items on the floor, or find a chest or Kecleon Shop.');return}
  $('dgPanel').innerHTML='<div class="dg-msg">Use which item?</div><div class="dg-items">'+ks.map(k=>'<button class="btn" onclick="dgUseItem(\''+k+'\')">'+DITEMS[k].icon+' '+DITEMS[k].name+' ×'+r.bag[k]+'<small>'+DITEMS[k].desc+'</small></button>').join('')+'<button class="btn smallbtn" onclick="DG.busy=0;dgPanelBattle()">BACK</button></div>'}
-function dgUseItem(k){const r=runOf(),b=r.battle,slot=b.turn;
+function dgUseItem(k){const r=runOf(),b=r.battle,slot=b.turn;if(b)b.usedItem=true;
  if(k==='overclock'){dgOverclock();return}if(k==='timegear'){dgTimeGear();return}
  if(DITEMS[k].aoe||DITEMS[k].split){dgBlastItem(k);return}if(k==='snag'){dgChooseFoe(i=>dgSnag(i));return}
  dgTarget={side:'ally',fn:async i=>{dgCrosshair('ally',i,slot);const res=await dgQ(DITEMS[k].icon+' '+DITEMS[k].name.toUpperCase());let used=false,msg;
@@ -2998,7 +3102,7 @@ function dgUseItem(k){const r=runOf(),b=r.battle,slot=b.turn;
    save();await dgSleep(700);dgAfterAction()}};
  document.querySelectorAll('.dg-ally').forEach(x=>x.classList.add('pickable'));$('dgPanel').querySelector('.dg-msg').innerHTML='Tap a teammate to use the '+DITEMS[k].name+' on.'}
 // Pocket Voltorb / Stellar Storm / Thundurus' Might: answer one question, then fixed damage to the enemies
-async function dgBlastItem(k){const r=runOf(),b=r.battle,slot=b.turn,I=DITEMS[k],who=partyMon(r.party[slot]);dgCrosshair('ally',slot,slot);const res=await dgQ(I.icon+' '+I.name.toUpperCase());
+async function dgcBlastItem(k){const r=runOf(),b=r.battle,slot=b.turn,I=DITEMS[k],who=partyMon(r.party[slot]);dgCrosshair('ally',slot,slot);const res=await dgQ(I.icon+' '+I.name.toUpperCase());
  if(res==='makeup'&&Math.random()<.25){toast((who.nickname||who.species)+' fumbled the item! (kept, but no effect)');dgAfterAction();return}
  r.bag[k]--;if(res==='fail'){toast('The '+I.name+' was used up with no effect.');save();dgAfterAction();return}
  const alive=b.enemies.map((e,i)=>[e,i]).filter(([e])=>e.hp>0),n=alive.length,hits=alive.map(([e,i],j)=>{const d=I.aoe||Math.floor(I.split/n)+(j<I.split%n?1:0);e.hp=Math.max(0,e.hp-d);e.hitR=b.round;return {e,i,d}});save();
@@ -3017,11 +3121,11 @@ async function dgOverclock(){const r=runOf(),b=r.battle;r.bag.overclock--;dgCros
 async function dgTimeGear(){const r=runOf(),b=r.battle;r.bag.timegear--;const n=1+Math.floor(Math.random()*4);let ok=0;for(let i=0;i<n;i++){const res=await dgQ('⏱️ TIME GEAR '+(i+1)+'/'+n,{makeUp:false});if(res==='full')ok++}
  if(ok/n>=.5){b.skip=true;save();dgDrawBattle();document.querySelector('.dg-field').classList.add('negative');setTimeout(()=>{const f=document.querySelector('.dg-field');if(f)f.classList.remove('negative')},1200);toast('⏱️ The Time Gear glows: every enemy skips its next turn!')}else{save();toast('The Time Gear flickers and fades…')}await dgSleep(800);dgAfterAction()}
 async function dgGuard(){const _r=runOf(),_b=_r&&_r.battle;if(!_b||_b.enemyPhase||!_r.party[_b.turn])return;if(DG.busy)return;DG.busy=1;const r=runOf(),b=r.battle,m=r.party[b.turn],p=partyMon(m),c=combatant(p);const res=await dgQ('🛡 GUARD');
- const tier={full:[.75,10,'Perfect Guard!'],makeup:[.5,6,'Guard!'],fail:[.25,4,'Shaky guard…']}[res];const gain=tier[1]+Math.round((c.spe+(m.starf&&m.starf.stat==='spe'?2:0))/3);b.guard[b.turn]=tier[0];m.energy=Math.min(100,m.energy+gain);save();dgDrawBattle();dgFloat('.dg-ally[data-i="'+b.turn+'"]',tier[2]+' +'+gain+'⚡','heal');await dgSleep(700);dgAfterAction()}
+ const tier={full:[.75,10,'Perfect Guard!'],makeup:[.5,6,'Guard!'],fail:[.25,4,'Shaky guard…']}[res];const gain=tier[1]+Math.round((c.spe+(m.starf&&m.starf.stat==='spe'?2:0))/3);b.guard[b.turn]=tier[0];m.energy=Math.min(100,m.energy+gain);const lh=twGuardHeal(m,c,gain);save();dgDrawBattle();dgFloat('.dg-ally[data-i="'+b.turn+'"]',tier[2]+' +'+gain+'⚡'+(lh?' +'+lh+' HP':''),'heal');await dgSleep(700);dgAfterAction()}
 // ---------- turn flow ----------
-function dgAfterAction(){const r=runOf(),b=r&&r.battle;if(DG)DG.busy=0;if(!b)return;if(b.enemies.every(e=>e.hp<=0)){dgWin();return}
+function dgcAfterAction(){const r=runOf(),b=r&&r.battle;if(DG)DG.busy=0;if(!b)return;if(b.enemies.every(e=>e.hp<=0)){dgWin();return}
  b.turn++;if(b.turn>=r.party.length){dgEnemyPhase();return}save();dgDrawBattle()}
-async function dgEnemyPhase(){const r=runOf(),b=r.battle;b.enemyPhase=true;save();dgDrawBattle();
+async function dgcEnemyPhase(){const r=runOf(),b=r.battle;if(!b.enemyPhase)twTurnEnd(r,b);b.enemyPhase=true;save();dgDrawBattle();
  if(b.skip){b.skip=false;dgPanelBattle('⏱ The enemies are frozen in time!');await dgSleep(1100)}
  else for(let i=0;i<b.enemies.length;i++){const e=b.enemies[i];if(e.hp<=0)continue;for(let k=0;k<(e.twice?2:1);k++){
   if(k===0&&(e.para||e.flinch)){const why=e.para?'is paralyzed':'flinched';e.para=false;e.flinch=false;if(DG)DG.msg=esc(e.species)+' '+why+' and can’t move!';dgDrawBattle();await dgSleep(800);break}
@@ -3029,7 +3133,7 @@ async function dgEnemyPhase(){const r=runOf(),b=r.battle;b.enemyPhase=true;save(
   const alive=r.party.map((m,j)=>m.hp>0&&m.sky!==b.round?j:-1).filter(j=>j>=0);if(!alive.length)break;const ti=alive[Math.floor(Math.random()*alive.length)],tm=r.party[ti],tp=partyMon(tm),tc=combatant(tp);
   const disc=MOVE_STATS[e.disc],useDisc=disc&&e.energy>=disc[2]&&Math.random()<.4,mv0=useDisc?disc:(MOVE_STATS[e.fast]||['Normal',8,8,'fast']),eh=dgEnemyHits(useDisc?e.disc:e.fast),mv=eh>1?Object.assign([mv0[0],Math.round(mv0[1]*eh),mv0[2],mv0[3]],{cat:moveCat(mv0)}):mv0;
   if(MOVE_SPREAD.has(useDisc?e.disc:e.fast)){await dgEnemyAll(i,e,mv,useDisc);if(!runOf()||runOf().battle!==b)return;if(r.party.every(m=>m.hp<=0))break;continue}
-  const {dmg:raw0}=dgDamage({atk:e.atk,spa:e.spa,types:e.types},{def:tc.def+(tm.starf&&tm.starf.stat==='def'?2:0),spd:tc.spd+(tm.starf&&tm.starf.stat==='spd'?2:0),types:tc.types},mv,.85+Math.random()*.3),capF=(e.boss?(useDisc?.75:.55):(useDisc?.6:.45))*(DIFF[r.diff].dm||1),raw=Math.min(raw0,Math.ceil(tc.hp*capF*(.9+Math.random()*.2)));const dodged=Math.random()<dgDodge(tc.spe+(tm.starf&&tm.starf.stat==='spe'?2:0),e.spe),dmg=dodged?0:ultGuardDmg(b,Math.max(1,Math.round(raw*(1-Math.min(.9,(b.guard[ti]||0)+(b.wall===b.round?.1:0))))));
+  const {dmg:raw0}=dgDamage({atk:e.atk,spa:e.spa,types:e.types},{def:tc.def+(tm.starf&&tm.starf.stat==='def'?2:0),spd:tc.spd+(tm.starf&&tm.starf.stat==='spd'?2:0),types:tc.types},mv,(.85+Math.random()*.3)*dgFoeMult(mv[0])),capF=(e.boss?(useDisc?.75:.55):(useDisc?.6:.45))*(DIFF[r.diff].dm||1),raw=twFoeHit(Math.min(raw0,Math.ceil(tc.hp*capF*(.9+Math.random()*.2))),e,tc.types,tp.species,tm);const dodged=Math.random()<dgDodge(tc.spe+(tm.starf&&tm.starf.stat==='spe'?2:0),e.spe),dmg=dodged?0:ultGuardDmg(b,Math.max(1,Math.round(raw*(1-Math.min(.9,(b.guard[ti]||0)+(b.wall===b.round?.1:0))))));
   if(useDisc)e.energy-=disc[2];else e.energy=Math.min(100,e.energy+mv[2]);tm.hp=Math.max(0,tm.hp-dmg);dgHurt(b,tm,dmg);e.acted=1;save();
   const eff=typeEff(mv[0],tc.types),asel='.dg-ally[data-i="'+ti+'"]',line=esc(e.species)+' used <b>'+esc(useDisc?e.disc:e.fast)+'</b> on <b style="color:'+SLOT_COLORS[ti]+'">'+esc(tp.nickname||tp.species)+'</b>!'+(dodged?' 💨 '+esc(tp.nickname||tp.species)+' dodged it!':b.diamond===b.round?' 💎 The diamond shield blocked it!':(eff>1.2?' <span class="t-sup">Super effective!</span>':eff<.8?' <span class="t-weak">Not very effective…</span>':'')+' <b>−'+dmg+'</b>'+(b.guard[ti]?' 🛡':''))+(tm.hp<=0?' '+esc(tp.nickname||tp.species)+' fainted!':'');
   if(DG)DG.msg=line+(eh>1&&dmg>0?' Hit '+Math.round(eh)+' times!':'');dgPanelBattle(esc(e.species)+' used '+esc(useDisc?e.disc:e.fast)+'!');
@@ -3037,10 +3141,10 @@ async function dgEnemyPhase(){const r=runOf(),b=r.battle;b.enemyPhase=true;save(
   dgDrawBattle();dgPanelBattle(esc(e.species)+' used '+esc(useDisc?e.disc:e.fast)+'!');if(dodged){mvMove(asel,[{x:0},{x:-22,offset:.3},{x:-22,offset:.6},{x:0}],450);dgFloat(asel,'Dodged!','heal')}else{dgHit(asel,useDisc||eff>1.2);dgFloat(asel,b.diamond===b.round?'💎 0':'-'+dmg+(b.guard[ti]?' 🛡':''),eff>1.2?'super':eff<.8?'weak':'')}if(tm.hp<=0)setTimeout(()=>dgFaint(asel),380);await dgSleep(tm.hp<=0?950:750)}}
  const bossUp=b.enemies.find(e=>e.boss&&e.hp>0);if(bossUp&&!b.charge&&r.party.filter(m=>m.hp>0).length>1&&(b.round%3===2||Math.random()<.2)){b.charge=true;if(DG)DG.msg='⚠ '+esc(bossUp.species)+' is gathering power…'}
  dgSaltTick(b);await ultEndOfRound(r,b);if(!runOf()||runOf().battle!==b)return;
- b.guard={};b.enemyPhase=false;b.turn=0;b.round++;if(b.enemies.every(e=>e.hp<=0)){dgWin();return}
+ twRoundEnd(r,b);b.guard={};b.enemyPhase=false;b.turn=0;b.round++;if(b.enemies.every(e=>e.hp<=0)){dgWin();return}
  if(r.party.every(m=>m.hp<=0)){dgLose();return}save();dgDrawBattle()}
 async function dgEnemyAll(i,e,mv,useDisc){const r=runOf(),b=r.battle,name=useDisc?e.disc:e.fast,capF=(e.boss?(useDisc?.75:.55):(useDisc?.6:.45))*(DIFF[r.diff].dm||1)*.75;
- const hits=r.party.map((m,j)=>[m,j]).filter(([m])=>m.hp>0&&m.sky!==b.round).map(([m,j])=>{const tp=partyMon(m),tc=combatant(tp),{dmg:raw0,eff}=dgDamage({atk:e.atk,spa:e.spa,types:e.types},{def:tc.def+(m.starf&&m.starf.stat==='def'?2:0),spd:tc.spd+(m.starf&&m.starf.stat==='spd'?2:0),types:tc.types},mv,(.85+Math.random()*.3)*.75),raw=Math.min(raw0,Math.ceil(tc.hp*capF*(.9+Math.random()*.2))),dodged=Math.random()<dgDodge(tc.spe+(m.starf&&m.starf.stat==='spe'?2:0),e.spe),dmg=dodged?0:ultGuardDmg(b,Math.max(1,Math.round(raw*(1-Math.min(.9,(b.guard[j]||0)+(b.wall===b.round?.1:0))))));m.hp=Math.max(0,m.hp-dmg);dgHurt(b,m,dmg);return {m,j,dmg,eff,dodged}});
+ const hits=r.party.map((m,j)=>[m,j]).filter(([m])=>m.hp>0&&m.sky!==b.round).map(([m,j])=>{const tp=partyMon(m),tc=combatant(tp),{dmg:raw0,eff}=dgDamage({atk:e.atk,spa:e.spa,types:e.types},{def:tc.def+(m.starf&&m.starf.stat==='def'?2:0),spd:tc.spd+(m.starf&&m.starf.stat==='spd'?2:0),types:tc.types},mv,(.85+Math.random()*.3)*.75*dgFoeMult(mv[0])),raw=twFoeHit(Math.min(raw0,Math.ceil(tc.hp*capF*(.9+Math.random()*.2))),e,tc.types,tp.species,m),dodged=Math.random()<dgDodge(tc.spe+(m.starf&&m.starf.stat==='spe'?2:0),e.spe),dmg=dodged?0:ultGuardDmg(b,Math.max(1,Math.round(raw*(1-Math.min(.9,(b.guard[j]||0)+(b.wall===b.round?.1:0))))));m.hp=Math.max(0,m.hp-dmg);dgHurt(b,m,dmg);return {m,j,dmg,eff,dodged}});
  if(useDisc)e.energy-=mv[2];else e.energy=Math.min(100,e.energy+mv[2]);e.acted=1;save();
  if(DG)DG.msg=esc(e.species)+' used <b>'+esc(name)+'</b>! It hits your whole team!'+(hits.some(x=>x.eff>1.2&&!x.dodged)?' <span class="t-sup">Super effective!</span>':'');dgPanelBattle(esc(e.species)+' used '+esc(name)+'!');
  await Promise.all(hits.map((x,k)=>dgSleep(k*70).then(()=>moveFx(mv[0],mv[1]>70,'.dg-foe[data-i="'+i+'"]','.dg-ally[data-i="'+x.j+'"]'))));if(!runOf()||runOf().battle!==b)return;
@@ -3048,11 +3152,11 @@ async function dgEnemyAll(i,e,mv,useDisc){const r=runOf(),b=r.battle,name=useDis
  await dgSleep(hits.some(x=>x.m.hp<=0)?1000:800)}
 async function dgSpread(i,e){const r=runOf(),b=r.battle,t=String((e.types||['normal'])[0]).toLowerCase(),name=SPREAD_MOVES[t]||'Hyper Voice',mv=[t.charAt(0).toUpperCase()+t.slice(1),95,0,'charged'];
  const foe=document.querySelector('.dg-foe[data-i="'+i+'"]');if(foe){foe.classList.add('lunge');setTimeout(()=>foe.classList.remove('lunge'),400)}
- const hits=[];r.party.forEach((m,j)=>{if(m.hp<=0||m.sky===b.round)return;const c=combatant(partyMon(m)),{dmg:raw}=dgDamage({atk:e.atk,spa:e.spa,types:e.types},{def:c.def+(m.starf&&m.starf.stat==='def'?2:0),spd:c.spd+(m.starf&&m.starf.stat==='spd'?2:0),types:c.types},mv,.75*(.9+Math.random()*.2)),cut=Math.min(raw,Math.ceil(c.hp*.42*(DIFF[r.diff].dm||1)*(.9+Math.random()*.2))),dmg=Math.random()<dgDodge(c.spe+(m.starf&&m.starf.stat==='spe'?2:0),e.spe)?0:ultGuardDmg(b,Math.max(1,Math.round(cut*(1-Math.min(.9,(b.guard[j]||0)+(b.wall===b.round?.1:0))))));m.hp=Math.max(0,m.hp-dmg);dgHurt(b,m,dmg);hits.push([j,dmg])});save();
+ const hits=[];r.party.forEach((m,j)=>{if(m.hp<=0||m.sky===b.round)return;const c=combatant(partyMon(m)),{dmg:raw}=dgDamage({atk:e.atk,spa:e.spa,types:e.types},{def:c.def+(m.starf&&m.starf.stat==='def'?2:0),spd:c.spd+(m.starf&&m.starf.stat==='spd'?2:0),types:c.types},mv,.75*(.9+Math.random()*.2)*dgFoeMult(mv[0])),cut=twFoeHit(Math.min(raw,Math.ceil(c.hp*.42*(DIFF[r.diff].dm||1)*(.9+Math.random()*.2))),e,c.types,partyMon(m).species,m),dmg=Math.random()<dgDodge(c.spe+(m.starf&&m.starf.stat==='spe'?2:0),e.spe)?0:ultGuardDmg(b,Math.max(1,Math.round(cut*(1-Math.min(.9,(b.guard[j]||0)+(b.wall===b.round?.1:0))))));m.hp=Math.max(0,m.hp-dmg);dgHurt(b,m,dmg);hits.push([j,dmg])});save();
  if(DG)DG.msg='💥 '+esc(e.species)+' used <b>'+name+'</b>! It hits your whole team!';dgPanelBattle('💥 '+esc(e.species)+' used '+name+'!');await dgSleep(400);dgDrawBattle();dgPanelBattle('💥 '+esc(e.species)+' used '+name+'!');
  const f=document.querySelector('.dg-field');if(f){f.classList.add('spreadfx');setTimeout(()=>f.classList.remove('spreadfx'),700)}
  hits.forEach(([j,dmg])=>{const s='.dg-ally[data-i="'+j+'"]';if(!dmg){mvMove(s,[{x:0},{x:-22,offset:.3},{x:-22,offset:.6},{x:0}],450);dgFloat(s,'Dodged!','heal');return}dgHit(s,true);dgFloat(s,'-'+dmg+(b.guard[j]?' 🛡':''),'super');if(r.party[j].hp<=0)setTimeout(()=>dgFaint(s),380)});await dgSleep(1200)}
-function dgWin(){const r=runOf(),b=r.battle,boss=b.kind!=='battle'&&b.kind!=='swarm',cogs=(b.kind==='swarm'?5:boss?(b.kind==='boss'?12:18):3)+(dgGamey(r)?(r.floor||0):0),got=['+'+cogs+' 🎟️ Tickets'];r.tickets=(r.tickets||0)+cogs;r.cogs=(r.cogs||0)+cogs;
+function dgcWin(){if(runOf()&&runOf().tower)return twWin();const r=runOf(),b=r.battle,boss=b.kind!=='battle'&&b.kind!=='swarm',cogs=(b.kind==='swarm'?5:boss?(b.kind==='boss'?12:18):3)+(dgGamey(r)?(r.floor||0):0),got=['+'+cogs+' 🎟️ Tickets'];r.tickets=(r.tickets||0)+cogs;r.cogs=(r.cogs||0)+cogs;
  const exp=Math.round((boss?4500:b.kind==='swarm'?2000:1500)*(1+(dgGamey(r)?.15*(r.floor||0):0)));r.party.forEach(m=>{const p=partyMon(m);if(p){p.pxp=(p.pxp||0)+exp}});got.push('Team +'+Math.round(exp).toLocaleString()+' EXP each');
  if(boss){const bk=Math.random()<.5?'apple':'starf';r.bag[bk]=(r.bag[bk]||0)+1;got.push(DITEMS[bk].icon+' '+DITEMS[bk].name);if(Math.random()<.2){db.candies++;got.push('🍬 Rare Candy')}}
  if(b.kind==='totem'||b.kind==='alpha'){const big=b.enemies[0],sp=PRE_EVO[big.species]||big.species,m=dgBossMon(sp,b.kind);const e=giveMon(m);got.push('🎁 '+(e.shiny?'✨ Shiny ':'')+e.species+' joined your Box! ('+(sizeTag(e.size)||'Average')+')')}
@@ -3061,10 +3165,500 @@ function dgWin(){const r=runOf(),b=r.battle,boss=b.kind!=='battle'&&b.kind!=='sw
 function dgBossMon(species,kind){const tier=INDEX[species]?INDEX[species].tier:0,m={species,tier,shiny:Math.random()<(1/4096+.05),size:rollSize(),growth:rollGrowth().map(g=>Math.max(2,g))};
  const steps=[.55,.65,.76,1,1.21,1.38,1.48],idx=steps.reduce((bi,v,i)=>Math.abs(v-m.size)<Math.abs(steps[bi]-m.size)?i:bi,3);
  if(kind==='totem'&&m.size<.95&&Math.random()<.25)m.size=steps[Math.max(0,idx-1)];if(kind==='alpha'&&m.size>1.05&&Math.random()<.25)m.size=steps[Math.min(6,idx+1)];return m}
-function dgLose(){const r=runOf();r.battle=null;save();if(!$('dgStage'))return;$('dgStage').innerHTML='<div class="dg-room"><span class="dg-big">💤</span><h3>Your team fainted…</h3><p>The run is over. Your leftover 🎟️ Tickets turn into Cogs, and you keep the EXP and Pokémon you earned.</p><button class="btn red" onclick="dgEnd(false)">LEAVE THE DUNGEON</button></div>';$('dgPanel').innerHTML=''}
-function dgEnd(cleared,quit){const r=runOf();if(!r)return;let bonus=0;const tix=Math.max(0,Math.round(r.tickets||0));db.cogs=Math.round(db.cogs+tix);const fl=r.clearedFloors||0;if(cleared&&fl){bonus=dgFloorBonus(r);db.cogs=Math.round(db.cogs+bonus);grantXp(20+10*fl)}else grantXp(15);
- const lines=[(cleared&&fl?'🏆 Cleared '+fl+' floor'+(fl>1?'s':'')+'! +'+bonus+' Cogs floor bonus':quit?'Run ended early.':'Run over.'),'🎟️ Tickets earned: '+(r.cogs||0)+' · '+tix+' left over → +'+tix+' Cogs','Cogs from this run: '+(tix+bonus),'Rooms explored: '+r.rooms,'Time studying: '+fmtMin(r.studyMs)];db.run=null;save();if(mgState)mgState.stop&&mgState.stop();mgState=null;render();
+function dgLose(){if(runOf()&&runOf().tower)return twLoseScreen();const r=runOf();r.battle=null;save();if(!$('dgStage'))return;$('dgStage').innerHTML='<div class="dg-room"><span class="dg-big">💤</span><h3>Your team fainted…</h3><p>The run is over. Your leftover 🎟️ Tickets turn into Cogs, and you keep the EXP and Pokémon you earned.</p><button class="btn red" onclick="dgEnd(false)">LEAVE THE DUNGEON</button></div>';$('dgPanel').innerHTML=''}
+function dgEnd(cleared,quit){if(dgMode==='tower')return twEnd(quit);const r=runOf();if(!r)return;let bonus=0;const tix=Math.max(0,Math.round(r.tickets||0));db.cogs=Math.round(db.cogs+tix);const fl=r.clearedFloors||0;if(cleared&&fl){bonus=dgFloorBonus(r);db.cogs=Math.round(db.cogs+bonus);grantXp(20+10*fl)}else grantXp(15);
+ const lines=[(cleared&&fl?'🏆 Beat '+fl+' boss'+(fl>1?'es':'')+'! +'+bonus+' Cogs bonus':quit?'Run ended early.':'Run over.'),'🎟️ Tickets earned: '+(r.cogs||0)+' · '+tix+' left over → +'+tix+' Cogs','Cogs from this run: '+(tix+bonus),'Deepest floor: B'+(r.floor+1)+'F','Time studying: '+fmtMin(r.studyMs)];db.run=null;save();if(mgState)mgState.stop&&mgState.stop();mgState=null;render();
  $('mgArea').innerHTML='<div class="reveal mg-end"><h2>🏰 Mystery Dungeon</h2>'+lines.map(l=>'<p>'+l+'</p>').join('')+'<div class="actions"><button class="btn" onclick="mgQuit()">MENU</button></div></div>'}
+// ===================== MYSTERY DUNGEON · grid floors =====================
+// Mystery Dungeon is played on tile floors: rooms joined by corridors, stairs down, items on the ground and wild Pokémon in
+// the rooms. On your turn, every Pokémon may move once (up to its move range, set by its species' Speed) and then act once
+// (Fight, Item or Guard). Only actions ask a study question. Moves have reach and shapes, so where you stand matters.
+// Every few floors a boss guards the stairs. This file replaces the old room map: functions with the same names as in the
+// battle code above (dgOpen, dgDrawBattle, dgAfterAction, dgEnemyPhase…) take over from those versions.
+const GD_T=40,GD_DEPTH={easy:3,balanced:4,hard:5},GD_SIZE={easy:[22,20,6],balanced:[26,24,7],hard:[28,26,8]};
+const GD_THEMES=[
+ {name:'Grassy Plains',f1:'#d6e4a2',f2:'#cbdb94',w1:'#6e9a44',w2:'#5b8637',e:'#3f6229',g:'#a9c46f'},
+ {name:'Rocky Cave',f1:'#cdb898',f2:'#c0aa89',w1:'#7a6650',w2:'#675442',e:'#463a2d',g:'#a8916f'},
+ {name:'Frosty Grotto',f1:'#dcebf3',f2:'#cfe2ed',w1:'#7aa3c1',w2:'#668faf',e:'#46698a',g:'#b2cfe2'},
+ {name:'Ember Caverns',f1:'#e3b893',f2:'#d8aa84',w1:'#8a3f2c',w2:'#753423',e:'#52231a',g:'#c78f68'},
+ {name:'Crystal Depths',f1:'#d8cfea',f2:'#ccc0e2',w1:'#6a58a0',w2:'#58498b',e:'#3c3166',g:'#b4a6d6'}];
+const GD_DIRS=[[0,1],[1,1],[1,0],[1,-1],[0,-1],[-1,-1],[-1,0],[-1,1]]; // sprite-sheet rows: S SE E NE N NW W SW
+const GD_SPECIAL={shop:{icon:'🛒',name:'Kecleon Shop'},chest:{icon:'💎',name:'Treasure Chest'},spring:{icon:'⛲',name:'Healing Spring'}};
+function gdDirOf(dx,dy){const i=GD_DIRS.findIndex(d=>d[0]===Math.sign(dx)&&d[1]===Math.sign(dy));return i<0?0:i}
+function gdMV(species){const s=((SPECIES_DATA[species]||{}).stats||[0,0,0,0,0,60])[5];return s<50?2:s<80?3:s<110?4:5}
+function gdTheme(r){return GD_THEMES[(Math.floor(r.floor/(GD_DEPTH[r.diff]||3))+(r.themeOff||0))%GD_THEMES.length]}
+function gdIsBossFloor(r){return (r.floor+1)%(GD_DEPTH[r.diff]||3)===0}
+function gdTile(fl,x,y){return x<0||y<0||x>=fl.w||y>=fl.h?0:+fl.tiles[y][x]}
+const gdKey=(x,y)=>x+','+y,gdCheb=(a,b)=>Math.max(Math.abs(a.x-b.x),Math.abs(a.y-b.y));
+// ---------- floor generation ----------
+function gdNewFloor(r){const [W,H,NR]=GD_SIZE[r.diff]||GD_SIZE.easy,g=Array.from({length:H},()=>Array(W).fill(0)),rooms=[],rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+ for(let t=0;t<400&&rooms.length<NR;t++){const w=rnd(4,7),h=rnd(4,6),x=rnd(1,W-w-2),y=rnd(1,H-h-2);if(rooms.some(o=>x<o[0]+o[2]+2&&o[0]<x+w+2&&y<o[1]+o[3]+2&&o[1]<y+h+2))continue;rooms.push([x,y,w,h])}
+ rooms.sort((a,b)=>a[0]-b[0]);rooms.forEach(([x,y,w,h])=>{for(let j=y;j<y+h;j++)for(let i=x;i<x+w;i++)g[j][i]=1});
+ const ctr=o=>[o[0]+(o[2]>>1),o[1]+(o[3]>>1)],dig=(a,b)=>{let [x,y]=a;const [tx,ty]=b,set=()=>{if(!g[y][x])g[y][x]=2};const hf=Math.random()<.5;
+  if(hf){while(x!==tx){x+=Math.sign(tx-x);set()}while(y!==ty){y+=Math.sign(ty-y);set()}}else{while(y!==ty){y+=Math.sign(ty-y);set()}while(x!==tx){x+=Math.sign(tx-x);set()}}};
+ for(let i=0;i<rooms.length-1;i++)dig(ctr(rooms[i]),ctr(rooms[i+1]));for(let k=0;k<2&&rooms.length>3;k++){const a=rnd(0,rooms.length-1),b=rnd(0,rooms.length-1);if(Math.abs(a-b)>1)dig(ctr(rooms[a]),ctr(rooms[b]))}
+ const tiles=g.map(row=>row.join('')),fl={w:W,h:H,tiles,rooms,items:[],specials:[],seen:'0'.repeat(W*H),boss:gdIsBossFloor(r),stairsHidden:false,id:uid()};
+ // the farthest room (by walking distance) holds the stairs, and the boss on a boss floor
+ const dist=gdBFS(fl,ctr(rooms[0]),()=>false,999),far=rooms.map((o,i)=>[i,(dist.get(gdKey(...ctr(o)))||{d:0}).d]).sort((a,b)=>b[1]-a[1])[0][0];fl.stairs=ctr(rooms[far]);fl.stairsHidden=fl.boss;
+ const free=o=>{const out=[];for(let j=o[1];j<o[1]+o[3];j++)for(let i=o[0];i<o[0]+o[2];i++)out.push([i,j]);return shuffle(out)},taken=new Set([gdKey(...fl.stairs)]);
+ const takeIn=o=>{for(const t of free(o))if(!taken.has(gdKey(...t))){taken.add(gdKey(...t));return t}return null};
+ // your team starts together in the first room
+ const s0=ctr(rooms[0]),spots=[[0,0],[1,0],[0,1],[1,1],[-1,0],[0,-1]].map(([dx,dy])=>[s0[0]+dx,s0[1]+dy]).filter(([x,y])=>gdTile(fl,x,y)===1);
+ r.party.forEach((m,i)=>{const p=spots[i]||takeIn(rooms[0]);m.x=p[0];m.y=p[1];m.dir=0;m.moved=false;m.acted=false;taken.add(gdKey(m.x,m.y));delete m.hurt;delete m.hurtR;delete m.koR});
+ // wild Pokémon
+ const D=DIFF[r.diff],seg=Math.floor(r.floor/(GD_DEPTH[r.diff]||3)),inSeg=r.floor%(GD_DEPTH[r.diff]||3),bump=(dgGamey(r)?seg*(D.step||2):0)+inSeg,avg=partyAvgLv()+bump,cap=avg+D.cap;
+ const spread=(mid,sd,lo,hi)=>{const z=(Math.random()+Math.random()+Math.random()-1.5)*2;return Math.max(1,Math.min(hi,Math.max(lo,Math.round(mid+z*sd))))},sd=r.diff==='hard'?3.5:r.diff==='easy'?2.5:3,en=[];
+ const put=(e,o)=>{const t=takeIn(o);if(!t)return;e.x=t[0];e.y=t[1];e.dir=0;e.mv=gdMV(e.species);en.push(e)};
+ rooms.forEach((o,i)=>{if(!i)return;
+  if(i===far&&fl.boss){const kind=r.diff==='easy'?'boss':Math.random()<.4?(r.diff==='hard'&&Math.random()<.5?'alpha':'totem'):'boss',evolved=MONS.filter(m=>PRE_EVO[m[0]]&&m[2]>=1),sp=kind==='boss'?speciesOfTier(2,4):evolved[Math.floor(Math.random()*evolved.length)][0];
+   const b=makeEnemy(sp,cap+rnd(0,2),{hpMul:D.bh*(kind==='totem'?.85:kind==='alpha'?1.2:1),atkMul:kind==='alpha'?1.3:1.2,boss:kind,twice:kind==='alpha'});taken.delete(gdKey(...fl.stairs));b.x=fl.stairs[0];b.y=fl.stairs[1];b.dir=0;b.mv=gdMV(sp);b.aware=1;en.push(b);taken.add(gdKey(b.x,b.y));
+   if(kind==='totem'){const pre=PRE_EVO[sp]||sp;for(let k=0;k<rnd(2,3);k++)put(makeEnemy(pre,spread(avg-2,2,avg-6,avg+1),{hpMul:.8}),o)}else put(makeEnemy(speciesOfTier(0,2),spread(avg,sd,avg-4,cap)),o);return}
+  if(i>1&&Math.random()<.14){const sp=speciesOfTier(0,0);for(let k=0;k<rnd(4,6);k++){const e=makeEnemy(sp,spread(avg-6,2,avg-10,avg-3),{hpMul:.7,atkMul:.75});e.swarm=1;put(e,o)}return}
+  if(Math.random()<.62){const n=rnd(1,r.diff==='hard'?3:2);for(let k=0;k<n;k++)put(makeEnemy(speciesOfTier(0,2),spread(avg+(cap-avg)*.4,sd,avg-6,cap+3),{hpMul:1.15}),o)}});
+ // items lying on the ground, and special spots
+ const mid=rooms.map((o,i)=>i).filter(i=>i&&i!==far);for(let k=0;k<rnd(2,4);k++){const o=rooms[rnd(0,rooms.length-1)],t=takeIn(o);if(!t)continue;
+  if(Math.random()<.35)fl.items.push({x:t[0],y:t[1],tickets:rnd(3,8)+inSeg});else{const pool=Object.keys(DITEMS).filter(id=>id!=='snag'||Math.random()<.15).map(id=>({id,w:DITEM_TIER_W[DITEMS[id].tier||0]}));fl.items.push({x:t[0],y:t[1],k:pickWeighted(pool).id})}}
+ const sp2=[['chest',.65],['spring',.35],['shop',.25]];for(const [k,p] of sp2){if(Math.random()>p||!mid.length)continue;const t=takeIn(rooms[mid[rnd(0,mid.length-1)]]);if(t)fl.specials.push({x:t[0],y:t[1],k})}
+ r.fl=fl;r.battle={kind:'floor',enemies:en,turn:0,round:1,overclock:0,skip:false,guard:{},done:false,enemyPhase:false};gdSee(r);if(DG){DG.gmode='select';DG.msg=''}}
+// breadth-first search over walkable tiles; blocked(x,y) says a tile can't be entered
+function gdBFS(fl,start,blocked,max){const q=[[start[0],start[1]]],seen=new Map([[gdKey(...start),{d:0,prev:null}]]);
+ while(q.length){const [x,y]=q.shift(),cur=seen.get(gdKey(x,y));if(cur.d>=max)continue;
+  for(const [dx,dy] of GD_DIRS){const nx=x+dx,ny=y+dy,k=gdKey(nx,ny);if(seen.has(k)||!gdTile(fl,nx,ny))continue;if(dx&&dy&&(!gdTile(fl,x+dx,y)||!gdTile(fl,x,y+dy)))continue;if(blocked(nx,ny))continue;seen.set(k,{d:cur.d+1,prev:gdKey(x,y)});q.push([nx,ny])}}
+ return seen}
+function gdPath(reach,k){const out=[];while(k){out.unshift(k.split(',').map(Number));k=reach.get(k).prev}return out}
+function gdAliveFoes(b){return b.enemies.map((e,i)=>[e,i]).filter(([e])=>(e.hp>0||e.gdOut)&&!e.done)}
+function gdUnitAt(r,x,y){const b=r.battle;const ai=r.party.findIndex(m=>m.x===x&&m.y===y);if(ai>=0)return {side:'ally',i:ai};const fi=b.enemies.findIndex(e=>(e.hp>0||e.gdOut)&&!e.done&&e.x===x&&e.y===y);return fi>=0?{side:'foe',i:fi}:null}
+// ---------- what you can see ----------
+function gdRoomOf(fl,x,y){return fl.rooms.findIndex(o=>x>=o[0]&&x<o[0]+o[2]&&y>=o[1]&&y<o[1]+o[3])}
+function gdLit(r){const fl=r.fl,L=new Set();r.party.forEach(m=>{const ri=gdRoomOf(fl,m.x,m.y);if(ri>=0){const o=fl.rooms[ri];for(let j=o[1]-1;j<=o[1]+o[3];j++)for(let i=o[0]-1;i<=o[0]+o[2];i++)L.add(gdKey(i,j))}
+  for(let dy=-2;dy<=2;dy++)for(let dx=-2;dx<=2;dx++)L.add(gdKey(m.x+dx,m.y+dy))});return L}
+function gdSee(r){const fl=r.fl,L=gdLit(r),s=fl.seen.split('');L.forEach(k=>{const [x,y]=k.split(',').map(Number);if(x>=0&&y>=0&&x<fl.w&&y<fl.h)s[y*fl.w+x]='1'});fl.seen=s.join('');
+ // wild Pokémon that can see your team wake up and start hunting
+ r.battle.enemies.forEach(e=>{if(!e.aware&&e.hp>0&&L.has(gdKey(e.x,e.y))&&r.party.some(m=>gdCheb(m,e)<=5))e.aware=1});return L}
+// ---------- move shapes ----------
+// adjacent: the 8 tiles around you · line: the first foe in a straight line · beam: every foe in the line · area: every foe within reach
+function gdShape(name,mv){const cat=moveCat(mv)||'P';if(MOVE_SPREAD.has(name))return {k:'area',r:2,label:'All foes within 2'};if(mv[3]==='fast')return cat==='S'?{k:'line',r:3,label:'Line · 3'}:{k:'adj',r:1,label:'Next to you'};
+ if(cat==='P')return {k:'line',r:2,label:'Lunge · 2'};return /beam|pump|thrower|bolt|pulse|cannon|blast|laser|ray|hurricane|thunder$/i.test(name)?{k:'beam',r:5,label:'Beam · 5, pierces'}:{k:'line',r:4,label:'Line · 4'}}
+// options = [{key:target index, hits:[indices]}] for a user at (ux,uy) against a list of [unit, index] targets
+function gdOptions(fl,ux,uy,shape,targets){const at=new Map(targets.map(([u,i])=>[gdKey(u.x,u.y),i])),out=[];
+ if(shape.k==='area'){const hits=targets.filter(([u])=>gdCheb(u,{x:ux,y:uy})<=shape.r).map(([,i])=>i);return hits.length?[{key:hits[0],hits,all:true}]:[]}
+ if(shape.k==='adj'){targets.forEach(([u,i])=>{if(gdCheb(u,{x:ux,y:uy})===1)out.push({key:i,hits:[i]})});return out}
+ for(const [dx,dy] of GD_DIRS){let x=ux,y=uy;const line=[];for(let s=1;s<=shape.r;s++){x+=dx;y+=dy;if(!gdTile(fl,x,y))break;const i=at.get(gdKey(x,y));if(i!=null){line.push(i);if(shape.k==='line')break}}
+  if(!line.length)continue;if(shape.k==='line')out.push({key:line[0],hits:[line[0]]});else line.forEach(i=>out.push({key:i,hits:line}))}
+ return out}
+function gdFoeTargets(r){const L=gdLit(r);return gdAliveFoes(r.battle).filter(([e])=>e.hp>0&&L.has(gdKey(e.x,e.y)))}
+// ---------- drawing ----------
+function gdTilesCanvas(r){const fl=r.fl,th=gdTheme(r),T=GD_T;if(DG&&DG.tilesFor===fl.id&&DG.tiles)return DG.tiles;const c=document.createElement('canvas');c.width=fl.w*T;c.height=fl.h*T;const g=c.getContext('2d');
+ let seed=7;const rr=()=>{seed=(seed*16807)%2147483647;return seed/2147483647};
+ for(let y=0;y<fl.h;y++)for(let x=0;x<fl.w;x++){const t=gdTile(fl,x,y),X=x*T,Y=y*T;
+  if(t){g.fillStyle=(x+y)%2?th.f1:th.f2;g.fillRect(X,Y,T,T);if(rr()<.25){g.fillStyle=th.g;g.fillRect(X+4+rr()*26,Y+4+rr()*26,4,3)}}
+  else{g.fillStyle=th.w1;g.fillRect(X,Y,T,T);g.fillStyle=th.w2;g.fillRect(X+2,Y+2,T-4,T-4);if(rr()<.3){g.fillStyle=th.e;g.fillRect(X+8+rr()*20,Y+8+rr()*20,6,6)}
+   // edge shading where a wall meets a floor tile, so walls read as raised
+   if(gdTile(fl,x,y+1)){g.fillStyle=th.e;g.fillRect(X,Y+T-7,T,7)}}}
+ if(DG){DG.tiles=c;DG.tilesFor=fl.id}return c}
+function gdDrawBattle(entering){const r=runOf(),b=r&&r.battle,st=$('dgStage');if(!b||!st||!r.fl)return;const fl=r.fl,T=GD_T,L=gdSee(r),th=gdTheme(r);
+ let field=st.querySelector('.gd-field');if(!field||entering){st.innerHTML='<div class="dg-field gd-field"><div class="gd-map"><canvas class="gd-tiles"></canvas><div class="gd-objs"></div><canvas class="gd-fog"></canvas><div class="gd-hl"></div><div class="gd-units"></div></div><canvas class="gd-mini"></canvas><div class="gd-floor"></div></div>';field=st.querySelector('.gd-field');field.addEventListener('click',gdTap);
+  const mp=field.querySelector('.gd-map');mp.style.width=fl.w*T+'px';mp.style.height=fl.h*T+'px';const tc=field.querySelector('.gd-tiles');tc.width=fl.w*T;tc.height=fl.h*T;tc.getContext('2d').drawImage(gdTilesCanvas(r),0,0)}
+ let tk=field.querySelector('.dg-ticker');if(DG&&DG.msg){if(!tk){tk=document.createElement('div');tk.className='dg-ticker';field.appendChild(tk)}tk.innerHTML=DG.msg}else if(tk)tk.remove();
+ field.querySelector('.gd-floor').innerHTML='B'+(r.floor+1)+'F · '+th.name+(fl.boss?' · 👑':'');
+ // fog: black where you've never been, dim where you can't see right now
+ const fc=field.querySelector('.gd-fog');fc.width=fl.w*T;fc.height=fl.h*T;const fg=fc.getContext('2d');for(let y=0;y<fl.h;y++)for(let x=0;x<fl.w;x++){const seen=fl.seen[y*fl.w+x]==='1';if(!seen){fg.fillStyle='#05070d';fg.fillRect(x*T,y*T,T,T)}else if(!L.has(gdKey(x,y))){fg.fillStyle='rgba(5,7,13,.45)';fg.fillRect(x*T,y*T,T,T)}}
+ const vis=(x,y)=>L.has(gdKey(x,y)),seenAt=(x,y)=>fl.seen[y*fl.w+x]==='1';
+ field.querySelector('.gd-objs').innerHTML=(!fl.stairsHidden&&seenAt(...fl.stairs)?'<div class="gd-obj stairs" style="left:'+fl.stairs[0]*T+'px;top:'+fl.stairs[1]*T+'px">🪜</div>':'')
+  +fl.items.filter(it=>seenAt(it.x,it.y)).map(it=>'<div class="gd-obj" style="left:'+it.x*T+'px;top:'+it.y*T+'px">'+(it.tickets?'🎟️':DITEMS[it.k].icon)+'</div>').join('')
+  +fl.specials.filter(s=>seenAt(s.x,s.y)).map(s=>'<div class="gd-obj sp" style="left:'+s.x*T+'px;top:'+s.y*T+'px">'+GD_SPECIAL[s.k].icon+'</div>').join('');
+ // units (sprites keep their element between redraws so animations and effects stay smooth)
+ const U=field.querySelector('.gd-units'),want=new Set();
+ const unit=(cls,i,x,y,sp,row,hpPct,extra,color)=>{const id=cls+i;want.add(id);let el=U.querySelector('[data-u="'+id+'"]');if(!el){el=document.createElement('div');el.dataset.u=id;el.innerHTML='<div class="gd-hp"><i></i></div><div class="dg-spr" data-sp="'+esc(sp)+'" data-row="'+row+'" data-sz="'+(extra.includes('big')?1:.82)+'"></div><b class="dg-xh"></b>';U.appendChild(el)}
+  el.className='gd-u '+cls+' '+extra;el.dataset.i=i;el.style.left=x*T+'px';el.style.top=y*T+'px';el.style.zIndex=10+y;if(color)el.style.setProperty('--c',color);const s=el.querySelector('.dg-spr');if(+s.dataset.row!==row){s.dataset.row=row;s.classList.remove('ok')}
+  const hp=el.querySelector('.gd-hp i');hp.style.width=Math.max(0,Math.min(100,hpPct))+'%';hp.className=hpPct<=20?'low':hpPct<=50?'mid':''};
+ r.party.forEach((m,i)=>{const c=combatant(partyMon(m));unit('dg-ally',i,m.x,m.y,partyMon(m).species,m.dir||0,m.hp/c.hp*100,(m.hp<=0?'ko ':'')+(b.turn===i&&!b.enemyPhase?'active ':'')+(m.acted?'done ':'')+(b.guard[i]?'guard ':''),SLOT_COLORS[i])});
+ b.enemies.forEach((e,i)=>{if(e.done||(e.hp<=0&&!e.gdOut)||!vis(e.x,e.y))return;unit('dg-foe',i,e.x,e.y,e.species,e.dir||0,(e.gdOut?e.gdHp:e.hp)/e.maxhp*100,(e.boss?'big ':'')+(e.aware?'':'asleep '))});
+ U.querySelectorAll('.gd-u').forEach(el=>{if(!want.has(el.dataset.u))el.remove()});dgFillSprites();
+ if(entering)gdFit();gdHighlight();gdMini(r,L);if(entering||DG&&DG.follow!==false)gdCamera();
+ if(DG&&DG.busy&&!b.enemyPhase)$('dgPanel').innerHTML='<div class="dg-msg">…</div>';else dgPanelBattle()}
+// fit the dungeon between the page header and the bottom dock, so the action buttons are never hidden
+function gdFit(){const dg=document.querySelector('.dg.gd');if(!dg)return;const dock=document.querySelector('nav.dock'),top=dg.getBoundingClientRect().top,db_=dock&&dock.getBoundingClientRect(),bot=db_&&db_.height&&db_.top>top?db_.top:innerHeight;dg.style.minHeight='0';dg.style.height=Math.max(400,Math.round(bot-top-6))+'px'}
+addEventListener('resize',()=>{if(document.querySelector('.dg.gd')){gdFit();gdCamera()}});
+function gdMini(r,L){const fl=r.fl,c=document.querySelector('.gd-mini');if(!c)return;const s=4;c.width=fl.w*s;c.height=fl.h*s;const g=c.getContext('2d');g.clearRect(0,0,c.width,c.height);
+ for(let y=0;y<fl.h;y++)for(let x=0;x<fl.w;x++)if(fl.seen[y*fl.w+x]==='1'&&gdTile(fl,x,y)){g.fillStyle=L.has(gdKey(x,y))?'#ffffffcc':'#ffffff66';g.fillRect(x*s,y*s,s,s)}
+ if(!fl.stairsHidden&&fl.seen[fl.stairs[1]*fl.w+fl.stairs[0]]==='1'){g.fillStyle='#4aa3ff';g.fillRect(fl.stairs[0]*s-1,fl.stairs[1]*s-1,s+2,s+2)}
+ fl.items.forEach(it=>{if(fl.seen[it.y*fl.w+it.x]==='1'){g.fillStyle='#ffd34d';g.fillRect(it.x*s,it.y*s,s,s)}});
+ r.battle.enemies.forEach(e=>{if(e.hp>0&&!e.done&&L.has(gdKey(e.x,e.y))){g.fillStyle='#ff4d4d';g.fillRect(e.x*s,e.y*s,s,s)}});
+ r.party.forEach((m,i)=>{g.fillStyle=SLOT_COLORS[i];g.fillRect(m.x*s-1,m.y*s-1,s+2,s+2)})}
+function gdCamera(x,y){const r=runOf(),f=document.querySelector('.gd-field'),mp=f&&f.querySelector('.gd-map');if(!mp)return;const b=r.battle,m=r.party[b.turn]||r.party[0];x=x??m.x;y=y??m.y;
+ const W=f.clientWidth,H=f.clientHeight,T=GD_T,mw=r.fl.w*T,mh=r.fl.h*T;let tx=W/2-(x+.5)*T,ty=H/2-(y+.5)*T;tx=Math.min(0,Math.max(W-mw,tx));ty=Math.min(0,Math.max(H-mh,ty));if(mw<W)tx=(W-mw)/2;if(mh<H)ty=(H-mh)/2;mp.style.transform='translate('+Math.round(tx)+'px,'+Math.round(ty)+'px)'}
+function gdHighlight(){const hl=document.querySelector('.gd-hl');if(!hl)return;const T=GD_T,H=DG&&DG.hl;hl.innerHTML=H?H.tiles.map(([x,y])=>'<i class="'+H.cls+'" style="left:'+x*T+'px;top:'+y*T+'px"></i>').join(''):''}
+// ---------- tapping the map ----------
+function gdTap(ev){const r=runOf(),b=r&&r.battle;if(!b||!r.fl||b.enemyPhase)return;const mp=document.querySelector('.gd-map').getBoundingClientRect(),x=Math.floor((ev.clientX-mp.left)/GD_T),y=Math.floor((ev.clientY-mp.top)/GD_T),u=gdUnitAt(r,x,y);
+ if(dgTarget){if(dgTarget.side==='ally'&&u&&u.side==='ally'){dgAllyPick(u.i);return}if(dgTarget.side==='foe'&&u&&u.side==='foe'){dgTargetPick(u.i);return}return}
+ if(DG.busy&&DG.gmode!=='move'&&DG.gmode!=='target')return;
+ if(DG.gmode==='move'){const k=gdKey(x,y);if(DG.reach&&DG.reach.has(k)&&!gdUnitAt(r,x,y)){gdWalkTo(b.turn,x,y);return}DG.gmode='select';DG.hl=null;DG.busy=0;gdHighlight();dgPanelBattle();return}
+ if(DG.gmode==='target'){if(u&&u.side==='foe'&&DG.opts){const o=DG.opts.find(o=>o.key===u.i)||DG.opts.find(o=>o.hits.includes(u.i));if(o){DG.pick(o);return}}return}
+ if(u&&u.side==='ally'&&!DG.busy){b.turn=u.i;DG.gmode='select';gdCamera();gdDrawBattle();return}
+ if(u&&u.side==='foe'){const e=b.enemies[u.i];toast(e.species+' Lv '+e.lv+' · '+e.hp+'/'+e.maxhp+' HP · moves '+e.mv+(e.aware?'':' · not noticed you yet'))}}
+// ---------- the action panel ----------
+function gdPanelBattle(msg){const r=runOf(),b=r.battle,m=r.party[b.turn],p=m&&partyMon(m);if(!r.fl)return;
+ if(b.enemyPhase||!m){$('dgPanel').innerHTML='<div class="dg-msg">'+(msg||'Enemy turn…')+'</div>';return}
+ if(ultResting(b,m)&&!m.acted){m.acted=true;m.moved=true;save()}
+ const c=combatant(p),fast=MOVE_STATS[p.fastMove]||['Normal',8,8,'fast'],disc=MOVE_STATS[p.discMove]||['Normal',80,50,'charged'],foes=gdFoeTargets(r),U=ultOf(p),canHit=gdOptions(r.fl,m.x,m.y,gdShape(p.fastMove,fast),foes).length>0||(m.energy>=disc[2]&&gdOptions(r.fl,m.x,m.y,gdShape(p.discMove,disc),foes).length>0)||(U&&m.energy>=100&&(U.t==='none'||foes.some(([e])=>gdCheb(e,m)<=(U.t==='all'?3:5))));
+ const chips='<div class="gd-chips">'+r.party.map((q,i)=>{const pp=partyMon(q),cc=combatant(pp);return '<button class="gd-chip'+(i===b.turn?' on':'')+(q.acted?' done':'')+(q.hp<=0?' ko':'')+'" style="--c:'+SLOT_COLORS[i]+'" onclick="gdSelect('+i+')">'+monSprite(pp,'',28)+'<small>'+(q.acted?'✓':q.hp<=0?'💤':q.hp+'/'+cc.hp)+'</small></button>'}).join('')+'</div>';
+ const head='<div class="dg-msg"><b style="color:'+SLOT_COLORS[b.turn]+'">'+esc(p.nickname||p.species)+'</b> · '+m.hp+'/'+c.hp+' HP · ⚡'+m.energy+' · 👣 '+gdMV(p.species)+(msg?'<br>'+msg:m.acted?' · done this turn':m.moved?' · moved, can still act':'')+'</div>';
+ const acts=m.hp<=0?'<div class="dg-acts"><button class="btn red" '+(m.acted?'disabled':'')+' onclick="dgRevive()">💫 ANSWER TO REVIVE</button></div>'
+  :'<div class="dg-acts gd-acts"><button class="btn" '+(m.moved||m.acted?'disabled':'')+' onclick="gdMoveStart()">👣 MOVE</button><button class="btn red" '+(m.acted||!canHit?'disabled':'')+' onclick="dgFight()">⚔️ FIGHT'+(canHit||m.acted?'':'<small>no foe in reach</small>')+'</button><button class="btn blue" '+(m.acted?'disabled':'')+' onclick="dgItem()">🎒 ITEM</button><button class="btn" '+(m.acted?'disabled':'')+' onclick="dgGuard()">🛡 GUARD</button></div>';
+ $('dgPanel').innerHTML=head+chips+acts+'<div class="dg-row"><button class="btn smallbtn red" onclick="gdEndTurn()">⏭ END TURN</button><span>⏱ <b id="dgTime">'+fmtMin(r.studyMs)+'</b></span><span>🎟️ '+(r.tickets||0)+'</span><button class="btn smallbtn" onclick="dgSettings()">⚙</button><button class="btn smallbtn" onclick="dgSaveExit()">💾</button></div>'}
+function gdSelect(i){const r=runOf(),b=r&&r.battle;if(!b||b.enemyPhase||DG.busy)return;b.turn=i;DG.gmode='select';DG.hl=null;gdDrawBattle()}
+// ---------- moving ----------
+function gdMoveStart(){const r=runOf(),b=r.battle,m=r.party[b.turn];if(!m||m.moved||m.acted||m.hp<=0||DG.busy)return;const fl=r.fl,mv=gdMV(partyMon(m).species);
+ const reach=gdBFS(fl,[m.x,m.y],(x,y)=>b.enemies.some(e=>(e.hp>0||e.gdOut)&&!e.done&&e.x===x&&e.y===y),mv);DG.reach=reach;DG.gmode='move';gdCamera(m.x,m.y);
+ DG.hl={cls:'mv',tiles:[...reach.keys()].map(k=>k.split(',').map(Number)).filter(([x,y])=>!(x===m.x&&y===m.y)&&!gdUnitAt(r,x,y))};gdHighlight();$('dgPanel').innerHTML='<div class="dg-msg">👣 Tap a blue tile to move there (up to '+mv+' tiles).</div><div class="dg-acts"><button class="btn" onclick="DG.gmode=\'select\';DG.hl=null;gdDrawBattle()">CANCEL</button></div>'}
+async function gdWalk(unitEl,obj,path,isFoe){const T=GD_T;for(let s=1;s<path.length;s++){const [x,y]=path[s],[px,py]=path[s-1];obj.dir=gdDirOf(x-px,y-py);obj.x=x;obj.y=y;if(unitEl){unitEl.style.left=x*T+'px';unitEl.style.top=y*T+'px';unitEl.style.zIndex=10+y;const sp=unitEl.querySelector('.dg-spr');if(sp&&+sp.dataset.row!==obj.dir){sp.dataset.row=obj.dir;sp.classList.remove('ok');dgFillSprites()}}if(!isFoe)gdCamera(x,y);await dgSleep(120)}}
+async function gdWalkTo(slot,x,y){const r=runOf(),b=r.battle,m=r.party[slot],path=gdPath(DG.reach,gdKey(x,y));DG.gmode='select';DG.hl=null;DG.busy=1;gdHighlight();
+ await gdWalk(document.querySelector('.dg-ally[data-i="'+slot+'"]'),m,path,false);if(!runOf()||runOf().battle!==b)return;m.moved=true;gdSee(r);save();DG.busy=0;
+ // pick up what's on the tile
+ const fl=r.fl,ii=fl.items.findIndex(it=>it.x===m.x&&it.y===m.y);if(ii>=0){const it=fl.items.splice(ii,1)[0];if(it.tickets){r.tickets=(r.tickets||0)+it.tickets;r.cogs=(r.cogs||0)+it.tickets;toast('🎟️ Found '+it.tickets+' Tickets!')}else{r.bag[it.k]=(r.bag[it.k]||0)+1;toast(DITEMS[it.k].icon+' Picked up '+DITEMS[it.k].name+'!')}save()}
+ const si=fl.specials.findIndex(s=>s.x===m.x&&s.y===m.y);if(si>=0){const s=fl.specials.splice(si,1)[0];save();r.rooms=(r.rooms||0)+1;if(s.k==='shop'){r.shopStock=null;dgShop()}else if(s.k==='chest')dgTreasure();else dgRest();return}
+ if(!fl.stairsHidden&&m.x===fl.stairs[0]&&m.y===fl.stairs[1]){gdDrawBattle();modal('🪜 STAIRS','<p>'+(fl.boss?'The way out of this part of the dungeon.':'Go down to <b>B'+(r.floor+2)+'F</b>? Your whole team comes along.')+'</p><div class="actions"><button class="btn" onclick="closeModal()">NOT YET</button><button class="btn red" onclick="closeModal();gdStairs()">'+(fl.boss?'CONTINUE':'GO DOWN')+'</button></div>');return}
+ gdDrawBattle()}
+function gdStairs(){const r=runOf();if(!r||!r.fl||r.fl.stairsHidden||!r.party.some(m=>m.x===r.fl.stairs[0]&&m.y===r.fl.stairs[1]))return;if(r.fl.boss){dgFloorClear();return}r.floor++;r.party.forEach(m=>{const c=combatant(partyMon(m));m.energy=Math.min(100,m.energy+10);if(m.hp>0)m.hp=Math.min(c.hp,m.hp+Math.ceil(c.hp*.2));if(m.starf&&--m.starf.rooms<=0)m.starf=null});gdNewFloor(r);save();toast('⬇ B'+(r.floor+1)+'F'+(r.fl.boss?' · something big is waiting here…':''));gdDrawBattle(true)}
+// ---------- fighting ----------
+async function gdFight(){const r=runOf(),b=r&&r.battle;if(!b||b.enemyPhase||DG.busy)return;const m=r.party[b.turn],p=partyMon(m);if(!m||m.acted||m.hp<=0)return;
+ const fast=MOVE_STATS[p.fastMove]||['Normal',8,8,'fast'],disc=MOVE_STATS[p.discMove]||['Normal',80,50,'charged'],X=dgCtx(b.turn),foes=gdFoeTargets(r),U=ultOf(p);
+ const opt=(n,mv)=>gdOptions(r.fl,m.x,m.y,gdShape(n,mv),foes),o1=opt(p.fastMove,fast),o2=opt(p.discMove,disc),uScope=U?(U.t==='all'?foes.filter(([e])=>gdCheb(e,m)<=3):U.t==='one'?foes.filter(([e])=>gdCheb(e,m)<=5):foes):[];
+ $('dgPanel').innerHTML='<div class="dg-msg">Choose a move. Its reach is shown under it.</div><div class="dg-acts">'+dgMoveBtn('dgM1','red',p.fastMove,fast,X,o1.length>0)+dgMoveBtn('dgM2','blue',p.discMove,disc,X,m.energy>=disc[2]&&o2.length>0)+(U?'<button class="btn ult" id="dgM3" '+(m.energy<100||(U.t!=='none'&&!uScope.length)?'disabled':'')+'>✦ '+esc(U.move)+'<small>ULTIMATE · '+(U.t==='all'?'foes within 3':U.t==='one'?'one foe within 5':'self')+' · '+(m.energy<100?m.energy+'/100⚡':'FULL ⚡')+'</small></button>':'')+'</div><div class="dg-acts"><button class="btn" onclick="DG.gmode=\'select\';DG.hl=null;gdDrawBattle()">BACK</button></div>';
+ const lab=(id,n,mv)=>{const el=$(id);if(el){const sm=el.querySelector('small');if(sm)sm.insertAdjacentHTML('beforeend','<br>📐 '+gdShape(n,mv).label)}};lab('dgM1',p.fastMove,fast);lab('dgM2',p.discMove,disc);
+ const choose=(name,mv,opts)=>{if(!opts.length)return;DG.gmode='target';DG.opts=opts;const T=new Set();opts.forEach(o=>o.hits.forEach(i=>T.add(i)));DG.hl={cls:'tg',tiles:[...T].map(i=>[b.enemies[i].x,b.enemies[i].y])};gdHighlight();
+  const go=async o=>{DG.gmode='select';DG.hl=null;gdHighlight();DG.busy=1;const sl=b.turn,ep=dgEpoch,res=await dgQ('⚔️ FIGHT',{hint:true});const mult=r.slider?await dgSlider(res,dgBarSlow(b)):dgRandMult();const r2=runOf();if(ep!==dgEpoch||!r2||r2.battle!==b||b.turn!==sl||m.acted)return;if(mv[3]!=='fast'&&m.energy<mv[2]){DG.busy=0;gdDrawBattle();return}
+   const t0=b.enemies[o.key];m.dir=gdDirOf(t0.x-m.x,t0.y-m.y);const s=document.querySelector('.dg-ally[data-i="'+sl+'"] .dg-spr');if(s){s.dataset.row=m.dir;s.classList.remove('ok');await dgFillSprites()}
+   if(o.hits.length===1&&!MOVE_SPREAD.has(name))dgAttack(sl,o.key,name,mv,mult);else gdAttackMulti(sl,name,mv,mult,o.hits)};
+  DG.pick=go;if(opts.length===1&&opts[0].all){go(opts[0]);return}$('dgPanel').innerHTML='<div class="dg-msg">🎯 Tap a highlighted foe.'+(gdShape(name,mv).k==='beam'?' The beam hits everything in that line.':'')+'</div><div class="dg-acts"><button class="btn" onclick="DG.gmode=\'select\';DG.hl=null;gdDrawBattle()">BACK</button></div>'};
+ $('dgM1').onclick=()=>choose(p.fastMove,fast,o1);$('dgM2').onclick=()=>choose(p.discMove,disc,o2);
+ if(U&&$('dgM3'))$('dgM3').onclick=async()=>{const sl=b.turn,ep=dgEpoch,run=async i=>{DG.busy=1;if(i!=null)dgCrosshair('foe',i,sl);const res=await dgQ('✦ '+U.move.toUpperCase(),{hint:true});const mult=U.t==='none'?1:r.slider?await dgSlider(res,dgBarSlow(b)*(U.fx==='cudgel'?.75:1)):dgRandMult();const r2=runOf();if(ep!==dgEpoch||!r2||r2.battle!==b||b.turn!==sl||m.acted||m.energy<100)return;
+   // foes out of the Ultimate's reach sit this one out
+   const keep=new Set(uScope.map(([,j])=>j));b.enemies.forEach((e,j)=>{if(e.hp>0&&!e.done&&!keep.has(j)){e.gdHp=e.hp;e.hp=0;e.gdOut=1}});dgUltimate(sl,i,mult,res)};
+  if(U.t==='one'){DG.gmode='target';DG.opts=uScope.map(([,j])=>({key:j,hits:[j]}));DG.hl={cls:'tg',tiles:uScope.map(([e])=>[e.x,e.y])};gdHighlight();DG.pick=o=>{DG.gmode='select';DG.hl=null;gdHighlight();run(o.key)};$('dgPanel').innerHTML='<div class="dg-msg">🎯 Tap a highlighted foe.</div>'}else run(null)}}
+// several targets (spread moves, beams): like the all-foes attack above, but only the foes hit
+async function gdAttackMulti(slot,name,mv,mult,idx){const r=runOf(),b=r&&r.battle,m=b&&r.party[slot],p=partyMon(m);if(!p)return;const x=dgCtx(slot),who=esc(p.nickname||p.species),asel='.dg-ally[data-i="'+slot+'"]',sc=idx.length>1?.75:1;
+ const hits=idx.map(i=>[b.enemies[i],i]).filter(([e])=>e&&e.hp>0).map(([e,i])=>Object.assign(dgStrike(x,name,mv,e,mult,sc),{e,i})),out=dgFinish(x,name,mv,hits);save();
+ const ok=hits.filter(h=>!h.fail),best=Math.max(1,...ok.map(h=>h.eff)),tot=ok.reduce((a,h)=>a+h.dmg,0),ko=ok.filter(h=>h.e.hp<=0).map(h=>esc(h.e.species)),crit=ok.some(h=>h.crit),tags=[...new Set(ok.flatMap(h=>h.tags))];
+ if(DG)DG.msg='<b style="color:'+SLOT_COLORS[slot]+'">'+who+'</b> used <b>'+esc(name)+'</b>! '+(ok.length?'It hits '+ok.length+' foe'+(ok.length>1?'s':'')+' for <b>'+tot+'</b>.':'But it failed! '+((hits[0]||{}).fail||''))+(crit&&ok.length?' <span class="t-crit">Critical hit!</span>':'')+(best>1.2?' <span class="t-sup">Super effective!</span>':'')+(tags.length?' '+tags.join(' '):'')+(ko.length?' '+ko.join(', ')+' fainted!':'')+dgOutMsg(out);
+ if(mv[3]!=='fast'||1)mvAttackAnim(asel);await Promise.all(ok.map((h,k)=>dgSleep(k*70).then(()=>moveFx(mv[0],movePow(name)>70,asel,'.dg-foe[data-i="'+h.i+'"]'))));if(!runOf()||runOf().battle!==b)return;
+ hits.forEach(h=>{const s='.dg-foe[data-i="'+h.i+'"]';if(h.fail){dgFloat(s,'No effect','weak');return}dgHit(s,h.crit||h.eff>1.2);dgFloat(s,'-'+h.dmg,h.crit?'crit':h.eff>1.2?'super':h.eff<.8?'weak':'');if(h.e.hp<=0)setTimeout(()=>dgFaint(s),380)});gdDrawBattle();
+ if(mv[3]==='fast')dgFloat(asel,'+⚡'+mv[2],'en');dgShowOut(slot,out);await dgSleep(ko.length?1000:850);dgAfterAction()}
+// the foe picker for items like the Snag Machine: any foe you can see within 4 tiles
+function gdChooseFoe(fn){const r=runOf(),b=r&&r.battle;if(!b)return;const m=r.party[b.turn],opts=gdFoeTargets(r).filter(([e])=>gdCheb(e,m)<=4);if(!opts.length){toast('No foe within 4 tiles');DG.busy=0;dgPanelBattle();return}
+ dgTarget={side:'foe',fn};DG.hl={cls:'tg',tiles:opts.map(([e])=>[e.x,e.y])};gdHighlight();$('dgPanel').innerHTML='<div class="dg-msg">🎯 Tap a highlighted foe (within 4 tiles).</div>'}
+// ---------- after each action ----------
+function gdUnstash(b){b.enemies.forEach(e=>{if(e.gdOut){e.hp=e.gdHp;delete e.gdHp;delete e.gdOut}})}
+function gdKills(r){const b=r.battle,got=[];b.enemies.forEach(e=>{if(e.hp>0||e.done||e.gdOut)return;e.done=1;const boss=!!e.boss,tix=(boss?(e.boss==='boss'?12:18):e.swarm?1:2)+(dgGamey(r)?Math.floor(r.floor/2):0),exp=Math.round((boss?4500:e.swarm?500:1000)*(1+(dgGamey(r)?.1*r.floor:0)));
+  r.tickets=(r.tickets||0)+tix;r.cogs=(r.cogs||0)+tix;r.party.forEach(m=>{const p=partyMon(m);if(p)p.pxp=(p.pxp||0)+exp});got.push((e.caught?'🧲 ':'')+esc(e.species)+': +'+tix+'🎟️ · team +'+money(exp)+' EXP');
+  if(boss){const bk=Math.random()<.5?'apple':'starf';r.bag[bk]=(r.bag[bk]||0)+1;got.push(DITEMS[bk].icon+' '+DITEMS[bk].name);if(Math.random()<.2){db.candies++;got.push('🍬 Rare Candy')}
+   if(e.boss==='totem'||e.boss==='alpha'){const sp=PRE_EVO[e.species]||e.species,mm=giveMon(dgBossMon(sp,e.boss));got.push('🎁 '+(mm.shiny?'✨ Shiny ':'')+mm.species+' joined your Box!')}
+   if(r.fl.boss){r.fl.stairsHidden=false;got.push('🪜 The stairs appeared!')}}});
+ if(got.length&&DG)DG.msg=(DG.msg?DG.msg+'<br>':'')+got.join('<br>')}
+function gdAfterAction(){const r=runOf(),b=r&&r.battle;if(DG)DG.busy=0;if(!b||!r.fl)return;gdUnstash(b);const m=r.party[b.turn];if(m){m.acted=true;m.moved=true}r.party.forEach(q=>{if(!(q.energy>=0))q.energy=0});dgTarget=null;if(DG){DG.gmode='select';DG.hl=null}gdKills(r);
+ if(r.party.every(q=>q.hp<=0)){dgLose();return}const next=r.party.findIndex((q,i)=>!q.acted&&(q.hp>0||!q.acted));
+ if(r.party.every(q=>q.acted||(q.hp<=0&&q.reviveTried))){save();gdEnemyPhase();return}if(next>=0)b.turn=next;save();gdDrawBattle()}
+function gdEndTurn(){const r=runOf(),b=r&&r.battle;if(!b||b.enemyPhase||DG.busy)return;if(r.party.some(q=>q.hp>0&&!q.acted)&&!confirm('End the turn? Pokémon that haven’t acted will skip their action.'))return;gdEnemyPhase()}
+// ---------- the enemies' turn ----------
+async function gdEnemyPhase(){const r=runOf(),b=r.battle;b.enemyPhase=true;DG.gmode='select';DG.hl=null;save();gdDrawBattle();const ep=dgEpoch;
+ if(b.skip){b.skip=false;dgPanelBattle('⏱ The enemies are frozen in time!');await dgSleep(1100)}
+ else for(let i=0;i<b.enemies.length;i++){const e=b.enemies[i];if(e.hp<=0||e.done)continue;gdSee(r);if(!e.aware)continue;
+  for(let k=0;k<(e.twice?2:1);k++){if(ep!==dgEpoch||!runOf()||runOf().battle!==b)return;if(r.party.every(m=>m.hp<=0))break;
+   if(k===0&&(e.para||e.flinch)){const why=e.para?'is paralyzed':'flinched';e.para=false;e.flinch=false;DG.msg=esc(e.species)+' '+why+' and can’t move!';gdDrawBattle();await dgSleep(700);break}
+   if(e.boss&&k===0&&b.charge){b.charge=false;await gdBossBlast(i,e);continue}
+   const disc=MOVE_STATS[e.disc],useDisc=disc&&e.energy>=disc[2]&&Math.random()<.4,name=useDisc?e.disc:e.fast,mv0=useDisc?disc:(MOVE_STATS[e.fast]||['Normal',8,8,'fast']),shape=gdShape(name,mv0);
+   const allies=()=>r.party.map((m,j)=>[m,j]).filter(([m])=>m.hp>0);let opts=gdOptions(r.fl,e.x,e.y,shape,allies());
+   if(!opts.length&&k===0){// walk toward your team: the closest tile it can attack from, otherwise as close as it can get
+    const reach=gdBFS(r.fl,[e.x,e.y],(x,y)=>r.party.some(m=>m.x===x&&m.y===y)||b.enemies.some((o,j)=>j!==i&&o.hp>0&&!o.done&&o.x===x&&o.y===y),e.mv||3);let best=null,bd=1e9;
+    reach.forEach((v,kk)=>{const [x,y]=kk.split(',').map(Number),o=gdOptions(r.fl,x,y,shape,allies());const near=Math.min(...allies().map(([m])=>gdCheb(m,{x,y})));const score=o.length?v.d:100+near*10+v.d;if(score<bd){bd=score;best=kk}});
+    if(best&&best!==gdKey(e.x,e.y)){const el=document.querySelector('.dg-foe[data-i="'+i+'"]');await gdWalk(el,e,gdPath(reach,best),true);gdDrawBattle();}
+    opts=gdOptions(r.fl,e.x,e.y,shape,allies())}
+   if(!opts.length)break;const o=opts.sort((a,c)=>c.hits.length-a.hits.length)[0];await gdEnemyStrike(i,e,o.hits,useDisc,name,mv0);if(r.party.every(m=>m.hp<=0))break}}
+ if(ep!==dgEpoch||!runOf()||runOf().battle!==b)return;
+ const bossUp=b.enemies.find(e=>e.boss&&e.hp>0&&!e.done&&e.aware);if(bossUp&&!b.charge&&r.party.filter(m=>m.hp>0).length>1&&(b.round%3===2||Math.random()<.2)){b.charge=true;DG.msg='⚠ '+esc(bossUp.species)+' is gathering power for a blast that hits everyone within 3 tiles! 🛡 Guard or get away.'}
+ dgSaltTick(b);await ultEndOfRound(r,b);if(!runOf()||runOf().battle!==b)return;gdKills(r);
+ b.guard={};b.enemyPhase=false;b.round++;
+ // like in the games, your team slowly recovers while no wild Pokémon is chasing it
+ const Lr=gdLit(r),calm=!b.enemies.some(e=>e.hp>0&&!e.done&&e.aware&&Lr.has(gdKey(e.x,e.y)));if(calm)r.party.forEach(m=>{const c=combatant(partyMon(m));if(m.hp>0&&m.hp<c.hp)m.hp=Math.min(c.hp,m.hp+Math.ceil(c.hp*.05))});
+ r.party.forEach(m=>{m.moved=false;m.acted=false;delete m.reviveTried});b.turn=Math.max(0,r.party.findIndex(m=>m.hp>0));
+ if(r.party.every(m=>m.hp<=0)){dgLose();return}save();gdDrawBattle()}
+async function gdEnemyStrike(i,e,targets,useDisc,name,mv0){const r=runOf(),b=r.battle,disc=MOVE_STATS[e.disc],eh=dgEnemyHits(name),mv=eh>1?Object.assign([mv0[0],Math.round(mv0[1]*eh),mv0[2],mv0[3]],{cat:moveCat(mv0)}):mv0,sc=targets.length>1?.75:1,fsel='.dg-foe[data-i="'+i+'"]';
+ const t0=r.party[targets[0]];e.dir=gdDirOf(t0.x-e.x,t0.y-e.y);const s=document.querySelector(fsel+' .dg-spr');if(s){s.dataset.row=e.dir;s.classList.remove('ok');await dgFillSprites()}
+ const hits=targets.map(ti=>{const tm=r.party[ti],tp=partyMon(tm),tc=combatant(tp),{dmg:raw0}=dgDamage({atk:e.atk,spa:e.spa,types:e.types},{def:tc.def+(tm.starf&&tm.starf.stat==='def'?2:0),spd:tc.spd+(tm.starf&&tm.starf.stat==='spd'?2:0),types:tc.types},mv,(.85+Math.random()*.3)*sc),capF=(e.boss?(useDisc?.75:.55):(useDisc?.6:.45))*(DIFF[r.diff].dm||1)*sc,raw=Math.min(raw0,Math.ceil(tc.hp*capF*(.9+Math.random()*.2))),dodged=Math.random()<dgDodge(tc.spe+(tm.starf&&tm.starf.stat==='spe'?2:0),e.spe),dmg=dodged?0:ultGuardDmg(b,Math.max(1,Math.round(raw*(1-Math.min(.9,(b.guard[ti]||0)+(b.wall===b.round?.1:0))))));
+  tm.hp=Math.max(0,tm.hp-dmg);dgHurt(b,tm,dmg);return {ti,tm,tp,dmg,dodged,eff:typeEff(mv[0],tc.types)}});
+ if(useDisc)e.energy-=disc[2];else e.energy=Math.min(100,e.energy+mv0[2]);e.acted=1;save();
+ DG.msg=esc(e.species)+' used <b>'+esc(name)+'</b>'+(hits.length>1?' on '+hits.length+' of your team':' on <b style="color:'+SLOT_COLORS[hits[0].ti]+'">'+esc(hits[0].tp.nickname||hits[0].tp.species)+'</b>')+'! '+hits.map(h=>h.dodged?'💨 '+esc(h.tp.nickname||h.tp.species)+' dodged!':'−'+h.dmg+(b.guard[h.ti]?'🛡':'')).join(' · ')+(eh>1?' (hit '+Math.round(eh)+' times)':'')+(hits.some(h=>h.eff>1.2&&!h.dodged)?' <span class="t-sup">Super effective!</span>':'')+hits.filter(h=>h.tm.hp<=0).map(h=>' '+esc(h.tp.nickname||h.tp.species)+' fainted!').join('');
+ dgPanelBattle(esc(e.species)+' used '+esc(name)+'!');mvAttackAnim(fsel);await Promise.all(hits.map((h,k)=>dgSleep(k*70).then(()=>moveFx(mv0[0],mv0[1]>70,fsel,'.dg-ally[data-i="'+h.ti+'"]'))));if(!runOf()||runOf().battle!==b)return;
+ gdDrawBattle();dgPanelBattle(esc(e.species)+' used '+esc(name)+'!');hits.forEach(h=>{const a='.dg-ally[data-i="'+h.ti+'"]';if(h.dodged){mvMove(a,[{x:0},{x:-14,offset:.3},{x:-14,offset:.6},{x:0}],450);dgFloat(a,'Dodged!','heal');return}dgHit(a,useDisc||h.eff>1.2);dgFloat(a,'-'+h.dmg+(b.guard[h.ti]?' 🛡':''),h.eff>1.2?'super':h.eff<.8?'weak':'');if(h.tm.hp<=0)setTimeout(()=>dgFaint(a),380)});
+ await dgSleep(hits.some(h=>h.tm.hp<=0)?950:750)}
+// a boss's charged blast: everyone within 3 tiles
+async function gdBossBlast(i,e){const r=runOf(),b=r.battle,t=String((e.types||['normal'])[0]).toLowerCase(),name=SPREAD_MOVES[t]||'Hyper Voice',mv=[t.charAt(0).toUpperCase()+t.slice(1),95,0,'charged'],hits=[];
+ r.party.forEach((m,j)=>{if(m.hp<=0||gdCheb(m,e)>3)return;const c=combatant(partyMon(m)),{dmg:raw}=dgDamage({atk:e.atk,spa:e.spa,types:e.types},{def:c.def,spd:c.spd,types:c.types},mv,.75*(.9+Math.random()*.2)),cut=Math.min(raw,Math.ceil(c.hp*.42*(DIFF[r.diff].dm||1)*(.9+Math.random()*.2))),dmg=Math.random()<dgDodge(c.spe,e.spe)?0:ultGuardDmg(b,Math.max(1,Math.round(cut*(1-Math.min(.9,b.guard[j]||0)))));m.hp=Math.max(0,m.hp-dmg);dgHurt(b,m,dmg);hits.push([j,dmg])});save();
+ DG.msg='💥 '+esc(e.species)+' used <b>'+name+'</b>!'+(hits.length?' It hits '+hits.length+' of your team!':' Everyone got out of range!');gdDrawBattle();const f=document.querySelector('.gd-field');if(f){f.classList.add('spreadfx');setTimeout(()=>f.classList.remove('spreadfx'),700)}
+ hits.forEach(([j,dmg])=>{const s='.dg-ally[data-i="'+j+'"]';if(!dmg){dgFloat(s,'Dodged!','heal');return}dgHit(s,true);dgFloat(s,'-'+dmg+(b.guard[j]?' 🛡':''),'super');if(r.party[j].hp<=0)setTimeout(()=>dgFaint(s),380)});await dgSleep(1200)}
+// ---------- taking over from the room-map versions above ----------
+// the Battle Tower keeps the classic battle screen (foes on top, team at the bottom); the dungeon uses the tile floors
+const gdTower=()=>{const r=runOf();return !!(r&&r.tower)};
+function dgDrawBattle(entering){return gdTower()?dgcDrawBattle(entering):gdDrawBattle(entering)}
+function dgDrawMap(){return gdDrawBattle(true)}
+function dgPanelBattle(msg){return gdTower()?dgcPanelBattle(msg):gdPanelBattle(msg)}
+function dgAfterAction(){return gdTower()?dgcAfterAction():gdAfterAction()}
+function dgEnemyPhase(){return gdTower()?dgcEnemyPhase():gdEnemyPhase()}
+function dgChooseFoe(fn){return gdTower()?dgcChooseFoe(fn):gdChooseFoe(fn)}
+function dgFight(){return gdTower()?dgcFight():gdFight()}
+function dgNextRoom(){const r=runOf();if(!r)return;if(r.tower){twShopDone();return}save();gdDrawBattle(true)}
+function dgWin(){return gdTower()?dgcWin():gdAfterAction()}
+function dgDescend(){const r=runOf();if(!r)return;r.floor++;r.party.forEach(m=>{const c=combatant(partyMon(m));if(m.hp>0)m.hp=Math.min(c.hp,m.hp+Math.round(c.hp*.3))});gdNewFloor(r);save();toast('⬇ B'+(r.floor+1)+'F'+(dgGamey(r)?'. The air feels heavier…':''));gdDrawBattle(true)}
+function dgFloorClear(){const r=runOf(),D=DIFF[r.diff],seg=Math.floor(r.floor/(GD_DEPTH[r.diff]||3))+1;r.clearedFloors=Math.max(r.clearedFloors||0,seg);save();const bonus=dgFloorBonus(r),g=dgGamey(r);
+ $('dgStage').innerHTML='<div class="dg-room"><span class="dg-big">🏁</span><h3>B'+(r.floor+1)+'F boss beaten!</h3><p>Leave now to collect a <b>'+bonus+' Cog</b> bonus'+(g?' ('+r.clearedFloors+' boss'+(r.clearedFloors>1?'es':'')+' × '+(D.fb||10)+')':'')+'.</p><p class="small">'+(g?'Or go deeper: the next floors are about '+((seg)*(D.step||2))+' levels stronger. Your team recovers 30% HP. If your team faints down there, you lose the bonus.':'Or keep exploring deeper. Casual floors stay the same strength, and your team recovers 30% HP on the way down.')+'</p><div class="actions"><button class="btn" onclick="dgEnd(true)">🏠 LEAVE WITH REWARDS</button><button class="btn red" onclick="dgDescend()">⬇ GO DEEPER</button></div></div>';$('dgPanel').innerHTML=dgPanelMap()}
+// items that hit "every enemy" hit every foe you can see
+async function dgBlastItem(k){if(gdTower())return dgcBlastItem(k);const r=runOf(),b=r.battle,slot=b.turn,I=DITEMS[k],who=partyMon(r.party[slot]);dgCrosshair('ally',slot,slot);const res=await dgQ(I.icon+' '+I.name.toUpperCase());
+ if(res==='makeup'&&Math.random()<.25){toast((who.nickname||who.species)+' fumbled the item! (kept, but no effect)');dgAfterAction();return}
+ r.bag[k]--;if(res==='fail'){toast('The '+I.name+' was used up with no effect.');save();dgAfterAction();return}
+ const alive=gdFoeTargets(r),n=alive.length;if(!n){toast('No foe in sight. The '+I.name+' fizzled.');save();dgAfterAction();return}
+ const hits=alive.map(([e,i],j)=>{const d=I.aoe||Math.floor(I.split/n)+(j<I.split%n?1:0);e.hp=Math.max(0,e.hp-d);e.hitR=b.round;return {e,i,d}});save();
+ DG.msg=I.icon+' <b>'+I.name+'</b>! '+hits.map(h=>esc(h.e.species)+' −'+h.d).join(', ');const f=document.querySelector('.gd-field');if(f){f.classList.add(k==='stellar'?'spreadfx':'shake');setTimeout(()=>f.classList.remove('spreadfx','shake'),700)}
+ hits.forEach(h=>{const s='.dg-foe[data-i="'+h.i+'"]';dgHit(s,true);dgFloat(s,'-'+h.d,'super');if(h.e.hp<=0)setTimeout(()=>dgFaint(s),380)});await dgSleep(1000);dgAfterAction()}
+async function dgRevive(){if(gdTower())return dgcRevive();const r=runOf(),b=r&&r.battle;if(!b||b.enemyPhase||DG.busy)return;const m=r.party[b.turn];if(!m||m.hp>0||m.acted)return;DG.busy=1;const res=await dgQ('💫 REVIVE');
+ if(res!=='fail'){m.hp=1;save();gdDrawBattle();dgFloat('.dg-ally[data-i="'+b.turn+'"]','Back up! (1 HP)','eff');await dgSleep(700)}else{m.reviveTried=1;toast('Still fainted. Try again next turn.')}dgAfterAction()}
+function dgStartRun(){dgMode='dungeon';const sids=[...document.querySelectorAll('.mg-sets input:checked')].map(x=>x.value),mode=(document.querySelector('input[name=mgm]:checked')||{}).value||'smart',diff=(document.querySelector('input[name=dgd]:checked')||{}).value||'easy',style=(document.querySelector('input[name=dgs]:checked')||{}).value||'casual';if(!sids.length){toast('Pick at least one study set');return}
+ if(mode==='weak'&&!sids.some(id=>(db.learned||{})[id])){toast('Finish Learn mode on one of these sets first');return}
+ if(!mgPicker(mgBank(sids),mode).bank.length){toast('No questions for that mode here');return}
+ db.run={diff,style,sids,mode,party:dgPick.map(id=>{const p=db.pokemon.find(x=>x.id===id),c=combatant(p);return {id,hp:c.hp,energy:20,starf:null}}),floor:0,bag:{oran:2},studyMs:0,cogs:0,tickets:0,rooms:0,startedAt:stamp(),slider:true,battle:null,themeOff:Math.floor(Math.random()*GD_THEMES.length),log:[]};dgPick=[];gdNewFloor(db.run);save();closeModal();go('minigames');dgOpen()}
+function dgOpen(mode){if(mode)dgMode=mode;if(dgMode==='tower')return dgcOpen();const r=runOf();if(!r)return;dgEpoch++;mgState={game:'dungeon',startedAt:Date.now(),stop:()=>{clearInterval(DG&&DG.clock);dgEpoch++;document.querySelectorAll('.mgq,.dg-slider').forEach(x=>x.remove());document.body.classList.remove('mg-on');DG=null}};DG={clock:setInterval(()=>{const rr=runOf();if(!rr||currentPage!=='minigames'||document.hidden)return;rr.studyMs+=1000;const t=$('dgTime');if(t)t.textContent=fmtMin(rr.studyMs)},1000),bank:mgBank(r.sids),gmode:'select'};DG.P=mgPicker(DG.bank,r.mode);document.body.classList.add('mg-on');
+ const el=$('mgArea');el.innerHTML='<div class="dg gd"><div class="dg-stage" id="dgStage"></div><div class="dg-panel" id="dgPanel"></div></div>';
+ // a run saved by the old room-map version continues on a fresh tile floor
+ if(!r.fl||!r.battle||r.battle.kind!=='floor'){r.floor=r.floor||0;if(r.themeOff==null)r.themeOff=0;gdNewFloor(r);save()}
+ gdDrawBattle(true);if(r.battle.enemyPhase)gdEnemyPhase()}
+// ===================== BATTLE TOWER =====================
+// Battles back to back: no map, rooms or rests. A boss waits every 10th floor. Battles can drop Tickets and battle items
+// into the run bag. Every 5 floors you choose a perk, and every 10 floors the environment changes. Uses the same battle
+// engine as Mystery Dungeon (runOf() points at db.tower while you're in the Tower). Leftover Tickets become Cogs at the end.
+var dgMode='dungeon',dgPickFor='dungeon';
+const TW_ENVS={
+ electric:{name:'Electric Workshop',icon:'⚡',desc:'Electric-type moves deal 30% more damage.',boost:{electric:1.3},plat:'#7d8799'},
+ grass:{name:'Grass Jungle',icon:'🌿',desc:'Grass-type moves deal 30% more damage.',boost:{grass:1.3},plat:'#6aa04d'},
+ misty:{name:'Misty World',icon:'🌸',desc:'Fairy-type moves deal 30% more damage.',boost:{fairy:1.3},plat:'#e9bcdc'},
+ psychic:{name:'Psychic Mindscape',icon:'🔮',desc:'Psychic-type moves deal 30% more damage.',boost:{psychic:1.3},plat:'#a95fbe'},
+ concrete:{name:'Concrete Jungle',icon:'🏙️',desc:'Grass- and Rock-type moves deal 15% more damage.',boost:{grass:1.15,rock:1.15},plat:'#9a9aa2'},
+ wilds:{name:'Vicious Wilds',icon:'🐾',desc:'Multi-hit moves only hit once.',single:true,plat:'#96683f'},
+ holy:{name:'Holy Sanctum',icon:'🕊️',desc:'At the end of your turn, your Pokémon heal 2 HP.',heal:2},
+ sludge:{name:'Sludge Hell',icon:'☣️',desc:'After both sides have moved, the floor bubbles: 1 damage to every Pokémon that isn’t Poison or Steel type.',chip:{d:1,safe:['poison','steel'],icon:'☣️'}},
+ dragon:{name:'Dragon Cavern',icon:'🐉',desc:'Dragon-type Pokémon take 10% less damage from all attacks.',dragon:true},
+ legend:{name:'Legend’s Temple',icon:'🏛️',desc:'Legendary Pokémon take 5% less damage and deal 10% more damage.',legend:true},
+ trepid:{name:'Trepidation Habitat',icon:'🌊',desc:'Water-type attacks deal extra damage equal to 5% of the attacker’s max HP.',water:true},
+ sleepless:{name:'Sleepless Hollow',icon:'🌙',desc:'Items can’t be used.',noItems:true},
+ dank:{name:'Dank Depths',icon:'🦇',desc:'Dark-types dodge as if they had +4 Speed. Foe Dark-types can dodge your attack: 20% after a Make-Up answer, 40% after a wrong one.',dank:true},
+ crystal:{name:'Crystal Mines',icon:'💎',desc:'Rock- and Ground-type foes are more common. After both sides have moved, every Pokémon that isn’t Ground, Steel or Rock type takes 1 damage.',chip:{d:1,safe:['ground','steel','rock'],icon:'💎'},rockFoes:true},
+ snow:{name:'Snowscape',icon:'❄️',desc:'Ice-types take 10% less damage from attacks.',ice:true},
+ dice:{name:'Dice Arena',icon:'🎲',desc:'Moves that hit 2–5 times always hit at least 3 times.',dice:true},
+ spook:{name:'Spook Zone',icon:'👻',desc:'Every attack heals the attacker 10% of each hit’s damage (rounded down, at least 1 HP per hit).',spook:true},
+ king:{name:'King’s Battlefield',icon:'👑',desc:'The highest-level Pokémon on each side glows gold: it deals 15% more damage and takes 5% less. If it faints, each of its teammates loses 20% of their max HP.',king:true},
+ center:{name:'Pokémon Center',icon:'🏥',desc:'Revived Pokémon get back up with 15% of their max HP instead of 1 HP.',center:true},
+ lifeblock:{name:'Lifeblock Gym',icon:'🧱',desc:'Guarding also heals the guard for half the Stamina it gains (rounded down).',lifeblock:true}};
+const TW_PERKS={
+ meal:{icon:'🍲',name:'Hot Meal',desc:'Heal every Pokémon 50% of its HP (fainted ones get back up with 25%).'},
+ revive:{icon:'💫',name:'Revival Herb',desc:'Every fainted Pokémon gets back up with 50% HP.'},
+ power:{icon:'💪',name:'Power Charm',desc:'+10% damage for the rest of the run.'},
+ guard:{icon:'🛡️',name:'Iron Shell',desc:'Take 10% less damage for the rest of the run (up to 30%).'},
+ battery:{icon:'🔋',name:'Battery Pack',desc:'Every battle starts with +20 Stamina for each Pokémon.'},
+ lucky:{icon:'🍀',name:'Lucky Ticket',desc:'+25% Tickets from battles for the rest of the run.'},
+ supply:{icon:'📦',name:'Supply Drop',desc:'2 random battle items right now.'}};
+const TW_CHAL={
+ noitem:{t:'Win without using a battle item',ok:b=>!b.usedItem},
+ q4:{t:'Answer 4 questions right on the first try this battle',ok:b=>(b.qFull||0)>=4},
+ nofaint:{t:'Win without any of your Pokémon fainting',ok:b=>!b.koAny},
+ quick:{t:'Win within 6 rounds',ok:b=>b.round<=6}};
+function twEnvKey(r){r=r||runOf();if(!r||!r.envs)return 'electric';if(r.envs.length<Object.keys(TW_ENVS).length){const miss=Object.keys(TW_ENVS).filter(k=>!r.envs.includes(k));r.envs.push(...shuffle(miss))}return r.envs[Math.floor(Math.max(0,(r.floor||1)-1)/10)%r.envs.length]}
+function twEnv(r){return TW_ENVS[twEnvKey(r)]}
+// hooks used by the battle engine (always 1 / false outside the Tower)
+function dgEnvMult(type){const r=runOf();if(!r||!r.tower)return 1;const e=twEnv(r);return (e.boost&&e.boost[String(type).toLowerCase()])||1}
+function dgEnvSingle(){const r=runOf();return !!(r&&r.tower&&twEnv(r).single)}
+function twPowMult(){const r=runOf();return r&&r.tower?1+.1*((r.perks||{}).power||0):1}
+function dgFoeMult(type){const r=runOf();if(!r||!r.tower)return 1;return dgEnvMult(type)*(1-Math.min(.3,.1*((r.perks||{}).guard||0)))}
+function twStats(){return db.towerStats||(db.towerStats={best:0,bosses:0,runs:0,floors:0,challenges:0,bestAt:null})}
+// ---------- entry & setup ----------
+function towerEntry(){const r=db.tower,S=twStats(),rec='<div class="tw-rec"><div><b>'+S.best+'</b><small>Top floor</small></div><div><b>'+S.bosses+'</b><small>Bosses beaten</small></div><div><b>'+S.challenges+'</b><small>Challenges won</small></div><div><b>'+S.runs+'</b><small>Runs</small></div></div>';
+ if(r){modal('🗼 BATTLE TOWER',rec+'<div class="notice">Run in progress: floor '+r.floor+' with '+r.party.length+' Pokémon.</div><div class="actions"><button class="btn" onclick="if(confirm(\'End this run? Leftover Tickets become Cogs.\')){closeModal();dgMode=\'tower\';twEnd(true)}">END RUN</button><button class="btn red" onclick="closeModal();dgOpen(\'tower\')">CONTINUE</button></div>');return}
+ modal('🗼 BATTLE TOWER',rec+'<p class="small">Battles back to back with no breaks. A boss waits every 10th floor, every 5 floors you pick a perk, and every 10 floors the environment changes. Battles can drop Tickets and items. Leftover Tickets become Cogs when the run ends.</p><div class="actions"><button class="btn red" onclick="closeModal();dgPickFor=\'tower\';dgPick=[];dgPickParty()">CHOOSE A TEAM</button></div>')}
+function twSetupSets(){const sets=db.summaries.filter(s=>termsFor(s).length+(s.quiz?s.quiz.length:0)+prOf(s).length>0);if(!sets.length){modal('BATTLE TOWER','<div class="notice">The Tower asks questions from your study sets. Add a summary first.</div>');return}
+ modal('STUDY SETS','<div class="mg-sets">'+sets.map(s=>'<label><input type="checkbox" value="'+s.id+'" checked> <span>'+esc(s.title)+'<small>'+(termsFor(s).length+(s.quiz?s.quiz.length:0))+' items</small></span></label>').join('')+'</div><p class="small" style="margin-top:10px">Study mode</p><div class="mg-modes"><label><input type="radio" name="mgm" value="smart" checked> <b>Smart Study</b></label><label><input type="radio" name="mgm" value="learn"> <b>Learn</b></label><label><input type="radio" name="mgm" value="weak"> <b>Review Weak Points</b></label></div><div class="actions"><button class="btn red" onclick="twStartRun()">ENTER THE TOWER</button></div>')}
+function twStartRun(){const sids=[...document.querySelectorAll('.mg-sets input:checked')].map(x=>x.value),mode=(document.querySelector('input[name=mgm]:checked')||{}).value||'smart';if(!sids.length){toast('Pick at least one study set');return}
+ if(mode==='weak'&&!sids.some(id=>(db.learned||{})[id])){toast('Finish Learn mode on one of these sets first');return}if(!mgPicker(mgBank(sids),mode).bank.length){toast('No questions for that mode here');return}
+ db.tower={tower:true,diff:'balanced',style:'game',sids,mode,party:dgPick.map(id=>{const p=db.pokemon.find(x=>x.id===id),c=combatant(p);return {id,hp:c.hp,energy:20,starf:null}}),floor:0,cleared:0,bag:{oran:2},tickets:0,cogs:0,studyMs:0,rooms:0,startedAt:stamp(),slider:true,battle:null,
+  envs:shuffle(Object.keys(TW_ENVS)),perks:{},perkDone:[],bosses:0,challengesWon:0,log:[]};dgPick=[];dgPickFor='dungeon';save();closeModal();go('minigames');dgOpen('tower')}
+// ---------- floors ----------
+function twPanel(){const r=runOf();return '<div class="dg-row"><span>⏱ <b id="dgTime">'+fmtMin(r.studyMs)+'</b></span><span>🗼 '+(r.floor||1)+'F</span><span>🎟️ '+(r.tickets||0)+'</span><span>'+twEnv(r).icon+'</span></div><div class="dg-partyrow">'+r.party.map((m,i)=>{const p=partyMon(m),c=combatant(p);return '<div class="dg-mini" style="--c:'+SLOT_COLORS[i]+'">'+monSprite(p,'',34)+'<span><i style="width:'+Math.max(0,m.hp/c.hp*100)+'%"></i></span><small>'+m.hp+'/'+c.hp+' · ⚡'+m.energy+'</small></div>'}).join('')+'</div><div class="dg-bag">'+(Object.keys(r.bag).filter(k=>r.bag[k]>0).map(k=>'<span title="'+DITEMS[k].name+'">'+DITEMS[k].icon+'×'+r.bag[k]+'</span>').join('')||'<span class="small muted">No items</span>')+'</div>'+(Object.keys(r.perks||{}).length?'<div class="tw-perks">'+Object.entries(r.perks).map(([k,n])=>'<span title="'+TW_PERKS[k].name+'">'+TW_PERKS[k].icon+(n>1?'×'+n:'')+'</span>').join('')+'</div>':'')+'<div class="dg-row"><button class="btn smallbtn" onclick="dgSettings()">⚙</button><button class="btn smallbtn" onclick="dgSaveExit()">💾 SAVE & EXIT</button></div>'}
+// after a win (or when opening a run between floors): perk every 5 floors, then the next floor
+function twNext(){const r=runOf();if(!r)return;if(r.cleared&&r.cleared%5===0&&!r.perkDone.includes(r.cleared)){twPerkPick();return}twClimb(r.cleared+1)}
+function twFloor(f){const r=runOf();r.floor=f;save();const st=$('dgStage');if(!st)return;const newEnv=(f-1)%10===0,boss=f%10===0;
+ if(twIsShop(r,f)){r.rooms=f;r.battle=null;save();dgShop();return}
+ if(boss&&!r.chalOffered){r.chalOffered=f;const k=shuffle(Object.keys(TW_CHAL).filter(c=>!(c==='noitem'&&twEnv(r).noItems)))[0];r.chalPick=k;save();
+  st.innerHTML='<div class="dg-room tw-room" style="background-image:url(./assets/tower/'+twEnvKey(r)+'.jpg)"><span class="dg-big">👑</span><h3>Floor '+f+': Boss floor!</h3><p class="small">Optional challenge for bonus loot (extra Tickets, a rare item and a Rare Candy):</p><div class="notice">🎯 '+TW_CHAL[k].t+'</div><div class="actions"><button class="btn" onclick="twGo(null)">SKIP</button><button class="btn red" onclick="twGo(\''+k+'\')">ACCEPT</button></div></div>';$('dgPanel').innerHTML=twPanel();return}
+ if(newEnv&&r.envShown!==f){r.envShown=f;save();const e=twEnv(r);st.innerHTML='<div class="dg-room tw-room" style="background-image:url(./assets/tower/'+twEnvKey(r)+'.jpg)"><span class="dg-big">'+e.icon+'</span><h3>'+e.name+'</h3><p>'+e.desc+'</p><p class="small">Floors '+f+'–'+(f+9)+'</p><button class="btn red" onclick="twFloor('+f+')">FIGHT ▶</button></div>';$('dgPanel').innerHTML=twPanel();return}
+ twBattle(boss?r.chalPick&&r.chalAccepted===f?r.chalPick:null:null)}
+function twGo(ch){const r=runOf();if(ch)r.chalAccepted=r.floor;save();twBattle(ch)}
+function twBattle(ch){const r=runOf(),f=r.floor,avg=partyAvgLv(),boss=f%10===0,en=[],k=Math.min(4,Math.floor(f/12)),lvl=avg+Math.floor(f*.6)-2,hp=1.25+f*.03,atk=1.05+f*.012,rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1));let kind='battle';
+ if(boss)kind=f>=30&&Math.random()<.35?'alpha':f>=10&&Math.random()<.4?'totem':'boss';else if(f>2&&Math.random()<.15)kind='swarm';
+ if(kind==='battle'){const n=rnd(1,Math.min(4,2+Math.floor(f/8)));for(let i=0;i<n;i++)en.push(makeEnemy(twSp(0,Math.min(4,1+k)),Math.max(1,lvl+rnd(-3,2)),{hpMul:hp,atkMul:atk}))}
+ else if(kind==='swarm'){const sp=twSp(0,Math.min(1,k)),n=rnd(4,6);for(let i=0;i<n;i++)en.push(makeEnemy(sp,Math.max(1,lvl-5+rnd(-2,1)),{hpMul:hp*.6,atkMul:atk*.8}))}
+ else{const evolved=MONS.filter(m=>PRE_EVO[m[0]]&&m[2]>=1),sp=kind==='boss'?speciesOfTier(2,4):evolved[Math.floor(Math.random()*evolved.length)][0],bh=3.2*(1+f/40);
+  if(kind==='alpha')en.push(makeEnemy(sp,lvl+4,{hpMul:bh*1.2,atkMul:atk*1.3,boss:'alpha',twice:true}));
+  else{en.push(makeEnemy(sp,lvl+3,{hpMul:bh*(kind==='totem'?.85:1),atkMul:atk*1.2,boss:kind}));if(kind==='totem'){const pre=PRE_EVO[sp]||sp;for(let i=0;i<rnd(2,3);i++)en.push(makeEnemy(pre,lvl-1,{hpMul:hp*.8,atkMul:atk}))}}}
+ const bat=20*((r.perks||{}).battery||0);if(bat)r.party.forEach(m=>{if(m.hp>0)m.energy=Math.min(100,m.energy+bat)});r.party.forEach(q=>{delete q.hurt;delete q.hurtR;delete q.koR});
+ r.battle={kind,enemies:en,turn:0,round:1,overclock:0,skip:false,guard:{},done:false,challenge:ch||null};twCrown(r,r.battle);if(DG)DG.msg='';save();dgDrawBattle(true)}
+// ---------- loot ----------
+function twItem(minTier){const pool=Object.keys(DITEMS).filter(id=>(DITEMS[id].tier||0)>=(minTier||0)).map(id=>({id,w:[10,7,4,1.2][DITEMS[id].tier||0]}));return pickWeighted(pool).id}
+function twWin(){const r=runOf(),b=r.battle,f=r.floor,boss=b.kind!=='battle'&&b.kind!=='swarm',got=[],luck=1+.25*((r.perks||{}).lucky||0);
+ let tix=b.kind==='swarm'?5+Math.floor(f/4):boss?12+Math.floor(f/2)+(b.kind!=='boss'?5:0):3+Math.floor(f/4);tix=Math.round(tix*luck);
+ const items=[];if(boss){items.push(twItem(1),twItem(0))}else if(Math.random()<(b.kind==='swarm'?.45:.3))items.push(twItem(0));
+ let candy=boss&&Math.random()<.3?1:0;
+ if(b.challenge){const C=TW_CHAL[b.challenge];if(C.ok(b)){tix*=2;items.push(twItem(2));candy++;r.challengesWon=(r.challengesWon||0)+1;got.push('🎯 Challenge complete: '+C.t+'!')}else got.push('🎯 Challenge missed: '+C.t)}
+ r.tickets=(r.tickets||0)+tix;r.cogs=(r.cogs||0)+tix;got.push('+'+tix+' 🎟️ Tickets');items.forEach(k=>{r.bag[k]=(r.bag[k]||0)+1;got.push(DITEMS[k].icon+' '+DITEMS[k].name)});if(candy){db.candies=(db.candies||0)+candy;got.push('🍬 Rare Cand'+(candy>1?'ies ×'+candy:'y'))}
+ const exp=Math.round((boss?4500:b.kind==='swarm'?2000:1500)*(1+.06*f));r.party.forEach(m=>{const p=partyMon(m);if(p)p.pxp=(p.pxp||0)+exp});got.push('Team +'+exp.toLocaleString()+' EXP each');
+ if(boss)r.bosses=(r.bosses||0)+1;
+ if(b.kind==='totem'||b.kind==='alpha'){const big=b.enemies[0],sp=PRE_EVO[big.species]||big.species,m=dgBossMon(sp,b.kind),e=giveMon(m);got.push('🎁 '+(e.shiny?'✨ Shiny ':'')+e.species+' joined your Box!')}
+ r.cleared=f;r.battle=null;r.chalOffered=0;const S=twStats();if(f>S.best){S.best=f;S.bestAt=stamp()}if(DG)DG.msg='';save();if(!$('dgStage'))return;
+ $('dgStage').innerHTML='<div class="dg-room tw-room" style="background-image:url(./assets/tower/'+twEnvKey(r)+'.jpg)"><span class="dg-big">'+(boss?'👑':'🏆')+'</span><h3>Floor '+f+' cleared!</h3><p>'+got.join('<br>')+'</p><button class="btn red" onclick="twNext()">▶ FLOOR '+(f+1)+'</button></div>';$('dgPanel').innerHTML=twPanel()}
+// ---------- perks ----------
+function twPerkPick(){const r=runOf(),down=r.party.some(m=>m.hp<=0),opts=shuffle(Object.keys(TW_PERKS).filter(k=>!(k==='revive'&&!down)&&!(k==='guard'&&((r.perks||{}).guard||0)>=3))).slice(0,3);r.perkOpts=opts;save();
+ $('dgStage').innerHTML='<div class="dg-room tw-room" style="background-image:url(./assets/tower/'+twEnvKey(r)+'.jpg)"><span class="dg-big">✨</span><h3>Choose a perk</h3><p class="small">Floor '+r.cleared+' reached. Pick one:</p><div class="tw-perkpick">'+opts.map(k=>'<button class="btn" onclick="twPerk(\''+k+'\')"><b>'+TW_PERKS[k].icon+' '+TW_PERKS[k].name+'</b><small>'+TW_PERKS[k].desc+'</small></button>').join('')+'</div></div>';$('dgPanel').innerHTML=twPanel()}
+function twPerk(k){const r=runOf();if(!r||!TW_PERKS[k]||r.perkDone.includes(r.cleared))return;r.perkDone.push(r.cleared);
+ if(k==='meal')r.party.forEach(m=>{const c=combatant(partyMon(m));m.hp=Math.min(c.hp,m.hp>0?m.hp+Math.ceil(c.hp*.5):Math.ceil(c.hp*.25))});
+ else if(k==='revive')r.party.forEach(m=>{if(m.hp<=0)m.hp=Math.ceil(combatant(partyMon(m)).hp*.5)});
+ else if(k==='supply'){for(let i=0;i<2;i++){const it=twItem(0);r.bag[it]=(r.bag[it]||0)+1}}
+ else r.perks[k]=(r.perks[k]||0)+1;
+ save();toast(TW_PERKS[k].icon+' '+TW_PERKS[k].name+'!');twClimb(r.cleared+1)}
+// ---------- the end ----------
+function twLoseScreen(){const r=runOf();r.battle=null;save();if(!$('dgStage'))return;$('dgStage').innerHTML='<div class="dg-room tw-room" style="background-image:url(./assets/tower/'+twEnvKey(r)+'.jpg)"><span class="dg-big">💤</span><h3>Your team fainted on floor '+r.floor+'</h3><p>You cleared '+(r.cleared||0)+' floor'+(r.cleared===1?'':'s')+'. Leftover Tickets become Cogs.</p><button class="btn red" onclick="twEnd(false)">LEAVE THE TOWER</button></div>';$('dgPanel').innerHTML=''}
+function twEnd(quit){const r=db.tower;if(!r)return;const tix=Math.max(0,Math.round(r.tickets||0)),S=twStats();db.cogs=Math.round(db.cogs+tix);S.runs++;S.bosses+=r.bosses||0;S.challenges+=r.challengesWon||0;S.floors+=r.cleared||0;const newBest=(r.cleared||0)>=S.best&&(r.cleared||0)>0;S.best=Math.max(S.best,r.cleared||0);grantXp(10+2*(r.cleared||0));
+ const lines=[quit?'Run ended on floor '+r.floor+'.':'Run over.','🗼 Floors cleared: '+(r.cleared||0)+(newBest?' · 🏅 personal best!':''),'👑 Bosses beaten: '+(r.bosses||0),'🎯 Challenges won: '+(r.challengesWon||0),'🎟️ Tickets earned: '+(r.cogs||0)+' · '+tix+' left over → +'+tix+' Cogs','Time studying: '+fmtMin(r.studyMs)];
+ db.tower=null;save();if(mgState)mgState.stop&&mgState.stop();mgState=null;dgMode='dungeon';render();
+ const el=$('mgArea');if(el)el.innerHTML='<div class="reveal mg-end"><h2>🗼 Battle Tower</h2>'+lines.map(l=>'<p>'+l+'</p>').join('')+'<p class="small muted">Records: top floor '+S.best+' · bosses '+S.bosses+' · challenges '+S.challenges+' · runs '+S.runs+'</p><div class="actions"><button class="btn" onclick="mgQuit()">MENU</button></div></div>'}
+// ---------- shop floors ----------
+// one floor in every 10 (somewhere between its 3rd and 8th floor) is a Kecleon Shop instead of a battle
+function twIsShop(r,f){if(f<3||f%10===0)return false;const b=Math.floor((f-1)/10);r.shops=r.shops||{};if(r.shops[b]==null){r.shops[b]=b*10+3+Math.floor(Math.random()*6);save()}return f===r.shops[b]}
+function twShopDone(){const r=runOf();if(!r)return;r.cleared=Math.max(r.cleared||0,r.floor);const S=twStats();if(r.cleared>S.best){S.best=r.cleared;S.bestAt=stamp()}save();twNext()}
+function twKind(r,f){return f%10===0?'boss':twIsShop(r,f)?'shop':'battle'}
+// ---------- climbing between floors ----------
+// The camera zooms out to show the tower, your team rides up one floor, a banner says what's next (a shop, a boss, a new
+// environment), then the camera zooms back in on the new floor. Tap to skip.
+const TW_SLAB=84,TW_GAP=8;
+async function twClimb(to){const r=runOf(),st=$('dgStage');if(!r||!st)return;const from=Math.max(0,to-1),ep=dgEpoch;
+ if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches){twFloor(to);return}
+ const lo=Math.max(0,from-3),hi=to+3,K={battle:['⚔️','Battle'],boss:['👑','Boss'],shop:['🛒','Kecleon Shop']},env=n=>TW_ENVS[r.envs[Math.floor(Math.max(0,n-1)/10)%r.envs.length]];
+ let slabs='';for(let n=hi;n>=lo;n--){if(n===0){slabs+='<div class="tw-slab ground" data-n="0"><b>🏁 Entrance</b></div>';continue}const k=twKind(r,n),e=env(n),done=n<=(r.cleared||0);
+  slabs+='<div class="tw-slab'+(n===to?' next':'')+(done?' done':'')+(k==='boss'?' boss':'')+'" data-n="'+n+'" style="background-image:url(./assets/tower/'+r.envs[Math.floor((n-1)/10)%r.envs.length]+'.jpg)"><b>'+n+'F</b><span>'+(done?'✓':K[k][0]+' '+K[k][1])+'</span><i>'+e.icon+'</i></div>'}
+ const team=r.party.map(m=>{const p=partyMon(m);return monSprite(p,m.hp<=0?'ko':'',30)}).join('');
+ const nk=twKind(r,to),newEnv=(to-1)%10===0,e=env(to),msg=[];if(newEnv){msg.push(e.icon+' <b>'+e.name+'</b><small>'+e.desc+'</small>');r.envShown=to}if(nk==='boss')msg.push('👑 <b>Boss floor!</b>');else if(nk==='shop')msg.push('🛒 <b>Kecleon Shop</b><small>Spend your Tickets before the next battle.</small>');else if(!newEnv)msg.push('⚔️ <b>Floor '+to+'</b>');save();
+ st.innerHTML='<div class="tw-climb"><div class="tw-cam"><div class="tw-stack">'+slabs+'</div><div class="tw-team">'+team+'</div></div><div class="tw-banner">'+msg.join('')+'</div><small class="tw-skip">Tap to skip</small></div>';$('dgPanel').innerHTML=twPanel();
+ const box=st.querySelector('.tw-climb'),cam=box.querySelector('.tw-cam'),stack=box.querySelector('.tw-stack'),ban=box.querySelector('.tw-banner'),H=box.clientHeight,step=TW_SLAB+TW_GAP;
+ // the stack is listed top floor first, so floor n sits (hi-n) slabs from the top
+ const yFor=n=>Math.round(H/2-((hi-n)*step+TW_SLAB/2)),place=n=>'translateY('+yFor(n)+'px)';stack.style.transform=place(from);
+ let skip=false;const gone=()=>ep!==dgEpoch||runOf()!==r;box.addEventListener('click',()=>{skip=true;box.getAnimations({subtree:true}).forEach(a=>a.finish())});
+ const run=(el,kf,o)=>skip?Promise.resolve():el.animate(kf,Object.assign({fill:'forwards'},o)).finished.catch(()=>{});
+ await run(cam,[{transform:'scale(3.4)',opacity:.4},{transform:'scale(1)',opacity:1}],{duration:650,easing:'cubic-bezier(.2,.8,.3,1)'});if(gone())return;
+ await run(stack,[{transform:place(from)},{transform:place(to)}],{duration:900,easing:'cubic-bezier(.45,0,.25,1)'});if(gone())return;
+ stack.querySelector('[data-n="'+to+'"]')?.classList.add('arrive');
+ await run(ban,[{opacity:0,transform:'translate(-50%,10px)'},{opacity:1,transform:'translate(-50%,0)'}],{duration:280});
+ for(let t=0;t<(newEnv||nk!=='battle'?1150:550)&&!skip;t+=50)await dgSleep(50);if(gone())return;
+ run(ban,[{opacity:1},{opacity:0}],{duration:250});await run(cam,[{transform:'scale(1)',opacity:1},{transform:'scale(3.4)',opacity:0}],{duration:600,easing:'cubic-bezier(.6,0,.8,.4)'});
+ if(ep!==dgEpoch||runOf()!==r)return;twFloor(to)}
+// ---------- environment effects that need more than a damage multiplier ----------
+// (all of these do nothing outside the Tower)
+const twIsType=(types,t)=>(types||[]).some(x=>String(x).toLowerCase()===t),twLegend=sp=>!!(INDEX[sp]&&INDEX[sp].tier===4);
+function twOn(){const r=runOf();return r&&r.tower?twEnv(r):null}
+// the attacker's damage boost (Legend's Temple) and the target's damage cut (Dragon Cavern, Legend's Temple)
+function dgEnvAtk(types,sp,u){const e=twOn();if(!e)return 1;let k=1;if(e.legend&&twLegend(sp))k*=1.1;if(e.king&&u&&u.king)k*=1.15;return k}
+function dgEnvDef(types,sp,u){const e=twOn();if(!e)return 1;let k=1;if(e.dragon&&twIsType(types,'dragon'))k*=.9;if(e.legend&&twLegend(sp))k*=.95;if(e.ice&&twIsType(types,'ice'))k*=.9;if(e.king&&u&&u.king)k*=.95;return k}
+// Trepidation Habitat: a Water-type attacker adds 5% of its max HP to each hit target
+function dgEnvFlat(types,maxhp){const e=twOn();return e&&e.water&&twIsType(types,'water')?Math.max(1,Math.round(maxhp*.05)):0}
+function dgEnvNoItems(){const e=twOn();return !!(e&&e.noItems)}
+// a foe's hit on your team, after the usual damage cap
+function twFoeHit(raw,e,types,sp,u){twCur=twOn()?{att:e,types}:null;if(!twOn()||raw<=0)return raw;return Math.max(1,Math.round(raw*dgEnvAtk(e.types,e.species,e)*dgEnvDef(types,sp,u)))+dgEnvFlat(e.types,e.maxhp)}
+// Holy Sanctum: your team heals when your turn ends
+function twTurnEnd(r,b){const e=r&&r.tower?twEnv(r):null;if(!e||!e.heal)return;r.party.forEach((m,i)=>{if(m.hp<=0)return;const c=combatant(partyMon(m)),h=Math.min(e.heal,c.hp-m.hp);if(h>0){m.hp+=h;setTimeout(()=>dgFloat('.dg-ally[data-i="'+i+'"]','+'+h+' 🕊️','heal'),60)}})}
+// Sludge Hell and Crystal Mines: after both sides have moved, everyone without a safe type takes 1 damage
+function twRoundEnd(r,b){twCur=null;const e=r&&r.tower?twEnv(r):null;if(!e||!e.chip)return;const C=e.chip,safe=t=>C.safe.some(x=>twIsType(t,x));
+ r.party.forEach((m,i)=>{if(m.hp<=0)return;const c=combatant(partyMon(m));if(safe(c.types))return;m.hp=Math.max(0,m.hp-C.d);dgHurt(b,m,C.d);dgFloat('.dg-ally[data-i="'+i+'"]','-'+C.d+' '+C.icon,'weak')});
+ b.enemies.forEach((f,i)=>{if(f.hp<=0||safe(f.types))return;f.hp=Math.max(0,f.hp-C.d);dgFloat('.dg-foe[data-i="'+i+'"]','-'+C.d+' '+C.icon,'weak')});twKingCheck(r,b)}
+// Dice Arena
+function dgEnvDice(){const e=twOn();return !!(e&&e.dice)}
+// Dank Depths: Dark-types on your team dodge as if 4 Speed faster; foe Dark-types can dodge after a Make-Up or wrong answer
+let twCur=null;
+function twDodgeBonus(){const e=twOn();return e&&e.dank&&twCur&&twIsType(twCur.types,'dark')?4:0}
+function twDarkDodge(b,f){const e=twOn();if(!e||!e.dank||!twIsType(f.types,'dark'))return '';const p=b.lastRes==='makeup'?.2:b.lastRes==='fail'?.4:0;return Math.random()<p?'💨 '+f.species+' slipped away into the dark!':''}
+// Spook Zone: attackers heal 10% of each hit (rounded down, at least 1)
+function twSpookHeal(m,maxhp,parts){const e=twOn();if(!e||!e.spook||m.hp<=0)return 0;const h=Math.min(maxhp-m.hp,parts.reduce((a,d)=>a+(d>0?Math.max(1,Math.floor(d*.1)):0),0));if(h>0)m.hp+=h;return Math.max(0,h)}
+function twSpookFoe(d){const e=twOn();if(!e||!e.spook||!twCur||!twCur.att||d<=0)return;const f=twCur.att,h=Math.min(f.maxhp-f.hp,Math.max(1,Math.floor(d*.1)));if(h>0&&f.hp>0){f.hp+=h;const i=runOf().battle.enemies.indexOf(f);if(i>=0)setTimeout(()=>dgFloat('.dg-foe[data-i="'+i+'"]','+'+h+' 👻','heal'),300)}}
+// Pokémon Center and Lifeblock Gym
+function twReviveHp(m){const e=twOn();return e&&e.center?Math.max(1,Math.floor(combatant(partyMon(m)).hp*.15)):1}
+function twGuardHeal(m,c,gain){const e=twOn();if(!e||!e.lifeblock||m.hp<=0)return 0;const h=Math.min(c.hp-m.hp,Math.floor(gain/2));if(h>0)m.hp+=h;return Math.max(0,h)}
+// King's Battlefield: the highest-level Pokémon on each side is the king
+function twKingOn(u){const e=twOn();return !!(e&&e.king&&u&&u.king)}
+function twCrown(r,b){r.party.forEach(m=>delete m.king);b.enemies.forEach(f=>delete f.king);if(!twEnv(r).king)return;
+ const al=r.party.filter(m=>m.hp>0).sort((x,y)=>monLv(partyMon(y))-monLv(partyMon(x)))[0];if(al)al.king=true;const fo=[...b.enemies].sort((x,y)=>y.lv-x.lv)[0];if(fo)fo.king=true;b.kingDown={}}
+function twKingCheck(r,b){if(!r||!r.tower||!twEnv(r).king)return;b.kingDown=b.kingDown||{};
+ const ak=r.party.find(m=>m.king),fk=b.enemies.find(f=>f.king);
+ if(ak&&ak.hp<=0&&!b.kingDown.a){b.kingDown.a=1;r.party.forEach((m,i)=>{if(m===ak||m.hp<=0)return;const d=Math.ceil(combatant(partyMon(m)).hp*.2);m.hp=Math.max(0,m.hp-d);if(m.hp<=0){m.koR=b.round;b.koAny=1}setTimeout(()=>dgFloat('.dg-ally[data-i="'+i+'"]','-'+d+' 👑','super'),200)});if(DG)DG.msg=(DG.msg?DG.msg+'<br>':'')+'👑 Your king fell! The rest of your team loses 20% HP.';save()}
+ if(fk&&fk.hp<=0&&!b.kingDown.f){b.kingDown.f=1;b.enemies.forEach((f,i)=>{if(f===fk||f.hp<=0)return;const d=Math.ceil(f.maxhp*.2);f.hp=Math.max(0,f.hp-d);setTimeout(()=>dgFloat('.dg-foe[data-i="'+i+'"]','-'+d+' 👑','super'),200)});if(DG)DG.msg=(DG.msg?DG.msg+'<br>':'')+'👑 The foe’s king fell! Its teammates lose 20% HP.';save()}}
+// Crystal Mines: Rock- and Ground-types show up more
+function twSp(min,max){const r=runOf();if(r&&r.tower&&twEnv(r).rockFoes&&Math.random()<.6){const ch=MONS.filter(m=>m[2]>=min&&m[2]<=max&&SPECIES_DATA[m[0]]&&(SPECIES_DATA[m[0]].types||[]).some(t=>t==='rock'||t==='ground'));if(ch.length)return ch[Math.floor(Math.random()*ch.length)][0]}return speciesOfTier(min,max)}
+// ===================== EXPORT STUDY DATA =====================
+// Builds a plain-text (Markdown) report of how each study set is going: right/wrong per item, first-try answers, hints,
+// the wrong answers you picked, practice-problem mistakes and a day-by-day tally. Copy it or save it as a file, then paste it
+// into a tutoring chat so the tutor can see what to work on.
+function sdDate(t){return t?new Date(t).toLocaleDateString([],{month:'short',day:'numeric'}):'never'}
+function sdPct(r,w){return r+w?Math.round(r/(r+w)*100)+'%':'–'}
+function sdCell(t){return String(t==null?'':t).replace(/\s+/g,' ').replace(/\|/g,'/').trim()}
+function sdCut(t,n){t=sdCell(t);return t.length>n?t.slice(0,n-1)+'…':t}
+// one row per thing you study: each term, each quiz question, and each practice problem type (its 2 slots added together)
+function sdItems(s){const Q=db.qstats||{},out=[],get=k=>Q[k]||null;
+ termsFor(s).forEach(t=>out.push({kind:'Term',name:t.term,detail:t.definition,st:[get(s.id+'|t|'+t.term)]}));
+ (s.quiz||[]).forEach(q=>out.push({kind:'Quiz',name:q.question,detail:q.answer,st:[get(s.id+'|q|'+q.question)]}));
+ prOf(s).forEach(id=>out.push({kind:'Practice',name:PR[id].name,detail:PR[id].subject||'',gid:id,st:[get(s.id+'|g|'+id+'|0'),get(s.id+'|g|'+id+'|1')]}));
+ return out.map(it=>{const S=it.st.filter(Boolean),sum=k=>S.reduce((a,x)=>a+(x[k]||0),0);
+  return Object.assign(it,{r:sum('r'),w:sum('w'),ft:sum('ft'),mk:sum('mk'),h:sum('h'),miss:Math.max(0,...S.map(x=>x.miss||0)),last:Math.max(0,...S.map(x=>x.last||0)),wp:S.flatMap(x=>x.wp||[]).sort((a,b)=>b.at-a.at).slice(0,3),seen:S.length>0})})}
+function sdSetHasData(s){return sdItems(s).some(it=>it.seen)}
+function sdFolderOf(s){const k=sumKey(s);return k?sumKeyName(k):''}
+function sdSheet(sids){const sets=db.summaries.filter(s=>sids.includes(s.id)),now=new Date();let all={r:0,w:0};const L=[],rows=[];
+ for(const s of sets){const its=sdItems(s),r=its.reduce((a,x)=>a+x.r,0),w=its.reduce((a,x)=>a+x.w,0);all.r+=r;all.w+=w;rows.push({s,its,r,w})}
+ L.push('# Study data from PokémonCollege','','Exported '+now.toLocaleString([],{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'})+' · '+sets.length+' study set'+(sets.length===1?'':'s')+' · '+(all.r+all.w)+' answers · '+sdPct(all.r,all.w)+' right overall','',
+  '> For a tutor: these are my results from study games built from my class notes. "Right" and "Wrong" count every answer. "1st try" means right on the first attempt. "Make-Up" means I missed it, then got a second version right. "Hints" counts answers where I opened hints first. Please look at what I keep missing and help me understand those topics, step by step.','');
+ for(const {s,its,r,w} of rows){const seen=its.filter(x=>x.seen),unseen=its.filter(x=>!x.seen),last=Math.max(0,...its.map(x=>x.last)),folder=sdFolderOf(s),n=k=>its.filter(x=>x.kind===k).length;
+  L.push('## '+sdCell(s.title)+(folder?' ('+sdCell(folder)+')':''),'');
+  L.push('- Items: '+[n('Term')&&n('Term')+' term'+(n('Term')>1?'s':''),n('Quiz')&&n('Quiz')+' quiz question'+(n('Quiz')>1?'s':''),n('Practice')&&n('Practice')+' practice problem type'+(n('Practice')>1?'s':'')].filter(Boolean).join(', ')+'.');
+  L.push('- Answered '+(r+w)+' times · '+sdPct(r,w)+' right · practiced '+seen.length+' of '+its.length+' items · last studied '+sdDate(last)+(db.learned&&db.learned[s.id]?' · finished Learn mode':'')+'.');
+  const H=(db.qhist||{})[s.id]||{},days=Object.keys(H).sort().slice(-10);
+  if(days.length)L.push('- Recent days: '+days.map(d=>{const [y,m,dd]=d.split('-').map(Number);return sdDate(new Date(y,m-1,dd))+' '+H[d][0]+'✓ '+H[d][1]+'✗'}).join(' · ')+'.');
+  L.push('');
+  if(!seen.length){L.push('Not practiced yet.','');continue}
+  const weak=seen.filter(x=>x.w>0).sort((a,b)=>(b.w-b.r*.5+b.miss)-(a.w-a.r*.5+a.miss)||b.w-a.w).slice(0,15);
+  if(weak.length){L.push('### Struggling with (most missed first)','','| Item | Type | Right | Wrong | 1st try | Make-Up | Hints | Last missed |','|---|---|---|---|---|---|---|---|');
+   weak.forEach(x=>L.push('| '+sdCut(x.name,70)+' | '+x.kind+' | '+x.r+' | '+x.w+' | '+x.ft+' | '+x.mk+' | '+x.h+' | '+sdDate(x.wp[0]&&x.wp[0].at||x.last)+' |'));L.push('');
+   const mis=weak.filter(x=>x.wp.length);
+   if(mis.length){L.push('### What I picked when I got it wrong','');
+    mis.slice(0,10).forEach(x=>{L.push('- **'+sdCut(x.name,90)+'**'+(x.kind==='Term'?' (means: '+sdCut(x.detail,120)+')':x.kind==='Quiz'?' (answer: '+sdCut(x.detail,120)+')':''));
+     x.wp.forEach(p=>L.push('  - '+(x.kind==='Term'&&sdCell(p.q)===sdCell(x.detail)?'Asked which term means “'+sdCut(p.q,120)+'” · ':x.kind==='Practice'||sdCell(p.q)!==sdCell(x.name)?'Question: '+sdCut(p.q,200)+' · ':'')+'I picked: '+sdCut(p.p,120)+(p.a?' · Correct: '+sdCut(p.a,120):'')))});L.push('')}}
+  const good=seen.filter(x=>x.r>=2&&x.w===0||x.r>=4&&x.r>=x.w*4);
+  if(good.length)L.push('### Doing well','',good.map(x=>sdCut(x.name,50)).join(' · '),'');
+  if(unseen.length)L.push('### Not practiced yet','',unseen.map(x=>sdCut(x.name,50)).join(' · '),'')}
+ return L.join('\n').replace(/\n{3,}/g,'\n\n').trim()+'\n'}
+// ---------- the export window ----------
+function sdOpen(only){const sets=db.summaries.filter(s=>termsFor(s).length+(s.quiz?s.quiz.length:0)+prOf(s).length>0);if(!sets.length){toast('No study sets yet');return}
+ const on=s=>only?s.id===only:sdSetHasData(s);
+ modal('📊 EXPORT STUDY DATA','<p class="small">A sheet of how each study set is going: what you get right, what you keep missing and which wrong answers you picked. Copy it into a chat with Claude or another tutor so they can see what to work on.</p><div class="mg-sets sd-sets">'+sets.map(s=>'<label><input type="checkbox" value="'+s.id+'" '+(on(s)?'checked':'')+' onchange="sdPreview()"> <span>'+esc(s.title)+'<small>'+(sdSetHasData(s)?'has results':'not practiced yet')+'</small></span></label>').join('')+'</div><textarea id="sdText" class="sd-text" readonly></textarea><div class="actions"><button class="btn" onclick="sdSaveFile()">💾 SAVE FILE</button><button class="btn red" onclick="sdCopy()">📋 COPY</button></div>');sdPreview()}
+function sdChosen(){return [...document.querySelectorAll('.sd-sets input:checked')].map(x=>x.value)}
+function sdPreview(){const t=$('sdText');if(!t)return;const ids=sdChosen();t.value=ids.length?sdSheet(ids):'Tick at least one study set.'}
+async function sdCopy(){const t=$('sdText');if(!t||!sdChosen().length)return;const txt=t.value;
+ try{await navigator.clipboard.writeText(txt);toast('📋 Study data copied. Paste it into your tutoring chat.');return}catch(e){}
+ // older iOS web views: select the text and copy it the old way
+ t.removeAttribute('readonly');t.focus();t.select();t.setSelectionRange(0,txt.length);let ok=false;try{ok=document.execCommand('copy')}catch(e){}t.setAttribute('readonly','');toast(ok?'📋 Study data copied':'Select the text and copy it')}
+async function sdSaveFile(){const ids=sdChosen();if(!ids.length)return;const txt=sdSheet(ids),d=new Date(),pad=n=>String(n).padStart(2,'0'),nm='Study-data-'+localDay()+'-'+pad(d.getHours())+pad(d.getMinutes())+'.md',FS=fsPlugin();
+ if(FS){try{await FS.writeFile({path:'Study Data/'+nm,data:txt,directory:'DOCUMENTS',encoding:'utf8',recursive:true});toast('💾 Saved to Files → PokémonCollege → Study Data');return}catch(e){toast('Couldn’t save: '+String(e&&e.message||e).slice(0,80));return}}
+ const file=new File([txt],nm,{type:'text/markdown'});try{if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:'Study data'});return}}catch(e){if(e.name==='AbortError')return}
+ const url=URL.createObjectURL(file),a=document.createElement('a');a.href=url;a.download=nm;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),30000)}
 
 // ---- Legendary Ultimates: a third ability (Power 180, costs the full Stamina Bar), unlocked for 25 Rare Candy in the Box ----
 const ULT_COST=25;
@@ -3470,7 +4064,7 @@ function drawSummaries(){if(sumOpen&&!sumKeyName(sumOpen))sumOpen=null;const _al
 function drawSummaries0(all){$('summaryCount').textContent=all.length+' NOTES';const keys=sumOpen?[]:[...sumFolders().map(f=>'f:'+f.id),...ppGroups().filter(g=>all.some(s=>sumKey(s)==='g:'+g.id)).map(g=>'g:'+g.id)];
  const head=sumOpen?'<div class="pp-head"><button class="btn smallbtn" onclick="sumOpen=null;drawSummaries()">‹ ALL</button><h3>'+(sumOpen[0]==='g'?'📷 ':'📁 ')+esc(sumKeyName(sumOpen))+'</h3>'+(sumOpen[0]==='f'?'<button class="btn smallbtn" onclick="sumRenameFolder(\''+sumOpen.slice(2)+'\')" aria-label="Rename folder">✎</button><button class="btn smallbtn" onclick="sumDeleteFolder(\''+sumOpen.slice(2)+'\')" aria-label="Remove folder">🗑</button>':'')+'</div>'+(sumOpen[0]==='g'?'<p class="small muted">Summaries from your PokéPics group “'+esc(sumKeyName(sumOpen))+'”. This folder updates by itself.</p>':''):'<button class="btn smallbtn" style="margin:0 0 10px" onclick="sumNewFolder()">＋ NEW SUMMARY FOLDER</button>'+keys.map(k=>{const n=all.filter(s=>sumKey(s)===k).length;return '<button class="item sum-folder" style="width:100%;text-align:left" onclick="sumOpen=\''+k+'\';drawSummaries()"><span style="font-size:28px">'+(k[0]==='g'?'📷':'📁')+'</span><div class="iteminfo"><strong>'+esc(sumKeyName(k))+'</strong><small>'+n+' summar'+(n===1?'y':'ies')+(k[0]==='g'?' · from PokéPics':'')+'</small></div><span class="sum-chev">›</span></button>'}).join('');
  $('summaryList').innerHTML=head+(db.summaries.length?db.summaries.map(s=>'<div class="item"><span style="font-size:28px">📘</span><div class="iteminfo"><strong>'+esc(s.title)+'</strong><small>'+(s.aiBusy?'✨ AI is reading this set'+(s.aiProg?' ('+(/^Gemini/.test(s.aiProg)?s.aiProg:'part '+s.aiProg)+')':'')+'…':(s.ai?'✨ ':'')+esc((s.body||'').replace(/^SUMMARY\n/,'').slice(0,86))+(prOf(s).length?' · 🧮 '+prOf(s).length+' practice':''))+'</small></div>'+((db.learned||{})[s.id]&&mgBank([s.id]).filter(isWeak).length?'<button class="btn smallbtn" onclick="go(\'minigames\');mgSetup(\'flash\',\''+s.id+'\',\'weak\')" aria-label="Review weak spots">🎯 '+mgBank([s.id]).filter(isWeak).length+'</button>':'')+'<button class="btn smallbtn" onclick="summaryForm(\''+s.id+'\')">OPEN</button></div>').join(''):'<div class="empty">'+(sumOpen?'This folder is empty.<br>Open a summary and pick this folder to put it here.':keys.length?'':'No summaries yet.<br>Add notes for your first study minigame!')+'</div>')}
-function summaryForm(id=''){const s=db.summaries.find(x=>x.id===id)||{title:'',body:''};modal(id?'EDIT SUMMARY':'NEW SUMMARY','<form onsubmit="storeSummary(event,\''+id+'\')"><div class="field"><label>Title</label><input required maxlength="130" name="title" value="'+esc(s.title)+'"></div><div class="field"><label>Summary and terms</label><textarea name="body" style="min-height:210px" placeholder="Gravity: The attraction between objects with mass\nVelocity: Speed in a given direction">'+esc(s.body)+'</textarea></div>'+'<div class="field"><label>Folder</label><select name="sfolder"><option value="">'+(s.bound&&sumKey(Object.assign({},s,{folder:null}))?'Automatic (its PokéPics group)':'None (main list)')+'</option>'+sumFolders().map(f=>'<option value="'+f.id+'" '+(((s.folder||(!s.id&&sumOpen&&sumOpen[0]==='f'?sumOpen.slice(2):''))===f.id)?'selected':'')+'>📁 '+esc(f.name)+'</option>').join('')+'</select></div>'+prPickerHTML(s)+(s.bound?'<div class="notice">🔗 Bound to a PokéPics folder: this summary is rebuilt automatically whenever that folder’s photos change.</div>':'')+(id&&aiAny()?'<button class="btn blue" type="button" style="width:100%;margin-bottom:8px" onclick="aiFromForm(\''+id+'\')">✨ BUILD STUDY GUIDE WITH AI</button>':'')+(s.ai?'<p class="small muted">✨ Written by on-device AI'+(s.quiz&&s.quiz.length?' · '+s.quiz.length+' quiz questions':'')+'.</p>':'')+'<p class="small muted">Write “Term: Definition” on separate lines to make matching questions; pick problem types above for practice problems. Writing a summary grants no Cogs.</p><div class="actions">'+(id?'<button class="btn" type="button" onclick="removeSummary(\''+id+'\')">DELETE</button>':'')+'<button type="submit" class="btn red">SAVE</button></div></form>')}
+function summaryForm(id=''){const s=db.summaries.find(x=>x.id===id)||{title:'',body:''};modal(id?'EDIT SUMMARY':'NEW SUMMARY','<form onsubmit="storeSummary(event,\''+id+'\')"><div class="field"><label>Title</label><input required maxlength="130" name="title" value="'+esc(s.title)+'"></div><div class="field"><label>Summary and terms</label><textarea name="body" style="min-height:210px" placeholder="Gravity: The attraction between objects with mass\nVelocity: Speed in a given direction">'+esc(s.body)+'</textarea></div>'+'<div class="field"><label>Folder</label><select name="sfolder"><option value="">'+(s.bound&&sumKey(Object.assign({},s,{folder:null}))?'Automatic (its PokéPics group)':'None (main list)')+'</option>'+sumFolders().map(f=>'<option value="'+f.id+'" '+(((s.folder||(!s.id&&sumOpen&&sumOpen[0]==='f'?sumOpen.slice(2):''))===f.id)?'selected':'')+'>📁 '+esc(f.name)+'</option>').join('')+'</select></div>'+prPickerHTML(s)+(s.bound?'<div class="notice">🔗 Bound to a PokéPics folder: this summary is rebuilt automatically whenever that folder’s photos change.</div>':'')+(id&&aiAny()?'<button class="btn blue" type="button" style="width:100%;margin-bottom:8px" onclick="aiFromForm(\''+id+'\')">✨ BUILD STUDY GUIDE WITH AI</button>':'')+(id?'<button class="btn" type="button" style="width:100%;margin-bottom:8px" onclick="sdOpen(\''+id+'\')">📊 EXPORT STUDY DATA</button>':'')+(s.ai?'<p class="small muted">✨ Written by on-device AI'+(s.quiz&&s.quiz.length?' · '+s.quiz.length+' quiz questions':'')+'.</p>':'')+'<p class="small muted">Write “Term: Definition” on separate lines to make matching questions; pick problem types above for practice problems. Writing a summary grants no Cogs.</p><div class="actions">'+(id?'<button class="btn" type="button" onclick="removeSummary(\''+id+'\')">DELETE</button>':'')+'<button type="submit" class="btn red">SAVE</button></div></form>')}
 function prPickerHTML(s){const sel=prOf(s),auto=!Array.isArray(s.practice);return '<details class="pr-pick"'+(sel.length?' open':'')+'><summary>🧮 Practice problems'+(sel.length?' · '+sel.length+' selected':'')+'</summary><p class="small muted">The app makes these fresh every time and works out the answers itself, so they’re always right.'+(auto&&sel.length?' The ticked ones were found in your notes; change them freely.':'')+'</p>'+(sel.length?'<div class="pr-sub">'+sel.map(id=>'<label><input type="checkbox" name="pr" value="'+id+'" checked> '+esc(PR[id].name)+' <small class="muted">· '+esc(PR[id].subject)+'</small></label>').join('')+'</div>':'')+'<details class="pr-more"><summary>+ Add problem types</summary>'+Object.entries(prSubjects()).map(([sub,list])=>{const rest=list.filter(T=>!sel.includes(T.id));return rest.length?'<div class="pr-sub"><b>'+esc(sub)+'</b>'+rest.map(T=>'<label><input type="checkbox" name="pr" value="'+T.id+'"> '+esc(T.name)+'</label>').join('')+'</div>':''}).join('')+'</details><button type="button" class="btn smallbtn" onclick="prTry()">TRY A SAMPLE PROBLEM</button><div id="prSample"></div></details>'}
 function storeSummary(e,id){e.preventDefault();const f=new FormData(e.target),v={title:String(f.get('title')||'').trim(),body:String(f.get('body')||'').trim(),practice:f.getAll('pr').map(String),folder:String(f.get('sfolder')||'')||undefined};if(!v.title)return;const s=db.summaries.find(x=>x.id===id);if(s)Object.assign(s,v);else db.summaries.push({...v,id:uid(),createdAt:stamp()});save();closeModal();render();toast('Summary stored locally ✓')}
 function removeSummary(id){if(!confirm('Delete this summary?'))return;db.summaries=db.summaries.filter(s=>s.id!==id);save();closeModal();render()}
@@ -3490,7 +4084,7 @@ $('navHome').style.display='none';
  if(pcStorageReady)ensureMoveData();
  if(pcStorageReady&&permRoll())save();
  render();scheduleNotifs();aiCheck();window.__pcBooted=true;setTimeout(()=>{try{mdSync()}catch(e){}},1500);setTimeout(()=>{try{facTick()}catch(e){}},2500);setInterval(()=>{try{facTick();if(currentPage==='home'&&hab.scene&&hab.scene!=='home')drawHabitat()}catch(e){}},60000);
- window.__pcVersion='0.46.2';
+ window.__pcVersion='0.50.1';
  document.addEventListener('pointerdown',function(e){try{var t=e.target.closest&&e.target.closest('[onclick],button,a,[id]');if(!t)return;var oc=t.getAttribute('onclick');window.__pcLastTap=(oc?oc.slice(0,60):(t.id?'#'+t.id:t.tagName.toLowerCase()+'.'+String(t.className).split(' ')[0])).replace(/\s+/g,' ')}catch(_){}} ,true);
  Object.keys(window).forEach(function(k){var f=window[k];if(typeof f!=='function'||/^[A-Z]/.test(k)||k==='appError'||k==='$'||k==='esc'||/\[native code\]/.test(Function.prototype.toString.call(f)))return;
   var w=function(){try{return f.apply(this,arguments)}catch(err){if(err&&typeof err==='object'&&!err.__pcLogged){try{err.__pcLogged=1}catch(_){}appError(err,k)}throw err}};try{window[k]=w}catch(_){}});
