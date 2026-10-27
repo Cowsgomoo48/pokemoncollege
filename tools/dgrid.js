@@ -130,25 +130,41 @@ function gdTap(ev){const r=runOf(),b=r&&r.battle;if(!b||!r.fl||b.enemyPhase)retu
 function gdPanelBattle(msg){const r=runOf(),b=r.battle,m=r.party[b.turn],p=m&&partyMon(m);if(!r.fl)return;
  if(b.enemyPhase||!m){$('dgPanel').innerHTML='<div class="dg-msg">'+(msg||'Enemy turn…')+'</div>';return}
  if(ultResting(b,m)&&!m.acted){m.acted=true;m.moved=true;save()}
- const c=combatant(p),fast=MOVE_STATS[p.fastMove]||['Normal',8,8,'fast'],disc=MOVE_STATS[p.discMove]||['Normal',80,50,'charged'],foes=gdFoeTargets(r),U=ultOf(p),canHit=gdOptions(r.fl,m.x,m.y,gdShape(p.fastMove,fast),foes).length>0||(m.energy>=disc[2]&&gdOptions(r.fl,m.x,m.y,gdShape(p.discMove,disc),foes).length>0)||(U&&m.energy>=100&&(U.t==='none'||foes.some(([e])=>gdCheb(e,m)<=(U.t==='all'?3:5))));
+ const free=gdFree(r),c=combatant(p),fast=MOVE_STATS[p.fastMove]||['Normal',8,8,'fast'],disc=MOVE_STATS[p.discMove]||['Normal',80,50,'charged'],foes=gdFoeTargets(r),U=ultOf(p),canHit=gdOptions(r.fl,m.x,m.y,gdShape(p.fastMove,fast),foes).length>0||(m.energy>=disc[2]&&gdOptions(r.fl,m.x,m.y,gdShape(p.discMove,disc),foes).length>0)||(U&&m.energy>=100&&(U.t==='none'||foes.some(([e])=>gdCheb(e,m)<=(U.t==='all'?3:5))));
  const chips='<div class="gd-chips">'+r.party.map((q,i)=>{const pp=partyMon(q),cc=combatant(pp);return '<button class="gd-chip'+(i===b.turn?' on':'')+(q.acted?' done':'')+(q.hp<=0?' ko':'')+'" style="--c:'+SLOT_COLORS[i]+'" onclick="gdSelect('+i+')">'+monSprite(pp,'',28)+'<small>'+(q.acted?'✓':q.hp<=0?'💤':q.hp+'/'+cc.hp)+'</small></button>'}).join('')+'</div>';
- const head='<div class="dg-msg"><b style="color:'+SLOT_COLORS[b.turn]+'">'+esc(p.nickname||p.species)+'</b> · '+m.hp+'/'+c.hp+' HP · ⚡'+m.energy+' · 👣 '+gdMV(p.species)+(msg?'<br>'+msg:m.acted?' · done this turn':m.moved?' · moved, can still act':'')+'</div>';
+ const head='<div class="dg-msg"><b style="color:'+SLOT_COLORS[b.turn]+'">'+esc(p.nickname||p.species)+'</b> · '+m.hp+'/'+c.hp+' HP · ⚡'+m.energy+' · 👣 '+gdMV(p.species)+(msg?'<br>'+msg:free?'<br>🧭 No wild Pokémon in sight: walk freely, your team follows.':m.acted?' · done this turn':m.moved?' · moved, can still act':'')+'</div>';
  const acts=m.hp<=0?'<div class="dg-acts"><button class="btn red" '+(m.acted?'disabled':'')+' onclick="dgRevive()">💫 ANSWER TO REVIVE</button></div>'
-  :'<div class="dg-acts gd-acts"><button class="btn" '+(m.moved||m.acted?'disabled':'')+' onclick="gdMoveStart()">👣 MOVE</button><button class="btn red" '+(m.acted||!canHit?'disabled':'')+' onclick="dgFight()">⚔️ FIGHT'+(canHit||m.acted?'':'<small>no foe in reach</small>')+'</button><button class="btn blue" '+(m.acted?'disabled':'')+' onclick="dgItem()">🎒 ITEM</button><button class="btn" '+(m.acted?'disabled':'')+' onclick="dgGuard()">🛡 GUARD</button></div>';
+  :'<div class="dg-acts gd-acts"><button class="btn'+(free?' blue':'')+'" '+(!free&&(m.moved||m.acted)?'disabled':'')+' onclick="gdMoveStart()">👣 MOVE</button><button class="btn red" '+(m.acted||!canHit?'disabled':'')+' onclick="dgFight()">⚔️ FIGHT'+(canHit||m.acted?'':'<small>no foe in reach</small>')+'</button><button class="btn blue" '+(m.acted?'disabled':'')+' onclick="dgItem()">🎒 ITEM</button><button class="btn" '+(m.acted?'disabled':'')+' onclick="dgGuard()">🛡 GUARD</button></div>';
  $('dgPanel').innerHTML=head+chips+acts+'<div class="dg-row"><button class="btn smallbtn red" onclick="gdEndTurn()">⏭ END TURN</button><span>⏱ <b id="dgTime">'+fmtMin(r.studyMs)+'</b></span><span>🎟️ '+(r.tickets||0)+'</span><button class="btn smallbtn" onclick="dgSettings()">⚙</button><button class="btn smallbtn" onclick="dgSaveExit()">💾</button></div>'}
+// Free roam: while no wild Pokémon is in sight, moving doesn't use up anyone's turn. The picked Pokémon can keep walking
+// (up to 6 tiles a step, or more if it's faster), the rest of the team follows, and everyone slowly recovers HP.
+const GD_FREE_MV=6;
+function gdFree(r){r=r||runOf();return !!(r&&r.fl&&r.battle&&!r.battle.enemyPhase&&!gdFoeTargets(r).length)}
 function gdSelect(i){const r=runOf(),b=r&&r.battle;if(!b||b.enemyPhase||DG.busy)return;b.turn=i;DG.gmode='select';DG.hl=null;gdDrawBattle()}
 // ---------- moving ----------
-function gdMoveStart(){const r=runOf(),b=r.battle,m=r.party[b.turn];if(!m||m.moved||m.acted||m.hp<=0||DG.busy)return;const fl=r.fl,mv=gdMV(partyMon(m).species);
+function gdMoveStart(){const r=runOf(),b=r.battle,m=r.party[b.turn];if(!m||m.hp<=0||DG.busy)return;const free=gdFree(r);if(!free&&(m.moved||m.acted))return;const fl=r.fl,mv=free?Math.max(GD_FREE_MV,gdMV(partyMon(m).species)):gdMV(partyMon(m).species);
  const reach=gdBFS(fl,[m.x,m.y],(x,y)=>b.enemies.some(e=>(e.hp>0||e.gdOut)&&!e.done&&e.x===x&&e.y===y),mv);DG.reach=reach;DG.gmode='move';gdCamera(m.x,m.y);
- DG.hl={cls:'mv',tiles:[...reach.keys()].map(k=>k.split(',').map(Number)).filter(([x,y])=>!(x===m.x&&y===m.y)&&!gdUnitAt(r,x,y))};gdHighlight();$('dgPanel').innerHTML='<div class="dg-msg">👣 Tap a blue tile to move there (up to '+mv+' tiles).</div><div class="dg-acts"><button class="btn" onclick="DG.gmode=\'select\';DG.hl=null;gdDrawBattle()">CANCEL</button></div>'}
+ DG.hl={cls:'mv',tiles:[...reach.keys()].map(k=>k.split(',').map(Number)).filter(([x,y])=>!(x===m.x&&y===m.y)&&!gdUnitAt(r,x,y))};gdHighlight();$('dgPanel').innerHTML='<div class="dg-msg">👣 Tap a blue tile to move there (up to '+mv+' tiles).'+(free?' No foes in sight, so this doesn’t use up the turn.':'')+'</div><div class="dg-acts"><button class="btn" onclick="DG.gmode=\'select\';DG.hl=null;gdDrawBattle()">CANCEL</button></div>'}
 async function gdWalk(unitEl,obj,path,isFoe){const T=GD_T;for(let s=1;s<path.length;s++){const [x,y]=path[s],[px,py]=path[s-1];obj.dir=gdDirOf(x-px,y-py);obj.x=x;obj.y=y;if(unitEl){unitEl.style.left=x*T+'px';unitEl.style.top=y*T+'px';unitEl.style.zIndex=10+y;const sp=unitEl.querySelector('.dg-spr');if(sp&&+sp.dataset.row!==obj.dir){sp.dataset.row=obj.dir;sp.classList.remove('ok');dgFillSprites()}}if(!isFoe)gdCamera(x,y);await dgSleep(120)}}
-async function gdWalkTo(slot,x,y){const r=runOf(),b=r.battle,m=r.party[slot],path=gdPath(DG.reach,gdKey(x,y));DG.gmode='select';DG.hl=null;DG.busy=1;gdHighlight();
- await gdWalk(document.querySelector('.dg-ally[data-i="'+slot+'"]'),m,path,false);if(!runOf()||runOf().battle!==b)return;m.moved=true;gdSee(r);save();DG.busy=0;
+async function gdWalkTo(slot,x,y){const r=runOf(),b=r.battle,m=r.party[slot],path=gdPath(DG.reach,gdKey(x,y)),wasFree=gdFree(r);DG.gmode='select';DG.hl=null;DG.busy=1;gdHighlight();
+ await gdWalk(document.querySelector('.dg-ally[data-i="'+slot+'"]'),m,path,false);if(!runOf()||runOf().battle!==b)return;
+ if(wasFree)gdFollow(r,slot,path);gdSee(r);
+ // still nothing in sight: the walk was free. A foe came into view: this walk counts as the move, and the battle starts
+ if(wasFree&&gdFree(r)){m.moved=false;r.party.forEach(q=>{const c=combatant(partyMon(q));if(q.hp>0&&q.hp<c.hp)q.hp=Math.min(c.hp,q.hp+Math.max(1,Math.round(c.hp*.03)))})}else{m.moved=true;if(wasFree)r.party.forEach((q,i)=>{if(i!==slot)q.moved=false})}
+ save();DG.busy=0;
  // pick up what's on the tile
  const fl=r.fl,ii=fl.items.findIndex(it=>it.x===m.x&&it.y===m.y);if(ii>=0){const it=fl.items.splice(ii,1)[0];if(it.tickets){r.tickets=(r.tickets||0)+it.tickets;r.cogs=(r.cogs||0)+it.tickets;toast('🎟️ Found '+it.tickets+' Tickets!')}else{r.bag[it.k]=(r.bag[it.k]||0)+1;toast(DITEMS[it.k].icon+' Picked up '+DITEMS[it.k].name+'!')}save()}
  const si=fl.specials.findIndex(s=>s.x===m.x&&s.y===m.y);if(si>=0){const s=fl.specials.splice(si,1)[0];save();r.rooms=(r.rooms||0)+1;if(s.k==='shop'){r.shopStock=null;dgShop()}else if(s.k==='chest')dgTreasure();else dgRest();return}
  if(!fl.stairsHidden&&m.x===fl.stairs[0]&&m.y===fl.stairs[1]){gdDrawBattle();modal('🪜 STAIRS','<p>'+(fl.boss?'The way out of this part of the dungeon.':'Go down to <b>B'+(r.floor+2)+'F</b>? Your whole team comes along.')+'</p><div class="actions"><button class="btn" onclick="closeModal()">NOT YET</button><button class="btn red" onclick="closeModal();gdStairs()">'+(fl.boss?'CONTINUE':'GO DOWN')+'</button></div>');return}
- gdDrawBattle()}
+ gdDrawBattle();if(gdFree(r)&&r.battle.turn===slot&&m.hp>0)gdMoveStart()}
+// teammates (fainted ones too, so nobody gets left behind) walk behind the leader along its path
+function gdFollow(r,slot,path){const b=r.battle,lead=r.party[slot],trail=path.slice(0,-1).reverse(),taken=new Set([gdKey(lead.x,lead.y)]);
+ b.enemies.forEach(e=>{if(e.hp>0&&!e.done)taken.add(gdKey(e.x,e.y))});
+ const fol=r.party.map((q,i)=>[q,i]).filter(([q,i])=>i!==slot).sort((a,c)=>gdCheb(a[0],lead)-gdCheb(c[0],lead));
+ // tiles behind the leader first, then the leader's neighbours
+ const spots=[...trail,...GD_DIRS.map(([dx,dy])=>[lead.x+dx,lead.y+dy])].filter(([x,y])=>gdTile(r.fl,x,y));
+ fol.forEach(([q,i])=>{if(gdCheb(q,lead)<=1){taken.add(gdKey(q.x,q.y));return}const t=spots.find(([x,y])=>!taken.has(gdKey(x,y)));if(!t){taken.add(gdKey(q.x,q.y));return}
+  q.dir=gdDirOf(lead.x-t[0],lead.y-t[1]);q.x=t[0];q.y=t[1];taken.add(gdKey(t[0],t[1]))})}
 function gdStairs(){const r=runOf();if(!r||!r.fl||r.fl.stairsHidden||!r.party.some(m=>m.x===r.fl.stairs[0]&&m.y===r.fl.stairs[1]))return;if(r.fl.boss){dgFloorClear();return}r.floor++;r.party.forEach(m=>{const c=combatant(partyMon(m));m.energy=Math.min(100,m.energy+10);if(m.hp>0)m.hp=Math.min(c.hp,m.hp+Math.ceil(c.hp*.2));if(m.starf&&--m.starf.rooms<=0)m.starf=null});gdNewFloor(r);save();toast('⬇ B'+(r.floor+1)+'F'+(r.fl.boss?' · something big is waiting here…':''));gdDrawBattle(true)}
 // ---------- fighting ----------
 async function gdFight(){const r=runOf(),b=r&&r.battle;if(!b||b.enemyPhase||DG.busy)return;const m=r.party[b.turn],p=partyMon(m);if(!m||m.acted||m.hp<=0)return;

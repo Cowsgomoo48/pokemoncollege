@@ -24,14 +24,55 @@ const TW_ENVS={
  king:{name:'King’s Battlefield',icon:'👑',desc:'The highest-level Pokémon on each side glows gold: it deals 15% more damage and takes 5% less. If it faints, each of its teammates loses 20% of their max HP.',king:true},
  center:{name:'Pokémon Center',icon:'🏥',desc:'Revived Pokémon get back up with 15% of their max HP instead of 1 HP.',center:true},
  lifeblock:{name:'Lifeblock Gym',icon:'🧱',desc:'Guarding also heals the guard for half the Stamina it gains (rounded down).',lifeblock:true}};
-const TW_PERKS={
- meal:{icon:'🍲',name:'Hot Meal',desc:'Heal every Pokémon 50% of its HP (fainted ones get back up with 25%).'},
- revive:{icon:'💫',name:'Revival Herb',desc:'Every fainted Pokémon gets back up with 50% HP.'},
- power:{icon:'💪',name:'Power Charm',desc:'+10% damage for the rest of the run.'},
- guard:{icon:'🛡️',name:'Iron Shell',desc:'Take 10% less damage for the rest of the run (up to 30%).'},
- battery:{icon:'🔋',name:'Battery Pack',desc:'Every battle starts with +20 Stamina for each Pokémon.'},
- lucky:{icon:'🍀',name:'Lucky Ticket',desc:'+25% Tickets from battles for the rest of the run.'},
- supply:{icon:'📦',name:'Supply Drop',desc:'2 random battle items right now.'}};
+// Perk cards: 45 cards in 3 elements (🔥 Fire = offense, 💧 Water = defense, 🌿 Grass = utility) and 5 rarities.
+// stack: 0 = once per run, n = up to n copies, 99 = no limit, -1 = used right away. w = how often it shows up.
+const TW_CARDS={
+ netball:{"name": "Net Ball", "el": "fire", "rar": 1, "stack": 0, "emoji": "🕸️", "text": "Your attacks deal 5% more damage to Bug- and Water-type foes.", "w": 10},
+ charcoal:{"name": "Charcoal", "el": "fire", "rar": 1, "stack": 0, "emoji": "🔥", "text": "Fire-type moves deal 10% more damage.", "w": 10},
+ mysticwater:{"name": "Mystic Water", "el": "fire", "rar": 1, "stack": 0, "emoji": "💧", "text": "Water-type moves deal 10% more damage.", "w": 10},
+ miracleseed:{"name": "Miracle Seed", "el": "fire", "rar": 1, "stack": 0, "emoji": "🌱", "text": "Grass-type moves deal 10% more damage.", "w": 10},
+ muscleband:{"name": "Muscle Band", "el": "fire", "rar": 1, "stack": 0, "emoji": "💪", "text": "Physical moves deal 6% more damage.", "w": 10},
+ wiseglasses:{"name": "Wise Glasses", "el": "fire", "rar": 1, "stack": 0, "emoji": "👓", "text": "Special moves deal 6% more damage.", "w": 10},
+ seedsurge:{"name": "Seed Surge", "el": "water", "rar": 1, "stack": 0, "emoji": "🪴", "text": "At the end of a battle, your Grass-type Pokémon heal 1 HP.", "w": 10},
+ hotmeal:{"name": "Hot Meal", "el": "water", "rar": 1, "stack": -1, "emoji": "🍲", "text": "Right away: heal every Pokémon 50%. Fainted ones get up with 25%.", "w": 10},
+ revivalherb:{"name": "Revival Herb", "el": "water", "rar": 1, "stack": -1, "emoji": "🌿", "text": "Right away: every fainted Pokémon gets back up with 50% HP.", "w": 10},
+ sturdyshell:{"name": "Sturdy Shell", "el": "water", "rar": 1, "stack": 4, "emoji": "🐚", "text": "Take 5% less damage. Stacks up to 4 times.", "w": 10},
+ leftovers:{"name": "Leftovers", "el": "water", "rar": 1, "stack": 0, "emoji": "🍎", "text": "After each round, your most hurt Pokémon heals 1 HP.", "w": 10},
+ brightpowder:{"name": "Bright Powder", "el": "water", "rar": 1, "stack": 0, "emoji": "✨", "text": "Your Pokémon dodge attacks 5% more often.", "w": 10},
+ minersdream:{"name": "Miner’s Dream", "el": "grass", "rar": 1, "stack": 99, "emoji": "⛏️", "text": "+10% Tickets from battles. Stacks.", "w": 10},
+ payday:{"name": "Pay Day", "el": "grass", "rar": 1, "stack": 0, "emoji": "🪙", "text": "Each foe you knock out drops 1 extra Ticket.", "w": 10},
+ staminasnack:{"name": "Stamina Snack", "el": "grass", "rar": 1, "stack": 99, "emoji": "🍫", "text": "Battles start with +10 Stamina for each Pokémon. Stacks.", "w": 10},
+ cramnotes:{"name": "Cram Notes", "el": "grass", "rar": 1, "stack": 0, "emoji": "📒", "text": "The attack timing bar moves 10% slower.", "w": 10},
+ luckyegg:{"name": "Lucky Egg", "el": "grass", "rar": 1, "stack": 99, "emoji": "🥚", "text": "+15% EXP from battles. Stacks.", "w": 10},
+ supplydrop:{"name": "Supply Drop", "el": "grass", "rar": 1, "stack": -1, "emoji": "📦", "text": "Right away: get 2 random battle items.", "w": 10},
+ xattack:{"name": "X Attack", "el": "fire", "rar": 2, "stack": 99, "emoji": "⚔️", "text": "All attacks deal 5% more damage for the rest of the run. Stacks.", "w": 6},
+ quickclaw:{"name": "Quick Claw", "el": "fire", "rar": 2, "stack": 0, "emoji": "🐾", "text": "Fast moves deal 10% more damage.", "w": 6},
+ rockyhelmet:{"name": "Rocky Helmet", "el": "fire", "rar": 2, "stack": 0, "emoji": "⛑️", "text": "Foes that hit your Pokémon take 1 damage back.", "w": 6},
+ expertbelt:{"name": "Expert Belt", "el": "fire", "rar": 2, "stack": 0, "emoji": "🥋", "text": "Super-effective hits deal 15% more damage.", "w": 6},
+ firststrike:{"name": "First Strike", "el": "fire", "rar": 2, "stack": 0, "emoji": "🗡️", "text": "Each Pokémon’s first attack in a battle deals 25% more damage.", "w": 6},
+ tlc:{"name": "Tender Love and Care", "el": "water", "rar": 2, "stack": 99, "emoji": "💗", "text": "Revived Pokémon get up with 4 more HP. Stacks (+4 each).", "w": 6},
+ guardup:{"name": "Guard Up", "el": "water", "rar": 2, "stack": 0, "emoji": "🛡️", "text": "Guarding blocks 10% more damage.", "w": 6},
+ eviolite:{"name": "Eviolite", "el": "water", "rar": 2, "stack": 0, "emoji": "💎", "text": "Pokémon that can still evolve take 8% less damage.", "w": 6},
+ protectivepads:{"name": "Protective Pads", "el": "water", "rar": 2, "stack": 0, "emoji": "🧤", "text": "Take 10% less damage from physical moves.", "w": 6},
+ assaultvest:{"name": "Assault Vest", "el": "water", "rar": 2, "stack": 0, "emoji": "🦺", "text": "Take 10% less damage from special moves.", "w": 6},
+ doubledip:{"name": "Double Dip", "el": "grass", "rar": 2, "stack": 99, "emoji": "🔋", "text": "Charged attacks refund 10% of their Stamina. +5% per extra stack.", "w": 6},
+ amuletcoin:{"name": "Amulet Coin", "el": "grass", "rar": 2, "stack": 0, "emoji": "📿", "text": "Boss battles give double Tickets.", "w": 6},
+ haggler:{"name": "Haggler", "el": "grass", "rar": 2, "stack": 0, "emoji": "🏷️", "text": "Shop prices are 30% lower.", "w": 6},
+ fury:{"name": "Fury", "el": "fire", "rar": 3, "stack": 0, "emoji": "😤", "text": "+10% damage for each fainted Pokémon on your team.", "w": 3},
+ lifeorb:{"name": "Life Orb", "el": "fire", "rar": 3, "stack": 0, "emoji": "🔮", "text": "Attacks deal 20% more damage but cost the attacker 1 HP (never below 1).", "w": 3},
+ scopelens:{"name": "Scope Lens", "el": "fire", "rar": 3, "stack": 0, "emoji": "🎯", "text": "The critical-hit zone on the timing bar is 50% wider.", "w": 3},
+ focussash:{"name": "Focus Sash", "el": "water", "rar": 3, "stack": 0, "emoji": "🎗️", "text": "Once per battle, a Pokémon at full HP survives a knockout hit with 1 HP.", "w": 3},
+ shellbell:{"name": "Shell Bell", "el": "water", "rar": 3, "stack": 0, "emoji": "🔔", "text": "Attacks heal the attacker 8% of the damage dealt (at least 1).", "w": 3},
+ frenzy:{"name": "Frenzy", "el": "grass", "rar": 3, "stack": 0, "emoji": "💥", "text": "Extra damage beyond what a knockout needed turns into Tickets.", "w": 3},
+ quickball:{"name": "Quick Ball", "el": "grass", "rar": 3, "stack": 0, "emoji": "⚡", "text": "Foes skip their first turn in every battle.", "w": 3},
+ thief:{"name": "Thief", "el": "grass", "rar": 3, "stack": 0, "emoji": "💰", "text": "25% chance after each battle to snatch a random item.", "w": 3},
+ choiceband:{"name": "Choice Band", "el": "fire", "rar": 4, "stack": 0, "emoji": "🎽", "text": "Charged attacks deal 25% more damage.", "w": 1.5},
+ secondwind:{"name": "Second Wind", "el": "water", "rar": 4, "stack": 0, "emoji": "🌬️", "text": "Once per run, when your whole team faints, everyone gets back up with 30% HP.", "w": 1.5},
+ goldenticket:{"name": "Golden Ticket", "el": "grass", "rar": 4, "stack": 0, "emoji": "🎫", "text": "+40% Tickets, and shop prices are 25% lower.", "w": 1.5},
+ cardshark:{"name": "Card Shark", "el": "grass", "rar": 4, "stack": 0, "emoji": "🃏", "text": "Card picks show 4 cards, and cards of 3★ or more show up twice as often.", "w": 1.5},
+ ultraburst:{"name": "Ultra Burst", "el": "fire", "rar": 5, "stack": 0, "emoji": "🌟", "text": "Attacks after a first-try correct answer deal 40% more damage.", "w": 0.8},
+ sacredash:{"name": "Sacred Ash", "el": "water", "rar": 5, "stack": 0, "emoji": "🕊️", "text": "After every battle, fainted Pokémon get up with 50% HP and everyone heals 10%.", "w": 0.8}};
+const TW_RAR=[,'Common','Uncommon','Rare','Super Rare','Legendary'],TW_ELN={fire:'Fire',water:'Water',grass:'Grass'};
 const TW_CHAL={
  noitem:{t:'Win without using a battle item',ok:b=>!b.usedItem},
  q4:{t:'Answer 4 questions right on the first try this battle',ok:b=>(b.qFull||0)>=4},
@@ -42,8 +83,8 @@ function twEnv(r){return TW_ENVS[twEnvKey(r)]}
 // hooks used by the battle engine (always 1 / false outside the Tower)
 function dgEnvMult(type){const r=runOf();if(!r||!r.tower)return 1;const e=twEnv(r);return (e.boost&&e.boost[String(type).toLowerCase()])||1}
 function dgEnvSingle(){const r=runOf();return !!(r&&r.tower&&twEnv(r).single)}
-function twPowMult(){const r=runOf();return r&&r.tower?1+.1*((r.perks||{}).power||0):1}
-function dgFoeMult(type){const r=runOf();if(!r||!r.tower)return 1;return dgEnvMult(type)*(1-Math.min(.3,.1*((r.perks||{}).guard||0)))}
+function twPowMult(){return 1}
+function dgFoeMult(type){const r=runOf();if(!r||!r.tower)return 1;return dgEnvMult(type)}
 function twStats(){return db.towerStats||(db.towerStats={best:0,bosses:0,runs:0,floors:0,challenges:0,bestAt:null})}
 // ---------- entry & setup ----------
 function towerEntry(){const r=db.tower,S=twStats(),rec='<div class="tw-rec"><div><b>'+S.best+'</b><small>Top floor</small></div><div><b>'+S.bosses+'</b><small>Bosses beaten</small></div><div><b>'+S.challenges+'</b><small>Challenges won</small></div><div><b>'+S.runs+'</b><small>Runs</small></div></div>';
@@ -54,9 +95,9 @@ function twSetupSets(){const sets=db.summaries.filter(s=>termsFor(s).length+(s.q
 function twStartRun(){const sids=[...document.querySelectorAll('.mg-sets input:checked')].map(x=>x.value),mode=(document.querySelector('input[name=mgm]:checked')||{}).value||'smart';if(!sids.length){toast('Pick at least one study set');return}
  if(mode==='weak'&&!sids.some(id=>(db.learned||{})[id])){toast('Finish Learn mode on one of these sets first');return}if(!mgPicker(mgBank(sids),mode).bank.length){toast('No questions for that mode here');return}
  db.tower={tower:true,diff:'balanced',style:'game',sids,mode,party:dgPick.map(id=>{const p=db.pokemon.find(x=>x.id===id),c=combatant(p);return {id,hp:c.hp,energy:20,starf:null}}),floor:0,cleared:0,bag:{oran:2},tickets:0,cogs:0,studyMs:0,rooms:0,startedAt:stamp(),slider:true,battle:null,
-  envs:shuffle(Object.keys(TW_ENVS)),perks:{},perkDone:[],bosses:0,challengesWon:0,log:[]};dgPick=[];dgPickFor='dungeon';save();closeModal();go('minigames');dgOpen('tower')}
+  envs:shuffle(Object.keys(TW_ENVS)),cards:{},perkDone:[],bosses:0,challengesWon:0,log:[]};dgPick=[];dgPickFor='dungeon';save();closeModal();go('minigames');dgOpen('tower')}
 // ---------- floors ----------
-function twPanel(){const r=runOf();return '<div class="dg-row"><span>⏱ <b id="dgTime">'+fmtMin(r.studyMs)+'</b></span><span>🗼 '+(r.floor||1)+'F</span><span>🎟️ '+(r.tickets||0)+'</span><span>'+twEnv(r).icon+'</span></div><div class="dg-partyrow">'+r.party.map((m,i)=>{const p=partyMon(m),c=combatant(p);return '<div class="dg-mini" style="--c:'+SLOT_COLORS[i]+'">'+monSprite(p,'',34)+'<span><i style="width:'+Math.max(0,m.hp/c.hp*100)+'%"></i></span><small>'+m.hp+'/'+c.hp+' · ⚡'+m.energy+'</small></div>'}).join('')+'</div><div class="dg-bag">'+(Object.keys(r.bag).filter(k=>r.bag[k]>0).map(k=>'<span title="'+DITEMS[k].name+'">'+DITEMS[k].icon+'×'+r.bag[k]+'</span>').join('')||'<span class="small muted">No items</span>')+'</div>'+(Object.keys(r.perks||{}).length?'<div class="tw-perks">'+Object.entries(r.perks).map(([k,n])=>'<span title="'+TW_PERKS[k].name+'">'+TW_PERKS[k].icon+(n>1?'×'+n:'')+'</span>').join('')+'</div>':'')+'<div class="dg-row"><button class="btn smallbtn" onclick="dgSettings()">⚙</button><button class="btn smallbtn" onclick="dgSaveExit()">💾 SAVE & EXIT</button></div>'}
+function twPanel(){const r=runOf();return '<div class="dg-row"><span>⏱ <b id="dgTime">'+fmtMin(r.studyMs)+'</b></span><span>🗼 '+(r.floor||1)+'F</span><span>🎟️ '+(r.tickets||0)+'</span><span>'+twEnv(r).icon+'</span></div><div class="dg-partyrow">'+r.party.map((m,i)=>{const p=partyMon(m),c=combatant(p);return '<div class="dg-mini" style="--c:'+SLOT_COLORS[i]+'">'+monSprite(p,'',34)+'<span><i style="width:'+Math.max(0,m.hp/c.hp*100)+'%"></i></span><small>'+m.hp+'/'+c.hp+' · ⚡'+m.energy+'</small></div>'}).join('')+'</div><div class="dg-bag">'+(Object.keys(r.bag).filter(k=>r.bag[k]>0).map(k=>'<span title="'+DITEMS[k].name+'">'+DITEMS[k].icon+'×'+r.bag[k]+'</span>').join('')||'<span class="small muted">No items</span>')+'</div>'+twCardsRow(r)+'<div class="dg-row"><button class="btn smallbtn" onclick="dgSettings()">⚙</button><button class="btn smallbtn" onclick="dgSaveExit()">💾 SAVE & EXIT</button></div>'}
 // after a win (or when opening a run between floors): perk every 5 floors, then the next floor
 function twNext(){const r=runOf();if(!r)return;if(r.cleared&&r.cleared%5===0&&!r.perkDone.includes(r.cleared)){twPerkPick();return}twClimb(r.cleared+1)}
 function twFloor(f){const r=runOf();r.floor=f;save();const st=$('dgStage');if(!st)return;const newEnv=(f-1)%10===0,boss=f%10===0;
@@ -66,37 +107,95 @@ function twFloor(f){const r=runOf();r.floor=f;save();const st=$('dgStage');if(!s
  if(newEnv&&r.envShown!==f){r.envShown=f;save();const e=twEnv(r);st.innerHTML='<div class="dg-room tw-room" style="background-image:url(./assets/tower/'+twEnvKey(r)+'.jpg)"><span class="dg-big">'+e.icon+'</span><h3>'+e.name+'</h3><p>'+e.desc+'</p><p class="small">Floors '+f+'–'+(f+9)+'</p><button class="btn red" onclick="twFloor('+f+')">FIGHT ▶</button></div>';$('dgPanel').innerHTML=twPanel();return}
  twBattle(boss?r.chalPick&&r.chalAccepted===f?r.chalPick:null:null)}
 function twGo(ch){const r=runOf();if(ch)r.chalAccepted=r.floor;save();twBattle(ch)}
-function twBattle(ch){const r=runOf(),f=r.floor,avg=partyAvgLv(),boss=f%10===0,en=[],k=Math.min(4,Math.floor(f/12)),lvl=avg+Math.floor(f*.6)-2,hp=1.25+f*.03,atk=1.05+f*.012,rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1));let kind='battle';
+function twBattle(ch){const r=runOf(),f=r.floor,avg=partyAvgLv(),boss=f%10===0,en=[],k=Math.min(4,Math.floor(f/12)),lvl=avg+Math.floor(f*.6)-2,hp=(1.25+f*.03)*.75,atk=1.05+f*.012,rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1));let kind='battle';
  if(boss)kind=f>=30&&Math.random()<.35?'alpha':f>=10&&Math.random()<.4?'totem':'boss';else if(f>2&&Math.random()<.15)kind='swarm';
  if(kind==='battle'){const n=rnd(1,Math.min(4,2+Math.floor(f/8)));for(let i=0;i<n;i++)en.push(makeEnemy(twSp(0,Math.min(4,1+k)),Math.max(1,lvl+rnd(-3,2)),{hpMul:hp,atkMul:atk}))}
  else if(kind==='swarm'){const sp=twSp(0,Math.min(1,k)),n=rnd(4,6);for(let i=0;i<n;i++)en.push(makeEnemy(sp,Math.max(1,lvl-5+rnd(-2,1)),{hpMul:hp*.6,atkMul:atk*.8}))}
- else{const evolved=MONS.filter(m=>PRE_EVO[m[0]]&&m[2]>=1),sp=kind==='boss'?speciesOfTier(2,4):evolved[Math.floor(Math.random()*evolved.length)][0],bh=3.2*(1+f/40);
+ else{const evolved=MONS.filter(m=>PRE_EVO[m[0]]&&m[2]>=1),sp=kind==='boss'?speciesOfTier(2,4):evolved[Math.floor(Math.random()*evolved.length)][0],bh=2.4*(1+f/40);
   if(kind==='alpha')en.push(makeEnemy(sp,lvl+4,{hpMul:bh*1.2,atkMul:atk*1.3,boss:'alpha',twice:true}));
   else{en.push(makeEnemy(sp,lvl+3,{hpMul:bh*(kind==='totem'?.85:1),atkMul:atk*1.2,boss:kind}));if(kind==='totem'){const pre=PRE_EVO[sp]||sp;for(let i=0;i<rnd(2,3);i++)en.push(makeEnemy(pre,lvl-1,{hpMul:hp*.8,atkMul:atk}))}}}
- const bat=20*((r.perks||{}).battery||0);if(bat)r.party.forEach(m=>{if(m.hp>0)m.energy=Math.min(100,m.energy+bat)});r.party.forEach(q=>{delete q.hurt;delete q.hurtR;delete q.koR});
- r.battle={kind,enemies:en,turn:0,round:1,overclock:0,skip:false,guard:{},done:false,challenge:ch||null};twCrown(r,r.battle);if(DG)DG.msg='';save();dgDrawBattle(true)}
+ const bat=10*twC('staminasnack');if(bat)r.party.forEach(m=>{if(m.hp>0)m.energy=Math.min(100,m.energy+bat)});r.party.forEach(q=>{delete q.hurt;delete q.hurtR;delete q.koR});
+ r.battle={kind,enemies:en,turn:0,round:1,overclock:0,skip:!!twC('quickball'),guard:{},done:false,challenge:ch||null};twCrown(r,r.battle);if(DG)DG.msg='';save();dgDrawBattle(true)}
 // ---------- loot ----------
 function twItem(minTier){const pool=Object.keys(DITEMS).filter(id=>(DITEMS[id].tier||0)>=(minTier||0)).map(id=>({id,w:[10,7,4,1.2][DITEMS[id].tier||0]}));return pickWeighted(pool).id}
-function twWin(){const r=runOf(),b=r.battle,f=r.floor,boss=b.kind!=='battle'&&b.kind!=='swarm',got=[],luck=1+.25*((r.perks||{}).lucky||0);
- let tix=b.kind==='swarm'?5+Math.floor(f/4):boss?12+Math.floor(f/2)+(b.kind!=='boss'?5:0):3+Math.floor(f/4);tix=Math.round(tix*luck);
+function twWin(){const r=runOf(),b=r.battle,f=r.floor,boss=b.kind!=='battle'&&b.kind!=='swarm',got=[],luck=(1+.1*twC('minersdream'))*(twC('goldenticket')?1.4:1)*(boss&&twC('amuletcoin')?2:1);
+ let tix=b.kind==='swarm'?5+Math.floor(f/4):boss?12+Math.floor(f/2)+(b.kind!=='boss'?5:0):3+Math.floor(f/4);tix=Math.round((tix+(twC('payday')?b.enemies.length:0))*luck);
  const items=[];if(boss){items.push(twItem(1),twItem(0))}else if(Math.random()<(b.kind==='swarm'?.45:.3))items.push(twItem(0));
  let candy=boss&&Math.random()<.3?1:0;
  if(b.challenge){const C=TW_CHAL[b.challenge];if(C.ok(b)){tix*=2;items.push(twItem(2));candy++;r.challengesWon=(r.challengesWon||0)+1;got.push('🎯 Challenge complete: '+C.t+'!')}else got.push('🎯 Challenge missed: '+C.t)}
  r.tickets=(r.tickets||0)+tix;r.cogs=(r.cogs||0)+tix;got.push('+'+tix+' 🎟️ Tickets');items.forEach(k=>{r.bag[k]=(r.bag[k]||0)+1;got.push(DITEMS[k].icon+' '+DITEMS[k].name)});if(candy){db.candies=(db.candies||0)+candy;got.push('🍬 Rare Cand'+(candy>1?'ies ×'+candy:'y'))}
- const exp=Math.round((boss?4500:b.kind==='swarm'?2000:1500)*(1+.06*f));r.party.forEach(m=>{const p=partyMon(m);if(p)p.pxp=(p.pxp||0)+exp});got.push('Team +'+exp.toLocaleString()+' EXP each');
+ const exp=Math.round((boss?4500:b.kind==='swarm'?2000:1500)*(1+.06*f)*(1+.15*twC('luckyegg')));got.push(...twAfterBattle(r,b,items));r.party.forEach(m=>{const p=partyMon(m);if(p)p.pxp=(p.pxp||0)+exp});got.push('Team +'+exp.toLocaleString()+' EXP each');
  if(boss)r.bosses=(r.bosses||0)+1;
  if(b.kind==='totem'||b.kind==='alpha'){const big=b.enemies[0],sp=PRE_EVO[big.species]||big.species,m=dgBossMon(sp,b.kind),e=giveMon(m);got.push('🎁 '+(e.shiny?'✨ Shiny ':'')+e.species+' joined your Box!')}
  r.cleared=f;r.battle=null;r.chalOffered=0;const S=twStats();if(f>S.best){S.best=f;S.bestAt=stamp()}if(DG)DG.msg='';save();if(!$('dgStage'))return;
  $('dgStage').innerHTML='<div class="dg-room tw-room" style="background-image:url(./assets/tower/'+twEnvKey(r)+'.jpg)"><span class="dg-big">'+(boss?'👑':'🏆')+'</span><h3>Floor '+f+' cleared!</h3><p>'+got.join('<br>')+'</p><button class="btn red" onclick="twNext()">▶ FLOOR '+(f+1)+'</button></div>';$('dgPanel').innerHTML=twPanel()}
-// ---------- perks ----------
-function twPerkPick(){const r=runOf(),down=r.party.some(m=>m.hp<=0),opts=shuffle(Object.keys(TW_PERKS).filter(k=>!(k==='revive'&&!down)&&!(k==='guard'&&((r.perks||{}).guard||0)>=3))).slice(0,3);r.perkOpts=opts;save();
- $('dgStage').innerHTML='<div class="dg-room tw-room" style="background-image:url(./assets/tower/'+twEnvKey(r)+'.jpg)"><span class="dg-big">✨</span><h3>Choose a perk</h3><p class="small">Floor '+r.cleared+' reached. Pick one:</p><div class="tw-perkpick">'+opts.map(k=>'<button class="btn" onclick="twPerk(\''+k+'\')"><b>'+TW_PERKS[k].icon+' '+TW_PERKS[k].name+'</b><small>'+TW_PERKS[k].desc+'</small></button>').join('')+'</div></div>';$('dgPanel').innerHTML=twPanel()}
-function twPerk(k){const r=runOf();if(!r||!TW_PERKS[k]||r.perkDone.includes(r.cleared))return;r.perkDone.push(r.cleared);
- if(k==='meal')r.party.forEach(m=>{const c=combatant(partyMon(m));m.hp=Math.min(c.hp,m.hp>0?m.hp+Math.ceil(c.hp*.5):Math.ceil(c.hp*.25))});
- else if(k==='revive')r.party.forEach(m=>{if(m.hp<=0)m.hp=Math.ceil(combatant(partyMon(m)).hp*.5)});
- else if(k==='supply'){for(let i=0;i<2;i++){const it=twItem(0);r.bag[it]=(r.bag[it]||0)+1}}
- else r.perks[k]=(r.perks[k]||0)+1;
- save();toast(TW_PERKS[k].icon+' '+TW_PERKS[k].name+'!');twClimb(r.cleared+1)}
+// ---------- perk cards ----------
+function twCards(r){r=r||runOf();if(!r)return {};if(!r.cards){r.cards={};const P=r.perks||{},map={power:['xattack',2],guard:['sturdyshell',2],battery:['staminasnack',2],lucky:['minersdream',2]};
+  Object.entries(P).forEach(([k,n])=>{const m=map[k];if(m)r.cards[m[0]]=Math.min(TW_CARDS[m[0]].stack>0?TW_CARDS[m[0]].stack:99,(r.cards[m[0]]||0)+m[1]*n)});delete r.perks}return r.cards}
+function twC(id){const r=runOf();return r&&r.tower?(twCards(r)[id]||0):0}
+// the card picture plus its name and text, written on top in a pixel font
+function twCardHTML(id,cls){const c=TW_CARDS[id];if(!c)return '';const nf=Math.min(7.2,68/Math.max(6,c.name.length)).toFixed(2),tf=Math.max(5.6,Math.min(8.2,8.2-(c.text.length-36)*.065)).toFixed(2);
+ return '<div class="tw-card el-'+c.el+' r'+c.rar+(cls?' '+cls:'')+'" style="background-image:url(./assets/cards/'+id+'.png)"><b class="cn" style="font-size:'+nf+'cqw">'+esc(c.name)+'</b><span class="cd" style="font-size:'+tf+'cqw">'+esc(c.text)+'</span></div>'}
+// shrink a card's text a little if it doesn't fit its box
+function twFit(){const go=()=>document.querySelectorAll('.tw-card .cd').forEach(el=>{let f=parseFloat(el.style.fontSize)||7,n=0;while(el.clientHeight&&el.scrollHeight>el.clientHeight+1&&n++<14){f-=.25;el.style.fontSize=f+'cqw'}});requestAnimationFrame(go);if(document.fonts&&document.fonts.ready)document.fonts.ready.then(go)}
+function twCardsRow(r){const C=twCards(r),ids=Object.keys(C);return ids.length?'<button class="tw-perks" onclick="twMyCards()">'+ids.map(k=>'<span title="'+esc(TW_CARDS[k].name)+'">'+TW_CARDS[k].emoji+(C[k]>1?'×'+C[k]:'')+'</span>').join('')+'<small>🃏 '+ids.length+'</small></button>':''}
+function twMyCards(){const r=runOf(),C=twCards(r),ids=Object.keys(C).sort((a,b)=>TW_CARDS[b].rar-TW_CARDS[a].rar);modal('🃏 YOUR CARDS',ids.length?'<div class="tw-cardgrid">'+ids.map(k=>'<button class="tw-pick" onclick="twZoom(\''+k+'\',0)">'+twCardHTML(k)+(C[k]>1?'<em>×'+C[k]+'</em>':'')+'</button>').join('')+'</div>':'<p>No cards yet. You pick one every 5 floors.</p>');twFit()}
+// which cards can still be offered
+function twCanOffer(r,id){const c=TW_CARDS[id],n=twCards(r)[id]||0;if(c.stack===0&&n)return false;if(c.stack>0&&c.stack<99&&n>=c.stack)return false;
+ if(id==='revivalherb')return r.party.some(m=>m.hp<=0);if(id==='hotmeal')return r.party.some(m=>m.hp<combatant(partyMon(m)).hp);return true}
+function twCardWeight(r,id){const c=TW_CARDS[id];let w=c.w;if(c.rar>=3)w*=(1+Math.min(1,(r.cleared||0)/40))*(twC('cardshark')?2:1);return w}
+function twDeal(r){const n=twC('cardshark')?4:3,pool=Object.keys(TW_CARDS).filter(id=>twCanOffer(r,id)).map(id=>({id,w:twCardWeight(r,id)})),out=[];
+ while(out.length<n&&pool.length){const x=pickWeighted(pool);out.push(x.id);pool.splice(pool.indexOf(x),1)}return out}
+function twPerkPick(){const r=runOf();if(!r.perkOpts||r.perkFor!==r.cleared){r.perkOpts=twDeal(r);r.perkFor=r.cleared;save()}const opts=r.perkOpts;
+ $('dgStage').innerHTML='<div class="dg-room tw-room tw-pickroom" style="background-image:url(./assets/tower/'+twEnvKey(r)+'.jpg)"><h3>🃏 Choose a card</h3><p class="small">Floor '+r.cleared+' reached. Tap a card to look closer.</p><div class="tw-cardpick n'+opts.length+'">'+opts.map(k=>'<button class="tw-pick" onclick="twZoom(\''+k+'\',1)">'+twCardHTML(k)+'<small>'+'★'.repeat(TW_CARDS[k].rar)+' '+TW_RAR[TW_CARDS[k].rar]+(twCards(r)[k]?' · have ×'+twCards(r)[k]:'')+'</small></button>').join('')+'</div></div>';$('dgPanel').innerHTML=twPanel();twFit()}
+function twZoom(id,pick){const c=TW_CARDS[id];modal(TW_ELN[c.el].toUpperCase()+' · '+'★'.repeat(c.rar)+' '+TW_RAR[c.rar].toUpperCase(),'<div class="tw-zoom">'+twCardHTML(id,'big')+'</div>'+(pick?'<div class="actions"><button class="btn" onclick="closeModal()">BACK</button><button class="btn red" onclick="closeModal();twPerk(\''+id+'\')">TAKE THIS CARD</button></div>':''));twFit()}
+function twPerk(k){const r=runOf();if(!r||!TW_CARDS[k]||r.perkDone.includes(r.cleared)||!(r.perkOpts||[]).includes(k))return;r.perkDone.push(r.cleared);r.perkOpts=null;const C=twCards(r);
+ if(k==='hotmeal')r.party.forEach(m=>{const c=combatant(partyMon(m));m.hp=Math.min(c.hp,m.hp>0?m.hp+Math.ceil(c.hp*.5):Math.ceil(c.hp*.25))});
+ else if(k==='revivalherb')r.party.forEach(m=>{if(m.hp<=0)m.hp=Math.ceil(combatant(partyMon(m)).hp*.5)});
+ else if(k==='supplydrop'){for(let i=0;i<2;i++){const it=twItem(0);r.bag[it]=(r.bag[it]||0)+1}}
+ else C[k]=(C[k]||0)+1;
+ save();toast(TW_CARDS[k].emoji+' '+TW_CARDS[k].name+'!');twClimb(r.cleared+1)}
+// ---------- what the cards do in battle ----------
+const twIsT=(types,t)=>(types||[]).some(x=>String(x).toLowerCase()===t);
+// your attacks
+function twCardAtk(x,e,mv){const r=runOf();if(!r||!r.tower)return 1;const C=twCards(r),T=String(mv[0]).toLowerCase(),cat=moveCat(mv)||'P';let k=1+.05*(C.xattack||0);
+ if(C.netball&&(twIsT(e.types,'bug')||twIsT(e.types,'water')))k*=1.05;
+ if(C.charcoal&&T==='fire')k*=1.1;if(C.mysticwater&&T==='water')k*=1.1;if(C.miracleseed&&T==='grass')k*=1.1;
+ if(C.muscleband&&cat==='P')k*=1.06;if(C.wiseglasses&&cat==='S')k*=1.06;if(C.quickclaw&&mv[3]==='fast')k*=1.1;
+ if(C.expertbelt&&typeEff(mv[0],e.types)>1.2)k*=1.15;if(C.firststrike&&!(x.b.fs||{})[x.slot])k*=1.25;
+ if(C.fury)k*=1+.1*r.party.filter(m=>m.hp<=0).length;if(C.lifeorb)k*=1.2;if(C.choiceband&&mv[3]!=='fast')k*=1.25;if(C.ultraburst&&x.b.lastRes==='full')k*=1.4;return k}
+// once per attack: First Strike, Double Dip, Life Orb, Shell Bell
+function twCardAfter(x,n,mv,tot,failed,out){const r=runOf();if(!r||!r.tower||failed)return;const C=twCards(r),m=x.m;
+ if(C.firststrike){(x.b.fs=x.b.fs||{})[x.slot]=1}
+ if(C.doubledip&&mv[3]!=='fast'){const g=Math.floor(mv[2]*(.1+.05*(C.doubledip-1)));if(g>0)m.energy=Math.min(100,m.energy+g)}
+ if(C.shellbell&&tot>0&&m.hp>0){const h=Math.min(x.c.hp-m.hp,Math.max(1,Math.floor(tot*.08)));if(h>0){m.hp+=h;out.push(['heal',h])}}
+ if(C.lifeorb&&tot>0&&m.hp>1){m.hp-=1;out.push(['self',1])}}
+// Frenzy: overkill becomes Tickets
+function twFrenzy(ovk){if(!ovk||!twC('frenzy'))return 0;const r=runOf();r.tickets=(r.tickets||0)+ovk;r.cogs=(r.cogs||0)+ovk;return ovk}
+// damage your team takes (after the usual cap)
+function twCardDef(types,sp,mv){const r=runOf();if(!r||!r.tower)return 1;const C=twCards(r),cat=mv?moveCat(mv)||'P':'';let k=1-.05*Math.min(4,C.sturdyshell||0);
+ if(C.eviolite&&Object.values(PRE_EVO).includes(sp))k*=.92;if(C.protectivepads&&cat==='P')k*=.9;if(C.assaultvest&&cat==='S')k*=.9;return k}
+function twDodgeAdd(){return twC('brightpowder')?.05:0}
+function twGuardAdd(){return twC('guardup')?.1:0}
+function twSlowMult(){return twC('cramnotes')?.9:1}
+function twCritMult(){return twC('scopelens')?1.5:1}
+function twShopMult(){return (twC('haggler')?.7:1)*(twC('goldenticket')?.75:1)}
+// Focus Sash and Rocky Helmet, when one of your Pokémon is hit
+function twCardHurt(b,m,d){const r=runOf();if(!r||!r.tower||d<=0)return;const C=twCards(r),i=r.party.indexOf(m);
+ if(C.focussash&&m.hp<=0&&m.hp+d>=combatant(partyMon(m)).hp&&!(b.sash||{})[m.id]){(b.sash=b.sash||{})[m.id]=1;m.hp=1;setTimeout(()=>dgFloat('.dg-ally[data-i="'+i+'"]','🎗️ Hung on!','heal'),250)}
+ if(C.rockyhelmet&&twCur&&twCur.att&&twCur.att.hp>0){const f=twCur.att;f.hp=Math.max(0,f.hp-1);const j=b.enemies.indexOf(f);setTimeout(()=>dgFloat('.dg-foe[data-i="'+j+'"]','-1 ⛑️','weak'),300)}}
+// Leftovers, at the end of each round
+function twCardRound(r,b){if(!r||!r.tower||!twC('leftovers'))return;const hurt=r.party.map((m,i)=>[m,i,m.hp/combatant(partyMon(m)).hp]).filter(([m,,f])=>m.hp>0&&f<1).sort((a,c)=>a[2]-c[2])[0];
+ if(hurt){hurt[0].hp+=1;dgFloat('.dg-ally[data-i="'+hurt[1]+'"]','+1 🍎','heal')}}
+// Second Wind: once per run, when the whole team faints
+function twSecondWind(){const r=runOf();if(!r||!r.tower||!twC('secondwind')||r.swUsed||!r.battle)return false;r.swUsed=1;
+ r.party.forEach(m=>{m.hp=Math.max(1,Math.ceil(combatant(partyMon(m)).hp*.3))});if(DG)DG.msg='🌬️ Second Wind! Your whole team gets back up!';save();dgDrawBattle();return true}
+// after a battle: Seed Surge, Sacred Ash, Thief
+function twAfterBattle(r,b,items){const C=twCards(r),got=[];
+ if(C.sacredash){r.party.forEach(m=>{const c=combatant(partyMon(m));m.hp=m.hp<=0?Math.ceil(c.hp*.5):Math.min(c.hp,m.hp+Math.ceil(c.hp*.1))});got.push('🕊️ Sacred Ash restored your team')}
+ if(C.seedsurge){let n=0;r.party.forEach(m=>{const p=partyMon(m),c=combatant(p);if(m.hp>0&&m.hp<c.hp&&twIsT(c.types,'grass')){m.hp++;n++}});if(n)got.push('🪴 Seed Surge healed '+n+' Grass-type'+(n>1?'s':''))}
+ if(C.thief&&Math.random()<.25){const it=twItem(0);r.bag[it]=(r.bag[it]||0)+1;got.push('💰 Thief snatched '+DITEMS[it].icon+' '+DITEMS[it].name)}
+ return got}
 // ---------- the end ----------
 function twLoseScreen(){const r=runOf();r.battle=null;save();if(!$('dgStage'))return;$('dgStage').innerHTML='<div class="dg-room tw-room" style="background-image:url(./assets/tower/'+twEnvKey(r)+'.jpg)"><span class="dg-big">💤</span><h3>Your team fainted on floor '+r.floor+'</h3><p>You cleared '+(r.cleared||0)+' floor'+(r.cleared===1?'':'s')+'. Leftover Tickets become Cogs.</p><button class="btn red" onclick="twEnd(false)">LEAVE THE TOWER</button></div>';$('dgPanel').innerHTML=''}
 function twEnd(quit){const r=db.tower;if(!r)return;const tix=Math.max(0,Math.round(r.tickets||0)),S=twStats();db.cogs=Math.round(db.cogs+tix);S.runs++;S.bosses+=r.bosses||0;S.challenges+=r.challengesWon||0;S.floors+=r.cleared||0;const newBest=(r.cleared||0)>=S.best&&(r.cleared||0)>0;S.best=Math.max(S.best,r.cleared||0);grantXp(10+2*(r.cleared||0));
@@ -143,11 +242,11 @@ function dgEnvDef(types,sp,u){const e=twOn();if(!e)return 1;let k=1;if(e.dragon&
 function dgEnvFlat(types,maxhp){const e=twOn();return e&&e.water&&twIsType(types,'water')?Math.max(1,Math.round(maxhp*.05)):0}
 function dgEnvNoItems(){const e=twOn();return !!(e&&e.noItems)}
 // a foe's hit on your team, after the usual damage cap
-function twFoeHit(raw,e,types,sp,u){twCur=twOn()?{att:e,types}:null;if(!twOn()||raw<=0)return raw;return Math.max(1,Math.round(raw*dgEnvAtk(e.types,e.species,e)*dgEnvDef(types,sp,u)))+dgEnvFlat(e.types,e.maxhp)}
+function twFoeHit(raw,e,types,sp,u,mv){twCur=twOn()?{att:e,types}:null;if(!twOn()||raw<=0)return raw;return Math.max(1,Math.round(raw*dgEnvAtk(e.types,e.species,e)*dgEnvDef(types,sp,u)*twCardDef(types,sp,mv)))+dgEnvFlat(e.types,e.maxhp)}
 // Holy Sanctum: your team heals when your turn ends
 function twTurnEnd(r,b){const e=r&&r.tower?twEnv(r):null;if(!e||!e.heal)return;r.party.forEach((m,i)=>{if(m.hp<=0)return;const c=combatant(partyMon(m)),h=Math.min(e.heal,c.hp-m.hp);if(h>0){m.hp+=h;setTimeout(()=>dgFloat('.dg-ally[data-i="'+i+'"]','+'+h+' 🕊️','heal'),60)}})}
 // Sludge Hell and Crystal Mines: after both sides have moved, everyone without a safe type takes 1 damage
-function twRoundEnd(r,b){twCur=null;const e=r&&r.tower?twEnv(r):null;if(!e||!e.chip)return;const C=e.chip,safe=t=>C.safe.some(x=>twIsType(t,x));
+function twRoundEnd(r,b){twCur=null;twCardRound(r,b);const e=r&&r.tower?twEnv(r):null;if(!e||!e.chip)return;const C=e.chip,safe=t=>C.safe.some(x=>twIsType(t,x));
  r.party.forEach((m,i)=>{if(m.hp<=0)return;const c=combatant(partyMon(m));if(safe(c.types))return;m.hp=Math.max(0,m.hp-C.d);dgHurt(b,m,C.d);dgFloat('.dg-ally[data-i="'+i+'"]','-'+C.d+' '+C.icon,'weak')});
  b.enemies.forEach((f,i)=>{if(f.hp<=0||safe(f.types))return;f.hp=Math.max(0,f.hp-C.d);dgFloat('.dg-foe[data-i="'+i+'"]','-'+C.d+' '+C.icon,'weak')});twKingCheck(r,b)}
 // Dice Arena
@@ -160,7 +259,7 @@ function twDarkDodge(b,f){const e=twOn();if(!e||!e.dank||!twIsType(f.types,'dark
 function twSpookHeal(m,maxhp,parts){const e=twOn();if(!e||!e.spook||m.hp<=0)return 0;const h=Math.min(maxhp-m.hp,parts.reduce((a,d)=>a+(d>0?Math.max(1,Math.floor(d*.1)):0),0));if(h>0)m.hp+=h;return Math.max(0,h)}
 function twSpookFoe(d){const e=twOn();if(!e||!e.spook||!twCur||!twCur.att||d<=0)return;const f=twCur.att,h=Math.min(f.maxhp-f.hp,Math.max(1,Math.floor(d*.1)));if(h>0&&f.hp>0){f.hp+=h;const i=runOf().battle.enemies.indexOf(f);if(i>=0)setTimeout(()=>dgFloat('.dg-foe[data-i="'+i+'"]','+'+h+' 👻','heal'),300)}}
 // Pokémon Center and Lifeblock Gym
-function twReviveHp(m){const e=twOn();return e&&e.center?Math.max(1,Math.floor(combatant(partyMon(m)).hp*.15)):1}
+function twReviveHp(m){const e=twOn();return Math.min(combatant(partyMon(m)).hp,(e&&e.center?Math.max(1,Math.floor(combatant(partyMon(m)).hp*.15)):1)+4*twC('tlc'))}
 function twGuardHeal(m,c,gain){const e=twOn();if(!e||!e.lifeblock||m.hp<=0)return 0;const h=Math.min(c.hp-m.hp,Math.floor(gain/2));if(h>0)m.hp+=h;return Math.max(0,h)}
 // King's Battlefield: the highest-level Pokémon on each side is the king
 function twKingOn(u){const e=twOn();return !!(e&&e.king&&u&&u.king)}

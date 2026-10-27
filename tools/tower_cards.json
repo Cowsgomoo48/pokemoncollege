@@ -1,0 +1,452 @@
+[
+{
+"id": "netball",
+"name": "Net Ball",
+"el": "fire",
+"rar": 1,
+"stack": 0,
+"emoji": "🕸️",
+"text": "Your attacks deal 5% more damage to Bug- and Water-type foes.",
+"w": 10
+},
+{
+"id": "charcoal",
+"name": "Charcoal",
+"el": "fire",
+"rar": 1,
+"stack": 0,
+"emoji": "🔥",
+"text": "Fire-type moves deal 10% more damage.",
+"w": 10
+},
+{
+"id": "mysticwater",
+"name": "Mystic Water",
+"el": "fire",
+"rar": 1,
+"stack": 0,
+"emoji": "💧",
+"text": "Water-type moves deal 10% more damage.",
+"w": 10
+},
+{
+"id": "miracleseed",
+"name": "Miracle Seed",
+"el": "fire",
+"rar": 1,
+"stack": 0,
+"emoji": "🌱",
+"text": "Grass-type moves deal 10% more damage.",
+"w": 10
+},
+{
+"id": "muscleband",
+"name": "Muscle Band",
+"el": "fire",
+"rar": 1,
+"stack": 0,
+"emoji": "💪",
+"text": "Physical moves deal 6% more damage.",
+"w": 10
+},
+{
+"id": "wiseglasses",
+"name": "Wise Glasses",
+"el": "fire",
+"rar": 1,
+"stack": 0,
+"emoji": "👓",
+"text": "Special moves deal 6% more damage.",
+"w": 10
+},
+{
+"id": "seedsurge",
+"name": "Seed Surge",
+"el": "water",
+"rar": 1,
+"stack": 0,
+"emoji": "🪴",
+"text": "At the end of a battle, your Grass-type Pokémon heal 1 HP.",
+"w": 10
+},
+{
+"id": "hotmeal",
+"name": "Hot Meal",
+"el": "water",
+"rar": 1,
+"stack": -1,
+"emoji": "🍲",
+"text": "Right away: heal every Pokémon 50%. Fainted ones get up with 25%.",
+"w": 10
+},
+{
+"id": "revivalherb",
+"name": "Revival Herb",
+"el": "water",
+"rar": 1,
+"stack": -1,
+"emoji": "🌿",
+"text": "Right away: every fainted Pokémon gets back up with 50% HP.",
+"w": 10
+},
+{
+"id": "sturdyshell",
+"name": "Sturdy Shell",
+"el": "water",
+"rar": 1,
+"stack": 4,
+"emoji": "🐚",
+"text": "Take 5% less damage. Stacks up to 4 times.",
+"w": 10
+},
+{
+"id": "leftovers",
+"name": "Leftovers",
+"el": "water",
+"rar": 1,
+"stack": 0,
+"emoji": "🍎",
+"text": "After each round, your most hurt Pokémon heals 1 HP.",
+"w": 10
+},
+{
+"id": "brightpowder",
+"name": "Bright Powder",
+"el": "water",
+"rar": 1,
+"stack": 0,
+"emoji": "✨",
+"text": "Your Pokémon dodge attacks 5% more often.",
+"w": 10
+},
+{
+"id": "minersdream",
+"name": "Miner’s Dream",
+"el": "grass",
+"rar": 1,
+"stack": 99,
+"emoji": "⛏️",
+"text": "+10% Tickets from battles. Stacks.",
+"w": 10
+},
+{
+"id": "payday",
+"name": "Pay Day",
+"el": "grass",
+"rar": 1,
+"stack": 0,
+"emoji": "🪙",
+"text": "Each foe you knock out drops 1 extra Ticket.",
+"w": 10
+},
+{
+"id": "staminasnack",
+"name": "Stamina Snack",
+"el": "grass",
+"rar": 1,
+"stack": 99,
+"emoji": "🍫",
+"text": "Battles start with +10 Stamina for each Pokémon. Stacks.",
+"w": 10
+},
+{
+"id": "cramnotes",
+"name": "Cram Notes",
+"el": "grass",
+"rar": 1,
+"stack": 0,
+"emoji": "📒",
+"text": "The attack timing bar moves 10% slower.",
+"w": 10
+},
+{
+"id": "luckyegg",
+"name": "Lucky Egg",
+"el": "grass",
+"rar": 1,
+"stack": 99,
+"emoji": "🥚",
+"text": "+15% EXP from battles. Stacks.",
+"w": 10
+},
+{
+"id": "supplydrop",
+"name": "Supply Drop",
+"el": "grass",
+"rar": 1,
+"stack": -1,
+"emoji": "📦",
+"text": "Right away: get 2 random battle items.",
+"w": 10
+},
+{
+"id": "xattack",
+"name": "X Attack",
+"el": "fire",
+"rar": 2,
+"stack": 99,
+"emoji": "⚔️",
+"text": "All attacks deal 5% more damage for the rest of the run. Stacks.",
+"w": 6
+},
+{
+"id": "quickclaw",
+"name": "Quick Claw",
+"el": "fire",
+"rar": 2,
+"stack": 0,
+"emoji": "🐾",
+"text": "Fast moves deal 10% more damage.",
+"w": 6
+},
+{
+"id": "rockyhelmet",
+"name": "Rocky Helmet",
+"el": "fire",
+"rar": 2,
+"stack": 0,
+"emoji": "⛑️",
+"text": "Foes that hit your Pokémon take 1 damage back.",
+"w": 6
+},
+{
+"id": "expertbelt",
+"name": "Expert Belt",
+"el": "fire",
+"rar": 2,
+"stack": 0,
+"emoji": "🥋",
+"text": "Super-effective hits deal 15% more damage.",
+"w": 6
+},
+{
+"id": "firststrike",
+"name": "First Strike",
+"el": "fire",
+"rar": 2,
+"stack": 0,
+"emoji": "🗡️",
+"text": "Each Pokémon’s first attack in a battle deals 25% more damage.",
+"w": 6
+},
+{
+"id": "tlc",
+"name": "Tender Love and Care",
+"el": "water",
+"rar": 2,
+"stack": 99,
+"emoji": "💗",
+"text": "Revived Pokémon get up with 4 more HP. Stacks (+4 each).",
+"w": 6
+},
+{
+"id": "guardup",
+"name": "Guard Up",
+"el": "water",
+"rar": 2,
+"stack": 0,
+"emoji": "🛡️",
+"text": "Guarding blocks 10% more damage.",
+"w": 6
+},
+{
+"id": "eviolite",
+"name": "Eviolite",
+"el": "water",
+"rar": 2,
+"stack": 0,
+"emoji": "💎",
+"text": "Pokémon that can still evolve take 8% less damage.",
+"w": 6
+},
+{
+"id": "protectivepads",
+"name": "Protective Pads",
+"el": "water",
+"rar": 2,
+"stack": 0,
+"emoji": "🧤",
+"text": "Take 10% less damage from physical moves.",
+"w": 6
+},
+{
+"id": "assaultvest",
+"name": "Assault Vest",
+"el": "water",
+"rar": 2,
+"stack": 0,
+"emoji": "🦺",
+"text": "Take 10% less damage from special moves.",
+"w": 6
+},
+{
+"id": "doubledip",
+"name": "Double Dip",
+"el": "grass",
+"rar": 2,
+"stack": 99,
+"emoji": "🔋",
+"text": "Charged attacks refund 10% of their Stamina. +5% per extra stack.",
+"w": 6
+},
+{
+"id": "amuletcoin",
+"name": "Amulet Coin",
+"el": "grass",
+"rar": 2,
+"stack": 0,
+"emoji": "📿",
+"text": "Boss battles give double Tickets.",
+"w": 6
+},
+{
+"id": "haggler",
+"name": "Haggler",
+"el": "grass",
+"rar": 2,
+"stack": 0,
+"emoji": "🏷️",
+"text": "Shop prices are 30% lower.",
+"w": 6
+},
+{
+"id": "fury",
+"name": "Fury",
+"el": "fire",
+"rar": 3,
+"stack": 0,
+"emoji": "😤",
+"text": "+10% damage for each fainted Pokémon on your team.",
+"w": 3
+},
+{
+"id": "lifeorb",
+"name": "Life Orb",
+"el": "fire",
+"rar": 3,
+"stack": 0,
+"emoji": "🔮",
+"text": "Attacks deal 20% more damage but cost the attacker 1 HP (never below 1).",
+"w": 3
+},
+{
+"id": "scopelens",
+"name": "Scope Lens",
+"el": "fire",
+"rar": 3,
+"stack": 0,
+"emoji": "🎯",
+"text": "The critical-hit zone on the timing bar is 50% wider.",
+"w": 3
+},
+{
+"id": "focussash",
+"name": "Focus Sash",
+"el": "water",
+"rar": 3,
+"stack": 0,
+"emoji": "🎗️",
+"text": "Once per battle, a Pokémon at full HP survives a knockout hit with 1 HP.",
+"w": 3
+},
+{
+"id": "shellbell",
+"name": "Shell Bell",
+"el": "water",
+"rar": 3,
+"stack": 0,
+"emoji": "🔔",
+"text": "Attacks heal the attacker 8% of the damage dealt (at least 1).",
+"w": 3
+},
+{
+"id": "frenzy",
+"name": "Frenzy",
+"el": "grass",
+"rar": 3,
+"stack": 0,
+"emoji": "💥",
+"text": "Extra damage beyond what a knockout needed turns into Tickets.",
+"w": 3
+},
+{
+"id": "quickball",
+"name": "Quick Ball",
+"el": "grass",
+"rar": 3,
+"stack": 0,
+"emoji": "⚡",
+"text": "Foes skip their first turn in every battle.",
+"w": 3
+},
+{
+"id": "thief",
+"name": "Thief",
+"el": "grass",
+"rar": 3,
+"stack": 0,
+"emoji": "💰",
+"text": "25% chance after each battle to snatch a random item.",
+"w": 3
+},
+{
+"id": "choiceband",
+"name": "Choice Band",
+"el": "fire",
+"rar": 4,
+"stack": 0,
+"emoji": "🎽",
+"text": "Charged attacks deal 25% more damage.",
+"w": 1.5
+},
+{
+"id": "secondwind",
+"name": "Second Wind",
+"el": "water",
+"rar": 4,
+"stack": 0,
+"emoji": "🌬️",
+"text": "Once per run, when your whole team faints, everyone gets back up with 30% HP.",
+"w": 1.5
+},
+{
+"id": "goldenticket",
+"name": "Golden Ticket",
+"el": "grass",
+"rar": 4,
+"stack": 0,
+"emoji": "🎫",
+"text": "+40% Tickets, and shop prices are 25% lower.",
+"w": 1.5
+},
+{
+"id": "cardshark",
+"name": "Card Shark",
+"el": "grass",
+"rar": 4,
+"stack": 0,
+"emoji": "🃏",
+"text": "Card picks show 4 cards, and cards of 3★ or more show up twice as often.",
+"w": 1.5
+},
+{
+"id": "ultraburst",
+"name": "Ultra Burst",
+"el": "fire",
+"rar": 5,
+"stack": 0,
+"emoji": "🌟",
+"text": "Attacks after a first-try correct answer deal 40% more damage.",
+"w": 0.8
+},
+{
+"id": "sacredash",
+"name": "Sacred Ash",
+"el": "water",
+"rar": 5,
+"stack": 0,
+"emoji": "🕊️",
+"text": "After every battle, fainted Pokémon get up with 50% HP and everyone heals 10%.",
+"w": 0.8
+}
+]

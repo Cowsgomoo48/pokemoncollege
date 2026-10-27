@@ -39,3 +39,25 @@
 .dg-ally.tw-king .dg-spr,.dg-foe.tw-king .dg-spr{filter:drop-shadow(0 0 5px #ffd54a) drop-shadow(0 0 2px #fff3b0)}
 .dg-ally.tw-king::after,.dg-foe.tw-king::after{content:'✦ ✧ ✦';position:absolute;left:50%;top:-6px;transform:translateX(-50%);color:#ffd54a;font-size:13px;letter-spacing:6px;text-shadow:0 0 5px #ffb300;pointer-events:none;animation:twking 1.8s ease-in-out infinite;z-index:3}
 @keyframes twking{0%,100%{opacity:.5;transform:translate(-50%,0)}50%{opacity:1;transform:translate(-50%,-5px)}}
+/* Perk cards: pixel-art card picture with the name and text written on top in a pixel font */
+@font-face{font-family:'Pixelify Sans';src:url(./assets/fonts/pixelify-sans-latin-500-normal.woff2) format('woff2');font-weight:500;font-display:swap}
+@font-face{font-family:'Pixelify Sans';src:url(./assets/fonts/pixelify-sans-latin-700-normal.woff2) format('woff2');font-weight:700;font-display:swap}
+@font-face{font-family:'Silkscreen';src:url(./assets/fonts/silkscreen-latin-700-normal.woff2) format('woff2');font-weight:700;font-display:swap}
+@font-face{font-family:'VT323';src:url(./assets/fonts/vt323-latin-400-normal.woff2) format('woff2');font-weight:400;font-display:swap}
+.tw-card{position:relative;display:block;width:100%;aspect-ratio:96/136;background:center/100% 100% no-repeat;image-rendering:pixelated;container-type:inline-size;font-family:'Pixelify Sans',ui-monospace,monospace;text-align:center;border-radius:6%;filter:drop-shadow(0 3px 4px #0006)}
+.tw-card .cn{position:absolute;left:18%;right:18%;top:69.6%;height:8.4%;display:flex;align-items:center;justify-content:center;color:#fff6dc;font-family:'Silkscreen','Pixelify Sans',ui-monospace,monospace;font-weight:700;line-height:1;white-space:nowrap;letter-spacing:.02em;text-shadow:.7cqw 0 #2a1610,-.7cqw 0 #2a1610,0 .7cqw #2a1610,0 -.7cqw #2a1610,.7cqw .7cqw #2a1610}
+.tw-card .cd{position:absolute;left:10.5%;right:10.5%;top:79.8%;height:13.6%;display:flex;align-items:center;justify-content:center;font-family:'VT323',ui-monospace,monospace;font-weight:400;line-height:.98;padding:0 1%}
+.tw-card.el-fire .cd{color:#5a0c0c}.tw-card.el-water .cd{color:#0b2456}.tw-card.el-grass .cd{color:#0f3f16}
+.tw-pickroom{padding:10px 8px}
+.tw-pickroom h3{margin:2px 0}
+.tw-cardpick{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px;align-items:start}
+.tw-cardpick.n4{grid-template-columns:repeat(4,1fr);gap:5px}
+.tw-pick{position:relative;background:none;border:0;padding:0;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;font:inherit;color:inherit}
+.tw-pick small{font-size:10px;font-weight:700;text-shadow:0 1px 2px #000a;color:#fff}
+.tw-pick em{position:absolute;right:4%;top:2%;background:#17324d;color:#fff;border-radius:8px;padding:1px 6px;font-size:11px;font-style:normal}
+.tw-pick:active .tw-card{transform:scale(.97)}
+.tw-zoom{display:flex;justify-content:center;padding:4px 0 10px}
+.tw-zoom .tw-card{width:min(78vw,300px)}
+.tw-cardgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.tw-perks{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:16px;margin:4px 0;background:none;border:1px dashed #b9c6d2;border-radius:10px;padding:3px 8px;cursor:pointer;color:inherit;width:100%}
+.tw-perks small{margin-left:auto;font-size:11px;font-weight:700}

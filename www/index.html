@@ -570,6 +570,28 @@ body.mg-busy .inv-handle{display:none}
 .dg-ally.tw-king .dg-spr,.dg-foe.tw-king .dg-spr{filter:drop-shadow(0 0 5px #ffd54a) drop-shadow(0 0 2px #fff3b0)}
 .dg-ally.tw-king::after,.dg-foe.tw-king::after{content:'✦ ✧ ✦';position:absolute;left:50%;top:-6px;transform:translateX(-50%);color:#ffd54a;font-size:13px;letter-spacing:6px;text-shadow:0 0 5px #ffb300;pointer-events:none;animation:twking 1.8s ease-in-out infinite;z-index:3}
 @keyframes twking{0%,100%{opacity:.5;transform:translate(-50%,0)}50%{opacity:1;transform:translate(-50%,-5px)}}
+/* Perk cards: pixel-art card picture with the name and text written on top in a pixel font */
+@font-face{font-family:'Pixelify Sans';src:url(./assets/fonts/pixelify-sans-latin-500-normal.woff2) format('woff2');font-weight:500;font-display:swap}
+@font-face{font-family:'Pixelify Sans';src:url(./assets/fonts/pixelify-sans-latin-700-normal.woff2) format('woff2');font-weight:700;font-display:swap}
+@font-face{font-family:'Silkscreen';src:url(./assets/fonts/silkscreen-latin-700-normal.woff2) format('woff2');font-weight:700;font-display:swap}
+@font-face{font-family:'VT323';src:url(./assets/fonts/vt323-latin-400-normal.woff2) format('woff2');font-weight:400;font-display:swap}
+.tw-card{position:relative;display:block;width:100%;aspect-ratio:96/136;background:center/100% 100% no-repeat;image-rendering:pixelated;container-type:inline-size;font-family:'Pixelify Sans',ui-monospace,monospace;text-align:center;border-radius:6%;filter:drop-shadow(0 3px 4px #0006)}
+.tw-card .cn{position:absolute;left:18%;right:18%;top:69.6%;height:8.4%;display:flex;align-items:center;justify-content:center;color:#fff6dc;font-family:'Silkscreen','Pixelify Sans',ui-monospace,monospace;font-weight:700;line-height:1;white-space:nowrap;letter-spacing:.02em;text-shadow:.7cqw 0 #2a1610,-.7cqw 0 #2a1610,0 .7cqw #2a1610,0 -.7cqw #2a1610,.7cqw .7cqw #2a1610}
+.tw-card .cd{position:absolute;left:10.5%;right:10.5%;top:79.8%;height:13.6%;display:flex;align-items:center;justify-content:center;font-family:'VT323',ui-monospace,monospace;font-weight:400;line-height:.98;padding:0 1%}
+.tw-card.el-fire .cd{color:#5a0c0c}.tw-card.el-water .cd{color:#0b2456}.tw-card.el-grass .cd{color:#0f3f16}
+.tw-pickroom{padding:10px 8px}
+.tw-pickroom h3{margin:2px 0}
+.tw-cardpick{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px;align-items:start}
+.tw-cardpick.n4{grid-template-columns:repeat(4,1fr);gap:5px}
+.tw-pick{position:relative;background:none;border:0;padding:0;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;font:inherit;color:inherit}
+.tw-pick small{font-size:10px;font-weight:700;text-shadow:0 1px 2px #000a;color:#fff}
+.tw-pick em{position:absolute;right:4%;top:2%;background:#17324d;color:#fff;border-radius:8px;padding:1px 6px;font-size:11px;font-style:normal}
+.tw-pick:active .tw-card{transform:scale(.97)}
+.tw-zoom{display:flex;justify-content:center;padding:4px 0 10px}
+.tw-zoom .tw-card{width:min(78vw,300px)}
+.tw-cardgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.tw-perks{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:16px;margin:4px 0;background:none;border:1px dashed #b9c6d2;border-radius:10px;padding:3px 8px;cursor:pointer;color:inherit;width:100%}
+.tw-perks small{margin-left:auto;font-size:11px;font-weight:700}
 /* ===================== EXPORT STUDY DATA ===================== */
 .sd-sets{max-height:170px;overflow:auto}
 .sd-text{width:100%;box-sizing:border-box;min-height:200px;max-height:38vh;margin-top:10px;font:11px/1.4 ui-monospace,Menlo,monospace;border-radius:10px;border:1px solid #c9d4de;padding:8px;background:#f7f9fb;color:#17324d;white-space:pre-wrap;overflow:auto}
@@ -2926,8 +2948,9 @@ async function dgTreasure(){const r=runOf(),n=2+Math.floor(Math.random()*3);$('d
  const tp=Math.round((2+4*pct)*bonus),tc=Math.round((1+pct)*bonus);db.puffs=(db.puffs||0)+tp;db.candies=(db.candies||0)+tc;got.push('+'+tp+' 🧁 Poképuffs','+'+tc+' 🍬 Rare Cand'+(tc>1?'ies':'y'));save();
  $('dgStage').innerHTML='<div class="dg-room"><span class="dg-big">💎</span><h3>'+score+' / '+n+' correct</h3><p>'+got.join('<br>')+'</p><button class="btn red" onclick="dgNextRoom()">CONTINUE</button></div>';$('dgPanel').innerHTML=dgPanelMap()}
 function dgShop(){const r=runOf();if(!r.shopStock||r.shopAt!==r.rooms){const pool=Object.keys(DITEMS).map(id=>({id,w:DITEM_TIER_W[DITEMS[id].tier||0]})),st=[];while(st.length<4&&pool.length){const x=pickWeighted(pool);st.push(x.id);pool.splice(pool.indexOf(x),1)}r.shopStock=st;r.shopAt=r.rooms}
- $('dgStage').innerHTML='<div class="dg-room"><span class="dg-big">🛒</span><h3>Kecleon Shop</h3><p class="small">Pay with 🎟️ Tickets earned in this run. Leftover Tickets become Cogs when the run ends.</p><div class="dg-shop">'+r.shopStock.map(k=>'<div class="shopitem"><span class="shopicon">'+DITEMS[k].icon+'</span><div class="shopmain"><b>'+DITEMS[k].name+'</b><small>'+DITEMS[k].desc+'</small></div><button class="btn smallbtn" '+((r.tickets||0)<DITEMS[k].cost?'disabled':'')+' onclick="dgBuy(\''+k+'\')">'+DITEMS[k].cost+' 🎟️</button></div>').join('')+'</div><button class="btn red" onclick="dgNextRoom()">LEAVE</button></div>';$('dgPanel').innerHTML=dgPanelMap()}
-function dgBuy(k){const r=runOf();if((r.tickets||0)<DITEMS[k].cost)return;r.tickets-=DITEMS[k].cost;r.bag[k]=(r.bag[k]||0)+1;save();dgShop();toast(DITEMS[k].name+' added to the run bag')}
+ $('dgStage').innerHTML='<div class="dg-room"><span class="dg-big">🛒</span><h3>Kecleon Shop</h3><p class="small">Pay with 🎟️ Tickets earned in this run. Leftover Tickets become Cogs when the run ends.</p><div class="dg-shop">'+r.shopStock.map(k=>'<div class="shopitem"><span class="shopicon">'+DITEMS[k].icon+'</span><div class="shopmain"><b>'+DITEMS[k].name+'</b><small>'+DITEMS[k].desc+'</small></div><button class="btn smallbtn" '+((r.tickets||0)<dgPrice(k)?'disabled':'')+' onclick="dgBuy(\''+k+'\')">'+dgPrice(k)+' 🎟️</button></div>').join('')+'</div><button class="btn red" onclick="dgNextRoom()">LEAVE</button></div>';$('dgPanel').innerHTML=dgPanelMap()}
+function dgPrice(k){return Math.max(1,Math.round(DITEMS[k].cost*twShopMult()))}
+function dgBuy(k){const r=runOf();if((r.tickets||0)<dgPrice(k))return;r.tickets-=dgPrice(k);r.bag[k]=(r.bag[k]||0)+1;save();dgShop();toast(DITEMS[k].name+' added to the run bag')}
 function dgBossChoice(){const r=runOf();if(r.diff==='easy'||Math.random()>.45){dgBattle('boss');return}const alpha=r.diff==='hard'&&Math.random()<.5;
  $('dgStage').innerHTML='<div class="dg-room"><span class="dg-big">'+(alpha?'🔺':'🌀')+'</span><h3>'+(alpha?'An Alpha stirs ahead…':'A Totem Pokémon blocks the way…')+'</h3><p class="small">'+(alpha?'Alphas are far stronger and attack twice a turn.':'Totems fight with 2–3 allies.')+' Beat it to also bring home its pre-evolution.</p><div class="actions"><button class="btn" onclick="dgBattle(\'boss\')">FIGHT THE NORMAL BOSS</button><button class="btn red" onclick="dgBattle(\''+(alpha?'alpha':'totem')+'\')">FACE THE '+(alpha?'ALPHA':'TOTEM')+'</button></div></div>';$('dgPanel').innerHTML=dgPanelMap()}
 // ---------- battle setup ----------
@@ -2971,11 +2994,11 @@ async function dgcFight(){const _r=runOf(),_b=_r&&_r.battle;if(!_b||_b.enemyPhas
  $('dgM1').onclick=()=>go(p.fastMove,fast);$('dgM2').onclick=()=>go(p.discMove,disc);
  const U=ultOf(p);if(U&&$('dgM3'))$('dgM3').onclick=()=>{const sl=b.turn,run=async i=>{if(fired)return;fired=true;if(i!=null)dgCrosshair('foe',i,sl);const mult=U.t==='none'?1:r.slider?await dgSlider(res,dgBarSlow(b)*(U.fx==='cudgel'?.75:1)):dgRandMult();const r2=runOf();if(!r2||r2.battle!==b||b.turn!==sl)return;dgUltimate(sl,i,mult,res)};if(U.t==='one')dgChooseFoe(run);else run(null)}}
 function dgRandMult(){const t=[[.75,2],[.8,4],[.9,6],[1,8],[1.05,4],[1.1,4],[1.15,3],[1.2,3],[1.25,2],[2,1]];let x=Math.random()*37;for(const [v,w] of t){x-=w;if(x<0)return v}return 1}
-function dgSlider(res,slow){return new Promise(done=>{const cfg=Object.assign({},{full:{sp:.45,crit:.09},makeup:{sp:.75,crit:.055},fail:{sp:1.3,crit:.025}}[res]);cfg.sp*=slow||1;const ov=document.createElement('div');ov.className='dg-slider';ov.innerHTML='<div class="dg-sl-card"><p>Tap to strike!</p><div class="dg-sl-bar"><i class="crit" style="left:'+(50-cfg.crit*50)+'%;width:'+(cfg.crit*100)+'%"></i><b></b></div><small>Center = critical hit · edges = weak hit</small></div>';document.body.appendChild(ov);
+function dgSlider(res,slow){return new Promise(done=>{const cfg=Object.assign({},{full:{sp:.45,crit:.09},makeup:{sp:.75,crit:.055},fail:{sp:1.3,crit:.025}}[res]);cfg.sp*=(slow||1)*twSlowMult();cfg.crit=Math.min(.3,cfg.crit*twCritMult());const ov=document.createElement('div');ov.className='dg-slider';ov.innerHTML='<div class="dg-sl-card"><p>Tap to strike!</p><div class="dg-sl-bar"><i class="crit" style="left:'+(50-cfg.crit*50)+'%;width:'+(cfg.crit*100)+'%"></i><b></b></div><small>Center = critical hit · edges = weak hit</small></div>';document.body.appendChild(ov);
  const mk=ov.querySelector('b'),t0=performance.now();let pos=0,raf;const step=now=>{const ph=((now-t0)/1000*cfg.sp)%2;pos=ph<1?ph:2-ph;mk.style.left=(pos*100)+'%';raf=requestAnimationFrame(step)};raf=requestAnimationFrame(step);
  ov.onclick=()=>{cancelAnimationFrame(raf);const d=Math.abs(pos-.5)*2;const mult=d<=cfg.crit?2:+(1.25-.75*d).toFixed(2);mk.classList.add('hit');ov.querySelector('p').textContent=mult>=2?'CRITICAL HIT!':'×'+mult;setTimeout(()=>{ov.remove();done(mult)},550)}})}
 // Speed: your Pokémon can dodge enemy attacks; 0% unless faster than the attacker, rising to 25% at twice its Speed. Enemies never dodge yours.
-function dgDodge(mySpe,foeSpe){mySpe+=twDodgeBonus();return Math.max(0,Math.min(.25,(mySpe-foeSpe)/Math.max(1,foeSpe)*.25))}
+function dgDodge(mySpe,foeSpe){mySpe+=twDodgeBonus();return Math.max(0,Math.min(.25,(mySpe-foeSpe)/Math.max(1,foeSpe)*.25))+twDodgeAdd()}
 function dgDamage(att,def,mv,mult,extra,catOv,cs,effOv){const [type,pw,,kind]=mv,k=cs??1;const base=kind==='fast'?pw/6+k:pw/18+2*k;const stab=(att.types||[]).includes(String(type).toLowerCase())?1.2:1;const eff=effOv??typeEff(type,def.types);
  // physical moves: Attack vs Defense; special moves: Sp. Atk vs Sp. Def (moves with no listed category use the attacker's better stat)
  const cat=catOv||moveCat(mv)||((att.spa||0)>(att.atk||0)?'S':'P'),a=cat==='S'?(att.spa??att.atk):att.atk,d=cat==='S'?(def.spd??def.def):def.def;
@@ -3059,10 +3082,11 @@ function dgStrike(x,n,mv,e,mult,scale){const S=MOVE_SPECIAL[n]||{},sb=s=>x.m.sta
  let eff=S.eff?S.eff(e):typeEff(mv[0],e.types),crit=mult>=2;const melt=e.melt>0?1.15:1,tags=[];if(S.crit){crit=true;if(mult<1.5)mult=1.5}
  const xm=S.x?S.x(x,e):1;if(xm>1)tags.push(S.xTag||'Power ×'+xm+'!');
  if(S.fixed){eff=eff<.5?eff:1;const d=Math.max(1,Math.round(S.fixed(x,e)*eff*melt));e.hp=Math.max(0,e.hp-d);e.hitR=x.b.round;return {dmg:d,eff,parts:[d],tags,crit:false}}
- const pw=S.pw?S.pw(x,e):mv[1],H=dgHitPlan(n,x),cat=moveCat(mv),extra=(1+(x.b.overclock||0)+(x.b.teamBoost||0))*xm*dgEnvMult(mv[0])*twPowMult()*dgEnvAtk(x.c.types,x.p.species,x.m)*dgEnvDef(e.types,e.species,e),parts=[];
- for(const k of H.ks){if(e.hp<=0)break;const one=c=>dgDamage(att,def,[mv[0],pw*k,mv[2],mv[3]],mult*(scale||1),extra,c,k/H.S,eff).dmg;const d=Math.max(1,Math.round((S.best?Math.max(one('P'),one('S')):one(cat))*melt));e.hp=Math.max(0,e.hp-d);parts.push(d)}
+ const pw=S.pw?S.pw(x,e):mv[1],H=dgHitPlan(n,x),cat=moveCat(mv),extra=(1+(x.b.overclock||0)+(x.b.teamBoost||0))*xm*dgEnvMult(mv[0])*twPowMult()*dgEnvAtk(x.c.types,x.p.species,x.m)*dgEnvDef(e.types,e.species,e)*twCardAtk(x,e,mv),parts=[];let ovk=0;
+ for(const k of H.ks){if(e.hp<=0)break;const one=c=>dgDamage(att,def,[mv[0],pw*k,mv[2],mv[3]],mult*(scale||1),extra,c,k/H.S,eff).dmg;const d=Math.max(1,Math.round((S.best?Math.max(one('P'),one('S')):one(cat))*melt));if(d>e.hp)ovk+=d-e.hp;e.hp=Math.max(0,e.hp-d);parts.push(d)}
  {const fl=dgEnvFlat(x.c.types,x.c.hp);if(fl&&parts.length&&e.hp>0){const d=Math.min(e.hp,fl);e.hp-=d;parts[parts.length-1]+=d}}
  {const sh=twSpookHeal(x.m,x.c.hp,parts);if(sh)tags.push('👻 +'+sh+' HP')}
+ {const fz=twFrenzy(ovk);if(fz)tags.push('💥 +'+fz+'🎟️')}
  e.hitR=x.b.round;const t=S.hit&&S.hit(x,e);if(t)tags.push(t);
  return {dmg:parts.reduce((a,b)=>a+b,0),eff,parts,tags,crit}}
 // after the move: Stamina, healing, self-damage and what the move remembers for next time
@@ -3071,10 +3095,11 @@ function dgFinish(x,n,mv,R){const S=MOVE_SPECIAL[n]||{},m=x.m,out=[],failed=R.le
  const dr=MOVE_DRAIN[n];if(dr&&tot>0&&m.hp>0){const heal=Math.min(x.c.hp-m.hp,Math.max(1,Math.round(tot*dr[0]/dr[1])));if(heal>0){m.hp+=heal;out.push(['heal',heal])}}
  if(S.self&&!failed){const l=Math.ceil(x.c.hp*S.self);m.hp=Math.max(0,m.hp-l);out.push(['self',l])}
  if(S.after&&!failed)S.after(x);
+ twCardAfter(x,n,mv,tot,failed,out);
  const L=x.b.mlog=x.b.mlog||{},pr=L[x.slot];L[x.slot]={name:n,n:pr&&pr.name===n&&!failed?pr.n+1:1,failed};return out}
 function dgOutMsg(out){return out.map(([k,v])=>k==='heal'?' Restored '+v+' HP.':' It cost '+v+' HP!').join('')}
 function dgShowOut(slot,out){const s='.dg-ally[data-i="'+slot+'"]',m=runOf().party[slot];out.forEach(([k,v])=>{if(k==='heal')dgFloat(s,'+'+v+' HP','heal');else{dgHit(s);dgFloat(s,'-'+v,'weak')}});if(m&&m.hp<=0&&out.some(o=>o[0]==='self'))setTimeout(()=>dgFaint(s),380)}
-function dgHurt(b,m,d){twSpookFoe(d);if(d>0){m.hurt=(m.hurtR===b.round?m.hurt||0:0)+d;m.hurtR=b.round;if(m.hp<=0){m.koR=b.round;b.koAny=1}}}
+function dgHurt(b,m,d){twSpookFoe(d);twCardHurt(b,m,d);if(d>0){m.hurt=(m.hurtR===b.round?m.hurt||0:0)+d;m.hurtR=b.round;if(m.hp<=0){m.koR=b.round;b.koAny=1}}}
 function dgSaltTick(b){b.enemies.forEach((e,i)=>{if(e.hp>0&&e.salt){const f=((e.types||[]).some(t=>t==='water'||t==='steel')?.25:.125)*(e.boss?.5:1),d=Math.max(1,Math.round(e.maxhp*f)),s='.dg-foe[data-i="'+i+'"]';e.hp=Math.max(0,e.hp-d);setTimeout(()=>{dgFloat(s,'-'+d+' 🧂','super');dgHit(s);if(e.hp<=0)dgFaint(s)},60)}})}
 function dgMoveBtn(id,cls,n,mv,x,ok){const S=MOVE_SPECIAL[n]||{},blk=dgBlock(n,x),boost=!blk&&dgBoosted(n,x);let pw=mv[1];if(S.fixed)pw='fixed';else if(S.pw){try{pw=S.pw.length<2?S.pw(x):'var'}catch(e){}}
  return '<button class="btn '+cls+(boost?' dg-boost':'')+'" id="'+id+'" '+(!ok||blk?'disabled':'')+'>'+esc(n)+'<small>'+mv[0]+' · '+pw+(typeof pw==='number'?' pw':'')+(moveHitsTag(n)?' '+moveHitsTag(n):'')+' · '+(S.drainAll?'all':mv[3]==='fast'?'+'+mv[2]:'−'+mv[2])+'⚡'+(blk?' · '+blk:'')+'</small></button>'}
@@ -3131,7 +3156,7 @@ async function dgOverclock(){const r=runOf(),b=r.battle;r.bag.overclock--;dgCros
 async function dgTimeGear(){const r=runOf(),b=r.battle;r.bag.timegear--;const n=1+Math.floor(Math.random()*4);let ok=0;for(let i=0;i<n;i++){const res=await dgQ('⏱️ TIME GEAR '+(i+1)+'/'+n,{makeUp:false});if(res==='full')ok++}
  if(ok/n>=.5){b.skip=true;save();dgDrawBattle();document.querySelector('.dg-field').classList.add('negative');setTimeout(()=>{const f=document.querySelector('.dg-field');if(f)f.classList.remove('negative')},1200);toast('⏱️ The Time Gear glows: every enemy skips its next turn!')}else{save();toast('The Time Gear flickers and fades…')}await dgSleep(800);dgAfterAction()}
 async function dgGuard(){const _r=runOf(),_b=_r&&_r.battle;if(!_b||_b.enemyPhase||!_r.party[_b.turn])return;if(DG.busy)return;DG.busy=1;const r=runOf(),b=r.battle,m=r.party[b.turn],p=partyMon(m),c=combatant(p);const res=await dgQ('🛡 GUARD');
- const tier={full:[.75,10,'Perfect Guard!'],makeup:[.5,6,'Guard!'],fail:[.25,4,'Shaky guard…']}[res];const gain=tier[1]+Math.round((c.spe+(m.starf&&m.starf.stat==='spe'?2:0))/3);b.guard[b.turn]=tier[0];m.energy=Math.min(100,m.energy+gain);const lh=twGuardHeal(m,c,gain);save();dgDrawBattle();dgFloat('.dg-ally[data-i="'+b.turn+'"]',tier[2]+' +'+gain+'⚡'+(lh?' +'+lh+' HP':''),'heal');await dgSleep(700);dgAfterAction()}
+ const tier={full:[.75,10,'Perfect Guard!'],makeup:[.5,6,'Guard!'],fail:[.25,4,'Shaky guard…']}[res];const gain=tier[1]+Math.round((c.spe+(m.starf&&m.starf.stat==='spe'?2:0))/3);b.guard[b.turn]=tier[0]+twGuardAdd();m.energy=Math.min(100,m.energy+gain);const lh=twGuardHeal(m,c,gain);save();dgDrawBattle();dgFloat('.dg-ally[data-i="'+b.turn+'"]',tier[2]+' +'+gain+'⚡'+(lh?' +'+lh+' HP':''),'heal');await dgSleep(700);dgAfterAction()}
 // ---------- turn flow ----------
 function dgcAfterAction(){const r=runOf(),b=r&&r.battle;if(DG)DG.busy=0;if(!b)return;if(b.enemies.every(e=>e.hp<=0)){dgWin();return}
  b.turn++;if(b.turn>=r.party.length){dgEnemyPhase();return}save();dgDrawBattle()}
@@ -3143,7 +3168,7 @@ async function dgcEnemyPhase(){const r=runOf(),b=r.battle;if(!b.enemyPhase)twTur
   const alive=r.party.map((m,j)=>m.hp>0&&m.sky!==b.round?j:-1).filter(j=>j>=0);if(!alive.length)break;const ti=alive[Math.floor(Math.random()*alive.length)],tm=r.party[ti],tp=partyMon(tm),tc=combatant(tp);
   const disc=MOVE_STATS[e.disc],useDisc=disc&&e.energy>=disc[2]&&Math.random()<.4,mv0=useDisc?disc:(MOVE_STATS[e.fast]||['Normal',8,8,'fast']),eh=dgEnemyHits(useDisc?e.disc:e.fast),mv=eh>1?Object.assign([mv0[0],Math.round(mv0[1]*eh),mv0[2],mv0[3]],{cat:moveCat(mv0)}):mv0;
   if(MOVE_SPREAD.has(useDisc?e.disc:e.fast)){await dgEnemyAll(i,e,mv,useDisc);if(!runOf()||runOf().battle!==b)return;if(r.party.every(m=>m.hp<=0))break;continue}
-  const {dmg:raw0}=dgDamage({atk:e.atk,spa:e.spa,types:e.types},{def:tc.def+(tm.starf&&tm.starf.stat==='def'?2:0),spd:tc.spd+(tm.starf&&tm.starf.stat==='spd'?2:0),types:tc.types},mv,(.85+Math.random()*.3)*dgFoeMult(mv[0])),capF=(e.boss?(useDisc?.75:.55):(useDisc?.6:.45))*(DIFF[r.diff].dm||1),raw=twFoeHit(Math.min(raw0,Math.ceil(tc.hp*capF*(.9+Math.random()*.2))),e,tc.types,tp.species,tm);const dodged=Math.random()<dgDodge(tc.spe+(tm.starf&&tm.starf.stat==='spe'?2:0),e.spe),dmg=dodged?0:ultGuardDmg(b,Math.max(1,Math.round(raw*(1-Math.min(.9,(b.guard[ti]||0)+(b.wall===b.round?.1:0))))));
+  const {dmg:raw0}=dgDamage({atk:e.atk,spa:e.spa,types:e.types},{def:tc.def+(tm.starf&&tm.starf.stat==='def'?2:0),spd:tc.spd+(tm.starf&&tm.starf.stat==='spd'?2:0),types:tc.types},mv,(.85+Math.random()*.3)*dgFoeMult(mv[0])),capF=(e.boss?(useDisc?.75:.55):(useDisc?.6:.45))*(DIFF[r.diff].dm||1),raw=twFoeHit(Math.min(raw0,Math.ceil(tc.hp*capF*(.9+Math.random()*.2))),e,tc.types,tp.species,tm,mv);const dodged=Math.random()<dgDodge(tc.spe+(tm.starf&&tm.starf.stat==='spe'?2:0),e.spe),dmg=dodged?0:ultGuardDmg(b,Math.max(1,Math.round(raw*(1-Math.min(.9,(b.guard[ti]||0)+(b.wall===b.round?.1:0))))));
   if(useDisc)e.energy-=disc[2];else e.energy=Math.min(100,e.energy+mv[2]);tm.hp=Math.max(0,tm.hp-dmg);dgHurt(b,tm,dmg);e.acted=1;save();
   const eff=typeEff(mv[0],tc.types),asel='.dg-ally[data-i="'+ti+'"]',line=esc(e.species)+' used <b>'+esc(useDisc?e.disc:e.fast)+'</b> on <b style="color:'+SLOT_COLORS[ti]+'">'+esc(tp.nickname||tp.species)+'</b>!'+(dodged?' 💨 '+esc(tp.nickname||tp.species)+' dodged it!':b.diamond===b.round?' 💎 The diamond shield blocked it!':(eff>1.2?' <span class="t-sup">Super effective!</span>':eff<.8?' <span class="t-weak">Not very effective…</span>':'')+' <b>−'+dmg+'</b>'+(b.guard[ti]?' 🛡':''))+(tm.hp<=0?' '+esc(tp.nickname||tp.species)+' fainted!':'');
   if(DG)DG.msg=line+(eh>1&&dmg>0?' Hit '+Math.round(eh)+' times!':'');dgPanelBattle(esc(e.species)+' used '+esc(useDisc?e.disc:e.fast)+'!');
@@ -3154,7 +3179,7 @@ async function dgcEnemyPhase(){const r=runOf(),b=r.battle;if(!b.enemyPhase)twTur
  twRoundEnd(r,b);b.guard={};b.enemyPhase=false;b.turn=0;b.round++;if(b.enemies.every(e=>e.hp<=0)){dgWin();return}
  if(r.party.every(m=>m.hp<=0)){dgLose();return}save();dgDrawBattle()}
 async function dgEnemyAll(i,e,mv,useDisc){const r=runOf(),b=r.battle,name=useDisc?e.disc:e.fast,capF=(e.boss?(useDisc?.75:.55):(useDisc?.6:.45))*(DIFF[r.diff].dm||1)*.75;
- const hits=r.party.map((m,j)=>[m,j]).filter(([m])=>m.hp>0&&m.sky!==b.round).map(([m,j])=>{const tp=partyMon(m),tc=combatant(tp),{dmg:raw0,eff}=dgDamage({atk:e.atk,spa:e.spa,types:e.types},{def:tc.def+(m.starf&&m.starf.stat==='def'?2:0),spd:tc.spd+(m.starf&&m.starf.stat==='spd'?2:0),types:tc.types},mv,(.85+Math.random()*.3)*.75*dgFoeMult(mv[0])),raw=twFoeHit(Math.min(raw0,Math.ceil(tc.hp*capF*(.9+Math.random()*.2))),e,tc.types,tp.species,m),dodged=Math.random()<dgDodge(tc.spe+(m.starf&&m.starf.stat==='spe'?2:0),e.spe),dmg=dodged?0:ultGuardDmg(b,Math.max(1,Math.round(raw*(1-Math.min(.9,(b.guard[j]||0)+(b.wall===b.round?.1:0))))));m.hp=Math.max(0,m.hp-dmg);dgHurt(b,m,dmg);return {m,j,dmg,eff,dodged}});
+ const hits=r.party.map((m,j)=>[m,j]).filter(([m])=>m.hp>0&&m.sky!==b.round).map(([m,j])=>{const tp=partyMon(m),tc=combatant(tp),{dmg:raw0,eff}=dgDamage({atk:e.atk,spa:e.spa,types:e.types},{def:tc.def+(m.starf&&m.starf.stat==='def'?2:0),spd:tc.spd+(m.starf&&m.starf.stat==='spd'?2:0),types:tc.types},mv,(.85+Math.random()*.3)*.75*dgFoeMult(mv[0])),raw=twFoeHit(Math.min(raw0,Math.ceil(tc.hp*capF*(.9+Math.random()*.2))),e,tc.types,tp.species,m,mv),dodged=Math.random()<dgDodge(tc.spe+(m.starf&&m.starf.stat==='spe'?2:0),e.spe),dmg=dodged?0:ultGuardDmg(b,Math.max(1,Math.round(raw*(1-Math.min(.9,(b.guard[j]||0)+(b.wall===b.round?.1:0))))));m.hp=Math.max(0,m.hp-dmg);dgHurt(b,m,dmg);return {m,j,dmg,eff,dodged}});
  if(useDisc)e.energy-=mv[2];else e.energy=Math.min(100,e.energy+mv[2]);e.acted=1;save();
  if(DG)DG.msg=esc(e.species)+' used <b>'+esc(name)+'</b>! It hits your whole team!'+(hits.some(x=>x.eff>1.2&&!x.dodged)?' <span class="t-sup">Super effective!</span>':'');dgPanelBattle(esc(e.species)+' used '+esc(name)+'!');
  await Promise.all(hits.map((x,k)=>dgSleep(k*70).then(()=>moveFx(mv[0],mv[1]>70,'.dg-foe[data-i="'+i+'"]','.dg-ally[data-i="'+x.j+'"]'))));if(!runOf()||runOf().battle!==b)return;
@@ -3162,7 +3187,7 @@ async function dgEnemyAll(i,e,mv,useDisc){const r=runOf(),b=r.battle,name=useDis
  await dgSleep(hits.some(x=>x.m.hp<=0)?1000:800)}
 async function dgSpread(i,e){const r=runOf(),b=r.battle,t=String((e.types||['normal'])[0]).toLowerCase(),name=SPREAD_MOVES[t]||'Hyper Voice',mv=[t.charAt(0).toUpperCase()+t.slice(1),95,0,'charged'];
  const foe=document.querySelector('.dg-foe[data-i="'+i+'"]');if(foe){foe.classList.add('lunge');setTimeout(()=>foe.classList.remove('lunge'),400)}
- const hits=[];r.party.forEach((m,j)=>{if(m.hp<=0||m.sky===b.round)return;const c=combatant(partyMon(m)),{dmg:raw}=dgDamage({atk:e.atk,spa:e.spa,types:e.types},{def:c.def+(m.starf&&m.starf.stat==='def'?2:0),spd:c.spd+(m.starf&&m.starf.stat==='spd'?2:0),types:c.types},mv,.75*(.9+Math.random()*.2)*dgFoeMult(mv[0])),cut=twFoeHit(Math.min(raw,Math.ceil(c.hp*.42*(DIFF[r.diff].dm||1)*(.9+Math.random()*.2))),e,c.types,partyMon(m).species,m),dmg=Math.random()<dgDodge(c.spe+(m.starf&&m.starf.stat==='spe'?2:0),e.spe)?0:ultGuardDmg(b,Math.max(1,Math.round(cut*(1-Math.min(.9,(b.guard[j]||0)+(b.wall===b.round?.1:0))))));m.hp=Math.max(0,m.hp-dmg);dgHurt(b,m,dmg);hits.push([j,dmg])});save();
+ const hits=[];r.party.forEach((m,j)=>{if(m.hp<=0||m.sky===b.round)return;const c=combatant(partyMon(m)),{dmg:raw}=dgDamage({atk:e.atk,spa:e.spa,types:e.types},{def:c.def+(m.starf&&m.starf.stat==='def'?2:0),spd:c.spd+(m.starf&&m.starf.stat==='spd'?2:0),types:c.types},mv,.75*(.9+Math.random()*.2)*dgFoeMult(mv[0])),cut=twFoeHit(Math.min(raw,Math.ceil(c.hp*.42*(DIFF[r.diff].dm||1)*(.9+Math.random()*.2))),e,c.types,partyMon(m).species,m,mv),dmg=Math.random()<dgDodge(c.spe+(m.starf&&m.starf.stat==='spe'?2:0),e.spe)?0:ultGuardDmg(b,Math.max(1,Math.round(cut*(1-Math.min(.9,(b.guard[j]||0)+(b.wall===b.round?.1:0))))));m.hp=Math.max(0,m.hp-dmg);dgHurt(b,m,dmg);hits.push([j,dmg])});save();
  if(DG)DG.msg='💥 '+esc(e.species)+' used <b>'+name+'</b>! It hits your whole team!';dgPanelBattle('💥 '+esc(e.species)+' used '+name+'!');await dgSleep(400);dgDrawBattle();dgPanelBattle('💥 '+esc(e.species)+' used '+name+'!');
  const f=document.querySelector('.dg-field');if(f){f.classList.add('spreadfx');setTimeout(()=>f.classList.remove('spreadfx'),700)}
  hits.forEach(([j,dmg])=>{const s='.dg-ally[data-i="'+j+'"]';if(!dmg){mvMove(s,[{x:0},{x:-22,offset:.3},{x:-22,offset:.6},{x:0}],450);dgFloat(s,'Dodged!','heal');return}dgHit(s,true);dgFloat(s,'-'+dmg+(b.guard[j]?' 🛡':''),'super');if(r.party[j].hp<=0)setTimeout(()=>dgFaint(s),380)});await dgSleep(1200)}
@@ -3175,7 +3200,7 @@ function dgcWin(){if(runOf()&&runOf().tower)return twWin();const r=runOf(),b=r.b
 function dgBossMon(species,kind){const tier=INDEX[species]?INDEX[species].tier:0,m={species,tier,shiny:Math.random()<(1/4096+.05),size:rollSize(),growth:rollGrowth().map(g=>Math.max(2,g))};
  const steps=[.55,.65,.76,1,1.21,1.38,1.48],idx=steps.reduce((bi,v,i)=>Math.abs(v-m.size)<Math.abs(steps[bi]-m.size)?i:bi,3);
  if(kind==='totem'&&m.size<.95&&Math.random()<.25)m.size=steps[Math.max(0,idx-1)];if(kind==='alpha'&&m.size>1.05&&Math.random()<.25)m.size=steps[Math.min(6,idx+1)];return m}
-function dgLose(){if(runOf()&&runOf().tower)return twLoseScreen();const r=runOf();r.battle=null;save();if(!$('dgStage'))return;$('dgStage').innerHTML='<div class="dg-room"><span class="dg-big">💤</span><h3>Your team fainted…</h3><p>The run is over. Your leftover 🎟️ Tickets turn into Cogs, and you keep the EXP and Pokémon you earned.</p><button class="btn red" onclick="dgEnd(false)">LEAVE THE DUNGEON</button></div>';$('dgPanel').innerHTML=''}
+function dgLose(){if(runOf()&&runOf().tower){if(twSecondWind())return;return twLoseScreen()}const r=runOf();r.battle=null;save();if(!$('dgStage'))return;$('dgStage').innerHTML='<div class="dg-room"><span class="dg-big">💤</span><h3>Your team fainted…</h3><p>The run is over. Your leftover 🎟️ Tickets turn into Cogs, and you keep the EXP and Pokémon you earned.</p><button class="btn red" onclick="dgEnd(false)">LEAVE THE DUNGEON</button></div>';$('dgPanel').innerHTML=''}
 function dgEnd(cleared,quit){if(dgMode==='tower')return twEnd(quit);const r=runOf();if(!r)return;let bonus=0;const tix=Math.max(0,Math.round(r.tickets||0));db.cogs=Math.round(db.cogs+tix);const fl=r.clearedFloors||0;if(cleared&&fl){bonus=dgFloorBonus(r);db.cogs=Math.round(db.cogs+bonus);grantXp(20+10*fl)}else grantXp(15);
  const lines=[(cleared&&fl?'🏆 Beat '+fl+' boss'+(fl>1?'es':'')+'! +'+bonus+' Cogs bonus':quit?'Run ended early.':'Run over.'),'🎟️ Tickets earned: '+(r.cogs||0)+' · '+tix+' left over → +'+tix+' Cogs','Cogs from this run: '+(tix+bonus),'Deepest floor: B'+(r.floor+1)+'F','Time studying: '+fmtMin(r.studyMs)];db.run=null;save();if(mgState)mgState.stop&&mgState.stop();mgState=null;render();
  $('mgArea').innerHTML='<div class="reveal mg-end"><h2>🏰 Mystery Dungeon</h2>'+lines.map(l=>'<p>'+l+'</p>').join('')+'<div class="actions"><button class="btn" onclick="mgQuit()">MENU</button></div></div>'}
@@ -3311,25 +3336,41 @@ function gdTap(ev){const r=runOf(),b=r&&r.battle;if(!b||!r.fl||b.enemyPhase)retu
 function gdPanelBattle(msg){const r=runOf(),b=r.battle,m=r.party[b.turn],p=m&&partyMon(m);if(!r.fl)return;
  if(b.enemyPhase||!m){$('dgPanel').innerHTML='<div class="dg-msg">'+(msg||'Enemy turn…')+'</div>';return}
  if(ultResting(b,m)&&!m.acted){m.acted=true;m.moved=true;save()}
- const c=combatant(p),fast=MOVE_STATS[p.fastMove]||['Normal',8,8,'fast'],disc=MOVE_STATS[p.discMove]||['Normal',80,50,'charged'],foes=gdFoeTargets(r),U=ultOf(p),canHit=gdOptions(r.fl,m.x,m.y,gdShape(p.fastMove,fast),foes).length>0||(m.energy>=disc[2]&&gdOptions(r.fl,m.x,m.y,gdShape(p.discMove,disc),foes).length>0)||(U&&m.energy>=100&&(U.t==='none'||foes.some(([e])=>gdCheb(e,m)<=(U.t==='all'?3:5))));
+ const free=gdFree(r),c=combatant(p),fast=MOVE_STATS[p.fastMove]||['Normal',8,8,'fast'],disc=MOVE_STATS[p.discMove]||['Normal',80,50,'charged'],foes=gdFoeTargets(r),U=ultOf(p),canHit=gdOptions(r.fl,m.x,m.y,gdShape(p.fastMove,fast),foes).length>0||(m.energy>=disc[2]&&gdOptions(r.fl,m.x,m.y,gdShape(p.discMove,disc),foes).length>0)||(U&&m.energy>=100&&(U.t==='none'||foes.some(([e])=>gdCheb(e,m)<=(U.t==='all'?3:5))));
  const chips='<div class="gd-chips">'+r.party.map((q,i)=>{const pp=partyMon(q),cc=combatant(pp);return '<button class="gd-chip'+(i===b.turn?' on':'')+(q.acted?' done':'')+(q.hp<=0?' ko':'')+'" style="--c:'+SLOT_COLORS[i]+'" onclick="gdSelect('+i+')">'+monSprite(pp,'',28)+'<small>'+(q.acted?'✓':q.hp<=0?'💤':q.hp+'/'+cc.hp)+'</small></button>'}).join('')+'</div>';
- const head='<div class="dg-msg"><b style="color:'+SLOT_COLORS[b.turn]+'">'+esc(p.nickname||p.species)+'</b> · '+m.hp+'/'+c.hp+' HP · ⚡'+m.energy+' · 👣 '+gdMV(p.species)+(msg?'<br>'+msg:m.acted?' · done this turn':m.moved?' · moved, can still act':'')+'</div>';
+ const head='<div class="dg-msg"><b style="color:'+SLOT_COLORS[b.turn]+'">'+esc(p.nickname||p.species)+'</b> · '+m.hp+'/'+c.hp+' HP · ⚡'+m.energy+' · 👣 '+gdMV(p.species)+(msg?'<br>'+msg:free?'<br>🧭 No wild Pokémon in sight: walk freely, your team follows.':m.acted?' · done this turn':m.moved?' · moved, can still act':'')+'</div>';
  const acts=m.hp<=0?'<div class="dg-acts"><button class="btn red" '+(m.acted?'disabled':'')+' onclick="dgRevive()">💫 ANSWER TO REVIVE</button></div>'
-  :'<div class="dg-acts gd-acts"><button class="btn" '+(m.moved||m.acted?'disabled':'')+' onclick="gdMoveStart()">👣 MOVE</button><button class="btn red" '+(m.acted||!canHit?'disabled':'')+' onclick="dgFight()">⚔️ FIGHT'+(canHit||m.acted?'':'<small>no foe in reach</small>')+'</button><button class="btn blue" '+(m.acted?'disabled':'')+' onclick="dgItem()">🎒 ITEM</button><button class="btn" '+(m.acted?'disabled':'')+' onclick="dgGuard()">🛡 GUARD</button></div>';
+  :'<div class="dg-acts gd-acts"><button class="btn'+(free?' blue':'')+'" '+(!free&&(m.moved||m.acted)?'disabled':'')+' onclick="gdMoveStart()">👣 MOVE</button><button class="btn red" '+(m.acted||!canHit?'disabled':'')+' onclick="dgFight()">⚔️ FIGHT'+(canHit||m.acted?'':'<small>no foe in reach</small>')+'</button><button class="btn blue" '+(m.acted?'disabled':'')+' onclick="dgItem()">🎒 ITEM</button><button class="btn" '+(m.acted?'disabled':'')+' onclick="dgGuard()">🛡 GUARD</button></div>';
  $('dgPanel').innerHTML=head+chips+acts+'<div class="dg-row"><button class="btn smallbtn red" onclick="gdEndTurn()">⏭ END TURN</button><span>⏱ <b id="dgTime">'+fmtMin(r.studyMs)+'</b></span><span>🎟️ '+(r.tickets||0)+'</span><button class="btn smallbtn" onclick="dgSettings()">⚙</button><button class="btn smallbtn" onclick="dgSaveExit()">💾</button></div>'}
+// Free roam: while no wild Pokémon is in sight, moving doesn't use up anyone's turn. The picked Pokémon can keep walking
+// (up to 6 tiles a step, or more if it's faster), the rest of the team follows, and everyone slowly recovers HP.
+const GD_FREE_MV=6;
+function gdFree(r){r=r||runOf();return !!(r&&r.fl&&r.battle&&!r.battle.enemyPhase&&!gdFoeTargets(r).length)}
 function gdSelect(i){const r=runOf(),b=r&&r.battle;if(!b||b.enemyPhase||DG.busy)return;b.turn=i;DG.gmode='select';DG.hl=null;gdDrawBattle()}
 // ---------- moving ----------
-function gdMoveStart(){const r=runOf(),b=r.battle,m=r.party[b.turn];if(!m||m.moved||m.acted||m.hp<=0||DG.busy)return;const fl=r.fl,mv=gdMV(partyMon(m).species);
+function gdMoveStart(){const r=runOf(),b=r.battle,m=r.party[b.turn];if(!m||m.hp<=0||DG.busy)return;const free=gdFree(r);if(!free&&(m.moved||m.acted))return;const fl=r.fl,mv=free?Math.max(GD_FREE_MV,gdMV(partyMon(m).species)):gdMV(partyMon(m).species);
  const reach=gdBFS(fl,[m.x,m.y],(x,y)=>b.enemies.some(e=>(e.hp>0||e.gdOut)&&!e.done&&e.x===x&&e.y===y),mv);DG.reach=reach;DG.gmode='move';gdCamera(m.x,m.y);
- DG.hl={cls:'mv',tiles:[...reach.keys()].map(k=>k.split(',').map(Number)).filter(([x,y])=>!(x===m.x&&y===m.y)&&!gdUnitAt(r,x,y))};gdHighlight();$('dgPanel').innerHTML='<div class="dg-msg">👣 Tap a blue tile to move there (up to '+mv+' tiles).</div><div class="dg-acts"><button class="btn" onclick="DG.gmode=\'select\';DG.hl=null;gdDrawBattle()">CANCEL</button></div>'}
+ DG.hl={cls:'mv',tiles:[...reach.keys()].map(k=>k.split(',').map(Number)).filter(([x,y])=>!(x===m.x&&y===m.y)&&!gdUnitAt(r,x,y))};gdHighlight();$('dgPanel').innerHTML='<div class="dg-msg">👣 Tap a blue tile to move there (up to '+mv+' tiles).'+(free?' No foes in sight, so this doesn’t use up the turn.':'')+'</div><div class="dg-acts"><button class="btn" onclick="DG.gmode=\'select\';DG.hl=null;gdDrawBattle()">CANCEL</button></div>'}
 async function gdWalk(unitEl,obj,path,isFoe){const T=GD_T;for(let s=1;s<path.length;s++){const [x,y]=path[s],[px,py]=path[s-1];obj.dir=gdDirOf(x-px,y-py);obj.x=x;obj.y=y;if(unitEl){unitEl.style.left=x*T+'px';unitEl.style.top=y*T+'px';unitEl.style.zIndex=10+y;const sp=unitEl.querySelector('.dg-spr');if(sp&&+sp.dataset.row!==obj.dir){sp.dataset.row=obj.dir;sp.classList.remove('ok');dgFillSprites()}}if(!isFoe)gdCamera(x,y);await dgSleep(120)}}
-async function gdWalkTo(slot,x,y){const r=runOf(),b=r.battle,m=r.party[slot],path=gdPath(DG.reach,gdKey(x,y));DG.gmode='select';DG.hl=null;DG.busy=1;gdHighlight();
- await gdWalk(document.querySelector('.dg-ally[data-i="'+slot+'"]'),m,path,false);if(!runOf()||runOf().battle!==b)return;m.moved=true;gdSee(r);save();DG.busy=0;
+async function gdWalkTo(slot,x,y){const r=runOf(),b=r.battle,m=r.party[slot],path=gdPath(DG.reach,gdKey(x,y)),wasFree=gdFree(r);DG.gmode='select';DG.hl=null;DG.busy=1;gdHighlight();
+ await gdWalk(document.querySelector('.dg-ally[data-i="'+slot+'"]'),m,path,false);if(!runOf()||runOf().battle!==b)return;
+ if(wasFree)gdFollow(r,slot,path);gdSee(r);
+ // still nothing in sight: the walk was free. A foe came into view: this walk counts as the move, and the battle starts
+ if(wasFree&&gdFree(r)){m.moved=false;r.party.forEach(q=>{const c=combatant(partyMon(q));if(q.hp>0&&q.hp<c.hp)q.hp=Math.min(c.hp,q.hp+Math.max(1,Math.round(c.hp*.03)))})}else{m.moved=true;if(wasFree)r.party.forEach((q,i)=>{if(i!==slot)q.moved=false})}
+ save();DG.busy=0;
  // pick up what's on the tile
  const fl=r.fl,ii=fl.items.findIndex(it=>it.x===m.x&&it.y===m.y);if(ii>=0){const it=fl.items.splice(ii,1)[0];if(it.tickets){r.tickets=(r.tickets||0)+it.tickets;r.cogs=(r.cogs||0)+it.tickets;toast('🎟️ Found '+it.tickets+' Tickets!')}else{r.bag[it.k]=(r.bag[it.k]||0)+1;toast(DITEMS[it.k].icon+' Picked up '+DITEMS[it.k].name+'!')}save()}
  const si=fl.specials.findIndex(s=>s.x===m.x&&s.y===m.y);if(si>=0){const s=fl.specials.splice(si,1)[0];save();r.rooms=(r.rooms||0)+1;if(s.k==='shop'){r.shopStock=null;dgShop()}else if(s.k==='chest')dgTreasure();else dgRest();return}
  if(!fl.stairsHidden&&m.x===fl.stairs[0]&&m.y===fl.stairs[1]){gdDrawBattle();modal('🪜 STAIRS','<p>'+(fl.boss?'The way out of this part of the dungeon.':'Go down to <b>B'+(r.floor+2)+'F</b>? Your whole team comes along.')+'</p><div class="actions"><button class="btn" onclick="closeModal()">NOT YET</button><button class="btn red" onclick="closeModal();gdStairs()">'+(fl.boss?'CONTINUE':'GO DOWN')+'</button></div>');return}
- gdDrawBattle()}
+ gdDrawBattle();if(gdFree(r)&&r.battle.turn===slot&&m.hp>0)gdMoveStart()}
+// teammates (fainted ones too, so nobody gets left behind) walk behind the leader along its path
+function gdFollow(r,slot,path){const b=r.battle,lead=r.party[slot],trail=path.slice(0,-1).reverse(),taken=new Set([gdKey(lead.x,lead.y)]);
+ b.enemies.forEach(e=>{if(e.hp>0&&!e.done)taken.add(gdKey(e.x,e.y))});
+ const fol=r.party.map((q,i)=>[q,i]).filter(([q,i])=>i!==slot).sort((a,c)=>gdCheb(a[0],lead)-gdCheb(c[0],lead));
+ // tiles behind the leader first, then the leader's neighbours
+ const spots=[...trail,...GD_DIRS.map(([dx,dy])=>[lead.x+dx,lead.y+dy])].filter(([x,y])=>gdTile(r.fl,x,y));
+ fol.forEach(([q,i])=>{if(gdCheb(q,lead)<=1){taken.add(gdKey(q.x,q.y));return}const t=spots.find(([x,y])=>!taken.has(gdKey(x,y)));if(!t){taken.add(gdKey(q.x,q.y));return}
+  q.dir=gdDirOf(lead.x-t[0],lead.y-t[1]);q.x=t[0];q.y=t[1];taken.add(gdKey(t[0],t[1]))})}
 function gdStairs(){const r=runOf();if(!r||!r.fl||r.fl.stairsHidden||!r.party.some(m=>m.x===r.fl.stairs[0]&&m.y===r.fl.stairs[1]))return;if(r.fl.boss){dgFloorClear();return}r.floor++;r.party.forEach(m=>{const c=combatant(partyMon(m));m.energy=Math.min(100,m.energy+10);if(m.hp>0)m.hp=Math.min(c.hp,m.hp+Math.ceil(c.hp*.2));if(m.starf&&--m.starf.rooms<=0)m.starf=null});gdNewFloor(r);save();toast('⬇ B'+(r.floor+1)+'F'+(r.fl.boss?' · something big is waiting here…':''));gdDrawBattle(true)}
 // ---------- fighting ----------
 async function gdFight(){const r=runOf(),b=r&&r.battle;if(!b||b.enemyPhase||DG.busy)return;const m=r.party[b.turn],p=partyMon(m);if(!m||m.acted||m.hp<=0)return;
@@ -3467,14 +3508,55 @@ const TW_ENVS={
  king:{name:'King’s Battlefield',icon:'👑',desc:'The highest-level Pokémon on each side glows gold: it deals 15% more damage and takes 5% less. If it faints, each of its teammates loses 20% of their max HP.',king:true},
  center:{name:'Pokémon Center',icon:'🏥',desc:'Revived Pokémon get back up with 15% of their max HP instead of 1 HP.',center:true},
  lifeblock:{name:'Lifeblock Gym',icon:'🧱',desc:'Guarding also heals the guard for half the Stamina it gains (rounded down).',lifeblock:true}};
-const TW_PERKS={
- meal:{icon:'🍲',name:'Hot Meal',desc:'Heal every Pokémon 50% of its HP (fainted ones get back up with 25%).'},
- revive:{icon:'💫',name:'Revival Herb',desc:'Every fainted Pokémon gets back up with 50% HP.'},
- power:{icon:'💪',name:'Power Charm',desc:'+10% damage for the rest of the run.'},
- guard:{icon:'🛡️',name:'Iron Shell',desc:'Take 10% less damage for the rest of the run (up to 30%).'},
- battery:{icon:'🔋',name:'Battery Pack',desc:'Every battle starts with +20 Stamina for each Pokémon.'},
- lucky:{icon:'🍀',name:'Lucky Ticket',desc:'+25% Tickets from battles for the rest of the run.'},
- supply:{icon:'📦',name:'Supply Drop',desc:'2 random battle items right now.'}};
+// Perk cards: 45 cards in 3 elements (🔥 Fire = offense, 💧 Water = defense, 🌿 Grass = utility) and 5 rarities.
+// stack: 0 = once per run, n = up to n copies, 99 = no limit, -1 = used right away. w = how often it shows up.
+const TW_CARDS={
+ netball:{"name": "Net Ball", "el": "fire", "rar": 1, "stack": 0, "emoji": "🕸️", "text": "Your attacks deal 5% more damage to Bug- and Water-type foes.", "w": 10},
+ charcoal:{"name": "Charcoal", "el": "fire", "rar": 1, "stack": 0, "emoji": "🔥", "text": "Fire-type moves deal 10% more damage.", "w": 10},
+ mysticwater:{"name": "Mystic Water", "el": "fire", "rar": 1, "stack": 0, "emoji": "💧", "text": "Water-type moves deal 10% more damage.", "w": 10},
+ miracleseed:{"name": "Miracle Seed", "el": "fire", "rar": 1, "stack": 0, "emoji": "🌱", "text": "Grass-type moves deal 10% more damage.", "w": 10},
+ muscleband:{"name": "Muscle Band", "el": "fire", "rar": 1, "stack": 0, "emoji": "💪", "text": "Physical moves deal 6% more damage.", "w": 10},
+ wiseglasses:{"name": "Wise Glasses", "el": "fire", "rar": 1, "stack": 0, "emoji": "👓", "text": "Special moves deal 6% more damage.", "w": 10},
+ seedsurge:{"name": "Seed Surge", "el": "water", "rar": 1, "stack": 0, "emoji": "🪴", "text": "At the end of a battle, your Grass-type Pokémon heal 1 HP.", "w": 10},
+ hotmeal:{"name": "Hot Meal", "el": "water", "rar": 1, "stack": -1, "emoji": "🍲", "text": "Right away: heal every Pokémon 50%. Fainted ones get up with 25%.", "w": 10},
+ revivalherb:{"name": "Revival Herb", "el": "water", "rar": 1, "stack": -1, "emoji": "🌿", "text": "Right away: every fainted Pokémon gets back up with 50% HP.", "w": 10},
+ sturdyshell:{"name": "Sturdy Shell", "el": "water", "rar": 1, "stack": 4, "emoji": "🐚", "text": "Take 5% less damage. Stacks up to 4 times.", "w": 10},
+ leftovers:{"name": "Leftovers", "el": "water", "rar": 1, "stack": 0, "emoji": "🍎", "text": "After each round, your most hurt Pokémon heals 1 HP.", "w": 10},
+ brightpowder:{"name": "Bright Powder", "el": "water", "rar": 1, "stack": 0, "emoji": "✨", "text": "Your Pokémon dodge attacks 5% more often.", "w": 10},
+ minersdream:{"name": "Miner’s Dream", "el": "grass", "rar": 1, "stack": 99, "emoji": "⛏️", "text": "+10% Tickets from battles. Stacks.", "w": 10},
+ payday:{"name": "Pay Day", "el": "grass", "rar": 1, "stack": 0, "emoji": "🪙", "text": "Each foe you knock out drops 1 extra Ticket.", "w": 10},
+ staminasnack:{"name": "Stamina Snack", "el": "grass", "rar": 1, "stack": 99, "emoji": "🍫", "text": "Battles start with +10 Stamina for each Pokémon. Stacks.", "w": 10},
+ cramnotes:{"name": "Cram Notes", "el": "grass", "rar": 1, "stack": 0, "emoji": "📒", "text": "The attack timing bar moves 10% slower.", "w": 10},
+ luckyegg:{"name": "Lucky Egg", "el": "grass", "rar": 1, "stack": 99, "emoji": "🥚", "text": "+15% EXP from battles. Stacks.", "w": 10},
+ supplydrop:{"name": "Supply Drop", "el": "grass", "rar": 1, "stack": -1, "emoji": "📦", "text": "Right away: get 2 random battle items.", "w": 10},
+ xattack:{"name": "X Attack", "el": "fire", "rar": 2, "stack": 99, "emoji": "⚔️", "text": "All attacks deal 5% more damage for the rest of the run. Stacks.", "w": 6},
+ quickclaw:{"name": "Quick Claw", "el": "fire", "rar": 2, "stack": 0, "emoji": "🐾", "text": "Fast moves deal 10% more damage.", "w": 6},
+ rockyhelmet:{"name": "Rocky Helmet", "el": "fire", "rar": 2, "stack": 0, "emoji": "⛑️", "text": "Foes that hit your Pokémon take 1 damage back.", "w": 6},
+ expertbelt:{"name": "Expert Belt", "el": "fire", "rar": 2, "stack": 0, "emoji": "🥋", "text": "Super-effective hits deal 15% more damage.", "w": 6},
+ firststrike:{"name": "First Strike", "el": "fire", "rar": 2, "stack": 0, "emoji": "🗡️", "text": "Each Pokémon’s first attack in a battle deals 25% more damage.", "w": 6},
+ tlc:{"name": "Tender Love and Care", "el": "water", "rar": 2, "stack": 99, "emoji": "💗", "text": "Revived Pokémon get up with 4 more HP. Stacks (+4 each).", "w": 6},
+ guardup:{"name": "Guard Up", "el": "water", "rar": 2, "stack": 0, "emoji": "🛡️", "text": "Guarding blocks 10% more damage.", "w": 6},
+ eviolite:{"name": "Eviolite", "el": "water", "rar": 2, "stack": 0, "emoji": "💎", "text": "Pokémon that can still evolve take 8% less damage.", "w": 6},
+ protectivepads:{"name": "Protective Pads", "el": "water", "rar": 2, "stack": 0, "emoji": "🧤", "text": "Take 10% less damage from physical moves.", "w": 6},
+ assaultvest:{"name": "Assault Vest", "el": "water", "rar": 2, "stack": 0, "emoji": "🦺", "text": "Take 10% less damage from special moves.", "w": 6},
+ doubledip:{"name": "Double Dip", "el": "grass", "rar": 2, "stack": 99, "emoji": "🔋", "text": "Charged attacks refund 10% of their Stamina. +5% per extra stack.", "w": 6},
+ amuletcoin:{"name": "Amulet Coin", "el": "grass", "rar": 2, "stack": 0, "emoji": "📿", "text": "Boss battles give double Tickets.", "w": 6},
+ haggler:{"name": "Haggler", "el": "grass", "rar": 2, "stack": 0, "emoji": "🏷️", "text": "Shop prices are 30% lower.", "w": 6},
+ fury:{"name": "Fury", "el": "fire", "rar": 3, "stack": 0, "emoji": "😤", "text": "+10% damage for each fainted Pokémon on your team.", "w": 3},
+ lifeorb:{"name": "Life Orb", "el": "fire", "rar": 3, "stack": 0, "emoji": "🔮", "text": "Attacks deal 20% more damage but cost the attacker 1 HP (never below 1).", "w": 3},
+ scopelens:{"name": "Scope Lens", "el": "fire", "rar": 3, "stack": 0, "emoji": "🎯", "text": "The critical-hit zone on the timing bar is 50% wider.", "w": 3},
+ focussash:{"name": "Focus Sash", "el": "water", "rar": 3, "stack": 0, "emoji": "🎗️", "text": "Once per battle, a Pokémon at full HP survives a knockout hit with 1 HP.", "w": 3},
+ shellbell:{"name": "Shell Bell", "el": "water", "rar": 3, "stack": 0, "emoji": "🔔", "text": "Attacks heal the attacker 8% of the damage dealt (at least 1).", "w": 3},
+ frenzy:{"name": "Frenzy", "el": "grass", "rar": 3, "stack": 0, "emoji": "💥", "text": "Extra damage beyond what a knockout needed turns into Tickets.", "w": 3},
+ quickball:{"name": "Quick Ball", "el": "grass", "rar": 3, "stack": 0, "emoji": "⚡", "text": "Foes skip their first turn in every battle.", "w": 3},
+ thief:{"name": "Thief", "el": "grass", "rar": 3, "stack": 0, "emoji": "💰", "text": "25% chance after each battle to snatch a random item.", "w": 3},
+ choiceband:{"name": "Choice Band", "el": "fire", "rar": 4, "stack": 0, "emoji": "🎽", "text": "Charged attacks deal 25% more damage.", "w": 1.5},
+ secondwind:{"name": "Second Wind", "el": "water", "rar": 4, "stack": 0, "emoji": "🌬️", "text": "Once per run, when your whole team faints, everyone gets back up with 30% HP.", "w": 1.5},
+ goldenticket:{"name": "Golden Ticket", "el": "grass", "rar": 4, "stack": 0, "emoji": "🎫", "text": "+40% Tickets, and shop prices are 25% lower.", "w": 1.5},
+ cardshark:{"name": "Card Shark", "el": "grass", "rar": 4, "stack": 0, "emoji": "🃏", "text": "Card picks show 4 cards, and cards of 3★ or more show up twice as often.", "w": 1.5},
+ ultraburst:{"name": "Ultra Burst", "el": "fire", "rar": 5, "stack": 0, "emoji": "🌟", "text": "Attacks after a first-try correct answer deal 40% more damage.", "w": 0.8},
+ sacredash:{"name": "Sacred Ash", "el": "water", "rar": 5, "stack": 0, "emoji": "🕊️", "text": "After every battle, fainted Pokémon get up with 50% HP and everyone heals 10%.", "w": 0.8}};
+const TW_RAR=[,'Common','Uncommon','Rare','Super Rare','Legendary'],TW_ELN={fire:'Fire',water:'Water',grass:'Grass'};
 const TW_CHAL={
  noitem:{t:'Win without using a battle item',ok:b=>!b.usedItem},
  q4:{t:'Answer 4 questions right on the first try this battle',ok:b=>(b.qFull||0)>=4},
@@ -3485,8 +3567,8 @@ function twEnv(r){return TW_ENVS[twEnvKey(r)]}
 // hooks used by the battle engine (always 1 / false outside the Tower)
 function dgEnvMult(type){const r=runOf();if(!r||!r.tower)return 1;const e=twEnv(r);return (e.boost&&e.boost[String(type).toLowerCase()])||1}
 function dgEnvSingle(){const r=runOf();return !!(r&&r.tower&&twEnv(r).single)}
-function twPowMult(){const r=runOf();return r&&r.tower?1+.1*((r.perks||{}).power||0):1}
-function dgFoeMult(type){const r=runOf();if(!r||!r.tower)return 1;return dgEnvMult(type)*(1-Math.min(.3,.1*((r.perks||{}).guard||0)))}
+function twPowMult(){return 1}
+function dgFoeMult(type){const r=runOf();if(!r||!r.tower)return 1;return dgEnvMult(type)}
 function twStats(){return db.towerStats||(db.towerStats={best:0,bosses:0,runs:0,floors:0,challenges:0,bestAt:null})}
 // ---------- entry & setup ----------
 function towerEntry(){const r=db.tower,S=twStats(),rec='<div class="tw-rec"><div><b>'+S.best+'</b><small>Top floor</small></div><div><b>'+S.bosses+'</b><small>Bosses beaten</small></div><div><b>'+S.challenges+'</b><small>Challenges won</small></div><div><b>'+S.runs+'</b><small>Runs</small></div></div>';
@@ -3497,9 +3579,9 @@ function twSetupSets(){const sets=db.summaries.filter(s=>termsFor(s).length+(s.q
 function twStartRun(){const sids=[...document.querySelectorAll('.mg-sets input:checked')].map(x=>x.value),mode=(document.querySelector('input[name=mgm]:checked')||{}).value||'smart';if(!sids.length){toast('Pick at least one study set');return}
  if(mode==='weak'&&!sids.some(id=>(db.learned||{})[id])){toast('Finish Learn mode on one of these sets first');return}if(!mgPicker(mgBank(sids),mode).bank.length){toast('No questions for that mode here');return}
  db.tower={tower:true,diff:'balanced',style:'game',sids,mode,party:dgPick.map(id=>{const p=db.pokemon.find(x=>x.id===id),c=combatant(p);return {id,hp:c.hp,energy:20,starf:null}}),floor:0,cleared:0,bag:{oran:2},tickets:0,cogs:0,studyMs:0,rooms:0,startedAt:stamp(),slider:true,battle:null,
-  envs:shuffle(Object.keys(TW_ENVS)),perks:{},perkDone:[],bosses:0,challengesWon:0,log:[]};dgPick=[];dgPickFor='dungeon';save();closeModal();go('minigames');dgOpen('tower')}
+  envs:shuffle(Object.keys(TW_ENVS)),cards:{},perkDone:[],bosses:0,challengesWon:0,log:[]};dgPick=[];dgPickFor='dungeon';save();closeModal();go('minigames');dgOpen('tower')}
 // ---------- floors ----------
-function twPanel(){const r=runOf();return '<div class="dg-row"><span>⏱ <b id="dgTime">'+fmtMin(r.studyMs)+'</b></span><span>🗼 '+(r.floor||1)+'F</span><span>🎟️ '+(r.tickets||0)+'</span><span>'+twEnv(r).icon+'</span></div><div class="dg-partyrow">'+r.party.map((m,i)=>{const p=partyMon(m),c=combatant(p);return '<div class="dg-mini" style="--c:'+SLOT_COLORS[i]+'">'+monSprite(p,'',34)+'<span><i style="width:'+Math.max(0,m.hp/c.hp*100)+'%"></i></span><small>'+m.hp+'/'+c.hp+' · ⚡'+m.energy+'</small></div>'}).join('')+'</div><div class="dg-bag">'+(Object.keys(r.bag).filter(k=>r.bag[k]>0).map(k=>'<span title="'+DITEMS[k].name+'">'+DITEMS[k].icon+'×'+r.bag[k]+'</span>').join('')||'<span class="small muted">No items</span>')+'</div>'+(Object.keys(r.perks||{}).length?'<div class="tw-perks">'+Object.entries(r.perks).map(([k,n])=>'<span title="'+TW_PERKS[k].name+'">'+TW_PERKS[k].icon+(n>1?'×'+n:'')+'</span>').join('')+'</div>':'')+'<div class="dg-row"><button class="btn smallbtn" onclick="dgSettings()">⚙</button><button class="btn smallbtn" onclick="dgSaveExit()">💾 SAVE & EXIT</button></div>'}
+function twPanel(){const r=runOf();return '<div class="dg-row"><span>⏱ <b id="dgTime">'+fmtMin(r.studyMs)+'</b></span><span>🗼 '+(r.floor||1)+'F</span><span>🎟️ '+(r.tickets||0)+'</span><span>'+twEnv(r).icon+'</span></div><div class="dg-partyrow">'+r.party.map((m,i)=>{const p=partyMon(m),c=combatant(p);return '<div class="dg-mini" style="--c:'+SLOT_COLORS[i]+'">'+monSprite(p,'',34)+'<span><i style="width:'+Math.max(0,m.hp/c.hp*100)+'%"></i></span><small>'+m.hp+'/'+c.hp+' · ⚡'+m.energy+'</small></div>'}).join('')+'</div><div class="dg-bag">'+(Object.keys(r.bag).filter(k=>r.bag[k]>0).map(k=>'<span title="'+DITEMS[k].name+'">'+DITEMS[k].icon+'×'+r.bag[k]+'</span>').join('')||'<span class="small muted">No items</span>')+'</div>'+twCardsRow(r)+'<div class="dg-row"><button class="btn smallbtn" onclick="dgSettings()">⚙</button><button class="btn smallbtn" onclick="dgSaveExit()">💾 SAVE & EXIT</button></div>'}
 // after a win (or when opening a run between floors): perk every 5 floors, then the next floor
 function twNext(){const r=runOf();if(!r)return;if(r.cleared&&r.cleared%5===0&&!r.perkDone.includes(r.cleared)){twPerkPick();return}twClimb(r.cleared+1)}
 function twFloor(f){const r=runOf();r.floor=f;save();const st=$('dgStage');if(!st)return;const newEnv=(f-1)%10===0,boss=f%10===0;
@@ -3509,37 +3591,95 @@ function twFloor(f){const r=runOf();r.floor=f;save();const st=$('dgStage');if(!s
  if(newEnv&&r.envShown!==f){r.envShown=f;save();const e=twEnv(r);st.innerHTML='<div class="dg-room tw-room" style="background-image:url(./assets/tower/'+twEnvKey(r)+'.jpg)"><span class="dg-big">'+e.icon+'</span><h3>'+e.name+'</h3><p>'+e.desc+'</p><p class="small">Floors '+f+'–'+(f+9)+'</p><button class="btn red" onclick="twFloor('+f+')">FIGHT ▶</button></div>';$('dgPanel').innerHTML=twPanel();return}
  twBattle(boss?r.chalPick&&r.chalAccepted===f?r.chalPick:null:null)}
 function twGo(ch){const r=runOf();if(ch)r.chalAccepted=r.floor;save();twBattle(ch)}
-function twBattle(ch){const r=runOf(),f=r.floor,avg=partyAvgLv(),boss=f%10===0,en=[],k=Math.min(4,Math.floor(f/12)),lvl=avg+Math.floor(f*.6)-2,hp=1.25+f*.03,atk=1.05+f*.012,rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1));let kind='battle';
+function twBattle(ch){const r=runOf(),f=r.floor,avg=partyAvgLv(),boss=f%10===0,en=[],k=Math.min(4,Math.floor(f/12)),lvl=avg+Math.floor(f*.6)-2,hp=(1.25+f*.03)*.75,atk=1.05+f*.012,rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1));let kind='battle';
  if(boss)kind=f>=30&&Math.random()<.35?'alpha':f>=10&&Math.random()<.4?'totem':'boss';else if(f>2&&Math.random()<.15)kind='swarm';
  if(kind==='battle'){const n=rnd(1,Math.min(4,2+Math.floor(f/8)));for(let i=0;i<n;i++)en.push(makeEnemy(twSp(0,Math.min(4,1+k)),Math.max(1,lvl+rnd(-3,2)),{hpMul:hp,atkMul:atk}))}
  else if(kind==='swarm'){const sp=twSp(0,Math.min(1,k)),n=rnd(4,6);for(let i=0;i<n;i++)en.push(makeEnemy(sp,Math.max(1,lvl-5+rnd(-2,1)),{hpMul:hp*.6,atkMul:atk*.8}))}
- else{const evolved=MONS.filter(m=>PRE_EVO[m[0]]&&m[2]>=1),sp=kind==='boss'?speciesOfTier(2,4):evolved[Math.floor(Math.random()*evolved.length)][0],bh=3.2*(1+f/40);
+ else{const evolved=MONS.filter(m=>PRE_EVO[m[0]]&&m[2]>=1),sp=kind==='boss'?speciesOfTier(2,4):evolved[Math.floor(Math.random()*evolved.length)][0],bh=2.4*(1+f/40);
   if(kind==='alpha')en.push(makeEnemy(sp,lvl+4,{hpMul:bh*1.2,atkMul:atk*1.3,boss:'alpha',twice:true}));
   else{en.push(makeEnemy(sp,lvl+3,{hpMul:bh*(kind==='totem'?.85:1),atkMul:atk*1.2,boss:kind}));if(kind==='totem'){const pre=PRE_EVO[sp]||sp;for(let i=0;i<rnd(2,3);i++)en.push(makeEnemy(pre,lvl-1,{hpMul:hp*.8,atkMul:atk}))}}}
- const bat=20*((r.perks||{}).battery||0);if(bat)r.party.forEach(m=>{if(m.hp>0)m.energy=Math.min(100,m.energy+bat)});r.party.forEach(q=>{delete q.hurt;delete q.hurtR;delete q.koR});
- r.battle={kind,enemies:en,turn:0,round:1,overclock:0,skip:false,guard:{},done:false,challenge:ch||null};twCrown(r,r.battle);if(DG)DG.msg='';save();dgDrawBattle(true)}
+ const bat=10*twC('staminasnack');if(bat)r.party.forEach(m=>{if(m.hp>0)m.energy=Math.min(100,m.energy+bat)});r.party.forEach(q=>{delete q.hurt;delete q.hurtR;delete q.koR});
+ r.battle={kind,enemies:en,turn:0,round:1,overclock:0,skip:!!twC('quickball'),guard:{},done:false,challenge:ch||null};twCrown(r,r.battle);if(DG)DG.msg='';save();dgDrawBattle(true)}
 // ---------- loot ----------
 function twItem(minTier){const pool=Object.keys(DITEMS).filter(id=>(DITEMS[id].tier||0)>=(minTier||0)).map(id=>({id,w:[10,7,4,1.2][DITEMS[id].tier||0]}));return pickWeighted(pool).id}
-function twWin(){const r=runOf(),b=r.battle,f=r.floor,boss=b.kind!=='battle'&&b.kind!=='swarm',got=[],luck=1+.25*((r.perks||{}).lucky||0);
- let tix=b.kind==='swarm'?5+Math.floor(f/4):boss?12+Math.floor(f/2)+(b.kind!=='boss'?5:0):3+Math.floor(f/4);tix=Math.round(tix*luck);
+function twWin(){const r=runOf(),b=r.battle,f=r.floor,boss=b.kind!=='battle'&&b.kind!=='swarm',got=[],luck=(1+.1*twC('minersdream'))*(twC('goldenticket')?1.4:1)*(boss&&twC('amuletcoin')?2:1);
+ let tix=b.kind==='swarm'?5+Math.floor(f/4):boss?12+Math.floor(f/2)+(b.kind!=='boss'?5:0):3+Math.floor(f/4);tix=Math.round((tix+(twC('payday')?b.enemies.length:0))*luck);
  const items=[];if(boss){items.push(twItem(1),twItem(0))}else if(Math.random()<(b.kind==='swarm'?.45:.3))items.push(twItem(0));
  let candy=boss&&Math.random()<.3?1:0;
  if(b.challenge){const C=TW_CHAL[b.challenge];if(C.ok(b)){tix*=2;items.push(twItem(2));candy++;r.challengesWon=(r.challengesWon||0)+1;got.push('🎯 Challenge complete: '+C.t+'!')}else got.push('🎯 Challenge missed: '+C.t)}
  r.tickets=(r.tickets||0)+tix;r.cogs=(r.cogs||0)+tix;got.push('+'+tix+' 🎟️ Tickets');items.forEach(k=>{r.bag[k]=(r.bag[k]||0)+1;got.push(DITEMS[k].icon+' '+DITEMS[k].name)});if(candy){db.candies=(db.candies||0)+candy;got.push('🍬 Rare Cand'+(candy>1?'ies ×'+candy:'y'))}
- const exp=Math.round((boss?4500:b.kind==='swarm'?2000:1500)*(1+.06*f));r.party.forEach(m=>{const p=partyMon(m);if(p)p.pxp=(p.pxp||0)+exp});got.push('Team +'+exp.toLocaleString()+' EXP each');
+ const exp=Math.round((boss?4500:b.kind==='swarm'?2000:1500)*(1+.06*f)*(1+.15*twC('luckyegg')));got.push(...twAfterBattle(r,b,items));r.party.forEach(m=>{const p=partyMon(m);if(p)p.pxp=(p.pxp||0)+exp});got.push('Team +'+exp.toLocaleString()+' EXP each');
  if(boss)r.bosses=(r.bosses||0)+1;
  if(b.kind==='totem'||b.kind==='alpha'){const big=b.enemies[0],sp=PRE_EVO[big.species]||big.species,m=dgBossMon(sp,b.kind),e=giveMon(m);got.push('🎁 '+(e.shiny?'✨ Shiny ':'')+e.species+' joined your Box!')}
  r.cleared=f;r.battle=null;r.chalOffered=0;const S=twStats();if(f>S.best){S.best=f;S.bestAt=stamp()}if(DG)DG.msg='';save();if(!$('dgStage'))return;
  $('dgStage').innerHTML='<div class="dg-room tw-room" style="background-image:url(./assets/tower/'+twEnvKey(r)+'.jpg)"><span class="dg-big">'+(boss?'👑':'🏆')+'</span><h3>Floor '+f+' cleared!</h3><p>'+got.join('<br>')+'</p><button class="btn red" onclick="twNext()">▶ FLOOR '+(f+1)+'</button></div>';$('dgPanel').innerHTML=twPanel()}
-// ---------- perks ----------
-function twPerkPick(){const r=runOf(),down=r.party.some(m=>m.hp<=0),opts=shuffle(Object.keys(TW_PERKS).filter(k=>!(k==='revive'&&!down)&&!(k==='guard'&&((r.perks||{}).guard||0)>=3))).slice(0,3);r.perkOpts=opts;save();
- $('dgStage').innerHTML='<div class="dg-room tw-room" style="background-image:url(./assets/tower/'+twEnvKey(r)+'.jpg)"><span class="dg-big">✨</span><h3>Choose a perk</h3><p class="small">Floor '+r.cleared+' reached. Pick one:</p><div class="tw-perkpick">'+opts.map(k=>'<button class="btn" onclick="twPerk(\''+k+'\')"><b>'+TW_PERKS[k].icon+' '+TW_PERKS[k].name+'</b><small>'+TW_PERKS[k].desc+'</small></button>').join('')+'</div></div>';$('dgPanel').innerHTML=twPanel()}
-function twPerk(k){const r=runOf();if(!r||!TW_PERKS[k]||r.perkDone.includes(r.cleared))return;r.perkDone.push(r.cleared);
- if(k==='meal')r.party.forEach(m=>{const c=combatant(partyMon(m));m.hp=Math.min(c.hp,m.hp>0?m.hp+Math.ceil(c.hp*.5):Math.ceil(c.hp*.25))});
- else if(k==='revive')r.party.forEach(m=>{if(m.hp<=0)m.hp=Math.ceil(combatant(partyMon(m)).hp*.5)});
- else if(k==='supply'){for(let i=0;i<2;i++){const it=twItem(0);r.bag[it]=(r.bag[it]||0)+1}}
- else r.perks[k]=(r.perks[k]||0)+1;
- save();toast(TW_PERKS[k].icon+' '+TW_PERKS[k].name+'!');twClimb(r.cleared+1)}
+// ---------- perk cards ----------
+function twCards(r){r=r||runOf();if(!r)return {};if(!r.cards){r.cards={};const P=r.perks||{},map={power:['xattack',2],guard:['sturdyshell',2],battery:['staminasnack',2],lucky:['minersdream',2]};
+  Object.entries(P).forEach(([k,n])=>{const m=map[k];if(m)r.cards[m[0]]=Math.min(TW_CARDS[m[0]].stack>0?TW_CARDS[m[0]].stack:99,(r.cards[m[0]]||0)+m[1]*n)});delete r.perks}return r.cards}
+function twC(id){const r=runOf();return r&&r.tower?(twCards(r)[id]||0):0}
+// the card picture plus its name and text, written on top in a pixel font
+function twCardHTML(id,cls){const c=TW_CARDS[id];if(!c)return '';const nf=Math.min(7.2,68/Math.max(6,c.name.length)).toFixed(2),tf=Math.max(5.6,Math.min(8.2,8.2-(c.text.length-36)*.065)).toFixed(2);
+ return '<div class="tw-card el-'+c.el+' r'+c.rar+(cls?' '+cls:'')+'" style="background-image:url(./assets/cards/'+id+'.png)"><b class="cn" style="font-size:'+nf+'cqw">'+esc(c.name)+'</b><span class="cd" style="font-size:'+tf+'cqw">'+esc(c.text)+'</span></div>'}
+// shrink a card's text a little if it doesn't fit its box
+function twFit(){const go=()=>document.querySelectorAll('.tw-card .cd').forEach(el=>{let f=parseFloat(el.style.fontSize)||7,n=0;while(el.clientHeight&&el.scrollHeight>el.clientHeight+1&&n++<14){f-=.25;el.style.fontSize=f+'cqw'}});requestAnimationFrame(go);if(document.fonts&&document.fonts.ready)document.fonts.ready.then(go)}
+function twCardsRow(r){const C=twCards(r),ids=Object.keys(C);return ids.length?'<button class="tw-perks" onclick="twMyCards()">'+ids.map(k=>'<span title="'+esc(TW_CARDS[k].name)+'">'+TW_CARDS[k].emoji+(C[k]>1?'×'+C[k]:'')+'</span>').join('')+'<small>🃏 '+ids.length+'</small></button>':''}
+function twMyCards(){const r=runOf(),C=twCards(r),ids=Object.keys(C).sort((a,b)=>TW_CARDS[b].rar-TW_CARDS[a].rar);modal('🃏 YOUR CARDS',ids.length?'<div class="tw-cardgrid">'+ids.map(k=>'<button class="tw-pick" onclick="twZoom(\''+k+'\',0)">'+twCardHTML(k)+(C[k]>1?'<em>×'+C[k]+'</em>':'')+'</button>').join('')+'</div>':'<p>No cards yet. You pick one every 5 floors.</p>');twFit()}
+// which cards can still be offered
+function twCanOffer(r,id){const c=TW_CARDS[id],n=twCards(r)[id]||0;if(c.stack===0&&n)return false;if(c.stack>0&&c.stack<99&&n>=c.stack)return false;
+ if(id==='revivalherb')return r.party.some(m=>m.hp<=0);if(id==='hotmeal')return r.party.some(m=>m.hp<combatant(partyMon(m)).hp);return true}
+function twCardWeight(r,id){const c=TW_CARDS[id];let w=c.w;if(c.rar>=3)w*=(1+Math.min(1,(r.cleared||0)/40))*(twC('cardshark')?2:1);return w}
+function twDeal(r){const n=twC('cardshark')?4:3,pool=Object.keys(TW_CARDS).filter(id=>twCanOffer(r,id)).map(id=>({id,w:twCardWeight(r,id)})),out=[];
+ while(out.length<n&&pool.length){const x=pickWeighted(pool);out.push(x.id);pool.splice(pool.indexOf(x),1)}return out}
+function twPerkPick(){const r=runOf();if(!r.perkOpts||r.perkFor!==r.cleared){r.perkOpts=twDeal(r);r.perkFor=r.cleared;save()}const opts=r.perkOpts;
+ $('dgStage').innerHTML='<div class="dg-room tw-room tw-pickroom" style="background-image:url(./assets/tower/'+twEnvKey(r)+'.jpg)"><h3>🃏 Choose a card</h3><p class="small">Floor '+r.cleared+' reached. Tap a card to look closer.</p><div class="tw-cardpick n'+opts.length+'">'+opts.map(k=>'<button class="tw-pick" onclick="twZoom(\''+k+'\',1)">'+twCardHTML(k)+'<small>'+'★'.repeat(TW_CARDS[k].rar)+' '+TW_RAR[TW_CARDS[k].rar]+(twCards(r)[k]?' · have ×'+twCards(r)[k]:'')+'</small></button>').join('')+'</div></div>';$('dgPanel').innerHTML=twPanel();twFit()}
+function twZoom(id,pick){const c=TW_CARDS[id];modal(TW_ELN[c.el].toUpperCase()+' · '+'★'.repeat(c.rar)+' '+TW_RAR[c.rar].toUpperCase(),'<div class="tw-zoom">'+twCardHTML(id,'big')+'</div>'+(pick?'<div class="actions"><button class="btn" onclick="closeModal()">BACK</button><button class="btn red" onclick="closeModal();twPerk(\''+id+'\')">TAKE THIS CARD</button></div>':''));twFit()}
+function twPerk(k){const r=runOf();if(!r||!TW_CARDS[k]||r.perkDone.includes(r.cleared)||!(r.perkOpts||[]).includes(k))return;r.perkDone.push(r.cleared);r.perkOpts=null;const C=twCards(r);
+ if(k==='hotmeal')r.party.forEach(m=>{const c=combatant(partyMon(m));m.hp=Math.min(c.hp,m.hp>0?m.hp+Math.ceil(c.hp*.5):Math.ceil(c.hp*.25))});
+ else if(k==='revivalherb')r.party.forEach(m=>{if(m.hp<=0)m.hp=Math.ceil(combatant(partyMon(m)).hp*.5)});
+ else if(k==='supplydrop'){for(let i=0;i<2;i++){const it=twItem(0);r.bag[it]=(r.bag[it]||0)+1}}
+ else C[k]=(C[k]||0)+1;
+ save();toast(TW_CARDS[k].emoji+' '+TW_CARDS[k].name+'!');twClimb(r.cleared+1)}
+// ---------- what the cards do in battle ----------
+const twIsT=(types,t)=>(types||[]).some(x=>String(x).toLowerCase()===t);
+// your attacks
+function twCardAtk(x,e,mv){const r=runOf();if(!r||!r.tower)return 1;const C=twCards(r),T=String(mv[0]).toLowerCase(),cat=moveCat(mv)||'P';let k=1+.05*(C.xattack||0);
+ if(C.netball&&(twIsT(e.types,'bug')||twIsT(e.types,'water')))k*=1.05;
+ if(C.charcoal&&T==='fire')k*=1.1;if(C.mysticwater&&T==='water')k*=1.1;if(C.miracleseed&&T==='grass')k*=1.1;
+ if(C.muscleband&&cat==='P')k*=1.06;if(C.wiseglasses&&cat==='S')k*=1.06;if(C.quickclaw&&mv[3]==='fast')k*=1.1;
+ if(C.expertbelt&&typeEff(mv[0],e.types)>1.2)k*=1.15;if(C.firststrike&&!(x.b.fs||{})[x.slot])k*=1.25;
+ if(C.fury)k*=1+.1*r.party.filter(m=>m.hp<=0).length;if(C.lifeorb)k*=1.2;if(C.choiceband&&mv[3]!=='fast')k*=1.25;if(C.ultraburst&&x.b.lastRes==='full')k*=1.4;return k}
+// once per attack: First Strike, Double Dip, Life Orb, Shell Bell
+function twCardAfter(x,n,mv,tot,failed,out){const r=runOf();if(!r||!r.tower||failed)return;const C=twCards(r),m=x.m;
+ if(C.firststrike){(x.b.fs=x.b.fs||{})[x.slot]=1}
+ if(C.doubledip&&mv[3]!=='fast'){const g=Math.floor(mv[2]*(.1+.05*(C.doubledip-1)));if(g>0)m.energy=Math.min(100,m.energy+g)}
+ if(C.shellbell&&tot>0&&m.hp>0){const h=Math.min(x.c.hp-m.hp,Math.max(1,Math.floor(tot*.08)));if(h>0){m.hp+=h;out.push(['heal',h])}}
+ if(C.lifeorb&&tot>0&&m.hp>1){m.hp-=1;out.push(['self',1])}}
+// Frenzy: overkill becomes Tickets
+function twFrenzy(ovk){if(!ovk||!twC('frenzy'))return 0;const r=runOf();r.tickets=(r.tickets||0)+ovk;r.cogs=(r.cogs||0)+ovk;return ovk}
+// damage your team takes (after the usual cap)
+function twCardDef(types,sp,mv){const r=runOf();if(!r||!r.tower)return 1;const C=twCards(r),cat=mv?moveCat(mv)||'P':'';let k=1-.05*Math.min(4,C.sturdyshell||0);
+ if(C.eviolite&&Object.values(PRE_EVO).includes(sp))k*=.92;if(C.protectivepads&&cat==='P')k*=.9;if(C.assaultvest&&cat==='S')k*=.9;return k}
+function twDodgeAdd(){return twC('brightpowder')?.05:0}
+function twGuardAdd(){return twC('guardup')?.1:0}
+function twSlowMult(){return twC('cramnotes')?.9:1}
+function twCritMult(){return twC('scopelens')?1.5:1}
+function twShopMult(){return (twC('haggler')?.7:1)*(twC('goldenticket')?.75:1)}
+// Focus Sash and Rocky Helmet, when one of your Pokémon is hit
+function twCardHurt(b,m,d){const r=runOf();if(!r||!r.tower||d<=0)return;const C=twCards(r),i=r.party.indexOf(m);
+ if(C.focussash&&m.hp<=0&&m.hp+d>=combatant(partyMon(m)).hp&&!(b.sash||{})[m.id]){(b.sash=b.sash||{})[m.id]=1;m.hp=1;setTimeout(()=>dgFloat('.dg-ally[data-i="'+i+'"]','🎗️ Hung on!','heal'),250)}
+ if(C.rockyhelmet&&twCur&&twCur.att&&twCur.att.hp>0){const f=twCur.att;f.hp=Math.max(0,f.hp-1);const j=b.enemies.indexOf(f);setTimeout(()=>dgFloat('.dg-foe[data-i="'+j+'"]','-1 ⛑️','weak'),300)}}
+// Leftovers, at the end of each round
+function twCardRound(r,b){if(!r||!r.tower||!twC('leftovers'))return;const hurt=r.party.map((m,i)=>[m,i,m.hp/combatant(partyMon(m)).hp]).filter(([m,,f])=>m.hp>0&&f<1).sort((a,c)=>a[2]-c[2])[0];
+ if(hurt){hurt[0].hp+=1;dgFloat('.dg-ally[data-i="'+hurt[1]+'"]','+1 🍎','heal')}}
+// Second Wind: once per run, when the whole team faints
+function twSecondWind(){const r=runOf();if(!r||!r.tower||!twC('secondwind')||r.swUsed||!r.battle)return false;r.swUsed=1;
+ r.party.forEach(m=>{m.hp=Math.max(1,Math.ceil(combatant(partyMon(m)).hp*.3))});if(DG)DG.msg='🌬️ Second Wind! Your whole team gets back up!';save();dgDrawBattle();return true}
+// after a battle: Seed Surge, Sacred Ash, Thief
+function twAfterBattle(r,b,items){const C=twCards(r),got=[];
+ if(C.sacredash){r.party.forEach(m=>{const c=combatant(partyMon(m));m.hp=m.hp<=0?Math.ceil(c.hp*.5):Math.min(c.hp,m.hp+Math.ceil(c.hp*.1))});got.push('🕊️ Sacred Ash restored your team')}
+ if(C.seedsurge){let n=0;r.party.forEach(m=>{const p=partyMon(m),c=combatant(p);if(m.hp>0&&m.hp<c.hp&&twIsT(c.types,'grass')){m.hp++;n++}});if(n)got.push('🪴 Seed Surge healed '+n+' Grass-type'+(n>1?'s':''))}
+ if(C.thief&&Math.random()<.25){const it=twItem(0);r.bag[it]=(r.bag[it]||0)+1;got.push('💰 Thief snatched '+DITEMS[it].icon+' '+DITEMS[it].name)}
+ return got}
 // ---------- the end ----------
 function twLoseScreen(){const r=runOf();r.battle=null;save();if(!$('dgStage'))return;$('dgStage').innerHTML='<div class="dg-room tw-room" style="background-image:url(./assets/tower/'+twEnvKey(r)+'.jpg)"><span class="dg-big">💤</span><h3>Your team fainted on floor '+r.floor+'</h3><p>You cleared '+(r.cleared||0)+' floor'+(r.cleared===1?'':'s')+'. Leftover Tickets become Cogs.</p><button class="btn red" onclick="twEnd(false)">LEAVE THE TOWER</button></div>';$('dgPanel').innerHTML=''}
 function twEnd(quit){const r=db.tower;if(!r)return;const tix=Math.max(0,Math.round(r.tickets||0)),S=twStats();db.cogs=Math.round(db.cogs+tix);S.runs++;S.bosses+=r.bosses||0;S.challenges+=r.challengesWon||0;S.floors+=r.cleared||0;const newBest=(r.cleared||0)>=S.best&&(r.cleared||0)>0;S.best=Math.max(S.best,r.cleared||0);grantXp(10+2*(r.cleared||0));
@@ -3586,11 +3726,11 @@ function dgEnvDef(types,sp,u){const e=twOn();if(!e)return 1;let k=1;if(e.dragon&
 function dgEnvFlat(types,maxhp){const e=twOn();return e&&e.water&&twIsType(types,'water')?Math.max(1,Math.round(maxhp*.05)):0}
 function dgEnvNoItems(){const e=twOn();return !!(e&&e.noItems)}
 // a foe's hit on your team, after the usual damage cap
-function twFoeHit(raw,e,types,sp,u){twCur=twOn()?{att:e,types}:null;if(!twOn()||raw<=0)return raw;return Math.max(1,Math.round(raw*dgEnvAtk(e.types,e.species,e)*dgEnvDef(types,sp,u)))+dgEnvFlat(e.types,e.maxhp)}
+function twFoeHit(raw,e,types,sp,u,mv){twCur=twOn()?{att:e,types}:null;if(!twOn()||raw<=0)return raw;return Math.max(1,Math.round(raw*dgEnvAtk(e.types,e.species,e)*dgEnvDef(types,sp,u)*twCardDef(types,sp,mv)))+dgEnvFlat(e.types,e.maxhp)}
 // Holy Sanctum: your team heals when your turn ends
 function twTurnEnd(r,b){const e=r&&r.tower?twEnv(r):null;if(!e||!e.heal)return;r.party.forEach((m,i)=>{if(m.hp<=0)return;const c=combatant(partyMon(m)),h=Math.min(e.heal,c.hp-m.hp);if(h>0){m.hp+=h;setTimeout(()=>dgFloat('.dg-ally[data-i="'+i+'"]','+'+h+' 🕊️','heal'),60)}})}
 // Sludge Hell and Crystal Mines: after both sides have moved, everyone without a safe type takes 1 damage
-function twRoundEnd(r,b){twCur=null;const e=r&&r.tower?twEnv(r):null;if(!e||!e.chip)return;const C=e.chip,safe=t=>C.safe.some(x=>twIsType(t,x));
+function twRoundEnd(r,b){twCur=null;twCardRound(r,b);const e=r&&r.tower?twEnv(r):null;if(!e||!e.chip)return;const C=e.chip,safe=t=>C.safe.some(x=>twIsType(t,x));
  r.party.forEach((m,i)=>{if(m.hp<=0)return;const c=combatant(partyMon(m));if(safe(c.types))return;m.hp=Math.max(0,m.hp-C.d);dgHurt(b,m,C.d);dgFloat('.dg-ally[data-i="'+i+'"]','-'+C.d+' '+C.icon,'weak')});
  b.enemies.forEach((f,i)=>{if(f.hp<=0||safe(f.types))return;f.hp=Math.max(0,f.hp-C.d);dgFloat('.dg-foe[data-i="'+i+'"]','-'+C.d+' '+C.icon,'weak')});twKingCheck(r,b)}
 // Dice Arena
@@ -3603,7 +3743,7 @@ function twDarkDodge(b,f){const e=twOn();if(!e||!e.dank||!twIsType(f.types,'dark
 function twSpookHeal(m,maxhp,parts){const e=twOn();if(!e||!e.spook||m.hp<=0)return 0;const h=Math.min(maxhp-m.hp,parts.reduce((a,d)=>a+(d>0?Math.max(1,Math.floor(d*.1)):0),0));if(h>0)m.hp+=h;return Math.max(0,h)}
 function twSpookFoe(d){const e=twOn();if(!e||!e.spook||!twCur||!twCur.att||d<=0)return;const f=twCur.att,h=Math.min(f.maxhp-f.hp,Math.max(1,Math.floor(d*.1)));if(h>0&&f.hp>0){f.hp+=h;const i=runOf().battle.enemies.indexOf(f);if(i>=0)setTimeout(()=>dgFloat('.dg-foe[data-i="'+i+'"]','+'+h+' 👻','heal'),300)}}
 // Pokémon Center and Lifeblock Gym
-function twReviveHp(m){const e=twOn();return e&&e.center?Math.max(1,Math.floor(combatant(partyMon(m)).hp*.15)):1}
+function twReviveHp(m){const e=twOn();return Math.min(combatant(partyMon(m)).hp,(e&&e.center?Math.max(1,Math.floor(combatant(partyMon(m)).hp*.15)):1)+4*twC('tlc'))}
 function twGuardHeal(m,c,gain){const e=twOn();if(!e||!e.lifeblock||m.hp<=0)return 0;const h=Math.min(c.hp-m.hp,Math.floor(gain/2));if(h>0)m.hp+=h;return Math.max(0,h)}
 // King's Battlefield: the highest-level Pokémon on each side is the king
 function twKingOn(u){const e=twOn();return !!(e&&e.king&&u&&u.king)}
@@ -4094,7 +4234,7 @@ $('navHome').style.display='none';
  if(pcStorageReady)ensureMoveData();
  if(pcStorageReady&&permRoll())save();
  render();scheduleNotifs();aiCheck();window.__pcBooted=true;setTimeout(()=>{try{mdSync()}catch(e){}},1500);setTimeout(()=>{try{facTick()}catch(e){}},2500);setInterval(()=>{try{facTick();if(currentPage==='home'&&hab.scene&&hab.scene!=='home')drawHabitat()}catch(e){}},60000);
- window.__pcVersion='0.51.0';
+ window.__pcVersion='0.53.1';
  document.addEventListener('pointerdown',function(e){try{var t=e.target.closest&&e.target.closest('[onclick],button,a,[id]');if(!t)return;var oc=t.getAttribute('onclick');window.__pcLastTap=(oc?oc.slice(0,60):(t.id?'#'+t.id:t.tagName.toLowerCase()+'.'+String(t.className).split(' ')[0])).replace(/\s+/g,' ')}catch(_){}} ,true);
  Object.keys(window).forEach(function(k){var f=window[k];if(typeof f!=='function'||/^[A-Z]/.test(k)||k==='appError'||k==='$'||k==='esc'||/\[native code\]/.test(Function.prototype.toString.call(f)))return;
   var w=function(){try{return f.apply(this,arguments)}catch(err){if(err&&typeof err==='object'&&!err.__pcLogged){try{err.__pcLogged=1}catch(_){}appError(err,k)}throw err}};try{window[k]=w}catch(_){}});
