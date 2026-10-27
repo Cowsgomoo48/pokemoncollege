@@ -115,7 +115,7 @@ function twBattle(ch){const r=runOf(),f=r.floor,avg=partyAvgLv(),boss=f%10===0,e
   if(kind==='alpha')en.push(makeEnemy(sp,lvl+4,{hpMul:bh*1.2,atkMul:atk*1.3,boss:'alpha',twice:true}));
   else{en.push(makeEnemy(sp,lvl+3,{hpMul:bh*(kind==='totem'?.85:1),atkMul:atk*1.2,boss:kind}));if(kind==='totem'){const pre=PRE_EVO[sp]||sp;for(let i=0;i<rnd(2,3);i++)en.push(makeEnemy(pre,lvl-1,{hpMul:hp*.8,atkMul:atk}))}}}
  const bat=10*twC('staminasnack');if(bat)r.party.forEach(m=>{if(m.hp>0)m.energy=Math.min(100,m.energy+bat)});r.party.forEach(q=>{delete q.hurt;delete q.hurtR;delete q.koR});
- r.battle={kind,enemies:en,turn:0,round:1,overclock:0,skip:!!twC('quickball'),guard:{},done:false,challenge:ch||null};twCrown(r,r.battle);if(DG)DG.msg='';save();dgDrawBattle(true)}
+ r.battle={kind,enemies:en,turn:0,round:1,overclock:0,skip:!!twC('quickball'),guard:{},done:false,challenge:ch||null,diy:f%10===0||f%3===0};twCrown(r,r.battle);if(DG)DG.msg='';save();dgDrawBattle(true)}
 // ---------- loot ----------
 function twItem(minTier){const pool=Object.keys(DITEMS).filter(id=>(DITEMS[id].tier||0)>=(minTier||0)).map(id=>({id,w:[10,7,4,1.2][DITEMS[id].tier||0]}));return pickWeighted(pool).id}
 function twWin(){const r=runOf(),b=r.battle,f=r.floor,boss=b.kind!=='battle'&&b.kind!=='swarm',got=[],luck=(1+.1*twC('minersdream'))*(twC('goldenticket')?1.4:1)*(boss&&twC('amuletcoin')?2:1);
@@ -201,7 +201,7 @@ function twLoseScreen(){const r=runOf();r.battle=null;save();if(!$('dgStage'))re
 function twEnd(quit){const r=db.tower;if(!r)return;const tix=Math.max(0,Math.round(r.tickets||0)),S=twStats();db.cogs=Math.round(db.cogs+tix);S.runs++;S.bosses+=r.bosses||0;S.challenges+=r.challengesWon||0;S.floors+=r.cleared||0;const newBest=(r.cleared||0)>=S.best&&(r.cleared||0)>0;S.best=Math.max(S.best,r.cleared||0);grantXp(10+2*(r.cleared||0));
  const lines=[quit?'Run ended on floor '+r.floor+'.':'Run over.','🗼 Floors cleared: '+(r.cleared||0)+(newBest?' · 🏅 personal best!':''),'👑 Bosses beaten: '+(r.bosses||0),'🎯 Challenges won: '+(r.challengesWon||0),'🎟️ Tickets earned: '+(r.cogs||0)+' · '+tix+' left over → +'+tix+' Cogs','Time studying: '+fmtMin(r.studyMs)];
  db.tower=null;save();if(mgState)mgState.stop&&mgState.stop();mgState=null;dgMode='dungeon';render();
- const el=$('mgArea');if(el)el.innerHTML='<div class="reveal mg-end"><h2>🗼 Battle Tower</h2>'+lines.map(l=>'<p>'+l+'</p>').join('')+'<p class="small muted">Records: top floor '+S.best+' · bosses '+S.bosses+' · challenges '+S.challenges+' · runs '+S.runs+'</p><div class="actions"><button class="btn" onclick="mgQuit()">MENU</button></div></div>'}
+ const el=$('mgArea');if(el)el.innerHTML='<div class="reveal mg-end"><h2>🗼 Battle Tower</h2>'+lines.map(l=>'<p>'+l+'</p>').join('')+'<p class="small muted">Records: top floor '+S.best+' · bosses '+S.bosses+' · challenges '+S.challenges+' · runs '+S.runs+'</p>'+recapHTML(r.recap)+'<div class="actions"><button class="btn" onclick="mgQuit()">MENU</button></div></div>'}
 // ---------- shop floors ----------
 // one floor in every 10 (somewhere between its 3rd and 8th floor) is a Kecleon Shop instead of a battle
 function twIsShop(r,f){if(f<3||f%10===0)return false;const b=Math.floor((f-1)/10);r.shops=r.shops||{};if(r.shops[b]==null){r.shops[b]=b*10+3+Math.floor(Math.random()*6);save()}return f===r.shops[b]}

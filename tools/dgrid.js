@@ -48,7 +48,7 @@ function gdNewFloor(r){const [W,H,NR]=GD_SIZE[r.diff]||GD_SIZE.easy,g=Array.from
  const mid=rooms.map((o,i)=>i).filter(i=>i&&i!==far);for(let k=0;k<rnd(2,4);k++){const o=rooms[rnd(0,rooms.length-1)],t=takeIn(o);if(!t)continue;
   if(Math.random()<.35)fl.items.push({x:t[0],y:t[1],tickets:rnd(3,8)+inSeg});else{const pool=Object.keys(DITEMS).filter(id=>id!=='snag'||Math.random()<.15).map(id=>({id,w:DITEM_TIER_W[DITEMS[id].tier||0]}));fl.items.push({x:t[0],y:t[1],k:pickWeighted(pool).id})}}
  const sp2=[['chest',.65],['spring',.35],['shop',.25]];for(const [k,p] of sp2){if(Math.random()>p||!mid.length)continue;const t=takeIn(rooms[mid[rnd(0,mid.length-1)]]);if(t)fl.specials.push({x:t[0],y:t[1],k})}
- r.fl=fl;r.battle={kind:'floor',enemies:en,turn:0,round:1,overclock:0,skip:false,guard:{},done:false,enemyPhase:false};gdSee(r);if(DG){DG.gmode='select';DG.msg=''}}
+ r.fl=fl;r.battle={kind:'floor',enemies:en,turn:0,round:1,overclock:0,skip:false,guard:{},done:false,enemyPhase:false,diy:fl.boss||Math.random()<.5};gdSee(r);if(DG){DG.gmode='select';DG.msg=''}}
 // breadth-first search over walkable tiles; blocked(x,y) says a tile can't be entered
 function gdBFS(fl,start,blocked,max){const q=[[start[0],start[1]]],seen=new Map([[gdKey(...start),{d:0,prev:null}]]);
  while(q.length){const [x,y]=q.shift(),cur=seen.get(gdKey(x,y));if(cur.d>=max)continue;

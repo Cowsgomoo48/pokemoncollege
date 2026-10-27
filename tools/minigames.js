@@ -17,12 +17,14 @@ function mgPicker(bank,mode){const P={mode,bank,queue:[],phase:1,mastery:{},done
  if(mode==='weak')P.bank=bank.filter(isWeak);
  const unseenFirst=a=>shuffle([...a]).sort((x,y)=>((db.qstats||{})[x.key]?1:0)-((db.qstats||{})[y.key]?1:0));
  P.queue=mode==='learn'?shuffle([...P.bank]):unseenFirst(P.bank);
- P.weight=it=>{const s=(db.qstats||{})[it.key]||{r:0,w:0,miss:0};return 1+s.miss*3+Math.max(0,s.w-s.r)};
+ P.weight=it=>{const s=(db.qstats||{})[it.key]||{r:0,w:0,miss:0};return Math.min(7,1+s.miss*2+Math.max(0,s.w-s.r)*.5)};
+ // variety: keep the last few items out of the draw, and favour items asked less often this session
+ P.asked={};P.recent=[];const K=Math.max(1,Math.min(10,Math.floor(bank.length/2)));
  P.next=()=>{if(!P.bank.length)return null;let it;
   if(P.queue.length)it=P.queue.shift();
   else{if(mode==='learn'&&!P.done){P.done=true;[...new Set(P.bank.map(b=>b.sid))].forEach(sid=>{(db.learned||(db.learned={}))[sid]=true});save()}
-   P.phase=2;const tot=P.bank.reduce((a,b)=>a+P.weight(b),0);let r=Math.random()*tot;it=P.bank[P.bank.length-1];for(const b of P.bank){r-=P.weight(b);if(r<0){it=b;break}}}
-  if(P.last&&it===P.last&&P.bank.length>1&&P.queue.length){P.queue.push(it);it=P.queue.shift()}P.last=it;return it};
+   P.phase=2;let pool=P.bank.filter(b=>!P.recent.includes(b.key));if(!pool.length)pool=P.bank;const wt=b=>P.weight(b)/(1+(P.asked[b.key]||0)*.7);const tot=pool.reduce((a,b)=>a+wt(b),0);let r=Math.random()*tot;it=pool[pool.length-1];for(const b of pool){r-=wt(b);if(r<0){it=b;break}}}
+  if(P.last&&it===P.last&&P.bank.length>1&&P.queue.length){P.queue.push(it);it=P.queue.shift()}P.last=it;P.asked[it.key]=(P.asked[it.key]||0)+1;P.recent.push(it.key);if(P.recent.length>K)P.recent.shift();return it};
  P.report=(it,res)=>{if(mode==='learn'&&!P.done){if(res==='full')P.mastery[it.key]=(P.mastery[it.key]||0)+1;if((P.mastery[it.key]||0)<2){const at=Math.min(P.queue.length,res==='full'?P.queue.length:3);P.queue.splice(at,0,it)}}};
  P.progress=()=>mode==='learn'&&!P.done?P.bank.filter(b=>(P.mastery[b.key]||0)>=2).length+' / '+P.bank.length+' learned':'';
  return P}
@@ -50,23 +52,43 @@ function mgHints(q){const a=String((q.options.find(o=>o.ok)||{}).t||'').trim();i
  if(a.length<=60)return ['It starts with “'+a.charAt(0).toUpperCase()+'” and is '+words.length+' word'+(words.length>1?'s':'')+' long.'];
  const pl=String(q.prompt).toLowerCase(),key=words.map(w=>w.replace(/[^A-Za-z0-9-]/g,'')).filter(w=>w.length>4&&!pl.includes(w.toLowerCase())).sort((x,y)=>y.length-x.length)[0];
  return key?['The right answer mentions “'+key+'”.']:['Read each choice and rule out the ones that don’t fit the question.']}
-function askQ(item,bank,opts={}){return new Promise(res=>{const ov=document.createElement('div');ov.className='mgq';document.body.appendChild(ov);const v0=Math.random()<.5?0:1;
- const show=(q,isMakeUp)=>{ov.innerHTML='<div class="mgq-card">'+(opts.title?'<span class="badge">'+esc(opts.title)+'</span> ':'')+(isMakeUp?'<span class="badge mk">MAKE-UP</span>':'')+'<h3>'+mathHTML(q.prompt)+'</h3><p class="small muted">'+esc(q.sub)+'</p>'+(opts.hint!==false?'<div class="mgq-hints"></div><button class="btn smallbtn mgq-hint">💡 Hint</button>':'')+q.options.map((o,i)=>'<button class="answer" data-i="'+i+'">'+mathHTML(o.t)+'</button>').join('')+(mathy(q.prompt,...q.options.map(o=>o.t))?calcHTML():'')+'</div>';calcInit(ov);
+// the first miss of the current question, kept for the end-of-run mistake recap
+let __qMiss=null;function __qMissReset(){__qMiss=null}function __qMissSet(m){if(!__qMiss)__qMiss=m}
+function askQ(item,bank,opts={}){__qMissReset();return new Promise(res=>{const ov=document.createElement('div');ov.className='mgq';document.body.appendChild(ov);const v0=Math.random()<.5?0:1;
+ // about 1 question in 5 asks you to type the answer instead of picking it (never a Make-Up)
+ const plan=opts.typed!==false&&Math.random()<(opts.typedChance??.2)?saPlan(item):null;
+ const show=(q,isMakeUp)=>{const t0=performance.now();let hinted=false;const typed=!!q.typed;
+  ov.innerHTML='<div class="mgq-card">'+(opts.title?'<span class="badge">'+esc(opts.title)+'</span> ':'')+(isMakeUp?'<span class="badge mk">MAKE-UP</span>':'')+(typed?'<span class="badge sa-b">✍️ TYPE IT</span>':'')+'<h3>'+mathHTML(q.prompt)+'</h3><p class="small muted">'+esc(q.sub)+'</p>'+(opts.hint!==false?'<div class="mgq-hints"></div><button class="btn smallbtn mgq-hint">💡 Hint</button>':'')
+   +(typed?'<div class="sa-wrap"><input class="sa-in" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Your answer"><button class="btn red sa-go">CHECK</button></div>'+(q.math?saKeysHTML():''):q.options.map((o,i)=>'<button class="answer" data-i="'+i+'">'+mathHTML(o.t)+'</button>').join(''))
+   +(q.math||mathy(q.prompt,...q.options.map(o=>o.t))?calcHTML():'')+'</div>';calcInit(ov);
   // hints come one step at a time; they explain the problem and never remove answers.
   // Questions without built-in steps ask the AI tutor to work out the steps the first time you tap.
   const hb=ov.querySelector('.mgq-hint'),ans=String((q.options.find(o=>o.ok)||{}).t||'');let H=q.steps&&q.steps.length?q.steps.map(x=>x[0]):null,hi=0,busy=false;
   const label=()=>{hb.textContent=(hi?'💡 Next hint ':'💡 Hint ')+(hi+1)+'/'+H.length};
   const next=()=>{if(hi>=H.length){hb.remove();return}ov.querySelector('.mgq-hints').insertAdjacentHTML('beforeend','<div class="mgq-step"><b>'+(H.length>1?'Step '+(hi+1)+'.':'Hint.')+'</b> '+mathHTML(H[hi])+'</div>');hi++;if(hi<H.length)label();else hb.remove()};
   if(hb){if(H)label();else hb.textContent=aiAny()?'💡 Walk me through it':'💡 Hint';
-   hb.onclick=async()=>{if(busy)return;if(!H){busy=true;if(aiAny()){hb.disabled=true;hb.textContent='💭 Working out the steps…';const st=await aiTutor(q.prompt,q.short||ans,q.options.map(o=>o.t));if(!ov.isConnected)return;hb.disabled=false;if(st){q.steps=st;H=st.map(x=>x[0])}}if(!H||!H.length)H=mgHints(q);busy=false;if(!H.length){hb.remove();return}}next()}}
-  ov.querySelectorAll('.answer').forEach(b=>b.onclick=()=>{const o=q.options[+b.dataset.i];const hb2=ov.querySelector('.mgq-hint');if(hb2)hb2.remove();ov.querySelectorAll('.answer').forEach(x=>{x.disabled=true;if(q.options[+x.dataset.i].ok)x.classList.add('correct')});
-   if(o.ok){qRecord(item,true,{first:!isMakeUp,makeup:isMakeUp,hints:hi});setTimeout(()=>{ov.remove();res(isMakeUp?'makeup':'full')},550);return}
-   b.classList.add('wrong');qRecord(item,false,{pick:o.t,prompt:q.prompt,answer:q.short||ans,hints:hi});const card=ov.querySelector('.mgq-card');
+   hb.onclick=async()=>{hinted=true;if(busy)return;if(!H){busy=true;if(aiAny()){hb.disabled=true;hb.textContent='💭 Working out the steps…';const st=await aiTutor(q.prompt,q.short||ans,q.options.map(o=>o.t));if(!ov.isConnected)return;hb.disabled=false;if(st){q.steps=st;H=st.map(x=>x[0])}}if(!H||!H.length)H=mgHints(q);busy=false;if(!H.length){hb.remove();return}}next()}}
+  const done=r=>{ov.remove();res(r)};
+  const answered=(o,b)=>{if(typeof apNote==='function')apNote({ms:performance.now()-t0,ok:!!o.ok,chars:String(q.prompt).length+q.options.reduce((a,x)=>a+String(x.t).length,0),hinted:hinted||typed});const hb2=ov.querySelector('.mgq-hint');if(hb2)hb2.remove();
+   ov.querySelectorAll('.answer').forEach(x=>{x.disabled=true;if(q.options[+x.dataset.i].ok)x.classList.add('correct')});const card=ov.querySelector('.mgq-card');
+   if(typed){const inp=ov.querySelector('.sa-in');inp.disabled=true;inp.classList.add(o.ok?'ok':'no');const g=ov.querySelector('.sa-go');if(g)g.remove();const k=ov.querySelector('.sa-keys');if(k)k.remove()}
+   if(o.ok){qRecord(item,true,{first:!isMakeUp,makeup:isMakeUp,hints:hi});
+    // confidence tap: a lucky guess still wins the turn, but the question comes back later as a weak spot
+    if(!isMakeUp&&!typed&&opts.confidence!==false){card.insertAdjacentHTML('beforeend','<div class="mgq-conf"><span>Did you know it?</span><button class="btn smallbtn" data-c="k">✅ Knew it</button><button class="btn smallbtn" data-c="g">🤔 Guessed</button></div>');
+     let fin=false;const pick=c=>{if(fin)return;fin=true;if(c==='g'){qGuessed(item);toast('🤔 Got it. That one will come back for practice.')}done('full')};
+     card.querySelectorAll('.mgq-conf button').forEach(x=>x.onclick=()=>pick(x.dataset.c));setTimeout(()=>pick('k'),6000);return}
+    setTimeout(()=>done(isMakeUp?'makeup':'full'),typed?700:550);return}
+   if(b)b.classList.add('wrong');qRecord(item,false,{pick:o.t,prompt:q.prompt,answer:q.short||ans,hints:hi});
+   __qMissSet({prompt:/Which term matches|Type the term/.test(q.sub||'')?'Which term means “'+q.prompt+'”?':q.prompt,pick:o.t,answer:q.short||ans,why:q.steps&&q.steps.length?(q.steps[q.steps.length-1][1]||q.steps[q.steps.length-1][0]):q.explain});
    const solOL=st=>'<ol>'+st.map(x=>'<li>'+mathHTML(x[0])+(x[1]?'<span class="mgq-work">'+mathHTML(x[1])+'</span>':'')+'</li>').join('')+'</ol>',tutorIt=!(q.steps&&q.steps.length)&&item.kind!=='term'&&aiAny();
-   card.insertAdjacentHTML('beforeend',(q.steps&&q.steps.length?'<div class="notice mgq-ex"><b>Answer:</b> '+mathHTML(q.short||ans)+'</div><details class="mgq-long" open><summary>Full solution</summary>'+solOL(q.steps)+'</details>':tutorIt?'<div class="notice mgq-ex"><b>Answer:</b> '+mathHTML(ans)+'</div><details class="mgq-long" open><summary>Full solution</summary><div class="mgq-sol small muted">💭 Working it out step by step…</div></details>':'<div class="notice mgq-ex">'+mathHTML(q.explain)+'</div>')+'<button class="btn '+(isMakeUp||opts.makeUp===false?'blue':'red')+' mgq-go">'+(isMakeUp||opts.makeUp===false?'CONTINUE':'MAKE-UP QUESTION →')+'</button>');
+   card.insertAdjacentHTML('beforeend',(q.steps&&q.steps.length?'<div class="notice mgq-ex"><b>Answer:</b> '+mathHTML(q.short||ans)+'</div><details class="mgq-long" open><summary>Full solution</summary>'+solOL(q.steps)+'</details>':tutorIt?'<div class="notice mgq-ex"><b>Answer:</b> '+mathHTML(ans)+'</div><details class="mgq-long" open><summary>Full solution</summary><div class="mgq-sol small muted">💭 Working it out step by step…</div></details>':'<div class="notice mgq-ex">'+(typed?'<b>Answer:</b> '+mathHTML(q.short||ans)+'<br>':'')+mathHTML(q.explain)+'</div>')+'<button class="btn '+(isMakeUp||opts.makeUp===false?'blue':'red')+' mgq-go">'+(isMakeUp||opts.makeUp===false?'CONTINUE':'MAKE-UP QUESTION →')+'</button>');
    if(tutorIt)aiTutor(q.prompt,ans,q.options.map(o=>o.t)).then(st=>{const el=card.querySelector('.mgq-sol');if(!el)return;if(st)el.outerHTML=solOL(st);else el.textContent='The AI couldn’t work this one out right now.'});
-   card.querySelector('.mgq-go').onclick=()=>{if(isMakeUp||opts.makeUp===false){ov.remove();res('fail')}else show(mgQuestion(item,bank,1-v0),true)}})};
- show(mgQuestion(item,bank,v0),false)})}
+   card.querySelector('.mgq-go').onclick=()=>{if(isMakeUp||opts.makeUp===false)done('fail');else show(mgQuestion(item,bank,1-v0),true)}};
+  ov.querySelectorAll('.answer').forEach(b=>b.onclick=()=>answered(q.options[+b.dataset.i],b));
+  if(typed){const inp=ov.querySelector('.sa-in'),go=()=>{const v=inp.value.trim();if(!v){inp.focus();return}answered({t:v,ok:saMatch(v,q.short)},null)};ov.querySelector('.sa-go').onclick=go;inp.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();go()}};
+   ov.querySelectorAll('.sa-keys button').forEach(b=>b.onclick=e=>{e.preventDefault();saInsert(inp,b.dataset.k)});setTimeout(()=>inp.focus(),60);
+   const ci=ov.querySelector('.calc-in');if(ci){ci.insertAdjacentHTML('beforeend','<button type="button" class="btn smallbtn blue sa-put">↳ Use this result</button>');ci.querySelector('.sa-put').onclick=e=>{e.preventDefault();const v=((ov.querySelector('.calc-res')||{}).textContent||'').replace(/^=\s*/,'');if(v)saInsert(inp,v)}}}};
+ show(plan?{typed:true,prompt:plan.prompt,sub:plan.sub,options:[{t:plan.answer,ok:true}],short:plan.answer,steps:plan.steps,explain:plan.explain,math:plan.math}:mgQuestion(item,bank,v0),false)})}
 // ---------- menu & setup ----------
 const MG={dungeon:{name:'Mystery Dungeon',icon:'🏰',desc:'Lead up to 4 Pokémon through a study dungeon.'},tower:{name:'Battle Tower',icon:'🗼',desc:'Non-stop battles. A boss every 10 floors. How high can you climb?'},luxor:{name:'Luxor',icon:'🔮',desc:'Fire type-marbles to break the chain. Questions push it back.'},flash:{name:'Flashcards',icon:'🎴',desc:'Flip, check yourself, repeat.'},match:{name:'Match-Up',icon:'🧩',desc:'Flip-free card matching: pair each term with its meaning.'},speed:{name:'Speed Round',icon:'⚡',desc:'15 seconds a question. Faster answers score more.'}};
 const MG_ENDLESS={luxor:1,match:1,speed:1};
