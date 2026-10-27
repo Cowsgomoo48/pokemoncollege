@@ -344,6 +344,13 @@ main.pad{padding:15px 13px calc(88px + env(safe-area-inset-bottom))}
 .inv-grid{flex:1;overflow:auto;display:grid;grid-template-columns:repeat(4,1fr);gap:9px;align-content:start;padding-top:4px}
 .inv-slot{position:relative;aspect-ratio:1;border:0;border-radius:50%;background:radial-gradient(circle,#e6f7ef 0 45%,#d3efe2 70%);display:grid;place-items:center;padding:0}.inv-slot b{position:absolute;right:0;bottom:2px;font-size:10px;background:#2f6f8f;color:#fff;border-radius:8px;padding:1px 5px}
 .inv-slot.t1{box-shadow:0 0 0 2px #86dc9b}.inv-slot.t2{box-shadow:0 0 0 2px #7fb8ff}.inv-slot.t3{box-shadow:0 0 0 3px #ffd76a}
+/* Bag: 5 per row, fixed-size round slots so they never overlap; the list scrolls when there are many */
+.inv-grid{grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;grid-auto-rows:calc((min(100vw,610px) - 28px - 10px - 32px) / 5);padding:5px 5px 14px;min-height:0;overscroll-behavior:contain}
+.inv-slot{aspect-ratio:auto;width:100%;height:100%;min-width:0}
+.inv-slot .it-ico{width:60%;height:60%;margin:0}
+.inv-slot .it-bg{width:64%;height:46%}
+.inv-slot b{right:-2px;bottom:-1px;font-size:9px;padding:1px 4px}
+body.mg-busy .inv-handle{display:none}
 .inv-detail{display:flex;gap:14px;align-items:center}.inv-detail p{margin:6px 0 0;font-size:13px;color:#33485c}
 .boxfx{position:fixed;inset:0;z-index:300;background:#050b14d9;opacity:0;transition:opacity .3s;overflow:hidden}.boxfx.on{opacity:1}
 .boxfx-box{position:absolute;left:50%;top:38%;width:110px;image-rendering:pixelated;transform:translate(-50%,120vh)}
@@ -1678,7 +1685,10 @@ function magTap(){const now=Date.now();magPokes=magPokes.filter(t=>now-t<3000);m
 function drawMagSound(){const el=$('magSndBox');if(!el)return;const on=db.magSound!==false;el.innerHTML='<div class="item"><span style="font-size:28px">🔊</span><div class="iteminfo"><strong>Magearna\'s voice</strong><small>Her cries in the shop. Turn off for class or the library.</small></div><button class="btn smallbtn" onclick="db.magSound='+(on?'false':'true')+';save();drawMagSound();if(db.magSound)magCry(\'happy\')">'+(on?'ON':'OFF')+'</button></div>'}
 // ---- Inventory (the gift box): swipe up from the dock, or tap the bag tab ----
 let invTab='all';
-function openInv(){const w=$('invWrap');drawInv();w.classList.add('open')}
+// the bag stays closed while a minigame (or one of its questions) is on screen
+function invBlocked(){return !!((typeof mgState!=='undefined'&&mgState)||document.querySelector('.mgq,.dg-slider'))}
+setInterval(()=>document.body.classList.toggle('mg-busy',invBlocked()),400);
+function openInv(){if(invBlocked())return;const w=$('invWrap');drawInv();w.classList.add('open')}
 function closeInv(){const w=$('invWrap');if(w)w.classList.remove('open')}
 function drawInv(){const el=$('invGrid');if(!el)return;const v=inv(),tabs={all:'All',snack:'Snacks',toy:'Toys',decor:'Decor',bg:'Backgrounds',other:'Tickets & Boxes'};
  const kindTab=k=>k==='snack'?'snack':k==='toy'?'toy':k==='small'||k==='medium'?'decor':k==='bg'?'bg':'other';
@@ -1722,7 +1732,7 @@ function drawExpBuffs(){const el=$('expBuffs');if(!el)return;el.innerHTML=expBoo
 function expBuffInfo(k){const ms=new Date((db.expBoost||{})[k]).getTime()-Date.now();if(!(ms>0))return;const d=Math.floor(ms/864e5),hr=Math.floor(ms%864e5/36e5);toast(ITEMS[k].name+': +'+EXP_TICKETS[k].pct*100+'% EXP · '+(d?d+'d ':'')+hr+'h left · total ×'+expBoostMult())}
 function useShinyTicket(){if(!inv().shinyticket)return;invAdd('shinyticket',-1);db.shinyCharges=(db.shinyCharges||0)+3;save();closeModal();drawInv();toast('✨ Shiny chances tripled for your next 3 Safaris')}
 function useTicket(id){const it=ITEMS[id];if(!it||!inv()[id])return;if(db.pendingSafari){toast('Finish the current Safari pull first');return}invAdd(id,-1);closeModal();closeInv();go('safari');buySafari(it.ticket,true)}
-(function(){let y0=null;document.addEventListener('touchstart',e=>{const t=e.touches[0],dock=document.querySelector('.dock');if(dock&&t.clientY>=dock.getBoundingClientRect().top-24&&!document.querySelector('.boxfx'))y0=t.clientY;else y0=null},{passive:true});document.addEventListener('touchmove',e=>{if(y0!==null&&y0-e.touches[0].clientY>45){y0=null;openInv()}},{passive:true})})();
+(function(){let y0=null;document.addEventListener('touchstart',e=>{const t=e.touches[0],dock=document.querySelector('.dock');if(dock&&t.clientY>=dock.getBoundingClientRect().top-24&&!document.querySelector('.boxfx'))y0=t.clientY;else y0=null},{passive:true});document.addEventListener('touchmove',e=>{if(y0!==null&&y0-e.touches[0].clientY>45){y0=null;if(!invBlocked())openInv()}},{passive:true})})();
 
 // ---- Habitat: decor, backgrounds, feeding, toys and decor interactions ----
 const MED_SLOTS=[[14,97],[38,97],[66,42],[90,64]]; // % of the habitat (bottom-centre of each medium decor)
@@ -3556,7 +3566,7 @@ async function twClimb(to){const r=runOf(),st=$('dgStage');if(!r||!st)return;con
  const box=st.querySelector('.tw-climb'),cam=box.querySelector('.tw-cam'),stack=box.querySelector('.tw-stack'),ban=box.querySelector('.tw-banner'),H=box.clientHeight,step=TW_SLAB+TW_GAP;
  // the stack is listed top floor first, so floor n sits (hi-n) slabs from the top
  const yFor=n=>Math.round(H/2-((hi-n)*step+TW_SLAB/2)),place=n=>'translateY('+yFor(n)+'px)';stack.style.transform=place(from);
- let skip=false;const gone=()=>ep!==dgEpoch||runOf()!==r;box.addEventListener('click',()=>{skip=true;box.getAnimations({subtree:true}).forEach(a=>a.finish())});
+ let skip=false;const gone=()=>ep!==dgEpoch||runOf()!==r;box.addEventListener('click',()=>{skip=true;box.getAnimations({subtree:true}).forEach(a=>{try{const t=a.effect&&a.effect.getTiming();if(!t||t.iterations===Infinity)return;a.finish()}catch(e){}})});
  const run=(el,kf,o)=>skip?Promise.resolve():el.animate(kf,Object.assign({fill:'forwards'},o)).finished.catch(()=>{});
  await run(cam,[{transform:'scale(3.4)',opacity:.4},{transform:'scale(1)',opacity:1}],{duration:650,easing:'cubic-bezier(.2,.8,.3,1)'});if(gone())return;
  await run(stack,[{transform:place(from)},{transform:place(to)}],{duration:900,easing:'cubic-bezier(.45,0,.25,1)'});if(gone())return;
@@ -4084,7 +4094,7 @@ $('navHome').style.display='none';
  if(pcStorageReady)ensureMoveData();
  if(pcStorageReady&&permRoll())save();
  render();scheduleNotifs();aiCheck();window.__pcBooted=true;setTimeout(()=>{try{mdSync()}catch(e){}},1500);setTimeout(()=>{try{facTick()}catch(e){}},2500);setInterval(()=>{try{facTick();if(currentPage==='home'&&hab.scene&&hab.scene!=='home')drawHabitat()}catch(e){}},60000);
- window.__pcVersion='0.50.1';
+ window.__pcVersion='0.51.0';
  document.addEventListener('pointerdown',function(e){try{var t=e.target.closest&&e.target.closest('[onclick],button,a,[id]');if(!t)return;var oc=t.getAttribute('onclick');window.__pcLastTap=(oc?oc.slice(0,60):(t.id?'#'+t.id:t.tagName.toLowerCase()+'.'+String(t.className).split(' ')[0])).replace(/\s+/g,' ')}catch(_){}} ,true);
  Object.keys(window).forEach(function(k){var f=window[k];if(typeof f!=='function'||/^[A-Z]/.test(k)||k==='appError'||k==='$'||k==='esc'||/\[native code\]/.test(Function.prototype.toString.call(f)))return;
   var w=function(){try{return f.apply(this,arguments)}catch(err){if(err&&typeof err==='object'&&!err.__pcLogged){try{err.__pcLogged=1}catch(_){}appError(err,k)}throw err}};try{window[k]=w}catch(_){}});

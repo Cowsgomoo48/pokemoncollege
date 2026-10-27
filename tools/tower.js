@@ -123,7 +123,7 @@ async function twClimb(to){const r=runOf(),st=$('dgStage');if(!r||!st)return;con
  const box=st.querySelector('.tw-climb'),cam=box.querySelector('.tw-cam'),stack=box.querySelector('.tw-stack'),ban=box.querySelector('.tw-banner'),H=box.clientHeight,step=TW_SLAB+TW_GAP;
  // the stack is listed top floor first, so floor n sits (hi-n) slabs from the top
  const yFor=n=>Math.round(H/2-((hi-n)*step+TW_SLAB/2)),place=n=>'translateY('+yFor(n)+'px)';stack.style.transform=place(from);
- let skip=false;const gone=()=>ep!==dgEpoch||runOf()!==r;box.addEventListener('click',()=>{skip=true;box.getAnimations({subtree:true}).forEach(a=>a.finish())});
+ let skip=false;const gone=()=>ep!==dgEpoch||runOf()!==r;box.addEventListener('click',()=>{skip=true;box.getAnimations({subtree:true}).forEach(a=>{try{const t=a.effect&&a.effect.getTiming();if(!t||t.iterations===Infinity)return;a.finish()}catch(e){}})});
  const run=(el,kf,o)=>skip?Promise.resolve():el.animate(kf,Object.assign({fill:'forwards'},o)).finished.catch(()=>{});
  await run(cam,[{transform:'scale(3.4)',opacity:.4},{transform:'scale(1)',opacity:1}],{duration:650,easing:'cubic-bezier(.2,.8,.3,1)'});if(gone())return;
  await run(stack,[{transform:place(from)},{transform:place(to)}],{duration:900,easing:'cubic-bezier(.45,0,.25,1)'});if(gone())return;
