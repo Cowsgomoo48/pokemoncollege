@@ -8,7 +8,7 @@ function mvMove(sel,frames,ms){const el=mvSpr(sel);if(!el)return;const z=mvZoom(
 function mvShake(sel,ms){mvMove(sel,[{x:0},{x:-6},{x:6},{x:-5},{x:5},{x:-3},{x:0}],ms||450)}
 // play the Pokémon's own Attack animation once (swaps to its Attack sheet, then back)
 async function mvAttackAnim(sel){const el=mvSpr(sel);if(!el)return;let a;try{a=await loadAnims(el.dataset.sp)}catch(e){return}const at=a&&a.Attack;if(!at)return;
- const row=+el.dataset.row,r=row<(at.rows||8)?row:0,keep=el.style.cssText,z=el.style.zoom,dur=at.d.reduce((x,y)=>x+y,0)/60,bb=await sprBounds(at,r),foot=Math.max(0,at.h-bb[3]-1);if(!el.isConnected)return;
+ const row=+el.dataset.row,r=row<(at.rows||8)?row:0,keep=el.style.cssText,z=el.style.zoom,dur=at.d.reduce((x,y)=>x+y,0)/60,base=a.Idle||a.Walk||at,footI=-(parseFloat(el.style.marginBottom)||0),foot=footI+(at.h-base.h)/2;if(!el.isConnected)return;
  el.style.cssText='width:'+at.w+'px;height:'+at.h+'px;margin-bottom:'+(-foot)+'px;background-image:url('+at.url+');background-position:0 '+(-r*at.h)+'px;--fw:'+at.w+'px;--fn:'+at.frames+';animation:dsxonce '+dur.toFixed(2)+'s steps('+Math.max(1,at.frames-1)+') 1 forwards;zoom:'+z+';';
  await dgSleep(Math.min(850,dur*1000));if(el.isConnected)el.style.cssText=keep}
 function mvArc(from,to,cls,ms,lift,style){const d=fxEl(cls,Object.assign({left:from.x+'px',top:from.y+'px'},style||{}));if(!d)return;const dx=to.x-from.x,dy=to.y-from.y;
