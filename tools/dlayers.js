@@ -149,20 +149,20 @@ function mdTypeMult(type){const fx=mdFx(),t=String(type).toLowerCase();return ((
 function mdDefMult(types){const fx=mdFx();if(!fx.def)return 1;let k=1;(types||[]).forEach(t=>{const m=fx.def[String(t).toLowerCase()];if(m)k*=m});return k}
 function mdFoeMult(type,types){return mdRun()?mdTypeMult(type)*mdDefMult(types):1}
 function mdMoveAdj(){return mdFx().mv||0}
-function mdTix(n){const fx=mdFx();return fx.tix?Math.round(n*fx.tix):n}
+function mdTix(n){const fx=mdFx();return Math.round(n*(fx.tix||1)*(1+MD_PER.magnet*mdLv('magnet')))}
 function mdIsType(types,t){return (types||[]).some(x=>String(x).toLowerCase()===t)}
 function mdSp(min,max){const fx=mdFx();if(fx.foes&&Math.random()<.55){const ch=MONS.filter(m=>m[2]>=min&&m[2]<=max&&SPECIES_DATA[m[0]]&&(SPECIES_DATA[m[0]].types||[]).some(t=>fx.foes.includes(t)));if(ch.length)return ch[Math.floor(Math.random()*ch.length)][0]}return speciesOfTier(min,max)}
 // after each round: chip damage (never your team's last HP), healing and Stamina
 async function mdRoundEnd(r,b){const fx=mdFx(r);if(!mdRun(r))return;const L=gdLit(r),fl=[];let pop='';
  if(fx.chip){const [d,safe,txt,icon]=fx.chip,ok=t=>safe.some(s=>mdIsType(t,s));
-  r.party.forEach((m,i)=>{if(m.hp<=0)return;const c=combatant(partyMon(m));if(ok(c.types))return;const k=Math.min(d,m.hp-1);if(k<=0)return;m.hp-=k;dgHurt(b,m,k);fl.push(['.dg-ally[data-i="'+i+'"]','-'+k+' '+icon,'env'])});
+  r.party.forEach((m,i)=>{if(m.hp<=0)return;const c=combatant(partyMon(m));if(ok(c.types))return;const k=Math.min(d,m.hp-mdFloorHP());if(k<=0)return;m.hp-=k;dgHurt(b,m,k);fl.push(['.dg-ally[data-i="'+i+'"]','-'+k+' '+icon,'env'])});
   b.enemies.forEach((e,i)=>{if(e.hp<=0||e.done||!e.aware||!L.has(gdKey(e.x,e.y))||ok(e.types))return;const k=Math.min(d,e.hp);e.hp-=k;fl.push(['.dg-foe[data-i="'+i+'"]','-'+k+' '+icon,'env'])});if(fl.length)pop=txt}
  if(fx.heal){let any=0;r.party.forEach((m,i)=>{if(m.hp<=0)return;const c=combatant(partyMon(m)),h=Math.min(fx.heal,c.hp-m.hp);if(h>0){m.hp+=h;any=1;fl.push(['.dg-ally[data-i="'+i+'"]','+'+h+' '+mdSub(r).icon,'heal'])}});if(any&&!pop)pop=mdSub(r).icon+' '+mdSub(r).name+' soothes your team…'}
  if(fx.en)r.party.forEach(m=>{if(m.hp>0)m.energy=Math.min(100,(m.energy||0)+fx.en)});
  if(!fl.length)return;gdKills(r);save();gdDrawBattle();twEnvPop(pop);fl.forEach(([s,t,c],k)=>setTimeout(()=>dgFloat(s,t,c),200+k*60));await dgSleep(1200)}
 // a Pokémon that ends its walk on a hazard
 function mdHazard(r,u,isFoe,i){const fl=r.fl;if(!fl||!fl.hz)return 0;const k=fl.hz[gdKey(u.x,u.y)];if(!k)return 0;const fx=mdFx(r),H=MD_HZ[k];if(!H||!fx.hz)return 0;
- const types=isFoe?u.types:combatant(partyMon(u)).types;if(fx.hz[3].some(s=>mdIsType(types,s)))return 0;const d=isFoe?Math.min(fx.hz[2],u.hp):Math.min(fx.hz[2],u.hp-1);if(d<=0)return 0;u.hp-=d;
+ const types=isFoe?u.types:combatant(partyMon(u)).types;if(fx.hz[3].some(s=>mdIsType(types,s)))return 0;if(!isFoe&&Math.random()<MD_PER.footing*mdLv('footing')){setTimeout(()=>dgFloat('.dg-ally[data-i="'+i+'"]','Sure footing!','heal'),80);return 0}const d=isFoe?Math.min(fx.hz[2],u.hp):Math.min(fx.hz[2],u.hp-mdFloorHP());if(d<=0)return 0;u.hp-=d;
  if(!isFoe)dgHurt(r.battle,u,d);save();setTimeout(()=>{twEnvPop(H.pop);dgFloat((isFoe?'.dg-foe':'.dg-ally')+'[data-i="'+i+'"]','-'+d+' '+H.icon,'env')},80);return d}
 // ---------- floor building: obstacles and hazards ----------
 function mdDress(r,fl,taken){const s=mdSub(r);if(!s)return;const rooms=fl.rooms,rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1)),ob=Array(fl.w*fl.h).fill('0'),hz={};

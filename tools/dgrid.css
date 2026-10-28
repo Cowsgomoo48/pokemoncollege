@@ -1,7 +1,7 @@
 /* ===================== MYSTERY DUNGEON · grid floors ===================== */
 .dg.gd .dg-stage{overflow:hidden;background:#05070d}
 .gd-field{position:relative;width:100%;height:100%;min-height:100%;overflow:hidden;display:block;padding:0;background:#05070d;touch-action:manipulation}
-.gd-map{position:absolute;left:0;top:0;transition:transform .18s ease-out;image-rendering:pixelated}
+.gd-map{position:absolute;left:0;top:0;transform-origin:0 0;transition:transform .3s ease-out;image-rendering:pixelated}
 .gd-map>canvas,.gd-map>div{position:absolute;left:0;top:0}
 .gd-tiles{image-rendering:pixelated}
 .gd-fog{pointer-events:none;z-index:50}
@@ -57,3 +57,14 @@
 @keyframes gdstag{0%,100%{transform:none}20%{transform:translateX(-5px) rotate(-7deg)}45%{transform:translateX(5px) rotate(7deg)}70%{transform:translateX(-3px) rotate(-4deg)}}
 .gd-u.ko .dg-spr{opacity:.55}
 .gd-u.fainting{animation:none}
+/* rooms that open over the map (shop, chest, boss cleared) scroll, with the way out always reachable */
+.dg.gd .dg-stage{position:relative}
+.dg.gd .dg-stage>.dg-room{position:absolute;inset:0;min-height:0;overflow-y:auto;justify-content:flex-start;padding:12px 14px 0;-webkit-overflow-scrolling:touch}
+.dg.gd .dg-stage>.dg-room .dg-big{font-size:34px}
+.dg.gd .dg-stage>.dg-room>.btn.red:last-child,.dg.gd .dg-stage>.dg-room>.actions:last-child{position:sticky;bottom:0;margin-top:auto;z-index:2;box-shadow:0 -8px 14px #0005}
+.dg.gd .dg-stage>.dg-room>.actions:last-child{background:var(--card,#fff);padding:8px;border-radius:12px 12px 0 0;width:100%;box-sizing:border-box}
+.dg.gd .dg-stage>.dg-room>*{flex:none}
+.gd-field .gd-under{opacity:.3;pointer-events:none!important}
+.gd-envslot .tw-envbtn,.gd-floor,.gd-mini{transition:opacity .2s}
+.gd-field .see-thru{opacity:.3!important;pointer-events:none!important;transition:opacity .2s}
+.gd-floor,.gd-envslot .tw-envbtn,.gd-mini,.gd-field .dg-ticker{transition:opacity .2s}

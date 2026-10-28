@@ -175,11 +175,11 @@ function twFrenzy(ovk){if(!ovk||!twC('frenzy'))return 0;const r=runOf();r.ticket
 // damage your team takes (after the usual cap)
 function twCardDef(types,sp,mv){const r=runOf();if(!r||!r.tower)return 1;const C=twCards(r),cat=mv?moveCat(mv)||'P':'';let k=1-.05*Math.min(4,C.sturdyshell||0);
  if(C.eviolite&&Object.values(PRE_EVO).includes(sp))k*=.92;if(C.protectivepads&&cat==='P')k*=.9;if(C.assaultvest&&cat==='S')k*=.9;return k}
-function twDodgeAdd(){return twC('brightpowder')?.05:0}
-function twGuardAdd(){return twC('guardup')?.1:0}
+function twDodgeAdd(){return (twC('brightpowder')?.05:0)+MD_PER.evasion*mdLv('evasion')}
+function twGuardAdd(){return (twC('guardup')?.1:0)+MD_PER.guard*mdLv('guard')}
 function twSlowMult(){return twC('cramnotes')?.9:1}
-function twCritMult(){return twC('scopelens')?1.5:1}
-function twShopMult(){return (twC('haggler')?.7:1)*(twC('goldenticket')?.75:1)}
+function twCritMult(){return (twC('scopelens')?1.5:1)*(1+MD_PER.sharp*mdLv('sharp'))}
+function twShopMult(){return (twC('haggler')?.7:1)*(twC('goldenticket')?.75:1)*(1-MD_PER.bargain*mdLv('bargain'))}
 // Focus Sash and Rocky Helmet, when one of your Pokémon is hit
 function twCardHurt(b,m,d){const r=runOf();if(!r||!r.tower||d<=0)return;const C=twCards(r),i=r.party.indexOf(m);
  if(C.focussash&&m.hp<=0&&m.hp+d>=combatant(partyMon(m)).hp&&!(b.sash||{})[m.id]){(b.sash=b.sash||{})[m.id]=1;m.hp=1;setTimeout(()=>dgFloat('.dg-ally[data-i="'+i+'"]','🎗️ Hung on!','heal'),250)}

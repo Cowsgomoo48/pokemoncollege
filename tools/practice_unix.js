@@ -10,7 +10,7 @@ function prCmd(id,name,kw,make){prDef(id,'Unix / command line',name,kw,make);PR[
 // one command question: answer, three wrong commands, a short explanation, other accepted forms
 function uxQ(q,a,wrong,why,alts){const p=prMC(q,uxC(a),wrong.map(uxC),k=>uxC(a+' '+'?'.repeat(k+1)),why,[['Which command does this job? Then which option, and what comes last (the file or folder)?',why],['Put it together: command, options, then the target.','Answer: '+uxC(a)]]);p.alts=alts||[];return p}
 // typed commands: same text after tidying spaces and quotes (iPhone smart quotes and dashes too)
-function uxNorm(s){return String(s==null?'':s).replace(/`/g,'').replace(/[“”„]/g,'"').replace(/[‘’']/g,'"').replace(/[—–]/g,'--').trim().replace(/\s+/g,' ').replace(/ ?\| ?/g,' | ').replace(/"([^"\s|*?^$\[\]\\{}()]+)"/g,'$1')}
+function uxNorm(s){return String(s==null?'':s).replace(/`/g,'').replace(/[“”„]/g,'"').replace(/[‘’']/g,'"').replace(/[—–]/g,'--').trim().replace(/\s+/g,' ').replace(/ ?\| ?/g,' | ').replace(/"([^"\s|*?^$\[\]\\{}()&#;<>!]+)"/g,'$1')}
 function cmdMatch(user,answers){const u=uxNorm(user);return !!u&&answers.some(a=>uxNorm(a)===u)}
 const uxPerms=(p,r)=>p.length<2?[p]:p.flatMap((x,i)=>uxPerms(p.slice(0,i).concat(p.slice(i+1))).map(t=>[x,...t]));
 const uxOct=s=>[0,3,6].map(i=>(s[i]==='r'?4:0)+(s[i+1]==='w'?2:0)+(s[i+2]==='x'?1:0)).join('');
@@ -134,3 +134,37 @@ prCmd('unix_basics','Everyday commands (cp, mv, rm, mkdir, touch, >, >>, chown, 
   ['Open the manual page for '+c+'.','man '+c,[c+' -h','help '+c,'less '+c],'`man COMMAND` shows the manual (`COMMAND --help` gives a short summary).'],
   ['Print your username.','whoami',['pwd','echo','id -g'],'`whoami` prints the user you’re logged in as.']]);
  return uxQ(T[0],T[1],T[2],T[3],T[4])});
+// ---------- scenario questions: where you are, where the file is, what to type ----------
+// Paths are worked out by the app, so relative paths (../..), absolute paths and ~ all count, and every correct way of
+// quoting an awkward file name (spaces, &, #, parentheses, a leading dash) is accepted.
+const UXS={users:['bob','alice','sam','kim'],dirs:['projects','docs','school','notes','to','the','file','site','src','labs','week3','cs101','backup','data','final'],
+ names:['==double_equal.txt','my notes.txt','R&D.txt','#readme.txt','file(1).txt','-dash.txt','final draft.md','a&b.log','plain.txt','results.csv','lab 2.txt','==notes==.md'],
+ scripts:['run.sh','build me.sh','#setup.sh','start.sh','test&go.sh'],words:['error','TODO','admin','denied']};
+const uxNeedsQ=n=>/[\s&#()]/.test(n),uxEsc=n=>n.replace(/([\s&#()])/g,'\\$1');
+// every accepted way to write a path whose last part may need quoting
+function uxForms(dirPart,name){const p=dirPart?dirPart+'/':'',out=[];if(!uxNeedsQ(name)&&!name.startsWith('-'))out.push(p+name);
+ if(uxNeedsQ(name)){out.push('"'+p+name+'"',p+'"'+name+'"',p+uxEsc(name))}
+ if(name.startsWith('-')){if(p)out.push(p+name);else out.push('./'+name)}return out}
+function uxRel(from,to){let i=0;while(i<from.length&&i<to.length&&from[i]===to[i])i++;return [...Array(from.length-i).fill('..'),...to.slice(i)].join('/')}
+prCmd('unix_paths','Paths and awkward file names (relative, absolute, quoting)',/\bcd\b|relative|absolute|\bcat\b|path|\.\/\w|quote/i,()=>{
+ const u=prPick(UXS.users),home=['home',u],D=()=>prPick(UXS.dirs);let cwd=[...home,D()];if(Math.random()<.6)cwd.push(D());
+ const where=prPick(['inside','sibling','up','abs']);let dir;
+ if(where==='inside'){dir=[...cwd,D()];if(Math.random()<.6)dir.push(D())}else if(where==='sibling'){dir=[...cwd.slice(0,-1),D()]}else if(where==='up'){dir=cwd.slice(0,Math.max(2,cwd.length-prR(1,2)))}else dir=['var','log',D()];
+ if(dir.join('/')===cwd.join('/'))dir=[...cwd,D()];
+ const act=prPick([['cat','read (print) the file FILE'],['less','page through the file FILE'],['wc -l','count the lines in the file FILE'],['grep "'+prPick(UXS.words)+'"','show the lines of FILE that contain “WORD”'],['run','run the script FILE'],['chmod u+x','make the script FILE executable for you'],['cp','copy the file FILE into your current directory']]);
+ const isScript=act[0]==='run'||act[0]==='chmod u+x',name=isScript?prPick(UXS.scripts):prPick(UXS.names);
+ const rel=uxRel(cwd,dir),abs='/'+dir.join('/'),tilde=dir.slice(0,2).join('/')===home.join('/')?'~/'+dir.slice(2).join('/'):null;
+ const relForms=uxForms(rel,name).concat(where==='inside'?uxForms('./'+rel,name):[]),absForms=uxForms(abs,name),tildeForms=tilde?uxForms(tilde.replace(/\/$/,''),name):[];
+ const wrap=f=>{if(act[0]==='run'){if(!f.replace(/"/g,'').includes('/'))return ['./'+f,...(f.startsWith('"')?['"./'+f.slice(1)]:[])];return /^("?\.\.|"?\/|"?~|"?\.\/)/.test(f)?[f]:f.startsWith('"')?['"./'+f.slice(1),'./'+f,f]:['./'+f,f]}return act[0]==='cp'?[act[0]+' '+f+' .',act[0]+' '+f+' ./']:[act[0]+' '+f]};
+ const all=[...relForms,...absForms,...tildeForms].flatMap(wrap),a=wrap((where==='abs'?absForms:relForms)[0])[0];
+ const locTxt=where==='inside'&&Math.random()<.5?uxC(rel)+' (inside your current directory)':uxC(abs);
+ const q='Your current directory is '+uxC('/'+cwd.join('/'))+'. What command will '+act[1].replace('WORD',act[0].split('"')[1]||'').replace('FILE',uxC(name))+'? It’s located in '+locTxt+'.';
+ const badRel=rel.startsWith('..')?rel.replace(/^\.\.\//,''):'../'+rel,noQ=(rel?rel+'/':'')+name;
+ const wrong=[wrap(uxNeedsQ(name)?noQ:(badRel+'/'+name))[0],wrap(uxNeedsQ(name)?uxForms(badRel,name)[0]:'../'+rel+'/'+name)[0],(act[0]==='run'?'cd ':act[0]==='cat'?'ls ':'cat ')+relForms[0],wrap(uxForms('',name)[0])[0]].filter(x=>!all.includes(x));
+ while(wrong.length<3)wrong.push(wrap(badRel+'/'+'x'.repeat(wrong.length)+name)[0]);
+ const why=(rel.startsWith('..')?'`..` goes up one folder, so from '+uxC('/'+cwd.join('/'))+' the path is '+uxC(rel+'/')+'. ':'')+(uxNeedsQ(name)?'The name has a space, &, # or brackets, so quote it (or put \\ before each one). ':name.startsWith('-')?'A name starting with - looks like an option, so write it as ./'+name+'. ':'')+(act[0]==='run'?'A script runs by its path; in the same folder that’s ./name. ':'')+'The absolute path '+uxC(abs+'/'+name)+' works too.';
+ const p=prMC(q,uxC(a),[...new Set(wrong)].filter(x=>!all.includes(x)).slice(0,3).map(uxC),k=>uxC(a+' '+'?'.repeat(k+1)),why,[
+  ['Where is the file compared to where you are? Count how many folders up (..) and then which folders down.','From /'+cwd.join('/')+' to '+abs+': '+uxC((rel||'.')+'/')],
+  [uxNeedsQ(name)||name.startsWith('-')?'Look at the file name: does anything in it mean something special to the shell?':'Which command does the job, and does it need anything after the path?',why],
+  ['Put the command and the path together.','Answer: '+uxC(a)+(absForms.length?' (or '+uxC(wrap(absForms[0])[0])+')':'')]]);
+ p.alts=all;return p});

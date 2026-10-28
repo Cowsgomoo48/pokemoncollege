@@ -23,7 +23,7 @@ function saMatch(user,ans){let u=saNorm(user),a=saNorm(ans);if(!u)return false;i
  // words: allow a small typo
  if(!/\d/.test(a)&&a.length>=4)return saLev(u,a)<=Math.max(1,Math.floor(a.length/6));return false}
 // which questions can be typed: practice problems, terms (type the term), and quiz questions with a short answer
-function saPlan(item){if(item.kind==='gen'){const p=prInstance(item.gid)||{q:item.front,a:item.back,steps:item.steps,ex:item.explain};const cmd=!!(PR[item.gid]&&PR[item.gid].cmd);return {prompt:p.q,answer:p.a,sub:(PR[item.gid]?PR[item.gid].name+' · ':'')+(cmd?'type the command.':'type your answer.'),steps:p.steps||[],explain:p.ex,math:!cmd,cmd,alts:p.alts||[]}}
+function saPlan(item){if(item.kind==='gen'){const p=prInstance(item.gid)||{q:item.front,a:item.back,steps:item.steps,ex:item.explain};const cmd=!!(PR[item.gid]&&PR[item.gid].cmd);if(cmd&&!/`/.test(p.a))return null;return {prompt:p.q,answer:p.a,sub:(PR[item.gid]?PR[item.gid].name+' · ':'')+(cmd?'type the command.':'type your answer.'),steps:p.steps||[],explain:p.ex,math:!cmd,cmd,alts:p.alts||[]}}
  if(item.kind==='term'&&String(item.front).length<=32)return {prompt:item.back,answer:item.front,sub:'Type the term that matches this definition.',steps:[],explain:'“'+item.front+'” means: '+item.back};
  if(item.kind==='mc'&&String(item.back).length<=24&&String(item.back).split(/\s+/).length<=3)return {prompt:item.front,answer:item.back,sub:'Type your answer.',steps:[],explain:'The answer is “'+item.back+'”.'};return null}
 const SA_KEYS=['x','²','^','√','π','×','÷','−','/','(',')','=','.'];

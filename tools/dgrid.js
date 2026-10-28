@@ -50,7 +50,8 @@ function gdNewFloor(r){mdPlan(r);const [W,H,NR]=GD_SIZE[r.diff]||GD_SIZE.easy,g=
  // items lying on the ground, and special spots
  const mid=rooms.map((o,i)=>i).filter(i=>i&&i!==far),nIt=rnd(2,4)+(mdFx(r).items||0);for(let k=0;k<nIt;k++){const o=rooms[rnd(0,rooms.length-1)],t=takeIn(o);if(!t)continue;
   if(Math.random()<.35)fl.items.push({x:t[0],y:t[1],tickets:mdTix(rnd(3,8)+inSeg)});else{const pool=Object.keys(DITEMS).filter(id=>id!=='snag'||Math.random()<.15).map(id=>({id,w:DITEM_TIER_W[DITEMS[id].tier||0]}));fl.items.push({x:t[0],y:t[1],k:pickWeighted(pool).id})}}
- const sp2=[['chest',.65],['spring',.35],['shop',.25]];for(const [k,p] of sp2){if(Math.random()>p||!mid.length)continue;const t=takeIn(rooms[mid[rnd(0,mid.length-1)]]);if(t)fl.specials.push({x:t[0],y:t[1],k})}
+ const sp2=[['chest',.65],['spring',.35],['shop',.35]];for(const [k,p] of sp2){if(Math.random()>p||!mid.length)continue;const t=takeIn(rooms[mid[rnd(0,mid.length-1)]]);if(t)fl.specials.push({x:t[0],y:t[1],k})}
+ mdPlaceDigs(r,fl,takeIn,rooms);if(Math.random()<MD_PER.forager*mdLvOf(r,'forager')){const k=twItem(0);r.bag[k]=(r.bag[k]||0)+1;setTimeout(()=>toast('🎒 Forager: you found '+DITEMS[k].icon+' '+DITEMS[k].name+'!'),900)}
  r.fl=fl;r.battle={kind:'floor',enemies:en,turn:0,round:1,overclock:0,skip:false,guard:{},done:false,enemyPhase:false,diy:fl.boss||Math.random()<.5};gdSee(r);if(DG){DG.gmode='select';DG.msg=''}}
 // breadth-first search over walkable tiles; blocked(x,y) says a tile can't be entered
 function gdBFS(fl,start,blocked,max){const q=[[start[0],start[1]]],seen=new Map([[gdKey(...start),{d:0,prev:null}]]);
@@ -63,7 +64,7 @@ function gdUnitAt(r,x,y){const b=r.battle;const ai=r.party.findIndex(m=>m.x===x&
 // ---------- what you can see ----------
 function gdRoomOf(fl,x,y){return fl.rooms.findIndex(o=>x>=o[0]&&x<o[0]+o[2]&&y>=o[1]&&y<o[1]+o[3])}
 function gdLit(r){const fl=r.fl,L=new Set();r.party.forEach(m=>{const ri=gdRoomOf(fl,m.x,m.y);if(ri>=0&&!mdFx(r).dark){const o=fl.rooms[ri];for(let j=o[1]-1;j<=o[1]+o[3];j++)for(let i=o[0]-1;i<=o[0]+o[2];i++)L.add(gdKey(i,j))}
-  for(let dy=-2;dy<=2;dy++)for(let dx=-2;dx<=2;dx++)L.add(gdKey(m.x+dx,m.y+dy))});return L}
+  const lr=mdFx(r).dark?2+mdLvOf(r,'light'):2;for(let dy=-lr;dy<=lr;dy++)for(let dx=-lr;dx<=lr;dx++)L.add(gdKey(m.x+dx,m.y+dy))});return L}
 function gdSee(r){const fl=r.fl,L=gdLit(r),s=fl.seen.split('');L.forEach(k=>{const [x,y]=k.split(',').map(Number);if(x>=0&&y>=0&&x<fl.w&&y<fl.h)s[y*fl.w+x]='1'});fl.seen=s.join('');
  // wild Pokémon that can see your team wake up and start hunting
  r.battle.enemies.forEach(e=>{if(!e.aware&&e.hp>0&&L.has(gdKey(e.x,e.y))&&r.party.some(m=>gdCheb(m,e)<=5))e.aware=1});return L}
@@ -98,7 +99,7 @@ function gdDrawBattle(entering){const r=runOf(),b=r&&r.battle,st=$('dgStage');if
  const vis=(x,y)=>L.has(gdKey(x,y)),seenAt=(x,y)=>fl.seen[y*fl.w+x]==='1';
  field.querySelector('.gd-objs').innerHTML=(!fl.stairsHidden&&seenAt(...fl.stairs)?'<div class="gd-obj stairs" style="left:'+fl.stairs[0]*T+'px;top:'+fl.stairs[1]*T+'px">🪜</div>':'')
   +fl.items.filter(it=>seenAt(it.x,it.y)).map(it=>'<div class="gd-obj" style="left:'+it.x*T+'px;top:'+it.y*T+'px">'+(it.tickets?'🎟️':DITEMS[it.k].icon)+'</div>').join('')
-  +fl.specials.filter(s=>seenAt(s.x,s.y)).map(s=>'<div class="gd-obj sp" style="left:'+s.x*T+'px;top:'+s.y*T+'px">'+GD_SPECIAL[s.k].icon+'</div>').join('');
+  +fl.specials.filter(s=>seenAt(s.x,s.y)).map(s=>'<div class="gd-obj sp" style="left:'+s.x*T+'px;top:'+s.y*T+'px">'+(s.k==='shop'?'🎩':GD_SPECIAL[s.k].icon)+'</div>').join('')+mdDigHTML(r,fl,T,seenAt);
  // units (sprites keep their element between redraws so animations and effects stay smooth)
  const U=field.querySelector('.gd-units'),want=new Set();
  const unit=(cls,i,x,y,sp,row,hpPct,extra,color,anim)=>{const id=cls+i;want.add(id);let el=U.querySelector('[data-u="'+id+'"]');if(!el){el=document.createElement('div');el.dataset.u=id;el.innerHTML='<div class="gd-hp"><i></i></div><div class="dg-spr" data-sp="'+esc(sp)+'" data-row="'+row+'" data-sz="'+(extra.includes('big')?1:.82)+'"></div><b class="dg-xh"></b>';U.appendChild(el)}
@@ -110,23 +111,30 @@ function gdDrawBattle(entering){const r=runOf(),b=r&&r.battle,st=$('dgStage');if
  b.enemies.forEach((e,i)=>{const dead=e.hp<=0&&!e.gdOut;if(dead&&!e.koAt&&!e.done){e.koAt=now;gdKoFx('dg-foe'+i,true)}if(dead?!(e.koAt&&now-e.koAt<1500):e.done)return;if(!vis(e.x,e.y))return;
   unit('dg-foe',i,e.x,e.y,e.species,e.dir||0,dead?0:(e.gdOut?e.gdHp:e.hp)/e.maxhp*100,(e.boss?'big ':'')+(e.aware||dead?'':'asleep ')+(dead?'gd-faint ':''),null,dead&&now-e.koAt>=600?'Sleep':'')});
  U.querySelectorAll('.gd-u').forEach(el=>{if(!want.has(el.dataset.u))el.remove()});dgFillSprites();
- if(DG){const free=gdFree(r);if(!free&&(DG.wasFree!==false||!DG.bcam))DG.bcam=gdBattleCam(r);if(free)DG.bcam=null;DG.wasFree=free}
- if(entering)gdFit();gdHighlight();gdMini(r,L);if(entering||DG&&DG.follow!==false)gdCamera();
+ if(DG){const free=gdFree(r);if(DG.wasFree===true&&!free)mdBattleStart(r);if(DG.wasFree===false&&free)mdBattleEnd(r);DG.bcam=free?null:gdBattleCam(r);DG.wasFree=free}
+ if(entering)gdFit();gdHighlight();gdMini(r,L);if(entering||DG&&DG.follow!==false)gdCamera();else gdOverlap();gdOverlays();setTimeout(gdOverlays,340);
  if(DG&&DG.busy&&!b.enemyPhase)$('dgPanel').innerHTML='<div class="dg-msg">…</div>';else dgPanelBattle()}
 // fit the dungeon between the page header and the bottom dock, so the action buttons are never hidden
 function gdFit(){const dg=document.querySelector('.dg.gd');if(!dg)return;const dock=document.querySelector('nav.dock'),top=dg.getBoundingClientRect().top,db_=dock&&dock.getBoundingClientRect(),bot=db_&&db_.height&&db_.top>top?db_.top:innerHeight;dg.style.minHeight='0';dg.style.height=Math.max(400,Math.round(bot-top-6))+'px'}
 addEventListener('resize',()=>{if(document.querySelector('.dg.gd')){gdFit();gdCamera()}});
 function gdMini(r,L){const fl=r.fl,c=document.querySelector('.gd-mini');if(!c)return;const s=4;c.width=fl.w*s;c.height=fl.h*s;const g=c.getContext('2d');g.clearRect(0,0,c.width,c.height);
  for(let y=0;y<fl.h;y++)for(let x=0;x<fl.w;x++)if(fl.seen[y*fl.w+x]==='1'&&gdTile(fl,x,y)){g.fillStyle=L.has(gdKey(x,y))?'#ffffffcc':'#ffffff66';g.fillRect(x*s,y*s,s,s)}
- if(!fl.stairsHidden&&fl.seen[fl.stairs[1]*fl.w+fl.stairs[0]]==='1'){g.fillStyle='#4aa3ff';g.fillRect(fl.stairs[0]*s-1,fl.stairs[1]*s-1,s+2,s+2)}
+ const sc=mdLvOf(r,'scout');if(sc>=2||mdLvOf(r,'patches')>=5)(fl.digs||[]).forEach(d=>{if(d.done<d.max){g.fillStyle='#ffe066';g.fillRect(d.x*s,d.y*s,s,s)}});if(sc>=3)fl.items.forEach(it=>{g.fillStyle='#ffd34d';g.fillRect(it.x*s,it.y*s,s,s)});
+ if(!fl.stairsHidden&&(sc>=1||fl.seen[fl.stairs[1]*fl.w+fl.stairs[0]]==='1')){g.fillStyle='#4aa3ff';g.fillRect(fl.stairs[0]*s-1,fl.stairs[1]*s-1,s+2,s+2)}
  fl.items.forEach(it=>{if(fl.seen[it.y*fl.w+it.x]==='1'){g.fillStyle='#ffd34d';g.fillRect(it.x*s,it.y*s,s,s)}});
  r.battle.enemies.forEach(e=>{if(e.hp>0&&!e.done&&L.has(gdKey(e.x,e.y))){g.fillStyle='#ff4d4d';g.fillRect(e.x*s,e.y*s,s,s)}});
  r.party.forEach((m,i)=>{g.fillStyle=SLOT_COLORS[i];g.fillRect(m.x*s-1,m.y*s-1,s+2,s+2)})}
-function gdCamera(x,y){const r=runOf(),f=document.querySelector('.gd-field'),mp=f&&f.querySelector('.gd-map');if(!mp)return;const b=r.battle,m=r.party[b.turn]||r.party[0];if(x==null&&DG&&DG.bcam)[x,y]=DG.bcam;x=x??m.x;y=y??m.y;
- const W=f.clientWidth,H=f.clientHeight,T=GD_T,mw=r.fl.w*T,mh=r.fl.h*T;let tx=W/2-(x+.5)*T,ty=H/2-(y+.5)*T;tx=Math.min(0,Math.max(W-mw,tx));ty=Math.min(0,Math.max(H-mh,ty));if(mw<W)tx=(W-mw)/2;if(mh<H)ty=(H-mh)/2;mp.style.transform='translate('+Math.round(tx)+'px,'+Math.round(ty)+'px)'}
+function gdCamera(x,y){const r=runOf(),f=document.querySelector('.gd-field'),mp=f&&f.querySelector('.gd-map');if(!mp)return;const b=r.battle,m=r.party[b.turn]||r.party[0];let sc=1;if(x==null&&DG&&DG.bcam){[x,y,sc]=DG.bcam;sc=sc||1}x=x??m.x;y=y??m.y;
+ const W=f.clientWidth,H=f.clientHeight,T=GD_T*sc,mw=r.fl.w*T,mh=r.fl.h*T;let tx=W/2-(x+.5)*T,ty=H/2-(y+.5)*T;tx=Math.min(0,Math.max(W-mw,tx));ty=Math.min(0,Math.max(H-mh,ty));if(mw<W)tx=(W-mw)/2;if(mh<H)ty=(H-mh)/2;mp.style.transform='translate('+Math.round(tx)+'px,'+Math.round(ty)+'px) scale('+sc+')';if(DG)DG.cam={tx,ty,T};gdOverlap()}
+// The floor label, info button, minimap and message bar stay solid, but turn see-through (and let taps pass) while a
+// Pokémon is underneath one. Worked out from where the camera is heading, so it's right before the slide finishes.
+function gdOverlap(){const f=document.querySelector('.gd-field'),r=runOf();if(!f||!DG||!DG.cam||!r||!r.battle)return;const {tx,ty,T}=DG.cam,fr=f.getBoundingClientRect(),pts=[];
+ r.party.forEach(m=>pts.push([m.x,m.y]));r.battle.enemies.forEach(e=>{if((e.hp>0||e.gdOut)&&!e.done)pts.push([e.x,e.y])});
+ f.querySelectorAll('.gd-floor,.gd-envslot .tw-envbtn,.gd-mini,.dg-ticker').forEach(el=>{const b=el.getBoundingClientRect();if(!b.width)return;const L=b.left-fr.left,Tp=b.top-fr.top,R=L+b.width,B=Tp+b.height;
+  const hit=pts.some(([x,y])=>{const ux=tx+x*T,uy=ty+(y-.4)*T;return ux<R&&ux+T>L&&uy<B&&uy+T*1.4>Tp});el.classList.toggle('see-thru',hit)})}
 function gdHighlight(){const hl=document.querySelector('.gd-hl');if(!hl)return;const T=GD_T,H=DG&&DG.hl;hl.innerHTML=H?H.tiles.map(([x,y])=>'<i class="'+H.cls+'" style="left:'+x*T+'px;top:'+y*T+'px"></i>').join(''):''}
 // ---------- tapping the map ----------
-function gdTap(ev){const r=runOf(),b=r&&r.battle;if(!b||!r.fl||b.enemyPhase)return;const mp=document.querySelector('.gd-map').getBoundingClientRect(),x=Math.floor((ev.clientX-mp.left)/GD_T),y=Math.floor((ev.clientY-mp.top)/GD_T),u=gdUnitAt(r,x,y);
+function gdTap(ev){const r=runOf(),b=r&&r.battle;if(!b||!r.fl||b.enemyPhase)return;const mp=document.querySelector('.gd-map').getBoundingClientRect(),ts=mp.width/r.fl.w,x=Math.floor((ev.clientX-mp.left)/ts),y=Math.floor((ev.clientY-mp.top)/ts),u=gdUnitAt(r,x,y);
  if(dgTarget){if(dgTarget.side==='ally'&&u&&u.side==='ally'){dgAllyPick(u.i);return}if(dgTarget.side==='foe'&&u&&u.side==='foe'){dgTargetPick(u.i);return}return}
  if(DG.busy&&DG.gmode!=='move'&&DG.gmode!=='target')return;
  if(DG.gmode==='move'){const k=gdKey(x,y);if(DG.reach&&DG.reach.has(k)&&!gdUnitAt(r,x,y)){gdWalkTo(b.turn,x,y);return}DG.gmode='select';DG.hl=null;DG.busy=0;gdHighlight();dgPanelBattle();return}
@@ -148,8 +156,11 @@ function gdPanelBattle(msg){const r=runOf(),b=r.battle,m=r.party[b.turn],p=m&&pa
 const GD_FREE_MV=6;
 function gdFree(r){r=r||runOf();return !!(r&&r.fl&&r.battle&&!r.battle.enemyPhase&&!gdFoeTargets(r).some(([e])=>e.aware))}
 // battles: the camera holds on the middle of the room (or between your team and the foes in a corridor)
-function gdBattleCam(r){const b=r.battle,m=r.party[b.turn]||r.party[0],ri=gdRoomOf(r.fl,m.x,m.y);if(ri>=0){const o=r.fl.rooms[ri];return [o[0]+(o[2]-1)/2,o[1]+(o[3]-1)/2]}
- const pts=[m,...gdFoeTargets(r).filter(([e])=>e.aware).map(([e])=>e)];return [pts.reduce((a,p)=>a+p.x,0)/pts.length,pts.reduce((a,p)=>a+p.y,0)/pts.length]}
+// The camera centres on the middle of the line between the ally and the awake foe that are furthest apart, and zooms
+// out (down to 62%) when they wouldn't both fit. It's worked out again on every redraw, so it follows the fight.
+function gdBattleCam(r){const b=r.battle,A=r.party.filter(m=>m.hp>0),F=gdFoeTargets(r).filter(([e])=>e.aware).map(([e])=>e),m=r.party[b.turn]||r.party[0];if(!A.length||!F.length)return [m.x,m.y,1];
+ let best=null,bd=-1;A.forEach(a=>F.forEach(f=>{const d=Math.hypot(a.x-f.x,a.y-f.y);if(d>bd){bd=d;best=[a,f]}}));const [a,f]=best,fe=document.querySelector('.gd-field'),W=fe?fe.clientWidth:390,H=fe?fe.clientHeight:400,T=GD_T;
+ const sc=Math.max(.62,Math.min(1,(W-28)/((Math.abs(a.x-f.x)+2)*T),(H-70)/((Math.abs(a.y-f.y)+2)*T)));return [(a.x+f.x)/2,(a.y+f.y)/2,sc]}
 // fainting: stagger, then the Sleep animation; foes then fade out (CSS does the motion)
 function gdKoFx(id,fade){setTimeout(()=>{const s=document.querySelector('.gd-units [data-u="'+id+'"] .dg-spr');if(s){s.dataset.anim='Sleep';s.classList.remove('ok');dgFillSprites()}},600);if(fade)setTimeout(()=>{const u=document.querySelector('.gd-units [data-u="'+id+'"]');if(u&&u.classList.contains('gd-faint'))u.remove()},1550)}
 function gdSelect(i){const r=runOf(),b=r&&r.battle;if(!b||b.enemyPhase||DG.busy)return;b.turn=i;DG.gmode='select';DG.hl=null;gdDrawBattle()}
@@ -157,7 +168,7 @@ function gdSelect(i){const r=runOf(),b=r&&r.battle;if(!b||b.enemyPhase||DG.busy)
 function gdMoveStart(){const r=runOf(),b=r.battle,m=r.party[b.turn];if(!m||m.hp<=0||DG.busy)return;const free=gdFree(r);if(!free&&(m.moved||m.acted))return;const fl=r.fl,mv=free?Math.max(GD_FREE_MV,gdMV(partyMon(m).species)):Math.max(1,gdMV(partyMon(m).species)+mdMoveAdj());
  const reach=gdBFS(fl,[m.x,m.y],(x,y)=>b.enemies.some(e=>(e.hp>0||e.gdOut)&&!e.done&&e.x===x&&e.y===y),mv);DG.reach=reach;DG.gmode='move';if(!DG.bcam)gdCamera(m.x,m.y);
  DG.hl={cls:'mv',tiles:[...reach.keys()].map(k=>k.split(',').map(Number)).filter(([x,y])=>!(x===m.x&&y===m.y)&&!gdUnitAt(r,x,y))};gdHighlight();$('dgPanel').innerHTML='<div class="dg-msg">👣 Tap a blue tile to move there (up to '+mv+' tiles).'+(free?' No foes in sight, so this doesn’t use up the turn.':'')+'</div><div class="dg-acts"><button class="btn" onclick="DG.gmode=\'select\';DG.hl=null;gdDrawBattle()">CANCEL</button></div>'}
-async function gdWalk(unitEl,obj,path,isFoe){const T=GD_T;for(let s=1;s<path.length;s++){const [x,y]=path[s],[px,py]=path[s-1];obj.dir=gdDirOf(x-px,y-py);obj.x=x;obj.y=y;if(unitEl){unitEl.style.left=x*T+'px';unitEl.style.top=y*T+'px';unitEl.style.zIndex=10+y;const sp=unitEl.querySelector('.dg-spr');if(sp&&+sp.dataset.row!==obj.dir){sp.dataset.row=obj.dir;sp.classList.remove('ok');dgFillSprites()}}if(!isFoe&&!(DG&&DG.bcam))gdCamera(x,y);await dgSleep(120)}}
+async function gdWalk(unitEl,obj,path,isFoe){const T=GD_T;for(let s=1;s<path.length;s++){const [x,y]=path[s],[px,py]=path[s-1];obj.dir=gdDirOf(x-px,y-py);obj.x=x;obj.y=y;if(unitEl){unitEl.style.left=x*T+'px';unitEl.style.top=y*T+'px';unitEl.style.zIndex=10+y;const sp=unitEl.querySelector('.dg-spr');if(sp&&+sp.dataset.row!==obj.dir){sp.dataset.row=obj.dir;sp.classList.remove('ok');dgFillSprites()}}if(!isFoe&&!(DG&&DG.bcam))gdCamera(x,y);else gdOverlap();gdOverlays();await dgSleep(120)}gdOverlays();setTimeout(gdOverlays,340)}
 async function gdWalkTo(slot,x,y){const r=runOf(),b=r.battle,m=r.party[slot],path=gdPath(DG.reach,gdKey(x,y)),wasFree=gdFree(r);DG.gmode='select';DG.hl=null;DG.busy=1;gdHighlight();
  await gdWalk(document.querySelector('.dg-ally[data-i="'+slot+'"]'),m,path,false);if(!runOf()||runOf().battle!==b)return;
  if(wasFree)gdFollow(r,slot,path);gdSee(r);mdHazard(r,m,false,slot);
@@ -166,7 +177,8 @@ async function gdWalkTo(slot,x,y){const r=runOf(),b=r.battle,m=r.party[slot],pat
  save();DG.busy=0;
  // pick up what's on the tile
  const fl=r.fl,ii=fl.items.findIndex(it=>it.x===m.x&&it.y===m.y);if(ii>=0){const it=fl.items.splice(ii,1)[0];if(it.tickets){r.tickets=(r.tickets||0)+it.tickets;r.cogs=(r.cogs||0)+it.tickets;toast('🎟️ Found '+it.tickets+' Tickets!')}else{r.bag[it.k]=(r.bag[it.k]||0)+1;toast(DITEMS[it.k].icon+' Picked up '+DITEMS[it.k].name+'!')}save()}
- const si=fl.specials.findIndex(s=>s.x===m.x&&s.y===m.y);if(si>=0){const s=fl.specials.splice(si,1)[0];save();r.rooms=(r.rooms||0)+1;if(s.k==='shop'){r.shopStock=null;dgShop()}else if(s.k==='chest')dgTreasure();else dgRest();return}
+ const di=(fl.digs||[]).findIndex(d=>d.x===m.x&&d.y===m.y&&d.done<d.max);if(di>=0&&gdFree(r)){gdDrawBattle();mdDigSpot(fl.digs[di]);return}
+ const si=fl.specials.findIndex(s=>s.x===m.x&&s.y===m.y);if(si>=0){const s=fl.specials.splice(si,1)[0];save();r.rooms=(r.rooms||0)+1;if(s.k==='shop'){gdDrawBattle();mdShopOpen()}else if(s.k==='chest')dgTreasure();else dgRest();return}
  if(!fl.stairsHidden&&m.x===fl.stairs[0]&&m.y===fl.stairs[1]){gdDrawBattle();modal('🪜 STAIRS','<p>'+(fl.boss?'The way out of this part of the dungeon.':'Go down to <b>B'+(r.floor+2)+'F</b>? Your whole team comes along.')+'</p><div class="actions"><button class="btn" onclick="closeModal()">NOT YET</button><button class="btn red" onclick="closeModal();gdStairs()">'+(fl.boss?'CONTINUE':'GO DOWN')+'</button></div>');return}
  gdDrawBattle();if(gdFree(r)&&r.battle.turn===slot&&m.hp>0)gdMoveStart()}
 // teammates (fainted ones too, so nobody gets left behind) walk behind the leader along its path
@@ -177,7 +189,7 @@ function gdFollow(r,slot,path){const b=r.battle,lead=r.party[slot],trail=path.sl
  const spots=[...trail,...GD_DIRS.map(([dx,dy])=>[lead.x+dx,lead.y+dy])].filter(([x,y])=>gdTile(r.fl,x,y));
  fol.forEach(([q,i])=>{if(gdCheb(q,lead)<=1){taken.add(gdKey(q.x,q.y));return}const t=spots.find(([x,y])=>!taken.has(gdKey(x,y)));if(!t){taken.add(gdKey(q.x,q.y));return}
   q.dir=gdDirOf(lead.x-t[0],lead.y-t[1]);q.x=t[0];q.y=t[1];taken.add(gdKey(t[0],t[1]))})}
-function gdStairs(){const r=runOf();if(!r||!r.fl||r.fl.stairsHidden||!r.party.some(m=>m.x===r.fl.stairs[0]&&m.y===r.fl.stairs[1]))return;if(r.fl.boss){dgFloorClear();return}r.floor++;r.party.forEach(m=>{const c=combatant(partyMon(m));m.energy=Math.min(100,m.energy+10);if(m.hp>0)m.hp=Math.min(c.hp,m.hp+Math.ceil(c.hp*.2));if(m.starf&&--m.starf.rooms<=0)m.starf=null});gdNewFloor(r);save();toast('⬇ B'+(r.floor+1)+'F'+(r.fl.boss?' · something big is waiting here…':''));gdDrawBattle(true);if(r.sub&&r.sub.fresh)mdDig(r)}
+function gdStairs(){const r=runOf();if(!r||!r.fl||r.fl.stairsHidden||!r.party.some(m=>m.x===r.fl.stairs[0]&&m.y===r.fl.stairs[1]))return;if(r.fl.boss){dgFloorClear();return}r.floor++;r.party.forEach(m=>{const c=combatant(partyMon(m));m.energy=Math.min(100,m.energy+10);if(m.hp>0)m.hp=Math.min(c.hp,m.hp+Math.ceil(c.hp*(.2+MD_PER.stairrest*mdLvOf(r,'stairrest'))));if(m.starf&&--m.starf.rooms<=0)m.starf=null});gdNewFloor(r);save();toast('⬇ B'+(r.floor+1)+'F'+(r.fl.boss?' · something big is waiting here…':''));gdDrawBattle(true);if(r.sub&&r.sub.fresh)mdDig(r)}
 // ---------- fighting ----------
 async function gdFight(){const r=runOf(),b=r&&r.battle;if(!b||b.enemyPhase||DG.busy)return;const m=r.party[b.turn],p=partyMon(m);if(!m||m.acted||m.hp<=0)return;
  const fast=MOVE_STATS[p.fastMove]||['Normal',8,8,'fast'],disc=MOVE_STATS[p.discMove]||['Normal',80,50,'charged'],X=dgCtx(b.turn),foes=gdFoeTargets(r),U=ultOf(p);
@@ -208,7 +220,7 @@ function gdChooseFoe(fn){const r=runOf(),b=r&&r.battle;if(!b)return;const m=r.pa
 // ---------- after each action ----------
 function gdUnstash(b){b.enemies.forEach(e=>{if(e.gdOut){e.hp=e.gdHp;delete e.gdHp;delete e.gdOut}})}
 function gdKills(r){const b=r.battle,got=[];b.enemies.forEach(e=>{if(e.hp>0||e.done||e.gdOut)return;e.done=1;const boss=!!e.boss,tix=(boss?(e.boss==='boss'?12:18):e.swarm?1:2)+(dgGamey(r)?Math.floor(r.floor/2):0),exp=Math.round((boss?4500:e.swarm?500:1000)*(1+(dgGamey(r)?.1*r.floor:0)));
-  const tx=mdTix(tix);r.tickets=(r.tickets||0)+tx;r.cogs=(r.cogs||0)+tx;r.party.forEach(m=>{const p=partyMon(m);if(p)p.pxp=(p.pxp||0)+exp});got.push((e.caught?'🧲 ':'')+esc(e.species)+': +'+tx+'🎟️ · team +'+money(exp)+' EXP');
+  const tx=mdTix(tix),stn=mdStoneDrop(r,e);r.tickets=(r.tickets||0)+tx;r.cogs=(r.cogs||0)+tx;r.party.forEach(m=>{const p=partyMon(m);if(p)p.pxp=(p.pxp||0)+exp});got.push((e.caught?'🧲 ':'')+esc(e.species)+': +'+tx+'🎟️'+(stn?' '+stn:'')+' · team +'+money(exp)+' EXP');
   if(boss){const bk=Math.random()<.5?'apple':'starf';r.bag[bk]=(r.bag[bk]||0)+1;got.push(DITEMS[bk].icon+' '+DITEMS[bk].name);if(Math.random()<.2){db.candies++;got.push('🍬 Rare Candy')}
    if(e.boss==='totem'||e.boss==='alpha'){const sp=PRE_EVO[e.species]||e.species,mm=giveMon(dgBossMon(sp,e.boss));got.push('🎁 '+(mm.shiny?'✨ Shiny ':'')+mm.species+' joined your Box!')}
    if(r.fl.boss){r.fl.stairsHidden=false;got.push('🪜 The stairs appeared!')}}});
@@ -245,16 +257,16 @@ async function gdEnemyPhase(){const r=runOf(),b=r.battle;b.enemyPhase=true;DG.gm
  if(r.party.every(m=>m.hp<=0)){dgLose();return}save();gdDrawBattle()}
 async function gdEnemyStrike(i,e,targets,useDisc,name,mv0){const r=runOf(),b=r.battle,disc=MOVE_STATS[e.disc],eh=dgEnemyHits(name),mv=eh>1?Object.assign([mv0[0],Math.round(mv0[1]*eh),mv0[2],mv0[3]],{cat:moveCat(mv0)}):mv0,sc=targets.length>1?.75:1,fsel='.dg-foe[data-i="'+i+'"]';
  const t0=r.party[targets[0]];e.dir=gdDirOf(t0.x-e.x,t0.y-e.y);const s=document.querySelector(fsel+' .dg-spr');if(s){s.dataset.row=e.dir;s.classList.remove('ok');await dgFillSprites()}
- const hits=targets.map(ti=>{const tm=r.party[ti],tp=partyMon(tm),tc=combatant(tp),{dmg:raw0}=dgDamage({atk:e.atk,spa:e.spa,types:e.types},{def:tc.def+(tm.starf&&tm.starf.stat==='def'?2:0),spd:tc.spd+(tm.starf&&tm.starf.stat==='spd'?2:0),types:tc.types},mv,(.85+Math.random()*.3)*sc*mdFoeMult(mv[0],tc.types)),capF=(e.boss?(useDisc?.75:.55):(useDisc?.6:.45))*(DIFF[r.diff].dm||1)*sc,raw=Math.min(raw0,Math.ceil(tc.hp*capF*(.9+Math.random()*.2))),dodged=Math.random()<dgDodge(tc.spe+(tm.starf&&tm.starf.stat==='spe'?2:0),e.spe),dmg=dodged?0:ultGuardDmg(b,Math.max(1,Math.round(raw*(1-Math.min(.9,(b.guard[ti]||0)+(b.wall===b.round?.1:0))))));
+ const hits=targets.map(ti=>{const tm=r.party[ti],tp=partyMon(tm),tc=combatant(tp),{dmg:raw0}=dgDamage({atk:e.atk,spa:e.spa,types:e.types},{def:tc.def+(tm.starf&&tm.starf.stat==='def'?2:0),spd:tc.spd+(tm.starf&&tm.starf.stat==='spd'?2:0),types:tc.types},mv,(.85+Math.random()*.3)*sc*mdFoeMult(mv[0],tc.types)),capF=(e.boss?(useDisc?.75:.55):(useDisc?.6:.45))*(DIFF[r.diff].dm||1)*sc,raw=Math.max(1,Math.round(Math.min(raw0,Math.ceil(tc.hp*capF*(.9+Math.random()*.2)))*mdHideMult())),dodged=Math.random()<dgDodge(tc.spe+(tm.starf&&tm.starf.stat==='spe'?2:0),e.spe),dmg=dodged?0:ultGuardDmg(b,Math.max(1,Math.round(raw*(1-Math.min(.9,(b.guard[ti]||0)+(b.wall===b.round?.1:0))))));
   tm.hp=Math.max(0,tm.hp-dmg);dgHurt(b,tm,dmg);return {ti,tm,tp,dmg,dodged,eff:typeEff(mv[0],tc.types)}});
  if(useDisc)e.energy-=disc[2];else e.energy=Math.min(100,e.energy+mv0[2]);e.acted=1;save();
  DG.msg=esc(e.species)+' used <b>'+esc(name)+'</b>'+(hits.length>1?' on '+hits.length+' of your team':' on <b style="color:'+SLOT_COLORS[hits[0].ti]+'">'+esc(hits[0].tp.nickname||hits[0].tp.species)+'</b>')+'! '+hits.map(h=>h.dodged?'💨 '+esc(h.tp.nickname||h.tp.species)+' dodged!':'−'+h.dmg+(b.guard[h.ti]?'🛡':'')).join(' · ')+(eh>1?' (hit '+Math.round(eh)+' times)':'')+(hits.some(h=>h.eff>1.2&&!h.dodged)?' <span class="t-sup">Super effective!</span>':'')+hits.filter(h=>h.tm.hp<=0).map(h=>' '+esc(h.tp.nickname||h.tp.species)+' fainted!').join('');
  dgPanelBattle(esc(e.species)+' used '+esc(name)+'!');mvAttackAnim(fsel);await Promise.all(hits.map((h,k)=>dgSleep(k*70).then(()=>moveFx(mv0[0],mv0[1]>70,fsel,'.dg-ally[data-i="'+h.ti+'"]'))));if(!runOf()||runOf().battle!==b)return;
  gdDrawBattle();dgPanelBattle(esc(e.species)+' used '+esc(name)+'!');hits.forEach(h=>{const a='.dg-ally[data-i="'+h.ti+'"]';if(h.dodged){mvMove(a,[{x:0},{x:-14,offset:.3},{x:-14,offset:.6},{x:0}],450);dgFloat(a,'Dodged!','heal');return}dgHit(a,useDisc||h.eff>1.2);dgFloat(a,'-'+h.dmg+(b.guard[h.ti]?' 🛡':''),h.eff>1.2?'super':h.eff<.8?'weak':'');if(h.tm.hp<=0)setTimeout(()=>dgFaint(a),380)});
- await dgSleep(hits.some(h=>h.tm.hp<=0)?950:750)}
+ mdRough(r,i,e,hits,mv0);await dgSleep(hits.some(h=>h.tm.hp<=0)?950:750)}
 // a boss's charged blast: everyone within 3 tiles
 async function gdBossBlast(i,e){const r=runOf(),b=r.battle,t=String((e.types||['normal'])[0]).toLowerCase(),name=SPREAD_MOVES[t]||'Hyper Voice',mv=[t.charAt(0).toUpperCase()+t.slice(1),95,0,'charged'],hits=[];
- r.party.forEach((m,j)=>{if(m.hp<=0||gdCheb(m,e)>3)return;const c=combatant(partyMon(m)),{dmg:raw}=dgDamage({atk:e.atk,spa:e.spa,types:e.types},{def:c.def,spd:c.spd,types:c.types},mv,.75*(.9+Math.random()*.2)),cut=Math.min(raw,Math.ceil(c.hp*.42*(DIFF[r.diff].dm||1)*(.9+Math.random()*.2))),dmg=Math.random()<dgDodge(c.spe,e.spe)?0:ultGuardDmg(b,Math.max(1,Math.round(cut*(1-Math.min(.9,b.guard[j]||0)))));m.hp=Math.max(0,m.hp-dmg);dgHurt(b,m,dmg);hits.push([j,dmg])});save();
+ r.party.forEach((m,j)=>{if(m.hp<=0||gdCheb(m,e)>3)return;const c=combatant(partyMon(m)),{dmg:raw}=dgDamage({atk:e.atk,spa:e.spa,types:e.types},{def:c.def,spd:c.spd,types:c.types},mv,.75*(.9+Math.random()*.2)),cut=Math.max(1,Math.round(Math.min(raw,Math.ceil(c.hp*.42*(DIFF[r.diff].dm||1)*(.9+Math.random()*.2)))*mdHideMult())),dmg=Math.random()<dgDodge(c.spe,e.spe)?0:ultGuardDmg(b,Math.max(1,Math.round(cut*(1-Math.min(.9,b.guard[j]||0)))));m.hp=Math.max(0,m.hp-dmg);dgHurt(b,m,dmg);hits.push([j,dmg])});save();
  DG.msg='💥 '+esc(e.species)+' used <b>'+name+'</b>!'+(hits.length?' It hits '+hits.length+' of your team!':' Everyone got out of range!');gdDrawBattle();const f=document.querySelector('.gd-field');if(f){f.classList.add('spreadfx');setTimeout(()=>f.classList.remove('spreadfx'),700)}
  hits.forEach(([j,dmg])=>{const s='.dg-ally[data-i="'+j+'"]';if(!dmg){dgFloat(s,'Dodged!','heal');return}dgHit(s,true);dgFloat(s,'-'+dmg+(b.guard[j]?' 🛡':''),'super');if(r.party[j].hp<=0)setTimeout(()=>dgFaint(s),380)});await dgSleep(1200)}
 // ---------- taking over from the room-map versions above ----------
@@ -271,7 +283,7 @@ function dgNextRoom(){const r=runOf();if(!r)return;if(r.tower){twShopDone();retu
 function dgWin(){return gdTower()?dgcWin():gdAfterAction()}
 function dgDescend(){const r=runOf();if(!r)return;r.floor++;r.party.forEach(m=>{const c=combatant(partyMon(m));if(m.hp>0)m.hp=Math.min(c.hp,m.hp+Math.round(c.hp*.3))});gdNewFloor(r);save();toast('⬇ B'+(r.floor+1)+'F'+(dgGamey(r)?'. The air feels heavier…':''));gdDrawBattle(true);if(r.sub&&r.sub.fresh)mdDig(r)}
 function dgFloorClear(){if(mdIsLast(runOf()))return mdFinal();const r=runOf(),D=DIFF[r.diff],seg=Math.floor(r.floor/(GD_DEPTH[r.diff]||3))+1;r.clearedFloors=Math.max(r.clearedFloors||0,seg);save();const bonus=dgFloorBonus(r),g=dgGamey(r);
- $('dgStage').innerHTML='<div class="dg-room"><span class="dg-big">🏁</span><h3>B'+(r.floor+1)+'F boss beaten!</h3><p>Leave now to collect a <b>'+bonus+' Cog</b> bonus'+(g?' ('+r.clearedFloors+' boss'+(r.clearedFloors>1?'es':'')+' × '+(D.fb||10)+')':'')+'.</p><p class="small">'+(g?'Or go deeper: the next floors are about '+((seg)*(D.step||2))+' levels stronger. Your team recovers 30% HP. If your team faints down there, you lose the bonus.':'Or keep exploring deeper. Casual floors stay the same strength, and your team recovers 30% HP on the way down.')+'</p><div class="actions"><button class="btn" onclick="dgEnd(true)">🏠 LEAVE WITH REWARDS</button><button class="btn red" onclick="dgDescend()">⬇ GO DEEPER</button></div></div>';$('dgPanel').innerHTML=dgPanelMap()}
+ $('dgStage').innerHTML='<div class="dg-room"><span class="dg-big">🏁</span><h3>B'+(r.floor+1)+'F boss beaten!</h3><p>Leave now to collect a <b>'+bonus+' Cog</b> bonus'+(g?' ('+r.clearedFloors+' boss'+(r.clearedFloors>1?'es':'')+' × '+(D.fb||10)+')':'')+'.</p><p class="small">'+(g?'Or go deeper: the next floors are about '+((seg)*(D.step||2))+' levels stronger. Your team recovers 30% HP. If your team faints down there, you lose the bonus.':'Or keep exploring deeper. Casual floors stay the same strength, and your team recovers 30% HP on the way down.')+'</p><div class="actions"><button class="btn" onclick="dgEnd(true)">🏠 LEAVE WITH REWARDS</button><button class="btn" onclick="mdShopOpen()">🎩 HATTERENE’S SHOP</button><button class="btn red" onclick="dgDescend()">⬇ GO DEEPER</button></div></div>';$('dgPanel').innerHTML=dgPanelMap()}
 // items that hit "every enemy" hit every foe you can see
 async function dgBlastItem(k){if(gdTower())return dgcBlastItem(k);const r=runOf(),b=r.battle,slot=b.turn,I=DITEMS[k],who=partyMon(r.party[slot]);dgCrosshair('ally',slot,slot);const res=await dgQ(I.icon+' '+I.name.toUpperCase());
  if(res==='makeup'&&Math.random()<.25){toast((who.nickname||who.species)+' fumbled the item! (kept, but no effect)');dgAfterAction();return}
@@ -285,10 +297,13 @@ async function dgRevive(){if(gdTower())return dgcRevive();const r=runOf(),b=r&&r
 function dgStartRun(){dgMode='dungeon';const sids=[...document.querySelectorAll('.mg-sets input:checked')].map(x=>x.value),mode=(document.querySelector('input[name=mgm]:checked')||{}).value||'smart',diff=(document.querySelector('input[name=dgd]:checked')||{}).value||'easy',style=(document.querySelector('input[name=dgs]:checked')||{}).value||'casual';if(!sids.length){toast('Pick at least one study set');return}
  if(mode==='weak'&&!sids.some(id=>(db.learned||{})[id])){toast('Finish Learn mode on one of these sets first');return}
  if(!mgPicker(mgBank(sids),mode).bank.length){toast('No questions for that mode here');return}
- db.run={diff,style,sids,mode,party:dgPick.map(id=>{const p=db.pokemon.find(x=>x.id===id),c=combatant(p);return {id,hp:c.hp,energy:20,starf:null}}),floor:0,bag:{oran:2},studyMs:0,cogs:0,tickets:0,rooms:0,startedAt:stamp(),slider:true,battle:null,themeOff:Math.floor(Math.random()*GD_THEMES.length),log:[]};dgPick=[];gdNewFloor(db.run);save();closeModal();go('minigames');dgOpen();mdDig(db.run)}
+ db.run={diff,style,sids,mode,party:dgPick.map(id=>{const p=db.pokemon.find(x=>x.id===id),c=combatant(p);return {id,hp:c.hp,energy:20,starf:null}}),floor:0,bag:{oran:2},studyMs:0,cogs:0,tickets:0,rooms:0,startedAt:stamp(),slider:true,battle:null,stones:{fire:0,water:0,leaf:0},up:{},themeOff:Math.floor(Math.random()*GD_THEMES.length),log:[]};dgPick=[];gdNewFloor(db.run);save();closeModal();go('minigames');dgOpen();mdDig(db.run)}
 function dgOpen(mode){if(mode)dgMode=mode;if(dgMode==='tower')return dgcOpen();const r=runOf();if(!r)return;dgEpoch++;mgState={game:'dungeon',startedAt:Date.now(),stop:()=>{clearInterval(DG&&DG.clock);dgEpoch++;document.querySelectorAll('.mgq,.dg-slider').forEach(x=>x.remove());document.body.classList.remove('mg-on');DG=null}};DG={clock:setInterval(()=>{const rr=runOf();if(!rr||currentPage!=='minigames'||document.hidden)return;rr.studyMs+=1000;const t=$('dgTime');if(t)t.textContent=fmtMin(rr.studyMs)},1000),bank:mgBank(r.sids),gmode:'select'};DG.P=mgPicker(DG.bank,r.mode);document.body.classList.add('mg-on');
  const el=$('mgArea');el.innerHTML='<div class="dg gd"><div class="dg-stage" id="dgStage"></div><div class="dg-panel" id="dgPanel"></div></div>';
  // a run saved by the old room-map version continues on a fresh tile floor
  if(!r.fl||!r.battle||r.battle.kind!=='floor'){r.floor=r.floor||0;if(r.themeOff==null)r.themeOff=0;gdNewFloor(r);save()}
  if(!r.sub){mdPlan(r);r.sub.fresh=false;save()}
  gdDrawBattle(true);if(r.battle.enemyPhase)gdEnemyPhase()}
+// The floor label, sublayer button and minimap stay solid, but go see-through and let taps pass when a Pokémon is under them
+function gdOverlays(){const f=document.querySelector('.gd-field');if(!f)return;const U=[...f.querySelectorAll('.gd-u')].map(u=>u.getBoundingClientRect()).filter(b=>b.width);
+ f.querySelectorAll('.gd-envslot .tw-envbtn,.gd-floor,.gd-mini').forEach(o=>{const a=o.getBoundingClientRect(),hit=U.some(b=>b.right>a.left+2&&b.left<a.right-2&&b.bottom>a.top+2&&b.top<a.bottom-2);o.classList.toggle('gd-under',hit)})}

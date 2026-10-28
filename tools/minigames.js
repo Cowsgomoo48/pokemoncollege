@@ -4,7 +4,7 @@ function mgBank(sids){const out=[];for(const s of db.summaries){if(!sids.include
  termsFor(s).forEach(t=>out.push({kind:'term',sid:s.id,key:s.id+'|t|'+t.term,front:t.term,back:t.definition}));
  (s.quiz||[]).forEach(q=>out.push({kind:'mc',sid:s.id,key:s.id+'|q|'+q.question,front:q.question,back:q.answer,wrong:(q.wrong||[]).slice(0,3)}));
  // practice problems made in code: two fresh ones per problem type each game
- prOf(s).forEach(id=>{for(let k=0;k<2;k++){const p=prInstance(id);if(p)out.push({kind:'gen',gid:id,sid:s.id,key:s.id+'|g|'+id+'|'+k,front:p.q,back:p.a,wrong:p.w,explain:p.ex,steps:p.steps})}})}return out}
+ prOf(s).forEach(id=>{for(let k=0;k<(PR[id].cmd?4:2);k++){const p=prInstance(id);if(p)out.push({kind:'gen',gid:id,sid:s.id,key:s.id+'|g|'+id+'|'+k,front:p.q,back:p.a,wrong:p.w,explain:p.ex,steps:p.steps})}})}return out}
 function qstat(key){const q=db.qstats||(db.qstats={});return q[key]||(q[key]={r:0,w:0,last:0,miss:0})}
 // Every answer is recorded per item (r = right, w = wrong). The extra details (first try or Make-Up, hints used, which wrong
 // answer was picked, a day-by-day tally per study set) feed the Export Study Data sheet.
@@ -56,7 +56,7 @@ function mgHints(q){const a=String((q.options.find(o=>o.ok)||{}).t||'').trim();i
 let __qMiss=null;function __qMissReset(){__qMiss=null}function __qMissSet(m){if(!__qMiss)__qMiss=m}
 function askQ(item,bank,opts={}){__qMissReset();return new Promise(res=>{const ov=document.createElement('div');ov.className='mgq';document.body.appendChild(ov);const v0=Math.random()<.5?0:1;
  // about 1 question in 5 asks you to type the answer instead of picking it (never a Make-Up)
- const plan=opts.typed!==false&&Math.random()<(opts.typedChance??.2)?saPlan(item):null;
+ const plan=opts.typed!==false&&Math.random()<(opts.typedChance??(item.kind==='gen'&&PR[item.gid]&&PR[item.gid].cmd?.85:.2))?saPlan(item):null;
  const show=(q,isMakeUp)=>{const t0=performance.now();let hinted=false;const typed=!!q.typed;
   ov.innerHTML='<div class="mgq-card">'+(opts.title?'<span class="badge">'+esc(opts.title)+'</span> ':'')+(isMakeUp?'<span class="badge mk">MAKE-UP</span>':'')+(typed?'<span class="badge sa-b">✍️ TYPE IT</span>':'')+'<h3>'+mathHTML(q.prompt)+'</h3><p class="small muted">'+esc(q.sub)+'</p>'+(opts.hint!==false?'<div class="mgq-hints"></div><button class="btn smallbtn mgq-hint">💡 Hint</button>':'')
    +(typed?'<div class="sa-wrap"><input class="sa-in" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Your answer"><button class="btn red sa-go">CHECK</button></div>'+(q.cmd?saKeysHTML(true):q.math?saKeysHTML():''):q.options.map((o,i)=>'<button class="answer" data-i="'+i+'">'+mathHTML(o.t)+'</button>').join(''))
