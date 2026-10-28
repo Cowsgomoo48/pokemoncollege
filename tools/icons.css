@@ -1,8 +1,9 @@
 /* soft painted icons standing in for emoji (tools/icons.js) */
-img.ico{display:inline-block;width:1.25em;height:1.25em;vertical-align:-.28em;object-fit:contain;pointer-events:none;user-select:none;-webkit-user-select:none;-webkit-user-drag:none;margin:0 .02em}
-.shopicon img.ico,.mg-tile>span img.ico,.mg-big>span img.ico{width:1.35em;height:1.35em}
+img.ico.ico{display:inline-block;width:1.25em!important;height:1.25em!important;max-width:none;vertical-align:-.28em;object-fit:contain;image-rendering:auto;position:static;pointer-events:none;user-select:none;-webkit-user-select:none;-webkit-user-drag:none;margin:0 .02em}
+.shopicon img.ico.ico,.mg-tile>span img.ico.ico,.mg-big>span img.ico.ico{width:1.35em!important;height:1.35em!important}
 .safari-grass{display:flex;justify-content:center;align-items:flex-end;gap:2px;height:96px;margin:14px 0 4px}
-.safari-grass img{width:84px;height:84px;transform-origin:50% 100%;animation:sgrass 2.4s ease-in-out infinite}
-.safari-grass img:nth-child(2){width:96px;height:96px;animation-delay:-.8s}.safari-grass img:nth-child(3){animation-delay:-1.6s;transform:scaleX(-1)}
+.safari-grass img.ico.ico{width:84px!important;height:84px!important;transform-origin:50% 100%;animation:sgrass 2.4s ease-in-out infinite}
+.safari-grass img.ico.ico:nth-child(2){width:96px!important;height:96px!important;animation-delay:-.8s}.safari-grass img:nth-child(3){animation-delay:-1.6s;transform:scaleX(-1)}
 @keyframes sgrass{0%,100%{rotate:0deg}20%{rotate:-6deg}35%{rotate:4deg}50%{rotate:0deg}}
 @media(prefers-reduced-motion:reduce){.safari-grass img{animation:none}}
+.bx-bag{font-size:18px!important;left:-4px!important;bottom:-4px!important;z-index:2}

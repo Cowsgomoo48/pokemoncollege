@@ -529,6 +529,14 @@ body.mg-busy .inv-handle{display:none}
 .dg.gd .dg-panel{flex:none;min-height:0;padding-top:6px;padding-bottom:6px}
 .dg.gd .dg-msg{margin-bottom:2px}
 .gd-chip img,.gd-chip canvas{max-height:24px}
+.gd-hl i.ally{background:rgba(76,217,100,.28);border:2px solid #4cd964;animation:gdpulse2 .8s ease-in-out infinite alternate}
+@keyframes gdpulse2{to{background:rgba(76,217,100,.5)}}
+.gd-u.gd-faint{animation:gdko 1.5s ease-in forwards}.gd-u.gd-faint .gd-hp{display:none}
+@keyframes gdko{0%{transform:none}8%{transform:translateX(-5px) rotate(-7deg)}18%{transform:translateX(5px) rotate(7deg)}28%{transform:translateX(-4px) rotate(-5deg)}38%{transform:translateX(3px) rotate(3deg)}46%{transform:none;opacity:1}100%{transform:translateY(5px);opacity:0}}
+.gd-u.gd-stagger{animation:gdstag .6s ease-in-out}
+@keyframes gdstag{0%,100%{transform:none}20%{transform:translateX(-5px) rotate(-7deg)}45%{transform:translateX(5px) rotate(7deg)}70%{transform:translateX(-3px) rotate(-4deg)}}
+.gd-u.ko .dg-spr{opacity:.55}
+.gd-u.fainting{animation:none}
 /* ===================== MYSTERY DUNGEON · cave layers ===================== */
 .md-dig{position:fixed;inset:0;z-index:9500;background:#000;touch-action:none;cursor:pointer}
 .md-dig.clear{background:transparent}
@@ -539,7 +547,7 @@ body.mg-busy .inv-handle{display:none}
 .gd-envslot:not(:empty)~.gd-floor{left:56px;top:13px}
 .md-envinfo{height:96px;border-radius:12px;background:linear-gradient(135deg,var(--a),var(--b) 70%,var(--c));display:flex;align-items:center;justify-content:center;margin-bottom:8px;border:3px solid var(--c)}
 .md-envinfo span{font-size:40px;width:66px;height:66px;border-radius:50%;background:#0d1b2ecc;display:flex;align-items:center;justify-content:center;border:3px solid #fff}
-.md-envinfo img.ico{width:44px;height:44px}
+.md-envinfo img.ico.ico{width:44px!important;height:44px!important}
 .md-fx{margin:6px 0 8px;padding-left:18px}.md-fx li{margin:3px 0}
 /* ===================== BATTLE TOWER ===================== */
 .dg-field.tower{background-size:cover;background-position:center bottom}
@@ -608,13 +616,13 @@ body.mg-busy .inv-handle{display:none}
 .tw-tag.boss{left:auto;right:8px}
 .tw-envbtn{position:absolute;left:8px;top:6px;z-index:4;width:40px;height:40px;border-radius:50%;border:2px solid #fff;background:radial-gradient(circle at 35% 30%,#3a5a86,#0d1b2e);color:#fff;font-size:19px;line-height:1;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px #0007;padding:0;cursor:pointer}
 .tw-envbtn b{position:absolute;bottom:-7px;left:50%;transform:translateX(-50%);font-size:9px;background:#0d1b2e;border:1px solid #fff;border-radius:999px;padding:0 4px;white-space:nowrap}
-.tw-envbtn img.ico{width:24px;height:24px}
+.tw-envbtn img.ico.ico{width:24px!important;height:24px!important}
 .tw-envpop{position:absolute;left:50%;top:40%;transform:translate(-50%,-50%);z-index:6;pointer-events:none;background:#0d1b2ed9;color:#fff;font-weight:800;font-size:15px;padding:8px 16px;border-radius:12px;border:2px solid #ffffff55;white-space:nowrap;animation:twpop 1.9s ease-out forwards}
 @keyframes twpop{0%{opacity:0;transform:translate(-50%,-30%) scale(.9)}12%{opacity:1;transform:translate(-50%,-50%) scale(1)}80%{opacity:1}100%{opacity:0;transform:translate(-50%,-62%)}}
 .dg-float.env{color:#d6a8ff;font-size:19px}
 .tw-envinfo{height:110px;border-radius:12px;background-size:cover;background-position:center;display:flex;align-items:center;justify-content:center;margin-bottom:8px}
 .tw-envinfo span{font-size:42px;width:70px;height:70px;border-radius:50%;background:#0d1b2ecc;display:flex;align-items:center;justify-content:center;border:3px solid #fff}
-.tw-envinfo img.ico{width:46px;height:46px}
+.tw-envinfo img.ico.ico{width:46px!important;height:46px!important}
 /* ===================== EXPORT STUDY DATA ===================== */
 .sd-sets{max-height:170px;overflow:auto}
 .sd-text{width:100%;box-sizing:border-box;min-height:200px;max-height:38vh;margin-top:10px;font:11px/1.4 ui-monospace,Menlo,monospace;border-radius:10px;border:1px solid #c9d4de;padding:8px;background:#f7f9fb;color:#17324d;white-space:pre-wrap;overflow:auto}
@@ -652,13 +660,14 @@ body.mg-busy .inv-handle{display:none}
 .recap-ok{color:#1f7a45;font-weight:700}
 .recap-why{font-size:12px;color:#5b6b7d;margin-top:2px}
 /* soft painted icons standing in for emoji (tools/icons.js) */
-img.ico{display:inline-block;width:1.25em;height:1.25em;vertical-align:-.28em;object-fit:contain;pointer-events:none;user-select:none;-webkit-user-select:none;-webkit-user-drag:none;margin:0 .02em}
-.shopicon img.ico,.mg-tile>span img.ico,.mg-big>span img.ico{width:1.35em;height:1.35em}
+img.ico.ico{display:inline-block;width:1.25em!important;height:1.25em!important;max-width:none;vertical-align:-.28em;object-fit:contain;image-rendering:auto;position:static;pointer-events:none;user-select:none;-webkit-user-select:none;-webkit-user-drag:none;margin:0 .02em}
+.shopicon img.ico.ico,.mg-tile>span img.ico.ico,.mg-big>span img.ico.ico{width:1.35em!important;height:1.35em!important}
 .safari-grass{display:flex;justify-content:center;align-items:flex-end;gap:2px;height:96px;margin:14px 0 4px}
-.safari-grass img{width:84px;height:84px;transform-origin:50% 100%;animation:sgrass 2.4s ease-in-out infinite}
-.safari-grass img:nth-child(2){width:96px;height:96px;animation-delay:-.8s}.safari-grass img:nth-child(3){animation-delay:-1.6s;transform:scaleX(-1)}
+.safari-grass img.ico.ico{width:84px!important;height:84px!important;transform-origin:50% 100%;animation:sgrass 2.4s ease-in-out infinite}
+.safari-grass img.ico.ico:nth-child(2){width:96px!important;height:96px!important;animation-delay:-.8s}.safari-grass img:nth-child(3){animation-delay:-1.6s;transform:scaleX(-1)}
 @keyframes sgrass{0%,100%{rotate:0deg}20%{rotate:-6deg}35%{rotate:4deg}50%{rotate:0deg}}
 @media(prefers-reduced-motion:reduce){.safari-grass img{animation:none}}
+.bx-bag{font-size:18px!important;left:-4px!important;bottom:-4px!important;z-index:2}
 /* ---- Legendary Ultimates ---- */
 .btn.ult{background:linear-gradient(135deg,#2b1b4a,#6b2fa8 55%,#d9a630);color:#fff;border-color:#f4cf55;box-shadow:0 0 10px #f4cf5588}.btn.ult:disabled{background:#4a4458;border-color:#7a7488;box-shadow:none;color:#bbb}
 .bx-ult{background:linear-gradient(135deg,#2b1b4a,#5a2a8a);color:#fff}.bx-ult small{color:#f4cf55!important}.bx-ult p,.bx-ultlock p{font-size:10px;line-height:1.3;margin:2px 0 0;opacity:.85}.bx-ult span{color:#f4cf55}
@@ -3037,6 +3046,8 @@ const DITEMS={apple:{name:'Apple',icon:'🍎',desc:'Restores 20 HP to a teammate
  voltorb:{name:'Pocket Voltorb',icon:'💥',desc:'Deals 3 damage to every enemy.',target:'none',cost:18,tier:1,aoe:3},
  stellar:{name:'Stellar Storm',icon:'🌠',desc:'Deals 6 damage to every enemy.',target:'none',cost:35,tier:2,aoe:6},
  thundurus:{name:'Thundurus’ Might',icon:'🌩️',desc:'10 damage split evenly between every enemy on the field (all 10 hit a lone enemy).',target:'none',cost:35,tier:2,split:10},
+ salts:{name:'Smelling Salts',icon:'🧂',desc:'Only for a fainted teammate: wakes it up with 50% HP.',target:'ally',cost:20,tier:1,ko:true},
+ wakemint:{name:'Wake Mint',icon:'🍃',desc:'Only while a teammate is fainted: every fainted teammate gets back up with 50% HP.',target:'none',cost:40,tier:2,ko:true},
  snag:{name:'Snag Machine',icon:'🧲',desc:'Tries to catch an enemy with Ultra Ball odds (Poké Ball odds on bosses). Hurt or paralyzed targets are easier. A caught Pokémon leaves the battle and joins your Box. Can’t be fumbled, but missing both questions lowers the odds.',target:'foe',cost:120,tier:3}};
 const DITEM_TIER_W=[10,7,4,1];
 // a Pokémon's catch rate (main-game style) by rarity tier: common 190 … legendary 3
@@ -3135,7 +3146,7 @@ function dgBattle(kind){const r=runOf(),bump=dgGamey(r)?(r.floor||0)*(DIFF[r.dif
 function dgSpriteHTML(species,row,cls,costumeP,size){return '<div class="dg-spr '+cls+'" data-sp="'+esc(species)+'" data-row="'+row+'" data-sz="'+(+size||1)+'"></div>'}
 const DG_SPRITE_SCALE=1.3; // every Pokémon is drawn at the same scale, so real size differences show
 async function dgFillSprites(){const els=document.querySelectorAll('.dg-spr:not(.ok)');for(const el of els){const sp=el.dataset.sp,row=+el.dataset.row;let a;try{a=await loadAnims(sp)}catch(e){a=null}if(!a){el.innerHTML=portraitHTML(sp,'dg-port');el.classList.add('ok');continue}
-  const an=a.Idle||a.Walk,r=row<(an.rows||8)?row:0,k=DG_SPRITE_SCALE*(+el.dataset.sz||1)*(el.closest('.dg-foe.big')?1.2:1),bb=await sprBounds(an,r),foot=Math.max(0,an.h-bb[3]-1);
+  const an=(el.dataset.anim&&a[el.dataset.anim])||a.Idle||a.Walk,r=row<(an.rows||8)?row:0,k=DG_SPRITE_SCALE*(+el.dataset.sz||1)*(el.closest('.dg-foe.big')?1.2:1),bb=await sprBounds(an,r),foot=Math.max(0,an.h-bb[3]-1);
   // stand the Pokémon on its feet: drop the empty strip under the body (tall frames like Gyarados have a lot of it)
   el.style.cssText='width:'+an.w+'px;height:'+an.h+'px;margin-bottom:'+(-foot)+'px;background-image:url('+an.url+');background-position:0 '+(-r*an.h)+'px;--fw:'+an.w+'px;--fn:'+an.frames+';animation:dsx '+(an.d.reduce((x,y)=>x+y,0)/60).toFixed(2)+'s steps('+an.frames+') infinite;zoom:'+k.toFixed(2)+';';el.classList.add('ok')}}
 function dgcDrawBattle(entering){const r=runOf(),b=r&&r.battle,st=$('dgStage');if(!b||!st)return;twKingCheck(r,b);if(entering)st.scrollTop=0;
@@ -3305,17 +3316,23 @@ async function dgAttack(slot,ti,name,mv,mult){if(MOVE_SPREAD.has(name))return dg
  await dgSleep(e.hp<=0?1000:800);dgAfterAction()}
 async function dgcRevive(){const _r=runOf(),_b=_r&&_r.battle;if(!_b||_b.enemyPhase||!_r.party[_b.turn])return;if(DG.busy)return;DG.busy=1;const r=runOf(),b=r.battle,m=r.party[b.turn];const res=await dgQ('💫 REVIVE');if(res!=='fail'){m.hp=twReviveHp(m);save();dgDrawBattle();dgFloat('.dg-ally[data-i="'+b.turn+'"]','Back up! ('+m.hp+' HP)','eff');await dgSleep(700)}else{toast('Still fainted. Try again next turn.')}dgAfterAction()}
 function dgItem(){const _r=runOf(),_b=_r&&_r.battle;if(!_b||_b.enemyPhase||!_r.party[_b.turn])return;if(DG.busy)return;if(dgEnvNoItems()){toast('🌙 Sleepless Hollow: items can’t be used here');return}DG.busy=1;const r=runOf(),b=r.battle,ks=Object.keys(r.bag).filter(k=>r.bag[k]>0);if(!ks.length){DG.busy=0;toast('The run bag is empty. Pick up items on the floor, or find a chest or Kecleon Shop.');return}
- $('dgPanel').innerHTML='<div class="dg-msg">Use which item?</div><div class="dg-items">'+ks.map(k=>'<button class="btn" onclick="dgUseItem(\''+k+'\')">'+DITEMS[k].icon+' '+DITEMS[k].name+' ×'+r.bag[k]+'<small>'+DITEMS[k].desc+'</small></button>').join('')+'<button class="btn smallbtn" onclick="DG.busy=0;dgPanelBattle()">BACK</button></div>'}
+ $('dgPanel').innerHTML='<div class="dg-msg">Use which item?</div><div class="dg-items">'+ks.map(k=>'<button class="btn" '+(DITEMS[k].ko&&!r.party.some(q=>q.hp<=0)?'disabled':'')+' onclick="dgUseItem(\''+k+'\')">'+DITEMS[k].icon+' '+DITEMS[k].name+' ×'+r.bag[k]+'<small>'+(DITEMS[k].ko&&!r.party.some(q=>q.hp<=0)?'Nobody has fainted. ':'')+DITEMS[k].desc+'</small></button>').join('')+'<button class="btn smallbtn" onclick="DG.busy=0;dgPanelBattle()">BACK</button></div>'}
 function dgUseItem(k){const r=runOf(),b=r.battle,slot=b.turn;if(b)b.usedItem=true;
- if(k==='overclock'){dgOverclock();return}if(k==='timegear'){dgTimeGear();return}
+ if(k==='overclock'){dgOverclock();return}if(k==='timegear'){dgTimeGear();return}if(k==='wakemint'){dgWakeMint();return}
+ if(k==='salts'&&!r.party.some(q=>q.hp<=0)){toast('Nobody has fainted');DG.busy=0;dgItem();return}let dgTarget0;
  if(DITEMS[k].aoe||DITEMS[k].split){dgBlastItem(k);return}if(k==='snag'){dgChooseFoe(i=>dgSnag(i));return}
- dgTarget={side:'ally',fn:async i=>{dgCrosshair('ally',i,slot);const res=await dgQ(DITEMS[k].icon+' '+DITEMS[k].name.toUpperCase());let used=false,msg;
+ dgTarget={side:'ally',fn:async i=>{if(k==='salts'&&r.party[i].hp>0){toast('Smelling Salts only work on a fainted teammate');dgTarget={side:'ally',fn:dgTarget0};return}dgCrosshair('ally',i,slot);const res=await dgQ(DITEMS[k].icon+' '+DITEMS[k].name.toUpperCase());let used=false,msg;
    if(res==='full'){used=true}else if(res==='makeup'){if(Math.random()<.25){msg=(partyMon(r.party[slot]).nickname||partyMon(r.party[slot]).species)+' fumbled the item! (kept, but no effect)';toast(msg);dgAfterAction();return}used=true}
    r.bag[k]--;if(!used){toast('The '+DITEMS[k].name+' was used up with no effect.');save();dgAfterAction();return}
-   const tm=r.party[i],tc=combatant(partyMon(tm));if(k==='apple'||k==='oran'){if(tm.hp<=0){toast('Fainted Pokémon need a revive question first');r.bag[k]++;DG.busy=0;dgPanelBattle();return}const h=k==='apple'?20:10;tm.hp=Math.min(tc.hp,tm.hp+h);dgDrawBattle();dgFloat('.dg-ally[data-i="'+i+'"]','+'+h+' HP','heal')}
+   const tm=r.party[i],tc=combatant(partyMon(tm));if(k==='salts'){tm.hp=Math.max(1,Math.round(tc.hp*.5));delete tm.reviveTried;dgDrawBattle();dgFloat('.dg-ally[data-i="'+i+'"]','Back up! +'+tm.hp+' HP','heal')}
+   else if(k==='apple'||k==='oran'){if(tm.hp<=0){toast('Fainted Pokémon need a revive question first');r.bag[k]++;DG.busy=0;dgPanelBattle();return}const h=k==='apple'?20:10;tm.hp=Math.min(tc.hp,tm.hp+h);dgDrawBattle();dgFloat('.dg-ally[data-i="'+i+'"]','+'+h+' HP','heal')}
    else if(k==='starf'){const stat=['atk','spa','def','spd','spe'][Math.floor(Math.random()*5)];tm.starf={stat,rooms:3};dgDrawBattle();dgFloat('.dg-ally[data-i="'+i+'"]','+2 '+{atk:'ATK',spa:'SP. ATK',def:'DEF',spd:'SP. DEF',spe:'SPEED'}[stat],'heal')}
    save();await dgSleep(700);dgAfterAction()}};
- document.querySelectorAll('.dg-ally').forEach(x=>x.classList.add('pickable'));$('dgPanel').querySelector('.dg-msg').innerHTML='Tap a teammate to use the '+DITEMS[k].name+' on.'}
+ dgTarget0=dgTarget.fn;document.querySelectorAll('.dg-ally').forEach(x=>{if(k!=='salts'||r.party[+x.dataset.i]&&r.party[+x.dataset.i].hp<=0)x.classList.add('pickable')});
+ // put the item list away so the whole team is in view; tap a teammate, or cancel
+ $('dgPanel').innerHTML='<div class="dg-msg">'+DITEMS[k].icon+' Tap a teammate to use the <b>'+DITEMS[k].name+'</b> on.</div><div class="dg-acts"><button class="btn" onclick="dgItemCancel()">CANCEL</button></div>';
+ if(r.fl&&DG){DG.hl={cls:'ally',tiles:r.party.filter(m=>k!=='salts'||m.hp<=0).map(m=>[m.x,m.y])};gdHighlight();gdFit();gdCamera()}}
+function dgItemCancel(){const r=runOf();dgTarget=null;document.querySelectorAll('.dg-ally').forEach(x=>x.classList.remove('pickable'));if(r&&r.battle)r.battle.usedItem=false;if(DG){DG.busy=0;DG.hl=null;if(r&&r.fl)gdHighlight()}dgItem()}
 // Pocket Voltorb / Stellar Storm / Thundurus' Might: answer one question, then fixed damage to the enemies
 async function dgcBlastItem(k){const r=runOf(),b=r.battle,slot=b.turn,I=DITEMS[k],who=partyMon(r.party[slot]);dgCrosshair('ally',slot,slot);const res=await dgQ(I.icon+' '+I.name.toUpperCase());
  if(res==='makeup'&&Math.random()<.25){toast((who.nickname||who.species)+' fumbled the item! (kept, but no effect)');dgAfterAction();return}
@@ -3384,6 +3401,12 @@ function dgLose(){if(runOf()&&runOf().tower){if(twSecondWind())return;return twL
 function dgEnd(cleared,quit){if(dgMode==='tower')return twEnd(quit);const r=runOf();if(!r)return;let bonus=0;const tix=Math.max(0,Math.round(r.tickets||0));db.cogs=Math.round(db.cogs+tix);const fl=r.clearedFloors||0;if(cleared&&fl){bonus=dgFloorBonus(r);db.cogs=Math.round(db.cogs+bonus);grantXp(20+10*fl)}else grantXp(15);
  const lines=[(cleared&&fl?'🏆 Beat '+fl+' boss'+(fl>1?'es':'')+'! +'+bonus+' Cogs bonus':quit?'Run ended early.':'Run over.'),'🎟️ Tickets earned: '+(r.cogs||0)+' · '+tix+' left over → +'+tix+' Cogs','Cogs from this run: '+(tix+bonus),'Deepest floor: B'+(r.floor+1)+'F','Time studying: '+fmtMin(r.studyMs)];db.run=null;save();if(mgState)mgState.stop&&mgState.stop();mgState=null;render();
  $('mgArea').innerHTML='<div class="reveal mg-end"><h2>🏰 Mystery Dungeon</h2>'+lines.map(l=>'<p>'+l+'</p>').join('')+recapHTML(r.recap)+'<div class="actions"><button class="btn" onclick="mgQuit()">MENU</button></div></div>'}
+// Wake Mint: one question, then every fainted teammate gets back up with 50% HP
+async function dgWakeMint(){const r=runOf(),b=r.battle,slot=b.turn,I=DITEMS.wakemint;if(!r.party.some(q=>q.hp<=0)){toast('Nobody has fainted');DG.busy=0;dgItem();return}dgCrosshair('ally',slot,slot);const res=await dgQ(I.icon+' '+I.name.toUpperCase());
+ if(res==='makeup'&&Math.random()<.25){toast('The Wake Mint slipped away! (kept, but no effect)');dgAfterAction();return}
+ r.bag.wakemint--;if(res==='fail'){toast('The Wake Mint was used up with no effect.');save();dgAfterAction();return}
+ const up=[];r.party.forEach((m,i)=>{if(m.hp>0)return;const c=combatant(partyMon(m));m.hp=Math.max(1,Math.round(c.hp*.5));delete m.reviveTried;up.push([i,m.hp])});save();dgDrawBattle();
+ up.forEach(([i,h])=>dgFloat('.dg-ally[data-i="'+i+'"]','Back up! +'+h+' HP','heal'));toast(I.icon+' '+up.length+' teammate'+(up.length>1?'s are':' is')+' back up!');await dgSleep(900);dgAfterAction()}
 // ===================== MYSTERY DUNGEON · grid floors =====================
 // Mystery Dungeon is played on tile floors: rooms joined by corridors, stairs down, items on the ground and wild Pokémon in
 // the rooms. On your turn, every Pokémon may move once (up to its move range, set by its species' Speed) and then act once
@@ -3487,12 +3510,16 @@ function gdDrawBattle(entering){const r=runOf(),b=r&&r.battle,st=$('dgStage');if
   +fl.specials.filter(s=>seenAt(s.x,s.y)).map(s=>'<div class="gd-obj sp" style="left:'+s.x*T+'px;top:'+s.y*T+'px">'+GD_SPECIAL[s.k].icon+'</div>').join('');
  // units (sprites keep their element between redraws so animations and effects stay smooth)
  const U=field.querySelector('.gd-units'),want=new Set();
- const unit=(cls,i,x,y,sp,row,hpPct,extra,color)=>{const id=cls+i;want.add(id);let el=U.querySelector('[data-u="'+id+'"]');if(!el){el=document.createElement('div');el.dataset.u=id;el.innerHTML='<div class="gd-hp"><i></i></div><div class="dg-spr" data-sp="'+esc(sp)+'" data-row="'+row+'" data-sz="'+(extra.includes('big')?1:.82)+'"></div><b class="dg-xh"></b>';U.appendChild(el)}
-  el.className='gd-u '+cls+' '+extra;el.dataset.i=i;el.style.left=x*T+'px';el.style.top=y*T+'px';el.style.zIndex=10+y;if(color)el.style.setProperty('--c',color);const s=el.querySelector('.dg-spr');if(+s.dataset.row!==row){s.dataset.row=row;s.classList.remove('ok')}
+ const unit=(cls,i,x,y,sp,row,hpPct,extra,color,anim)=>{const id=cls+i;want.add(id);let el=U.querySelector('[data-u="'+id+'"]');if(!el){el=document.createElement('div');el.dataset.u=id;el.innerHTML='<div class="gd-hp"><i></i></div><div class="dg-spr" data-sp="'+esc(sp)+'" data-row="'+row+'" data-sz="'+(extra.includes('big')?1:.82)+'"></div><b class="dg-xh"></b>';U.appendChild(el)}
+  el.className='gd-u '+cls+' '+extra;el.dataset.i=i;el.style.left=x*T+'px';el.style.top=y*T+'px';el.style.zIndex=10+y;if(color)el.style.setProperty('--c',color);const s=el.querySelector('.dg-spr');if(+s.dataset.row!==row){s.dataset.row=row;s.classList.remove('ok')}if((s.dataset.anim||'')!==(anim||'')){s.dataset.anim=anim||'';s.classList.remove('ok')}
   const hp=el.querySelector('.gd-hp i');hp.style.width=Math.max(0,Math.min(100,hpPct))+'%';hp.className=hpPct<=20?'low':hpPct<=50?'mid':''};
- r.party.forEach((m,i)=>{const c=combatant(partyMon(m));unit('dg-ally',i,m.x,m.y,partyMon(m).species,m.dir||0,m.hp/c.hp*100,(m.hp<=0?'ko ':'')+(b.turn===i&&!b.enemyPhase?'active ':'')+(m.acted?'done ':'')+(b.guard[i]?'guard ':''),SLOT_COLORS[i])});
- b.enemies.forEach((e,i)=>{if(e.done||(e.hp<=0&&!e.gdOut)||!vis(e.x,e.y))return;unit('dg-foe',i,e.x,e.y,e.species,e.dir||0,(e.gdOut?e.gdHp:e.hp)/e.maxhp*100,(e.boss?'big ':'')+(e.aware?'':'asleep '))});
+ const now=Date.now();
+ r.party.forEach((m,i)=>{const c=combatant(partyMon(m));if(m.hp>0)delete m.koAt;else if(!m.koAt){m.koAt=now;gdKoFx('dg-ally'+i,false)}const ko=m.hp>0?0:now-m.koAt;unit('dg-ally',i,m.x,m.y,partyMon(m).species,m.dir||0,m.hp/c.hp*100,(m.hp<=0?'ko ':'')+(m.hp<=0&&ko<700?'gd-stagger ':'')+(b.turn===i&&!b.enemyPhase?'active ':'')+(m.acted?'done ':'')+(b.guard[i]?'guard ':''),SLOT_COLORS[i],m.hp<=0&&ko>=600?'Sleep':'')});
+ // a fainted foe staggers, falls asleep and fades out instead of vanishing
+ b.enemies.forEach((e,i)=>{const dead=e.hp<=0&&!e.gdOut;if(dead&&!e.koAt&&!e.done){e.koAt=now;gdKoFx('dg-foe'+i,true)}if(dead?!(e.koAt&&now-e.koAt<1500):e.done)return;if(!vis(e.x,e.y))return;
+  unit('dg-foe',i,e.x,e.y,e.species,e.dir||0,dead?0:(e.gdOut?e.gdHp:e.hp)/e.maxhp*100,(e.boss?'big ':'')+(e.aware||dead?'':'asleep ')+(dead?'gd-faint ':''),null,dead&&now-e.koAt>=600?'Sleep':'')});
  U.querySelectorAll('.gd-u').forEach(el=>{if(!want.has(el.dataset.u))el.remove()});dgFillSprites();
+ if(DG){const free=gdFree(r);if(!free&&(DG.wasFree!==false||!DG.bcam))DG.bcam=gdBattleCam(r);if(free)DG.bcam=null;DG.wasFree=free}
  if(entering)gdFit();gdHighlight();gdMini(r,L);if(entering||DG&&DG.follow!==false)gdCamera();
  if(DG&&DG.busy&&!b.enemyPhase)$('dgPanel').innerHTML='<div class="dg-msg">…</div>';else dgPanelBattle()}
 // fit the dungeon between the page header and the bottom dock, so the action buttons are never hidden
@@ -3504,7 +3531,7 @@ function gdMini(r,L){const fl=r.fl,c=document.querySelector('.gd-mini');if(!c)re
  fl.items.forEach(it=>{if(fl.seen[it.y*fl.w+it.x]==='1'){g.fillStyle='#ffd34d';g.fillRect(it.x*s,it.y*s,s,s)}});
  r.battle.enemies.forEach(e=>{if(e.hp>0&&!e.done&&L.has(gdKey(e.x,e.y))){g.fillStyle='#ff4d4d';g.fillRect(e.x*s,e.y*s,s,s)}});
  r.party.forEach((m,i)=>{g.fillStyle=SLOT_COLORS[i];g.fillRect(m.x*s-1,m.y*s-1,s+2,s+2)})}
-function gdCamera(x,y){const r=runOf(),f=document.querySelector('.gd-field'),mp=f&&f.querySelector('.gd-map');if(!mp)return;const b=r.battle,m=r.party[b.turn]||r.party[0];x=x??m.x;y=y??m.y;
+function gdCamera(x,y){const r=runOf(),f=document.querySelector('.gd-field'),mp=f&&f.querySelector('.gd-map');if(!mp)return;const b=r.battle,m=r.party[b.turn]||r.party[0];if(x==null&&DG&&DG.bcam)[x,y]=DG.bcam;x=x??m.x;y=y??m.y;
  const W=f.clientWidth,H=f.clientHeight,T=GD_T,mw=r.fl.w*T,mh=r.fl.h*T;let tx=W/2-(x+.5)*T,ty=H/2-(y+.5)*T;tx=Math.min(0,Math.max(W-mw,tx));ty=Math.min(0,Math.max(H-mh,ty));if(mw<W)tx=(W-mw)/2;if(mh<H)ty=(H-mh)/2;mp.style.transform='translate('+Math.round(tx)+'px,'+Math.round(ty)+'px)'}
 function gdHighlight(){const hl=document.querySelector('.gd-hl');if(!hl)return;const T=GD_T,H=DG&&DG.hl;hl.innerHTML=H?H.tiles.map(([x,y])=>'<i class="'+H.cls+'" style="left:'+x*T+'px;top:'+y*T+'px"></i>').join(''):''}
 // ---------- tapping the map ----------
@@ -3528,13 +3555,18 @@ function gdPanelBattle(msg){const r=runOf(),b=r.battle,m=r.party[b.turn],p=m&&pa
 // Free roam: while no wild Pokémon is in sight, moving doesn't use up anyone's turn. The picked Pokémon can keep walking
 // (up to 6 tiles a step, or more if it's faster), the rest of the team follows, and everyone slowly recovers HP.
 const GD_FREE_MV=6;
-function gdFree(r){r=r||runOf();return !!(r&&r.fl&&r.battle&&!r.battle.enemyPhase&&!gdFoeTargets(r).length)}
+function gdFree(r){r=r||runOf();return !!(r&&r.fl&&r.battle&&!r.battle.enemyPhase&&!gdFoeTargets(r).some(([e])=>e.aware))}
+// battles: the camera holds on the middle of the room (or between your team and the foes in a corridor)
+function gdBattleCam(r){const b=r.battle,m=r.party[b.turn]||r.party[0],ri=gdRoomOf(r.fl,m.x,m.y);if(ri>=0){const o=r.fl.rooms[ri];return [o[0]+(o[2]-1)/2,o[1]+(o[3]-1)/2]}
+ const pts=[m,...gdFoeTargets(r).filter(([e])=>e.aware).map(([e])=>e)];return [pts.reduce((a,p)=>a+p.x,0)/pts.length,pts.reduce((a,p)=>a+p.y,0)/pts.length]}
+// fainting: stagger, then the Sleep animation; foes then fade out (CSS does the motion)
+function gdKoFx(id,fade){setTimeout(()=>{const s=document.querySelector('.gd-units [data-u="'+id+'"] .dg-spr');if(s){s.dataset.anim='Sleep';s.classList.remove('ok');dgFillSprites()}},600);if(fade)setTimeout(()=>{const u=document.querySelector('.gd-units [data-u="'+id+'"]');if(u&&u.classList.contains('gd-faint'))u.remove()},1550)}
 function gdSelect(i){const r=runOf(),b=r&&r.battle;if(!b||b.enemyPhase||DG.busy)return;b.turn=i;DG.gmode='select';DG.hl=null;gdDrawBattle()}
 // ---------- moving ----------
 function gdMoveStart(){const r=runOf(),b=r.battle,m=r.party[b.turn];if(!m||m.hp<=0||DG.busy)return;const free=gdFree(r);if(!free&&(m.moved||m.acted))return;const fl=r.fl,mv=free?Math.max(GD_FREE_MV,gdMV(partyMon(m).species)):Math.max(1,gdMV(partyMon(m).species)+mdMoveAdj());
- const reach=gdBFS(fl,[m.x,m.y],(x,y)=>b.enemies.some(e=>(e.hp>0||e.gdOut)&&!e.done&&e.x===x&&e.y===y),mv);DG.reach=reach;DG.gmode='move';gdCamera(m.x,m.y);
+ const reach=gdBFS(fl,[m.x,m.y],(x,y)=>b.enemies.some(e=>(e.hp>0||e.gdOut)&&!e.done&&e.x===x&&e.y===y),mv);DG.reach=reach;DG.gmode='move';if(!DG.bcam)gdCamera(m.x,m.y);
  DG.hl={cls:'mv',tiles:[...reach.keys()].map(k=>k.split(',').map(Number)).filter(([x,y])=>!(x===m.x&&y===m.y)&&!gdUnitAt(r,x,y))};gdHighlight();$('dgPanel').innerHTML='<div class="dg-msg">👣 Tap a blue tile to move there (up to '+mv+' tiles).'+(free?' No foes in sight, so this doesn’t use up the turn.':'')+'</div><div class="dg-acts"><button class="btn" onclick="DG.gmode=\'select\';DG.hl=null;gdDrawBattle()">CANCEL</button></div>'}
-async function gdWalk(unitEl,obj,path,isFoe){const T=GD_T;for(let s=1;s<path.length;s++){const [x,y]=path[s],[px,py]=path[s-1];obj.dir=gdDirOf(x-px,y-py);obj.x=x;obj.y=y;if(unitEl){unitEl.style.left=x*T+'px';unitEl.style.top=y*T+'px';unitEl.style.zIndex=10+y;const sp=unitEl.querySelector('.dg-spr');if(sp&&+sp.dataset.row!==obj.dir){sp.dataset.row=obj.dir;sp.classList.remove('ok');dgFillSprites()}}if(!isFoe)gdCamera(x,y);await dgSleep(120)}}
+async function gdWalk(unitEl,obj,path,isFoe){const T=GD_T;for(let s=1;s<path.length;s++){const [x,y]=path[s],[px,py]=path[s-1];obj.dir=gdDirOf(x-px,y-py);obj.x=x;obj.y=y;if(unitEl){unitEl.style.left=x*T+'px';unitEl.style.top=y*T+'px';unitEl.style.zIndex=10+y;const sp=unitEl.querySelector('.dg-spr');if(sp&&+sp.dataset.row!==obj.dir){sp.dataset.row=obj.dir;sp.classList.remove('ok');dgFillSprites()}}if(!isFoe&&!(DG&&DG.bcam))gdCamera(x,y);await dgSleep(120)}}
 async function gdWalkTo(slot,x,y){const r=runOf(),b=r.battle,m=r.party[slot],path=gdPath(DG.reach,gdKey(x,y)),wasFree=gdFree(r);DG.gmode='select';DG.hl=null;DG.busy=1;gdHighlight();
  await gdWalk(document.querySelector('.dg-ally[data-i="'+slot+'"]'),m,path,false);if(!runOf()||runOf().battle!==b)return;
  if(wasFree)gdFollow(r,slot,path);gdSee(r);mdHazard(r,m,false,slot);
@@ -3563,7 +3595,7 @@ async function gdFight(){const r=runOf(),b=r&&r.battle;if(!b||b.enemyPhase||DG.b
  const lab=(id,n,mv)=>{const el=$(id);if(el){const sm=el.querySelector('small');if(sm)sm.insertAdjacentHTML('beforeend','<br>📐 '+gdShape(n,mv).label)}};lab('dgM1',p.fastMove,fast);lab('dgM2',p.discMove,disc);
  const choose=(name,mv,opts)=>{if(!opts.length)return;DG.gmode='target';DG.opts=opts;const T=new Set();opts.forEach(o=>o.hits.forEach(i=>T.add(i)));DG.hl={cls:'tg',tiles:[...T].map(i=>[b.enemies[i].x,b.enemies[i].y])};gdHighlight();
   const go=async o=>{DG.gmode='select';DG.hl=null;gdHighlight();DG.busy=1;const sl=b.turn,ep=dgEpoch,res=await dgQ('⚔️ FIGHT',{hint:true});const mult=r.slider?await dgSlider(res,dgBarSlow(b)):dgRandMult();const r2=runOf();if(ep!==dgEpoch||!r2||r2.battle!==b||b.turn!==sl||m.acted)return;if(mv[3]!=='fast'&&m.energy<mv[2]){DG.busy=0;gdDrawBattle();return}
-   const t0=b.enemies[o.key];m.dir=gdDirOf(t0.x-m.x,t0.y-m.y);const s=document.querySelector('.dg-ally[data-i="'+sl+'"] .dg-spr');if(s){s.dataset.row=m.dir;s.classList.remove('ok');await dgFillSprites()}
+   const t0=b.enemies[o.key];o.hits.forEach(j=>{if(b.enemies[j])b.enemies[j].aware=1});m.dir=gdDirOf(t0.x-m.x,t0.y-m.y);const s=document.querySelector('.dg-ally[data-i="'+sl+'"] .dg-spr');if(s){s.dataset.row=m.dir;s.classList.remove('ok');await dgFillSprites()}
    if(o.hits.length===1&&!MOVE_SPREAD.has(name))dgAttack(sl,o.key,name,mv,mult);else gdAttackMulti(sl,name,mv,mult,o.hits)};
   DG.pick=go;if(opts.length===1&&opts[0].all){go(opts[0]);return}$('dgPanel').innerHTML='<div class="dg-msg">🎯 Tap a highlighted foe.'+(gdShape(name,mv).k==='beam'?' The beam hits everything in that line.':'')+'</div><div class="dg-acts"><button class="btn" onclick="DG.gmode=\'select\';DG.hl=null;gdDrawBattle()">BACK</button></div>'};
  $('dgM1').onclick=()=>choose(p.fastMove,fast,o1);$('dgM2').onclick=()=>choose(p.discMove,disc,o2);
@@ -3591,7 +3623,10 @@ function gdKills(r){const b=r.battle,got=[];b.enemies.forEach(e=>{if(e.hp>0||e.d
    if(r.fl.boss){r.fl.stairsHidden=false;got.push('🪜 The stairs appeared!')}}});
  if(got.length&&DG)DG.msg=(DG.msg?DG.msg+'<br>':'')+got.join('<br>')}
 function gdAfterAction(){const r=runOf(),b=r&&r.battle;if(DG)DG.busy=0;if(!b||!r.fl)return;gdUnstash(b);const m=r.party[b.turn];if(m){m.acted=true;m.moved=true}r.party.forEach(q=>{if(!(q.energy>=0))q.energy=0});dgTarget=null;if(DG){DG.gmode='select';DG.hl=null}gdKills(r);
- if(r.party.every(q=>q.hp<=0)){dgLose();return}const next=r.party.findIndex((q,i)=>!q.acted&&(q.hp>0||!q.acted));
+ if(r.party.every(q=>q.hp<=0)){dgLose();return}
+ // no foe awake in sight: the battle is over (or never started), so everyone can move again
+ if(gdFree(r)){r.party.forEach(q=>{q.moved=false;q.acted=false;delete q.reviveTried});b.turn=Math.max(0,r.party.findIndex(q=>q.hp>0));b.guard={};save();gdDrawBattle();gdCamera();return}
+ const next=r.party.findIndex((q,i)=>!q.acted&&(q.hp>0||!q.acted));
  if(r.party.every(q=>q.acted||(q.hp<=0&&q.reviveTried))){save();gdEnemyPhase();return}if(next>=0)b.turn=next;save();gdDrawBattle()}
 function gdEndTurn(){const r=runOf(),b=r&&r.battle;if(!b||b.enemyPhase||DG.busy)return;if(r.party.some(q=>q.hp>0&&!q.acted)&&!confirm('End the turn? Pokémon that haven’t acted will skip their action.'))return;gdEnemyPhase()}
 // ---------- the enemies' turn ----------
@@ -4369,7 +4404,7 @@ async function sdSaveFile(){const ids=sdChosen();if(!ids.length)return;const txt
  const url=URL.createObjectURL(file),a=document.createElement('a');a.href=url;a.download=nm;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),30000)}
 // ===================== SOFT ICONS =====================
 // Every emoji listed here is shown as a soft painted icon (assets/ico, drawn by tools/make_icons_soft.py) instead of the system emoji.
-const ICO_MAP={"✨":"sparkles","🔧":"settings","⚙":"cog","🎟":"ticket","⚡":"bolt","🍬":"candy","👑":"crown","🛡":"shield","⏱":"stopwatch","🎯":"target","💎":"gem","📚":"books","💾":"floppy","🧁":"cupcake","⚠":"warning","🎒":"backpack","⚔":"swords","🗡":"swords","🌿":"herb","🛒":"cart","💿":"disc","🎁":"gift","📁":"folder","🗂":"folder","📂":"folder_open","🗼":"tower","💥":"burst","📷":"camera","💡":"bulb","📋":"clipboard","🌳":"tree","📥":"inbox","⭐":"star","🗑":"trash","🎉":"party","💤":"zzz","💭":"thought","🧲":"magnet","🕊":"dove","🌱":"seedling","🔁":"repeat","🔄":"repeat","🎀":"ribbon","🌐":"globe","🧮":"abacus","💪":"dumbbell","🏋":"dumbbell","✅":"check","🏁":"flag","🔥":"fire","💨":"dash","🌬":"dash","🃏":"joker","🎙":"mic","🎮":"controller","📊":"chart","🎫":"ticket2","📖":"book","📘":"book","📒":"book","😋":"yum","😵":"dizzy_face","😤":"huff","🤔":"thinking","⏰":"alarm","🌙":"moon","🐾":"paw","👣":"paw","🔮":"crystal_ball","🛠":"tools","🍎":"apple","👻":"ghost","💫":"dizzy","🏆":"trophy","🏅":"trophy","🪜":"ladder","☣":"biohazard","🗓":"calendar","📅":"calendar","🔔":"bell","⏳":"hourglass","🚨":"siren","👀":"eyes","🏰":"dungeon","❌":"cross","🌠":"shooting_star","🏠":"house","💧":"drop","🪴":"potted","⛑":"helmet","🎗":"reminder","💰":"moneybag","🌟":"glow_star","🌾":"wheat","🎨":"palette","🐞":"ladybug","🧨":"firecracker","🔴":"red_circle","🟡":"yellow_circle","⏹":"stop","📝":"memo","✍":"memo","🖼":"frame","❓":"question","❔":"question","🔊":"speaker","🧢":"cap","📌":"pin","☀":"sun","🔒":"lock","🎴":"flashcards","🧩":"puzzle","🫐":"blueberry","🌩":"storm","🐝":"bee","🔺":"triangle","🌀":"cyclone","🧠":"brain","🧂":"salt","⛲":"fountain","🧭":"compass","⏭":"next","⏩":"next","📐":"ruler","🌸":"blossom","🏙":"city","🐉":"dragon","🏛":"temple","🌊":"wave","🦇":"bat","❄":"snowflake","🎲":"die","🏥":"hospital","🧱":"bricks","🕸":"web","👓":"glasses","🍲":"stew","🐚":"shell","⛏":"pickaxe","🪙":"coin","🍫":"chocolate","🥚":"egg","📦":"package","🥋":"gi","💗":"heart","❤":"heart","🧤":"glove","🦺":"vest","🔋":"battery","📿":"beads","🏷":"tag","🎽":"shirt","⛰":"mountain","👊":"fist","🔗":"link","🐍":"luxor","⏲":"mg_speed","🪸":"coral","🪵":"wood","🍄":"mushroom","🪡":"needle","🦷":"tooth","🗿":"moai","🔇":"mute","🌑":"newmoon","🐋":"whale","🦪":"oyster","🫧":"bubbles","🏮":"lantern","⚓":"anchor","♨":"hotspring","⚗":"alembic","🌋":"volcano","🌫":"fog","🔨":"hammer","🕯":"candle","⛓":"chain","📜":"scroll","🦴":"bone","🪨":"rock"};
+const ICO_MAP={"✨":"sparkles","🔧":"settings","⚙":"cog","🎟":"ticket","⚡":"bolt","🍬":"candy","👑":"crown","🛡":"shield","⏱":"stopwatch","🎯":"target","💎":"gem","📚":"books","💾":"floppy","🧁":"cupcake","⚠":"warning","🎒":"backpack","⚔":"swords","🗡":"swords","🌿":"herb","🛒":"cart","💿":"disc","🎁":"gift","📁":"folder","🗂":"folder","📂":"folder_open","🗼":"tower","💥":"burst","📷":"camera","💡":"bulb","📋":"clipboard","🌳":"tree","📥":"inbox","⭐":"star","🗑":"trash","🎉":"party","💤":"zzz","💭":"thought","🧲":"magnet","🕊":"dove","🌱":"seedling","🔁":"repeat","🔄":"repeat","🎀":"ribbon","🌐":"globe","🧮":"abacus","💪":"dumbbell","🏋":"dumbbell","✅":"check","🏁":"flag","🔥":"fire","💨":"dash","🌬":"dash","🃏":"joker","🎙":"mic","🎮":"controller","📊":"chart","🎫":"ticket2","📖":"book","📘":"book","📒":"book","😋":"yum","😵":"dizzy_face","😤":"huff","🤔":"thinking","⏰":"alarm","🌙":"moon","🐾":"paw","👣":"paw","🔮":"crystal_ball","🛠":"tools","🍎":"apple","👻":"ghost","💫":"dizzy","🏆":"trophy","🏅":"trophy","🪜":"ladder","☣":"biohazard","🗓":"calendar","📅":"calendar","🔔":"bell","⏳":"hourglass","🚨":"siren","👀":"eyes","🏰":"dungeon","❌":"cross","🌠":"shooting_star","🏠":"house","💧":"drop","🪴":"potted","⛑":"helmet","🎗":"reminder","💰":"moneybag","🌟":"glow_star","🌾":"wheat","🎨":"palette","🐞":"ladybug","🧨":"firecracker","🔴":"red_circle","🟡":"yellow_circle","⏹":"stop","📝":"memo","✍":"memo","🖼":"frame","❓":"question","❔":"question","🔊":"speaker","🧢":"cap","📌":"pin","☀":"sun","🔒":"lock","🎴":"flashcards","🧩":"puzzle","🫐":"blueberry","🌩":"storm","🐝":"bee","🔺":"triangle","🌀":"cyclone","🧠":"brain","🧂":"salt","⛲":"fountain","🧭":"compass","⏭":"next","⏩":"next","📐":"ruler","🌸":"blossom","🏙":"city","🐉":"dragon","🏛":"temple","🌊":"wave","🦇":"bat","❄":"snowflake","🎲":"die","🏥":"hospital","🧱":"bricks","🕸":"web","👓":"glasses","🍲":"stew","🐚":"shell","⛏":"pickaxe","🪙":"coin","🍫":"chocolate","🥚":"egg","📦":"package","🥋":"gi","💗":"heart","❤":"heart","🧤":"glove","🦺":"vest","🔋":"battery","📿":"beads","🏷":"tag","🎽":"shirt","⛰":"mountain","👊":"fist","🔗":"link","🐍":"luxor","⏲":"mg_speed","🪸":"coral","🪵":"wood","🍄":"mushroom","🪡":"needle","🦷":"tooth","🗿":"moai","🔇":"mute","🌑":"newmoon","🐋":"whale","🦪":"oyster","🫧":"bubbles","🏮":"lantern","⚓":"anchor","♨":"hotspring","⚗":"alembic","🌋":"volcano","🌫":"fog","🔨":"hammer","🕯":"candle","⛓":"chain","📜":"scroll","🦴":"bone","🪨":"rock","🍃":"mint"};
 // Swaps emoji in the page for the soft painted icons in assets/ico (ICO_MAP comes from tools/make_icons_soft.py).
 // Works on every text node as it appears, so nothing that writes emoji into the page needs to know about it.
 // Skipped: form fields, <select>/<option>, canvas, SVG, and anything inside .no-ico.
@@ -4812,7 +4847,7 @@ $('navHome').style.display='none';
  if(pcStorageReady)ensureMoveData();
  if(pcStorageReady&&permRoll())save();
  render();scheduleNotifs();aiCheck();window.__pcBooted=true;setTimeout(()=>{try{mdSync()}catch(e){}},1500);setTimeout(()=>{try{facTick()}catch(e){}},2500);setInterval(()=>{try{facTick();if(currentPage==='home'&&hab.scene&&hab.scene!=='home')drawHabitat()}catch(e){}},60000);
- window.__pcVersion='0.59.0';
+ window.__pcVersion='0.59.2';
  document.addEventListener('pointerdown',function(e){try{var t=e.target.closest&&e.target.closest('[onclick],button,a,[id]');if(!t)return;var oc=t.getAttribute('onclick');window.__pcLastTap=(oc?oc.slice(0,60):(t.id?'#'+t.id:t.tagName.toLowerCase()+'.'+String(t.className).split(' ')[0])).replace(/\s+/g,' ')}catch(_){}} ,true);
  Object.keys(window).forEach(function(k){var f=window[k];if(typeof f!=='function'||/^[A-Z]/.test(k)||k==='appError'||k==='$'||k==='esc'||/\[native code\]/.test(Function.prototype.toString.call(f)))return;
   var w=function(){try{return f.apply(this,arguments)}catch(err){if(err&&typeof err==='object'&&!err.__pcLogged){try{err.__pcLogged=1}catch(_){}appError(err,k)}throw err}};try{window[k]=w}catch(_){}});

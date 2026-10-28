@@ -4,6 +4,8 @@ const DITEMS={apple:{name:'Apple',icon:'🍎',desc:'Restores 20 HP to a teammate
  voltorb:{name:'Pocket Voltorb',icon:'💥',desc:'Deals 3 damage to every enemy.',target:'none',cost:18,tier:1,aoe:3},
  stellar:{name:'Stellar Storm',icon:'🌠',desc:'Deals 6 damage to every enemy.',target:'none',cost:35,tier:2,aoe:6},
  thundurus:{name:'Thundurus’ Might',icon:'🌩️',desc:'10 damage split evenly between every enemy on the field (all 10 hit a lone enemy).',target:'none',cost:35,tier:2,split:10},
+ salts:{name:'Smelling Salts',icon:'🧂',desc:'Only for a fainted teammate: wakes it up with 50% HP.',target:'ally',cost:20,tier:1,ko:true},
+ wakemint:{name:'Wake Mint',icon:'🍃',desc:'Only while a teammate is fainted: every fainted teammate gets back up with 50% HP.',target:'none',cost:40,tier:2,ko:true},
  snag:{name:'Snag Machine',icon:'🧲',desc:'Tries to catch an enemy with Ultra Ball odds (Poké Ball odds on bosses). Hurt or paralyzed targets are easier. A caught Pokémon leaves the battle and joins your Box. Can’t be fumbled, but missing both questions lowers the odds.',target:'foe',cost:120,tier:3}};
 const DITEM_TIER_W=[10,7,4,1];
 // a Pokémon's catch rate (main-game style) by rarity tier: common 190 … legendary 3
@@ -102,7 +104,7 @@ function dgBattle(kind){const r=runOf(),bump=dgGamey(r)?(r.floor||0)*(DIFF[r.dif
 function dgSpriteHTML(species,row,cls,costumeP,size){return '<div class="dg-spr '+cls+'" data-sp="'+esc(species)+'" data-row="'+row+'" data-sz="'+(+size||1)+'"></div>'}
 const DG_SPRITE_SCALE=1.3; // every Pokémon is drawn at the same scale, so real size differences show
 async function dgFillSprites(){const els=document.querySelectorAll('.dg-spr:not(.ok)');for(const el of els){const sp=el.dataset.sp,row=+el.dataset.row;let a;try{a=await loadAnims(sp)}catch(e){a=null}if(!a){el.innerHTML=portraitHTML(sp,'dg-port');el.classList.add('ok');continue}
-  const an=a.Idle||a.Walk,r=row<(an.rows||8)?row:0,k=DG_SPRITE_SCALE*(+el.dataset.sz||1)*(el.closest('.dg-foe.big')?1.2:1),bb=await sprBounds(an,r),foot=Math.max(0,an.h-bb[3]-1);
+  const an=(el.dataset.anim&&a[el.dataset.anim])||a.Idle||a.Walk,r=row<(an.rows||8)?row:0,k=DG_SPRITE_SCALE*(+el.dataset.sz||1)*(el.closest('.dg-foe.big')?1.2:1),bb=await sprBounds(an,r),foot=Math.max(0,an.h-bb[3]-1);
   // stand the Pokémon on its feet: drop the empty strip under the body (tall frames like Gyarados have a lot of it)
   el.style.cssText='width:'+an.w+'px;height:'+an.h+'px;margin-bottom:'+(-foot)+'px;background-image:url('+an.url+');background-position:0 '+(-r*an.h)+'px;--fw:'+an.w+'px;--fn:'+an.frames+';animation:dsx '+(an.d.reduce((x,y)=>x+y,0)/60).toFixed(2)+'s steps('+an.frames+') infinite;zoom:'+k.toFixed(2)+';';el.classList.add('ok')}}
 function dgcDrawBattle(entering){const r=runOf(),b=r&&r.battle,st=$('dgStage');if(!b||!st)return;twKingCheck(r,b);if(entering)st.scrollTop=0;
@@ -272,17 +274,23 @@ async function dgAttack(slot,ti,name,mv,mult){if(MOVE_SPREAD.has(name))return dg
  await dgSleep(e.hp<=0?1000:800);dgAfterAction()}
 async function dgcRevive(){const _r=runOf(),_b=_r&&_r.battle;if(!_b||_b.enemyPhase||!_r.party[_b.turn])return;if(DG.busy)return;DG.busy=1;const r=runOf(),b=r.battle,m=r.party[b.turn];const res=await dgQ('💫 REVIVE');if(res!=='fail'){m.hp=twReviveHp(m);save();dgDrawBattle();dgFloat('.dg-ally[data-i="'+b.turn+'"]','Back up! ('+m.hp+' HP)','eff');await dgSleep(700)}else{toast('Still fainted. Try again next turn.')}dgAfterAction()}
 function dgItem(){const _r=runOf(),_b=_r&&_r.battle;if(!_b||_b.enemyPhase||!_r.party[_b.turn])return;if(DG.busy)return;if(dgEnvNoItems()){toast('🌙 Sleepless Hollow: items can’t be used here');return}DG.busy=1;const r=runOf(),b=r.battle,ks=Object.keys(r.bag).filter(k=>r.bag[k]>0);if(!ks.length){DG.busy=0;toast('The run bag is empty. Pick up items on the floor, or find a chest or Kecleon Shop.');return}
- $('dgPanel').innerHTML='<div class="dg-msg">Use which item?</div><div class="dg-items">'+ks.map(k=>'<button class="btn" onclick="dgUseItem(\''+k+'\')">'+DITEMS[k].icon+' '+DITEMS[k].name+' ×'+r.bag[k]+'<small>'+DITEMS[k].desc+'</small></button>').join('')+'<button class="btn smallbtn" onclick="DG.busy=0;dgPanelBattle()">BACK</button></div>'}
+ $('dgPanel').innerHTML='<div class="dg-msg">Use which item?</div><div class="dg-items">'+ks.map(k=>'<button class="btn" '+(DITEMS[k].ko&&!r.party.some(q=>q.hp<=0)?'disabled':'')+' onclick="dgUseItem(\''+k+'\')">'+DITEMS[k].icon+' '+DITEMS[k].name+' ×'+r.bag[k]+'<small>'+(DITEMS[k].ko&&!r.party.some(q=>q.hp<=0)?'Nobody has fainted. ':'')+DITEMS[k].desc+'</small></button>').join('')+'<button class="btn smallbtn" onclick="DG.busy=0;dgPanelBattle()">BACK</button></div>'}
 function dgUseItem(k){const r=runOf(),b=r.battle,slot=b.turn;if(b)b.usedItem=true;
- if(k==='overclock'){dgOverclock();return}if(k==='timegear'){dgTimeGear();return}
+ if(k==='overclock'){dgOverclock();return}if(k==='timegear'){dgTimeGear();return}if(k==='wakemint'){dgWakeMint();return}
+ if(k==='salts'&&!r.party.some(q=>q.hp<=0)){toast('Nobody has fainted');DG.busy=0;dgItem();return}let dgTarget0;
  if(DITEMS[k].aoe||DITEMS[k].split){dgBlastItem(k);return}if(k==='snag'){dgChooseFoe(i=>dgSnag(i));return}
- dgTarget={side:'ally',fn:async i=>{dgCrosshair('ally',i,slot);const res=await dgQ(DITEMS[k].icon+' '+DITEMS[k].name.toUpperCase());let used=false,msg;
+ dgTarget={side:'ally',fn:async i=>{if(k==='salts'&&r.party[i].hp>0){toast('Smelling Salts only work on a fainted teammate');dgTarget={side:'ally',fn:dgTarget0};return}dgCrosshair('ally',i,slot);const res=await dgQ(DITEMS[k].icon+' '+DITEMS[k].name.toUpperCase());let used=false,msg;
    if(res==='full'){used=true}else if(res==='makeup'){if(Math.random()<.25){msg=(partyMon(r.party[slot]).nickname||partyMon(r.party[slot]).species)+' fumbled the item! (kept, but no effect)';toast(msg);dgAfterAction();return}used=true}
    r.bag[k]--;if(!used){toast('The '+DITEMS[k].name+' was used up with no effect.');save();dgAfterAction();return}
-   const tm=r.party[i],tc=combatant(partyMon(tm));if(k==='apple'||k==='oran'){if(tm.hp<=0){toast('Fainted Pokémon need a revive question first');r.bag[k]++;DG.busy=0;dgPanelBattle();return}const h=k==='apple'?20:10;tm.hp=Math.min(tc.hp,tm.hp+h);dgDrawBattle();dgFloat('.dg-ally[data-i="'+i+'"]','+'+h+' HP','heal')}
+   const tm=r.party[i],tc=combatant(partyMon(tm));if(k==='salts'){tm.hp=Math.max(1,Math.round(tc.hp*.5));delete tm.reviveTried;dgDrawBattle();dgFloat('.dg-ally[data-i="'+i+'"]','Back up! +'+tm.hp+' HP','heal')}
+   else if(k==='apple'||k==='oran'){if(tm.hp<=0){toast('Fainted Pokémon need a revive question first');r.bag[k]++;DG.busy=0;dgPanelBattle();return}const h=k==='apple'?20:10;tm.hp=Math.min(tc.hp,tm.hp+h);dgDrawBattle();dgFloat('.dg-ally[data-i="'+i+'"]','+'+h+' HP','heal')}
    else if(k==='starf'){const stat=['atk','spa','def','spd','spe'][Math.floor(Math.random()*5)];tm.starf={stat,rooms:3};dgDrawBattle();dgFloat('.dg-ally[data-i="'+i+'"]','+2 '+{atk:'ATK',spa:'SP. ATK',def:'DEF',spd:'SP. DEF',spe:'SPEED'}[stat],'heal')}
    save();await dgSleep(700);dgAfterAction()}};
- document.querySelectorAll('.dg-ally').forEach(x=>x.classList.add('pickable'));$('dgPanel').querySelector('.dg-msg').innerHTML='Tap a teammate to use the '+DITEMS[k].name+' on.'}
+ dgTarget0=dgTarget.fn;document.querySelectorAll('.dg-ally').forEach(x=>{if(k!=='salts'||r.party[+x.dataset.i]&&r.party[+x.dataset.i].hp<=0)x.classList.add('pickable')});
+ // put the item list away so the whole team is in view; tap a teammate, or cancel
+ $('dgPanel').innerHTML='<div class="dg-msg">'+DITEMS[k].icon+' Tap a teammate to use the <b>'+DITEMS[k].name+'</b> on.</div><div class="dg-acts"><button class="btn" onclick="dgItemCancel()">CANCEL</button></div>';
+ if(r.fl&&DG){DG.hl={cls:'ally',tiles:r.party.filter(m=>k!=='salts'||m.hp<=0).map(m=>[m.x,m.y])};gdHighlight();gdFit();gdCamera()}}
+function dgItemCancel(){const r=runOf();dgTarget=null;document.querySelectorAll('.dg-ally').forEach(x=>x.classList.remove('pickable'));if(r&&r.battle)r.battle.usedItem=false;if(DG){DG.busy=0;DG.hl=null;if(r&&r.fl)gdHighlight()}dgItem()}
 // Pocket Voltorb / Stellar Storm / Thundurus' Might: answer one question, then fixed damage to the enemies
 async function dgcBlastItem(k){const r=runOf(),b=r.battle,slot=b.turn,I=DITEMS[k],who=partyMon(r.party[slot]);dgCrosshair('ally',slot,slot);const res=await dgQ(I.icon+' '+I.name.toUpperCase());
  if(res==='makeup'&&Math.random()<.25){toast((who.nickname||who.species)+' fumbled the item! (kept, but no effect)');dgAfterAction();return}
@@ -351,3 +359,9 @@ function dgLose(){if(runOf()&&runOf().tower){if(twSecondWind())return;return twL
 function dgEnd(cleared,quit){if(dgMode==='tower')return twEnd(quit);const r=runOf();if(!r)return;let bonus=0;const tix=Math.max(0,Math.round(r.tickets||0));db.cogs=Math.round(db.cogs+tix);const fl=r.clearedFloors||0;if(cleared&&fl){bonus=dgFloorBonus(r);db.cogs=Math.round(db.cogs+bonus);grantXp(20+10*fl)}else grantXp(15);
  const lines=[(cleared&&fl?'🏆 Beat '+fl+' boss'+(fl>1?'es':'')+'! +'+bonus+' Cogs bonus':quit?'Run ended early.':'Run over.'),'🎟️ Tickets earned: '+(r.cogs||0)+' · '+tix+' left over → +'+tix+' Cogs','Cogs from this run: '+(tix+bonus),'Deepest floor: B'+(r.floor+1)+'F','Time studying: '+fmtMin(r.studyMs)];db.run=null;save();if(mgState)mgState.stop&&mgState.stop();mgState=null;render();
  $('mgArea').innerHTML='<div class="reveal mg-end"><h2>🏰 Mystery Dungeon</h2>'+lines.map(l=>'<p>'+l+'</p>').join('')+recapHTML(r.recap)+'<div class="actions"><button class="btn" onclick="mgQuit()">MENU</button></div></div>'}
+// Wake Mint: one question, then every fainted teammate gets back up with 50% HP
+async function dgWakeMint(){const r=runOf(),b=r.battle,slot=b.turn,I=DITEMS.wakemint;if(!r.party.some(q=>q.hp<=0)){toast('Nobody has fainted');DG.busy=0;dgItem();return}dgCrosshair('ally',slot,slot);const res=await dgQ(I.icon+' '+I.name.toUpperCase());
+ if(res==='makeup'&&Math.random()<.25){toast('The Wake Mint slipped away! (kept, but no effect)');dgAfterAction();return}
+ r.bag.wakemint--;if(res==='fail'){toast('The Wake Mint was used up with no effect.');save();dgAfterAction();return}
+ const up=[];r.party.forEach((m,i)=>{if(m.hp>0)return;const c=combatant(partyMon(m));m.hp=Math.max(1,Math.round(c.hp*.5));delete m.reviveTried;up.push([i,m.hp])});save();dgDrawBattle();
+ up.forEach(([i,h])=>dgFloat('.dg-ally[data-i="'+i+'"]','Back up! +'+h+' HP','heal'));toast(I.icon+' '+up.length+' teammate'+(up.length>1?'s are':' is')+' back up!');await dgSleep(900);dgAfterAction()}

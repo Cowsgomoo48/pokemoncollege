@@ -55,3 +55,4 @@
 ## Fixes
 - **Frenzy** is now a ★★★★★ Legendary card. Its card art had been left showing 3 stars.
 - **Leaving Magearna's shop:** the menu you tap now opens straight away. Magearna's goodbye cry still plays.
+- **Box:** the backpack badge on Pokémon that are on a run is a small corner icon again (it had grown to fill the whole circle).

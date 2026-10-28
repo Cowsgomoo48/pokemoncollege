@@ -101,12 +101,16 @@ function gdDrawBattle(entering){const r=runOf(),b=r&&r.battle,st=$('dgStage');if
   +fl.specials.filter(s=>seenAt(s.x,s.y)).map(s=>'<div class="gd-obj sp" style="left:'+s.x*T+'px;top:'+s.y*T+'px">'+GD_SPECIAL[s.k].icon+'</div>').join('');
  // units (sprites keep their element between redraws so animations and effects stay smooth)
  const U=field.querySelector('.gd-units'),want=new Set();
- const unit=(cls,i,x,y,sp,row,hpPct,extra,color)=>{const id=cls+i;want.add(id);let el=U.querySelector('[data-u="'+id+'"]');if(!el){el=document.createElement('div');el.dataset.u=id;el.innerHTML='<div class="gd-hp"><i></i></div><div class="dg-spr" data-sp="'+esc(sp)+'" data-row="'+row+'" data-sz="'+(extra.includes('big')?1:.82)+'"></div><b class="dg-xh"></b>';U.appendChild(el)}
-  el.className='gd-u '+cls+' '+extra;el.dataset.i=i;el.style.left=x*T+'px';el.style.top=y*T+'px';el.style.zIndex=10+y;if(color)el.style.setProperty('--c',color);const s=el.querySelector('.dg-spr');if(+s.dataset.row!==row){s.dataset.row=row;s.classList.remove('ok')}
+ const unit=(cls,i,x,y,sp,row,hpPct,extra,color,anim)=>{const id=cls+i;want.add(id);let el=U.querySelector('[data-u="'+id+'"]');if(!el){el=document.createElement('div');el.dataset.u=id;el.innerHTML='<div class="gd-hp"><i></i></div><div class="dg-spr" data-sp="'+esc(sp)+'" data-row="'+row+'" data-sz="'+(extra.includes('big')?1:.82)+'"></div><b class="dg-xh"></b>';U.appendChild(el)}
+  el.className='gd-u '+cls+' '+extra;el.dataset.i=i;el.style.left=x*T+'px';el.style.top=y*T+'px';el.style.zIndex=10+y;if(color)el.style.setProperty('--c',color);const s=el.querySelector('.dg-spr');if(+s.dataset.row!==row){s.dataset.row=row;s.classList.remove('ok')}if((s.dataset.anim||'')!==(anim||'')){s.dataset.anim=anim||'';s.classList.remove('ok')}
   const hp=el.querySelector('.gd-hp i');hp.style.width=Math.max(0,Math.min(100,hpPct))+'%';hp.className=hpPct<=20?'low':hpPct<=50?'mid':''};
- r.party.forEach((m,i)=>{const c=combatant(partyMon(m));unit('dg-ally',i,m.x,m.y,partyMon(m).species,m.dir||0,m.hp/c.hp*100,(m.hp<=0?'ko ':'')+(b.turn===i&&!b.enemyPhase?'active ':'')+(m.acted?'done ':'')+(b.guard[i]?'guard ':''),SLOT_COLORS[i])});
- b.enemies.forEach((e,i)=>{if(e.done||(e.hp<=0&&!e.gdOut)||!vis(e.x,e.y))return;unit('dg-foe',i,e.x,e.y,e.species,e.dir||0,(e.gdOut?e.gdHp:e.hp)/e.maxhp*100,(e.boss?'big ':'')+(e.aware?'':'asleep '))});
+ const now=Date.now();
+ r.party.forEach((m,i)=>{const c=combatant(partyMon(m));if(m.hp>0)delete m.koAt;else if(!m.koAt){m.koAt=now;gdKoFx('dg-ally'+i,false)}const ko=m.hp>0?0:now-m.koAt;unit('dg-ally',i,m.x,m.y,partyMon(m).species,m.dir||0,m.hp/c.hp*100,(m.hp<=0?'ko ':'')+(m.hp<=0&&ko<700?'gd-stagger ':'')+(b.turn===i&&!b.enemyPhase?'active ':'')+(m.acted?'done ':'')+(b.guard[i]?'guard ':''),SLOT_COLORS[i],m.hp<=0&&ko>=600?'Sleep':'')});
+ // a fainted foe staggers, falls asleep and fades out instead of vanishing
+ b.enemies.forEach((e,i)=>{const dead=e.hp<=0&&!e.gdOut;if(dead&&!e.koAt&&!e.done){e.koAt=now;gdKoFx('dg-foe'+i,true)}if(dead?!(e.koAt&&now-e.koAt<1500):e.done)return;if(!vis(e.x,e.y))return;
+  unit('dg-foe',i,e.x,e.y,e.species,e.dir||0,dead?0:(e.gdOut?e.gdHp:e.hp)/e.maxhp*100,(e.boss?'big ':'')+(e.aware||dead?'':'asleep ')+(dead?'gd-faint ':''),null,dead&&now-e.koAt>=600?'Sleep':'')});
  U.querySelectorAll('.gd-u').forEach(el=>{if(!want.has(el.dataset.u))el.remove()});dgFillSprites();
+ if(DG){const free=gdFree(r);if(!free&&(DG.wasFree!==false||!DG.bcam))DG.bcam=gdBattleCam(r);if(free)DG.bcam=null;DG.wasFree=free}
  if(entering)gdFit();gdHighlight();gdMini(r,L);if(entering||DG&&DG.follow!==false)gdCamera();
  if(DG&&DG.busy&&!b.enemyPhase)$('dgPanel').innerHTML='<div class="dg-msg">…</div>';else dgPanelBattle()}
 // fit the dungeon between the page header and the bottom dock, so the action buttons are never hidden
@@ -118,7 +122,7 @@ function gdMini(r,L){const fl=r.fl,c=document.querySelector('.gd-mini');if(!c)re
  fl.items.forEach(it=>{if(fl.seen[it.y*fl.w+it.x]==='1'){g.fillStyle='#ffd34d';g.fillRect(it.x*s,it.y*s,s,s)}});
  r.battle.enemies.forEach(e=>{if(e.hp>0&&!e.done&&L.has(gdKey(e.x,e.y))){g.fillStyle='#ff4d4d';g.fillRect(e.x*s,e.y*s,s,s)}});
  r.party.forEach((m,i)=>{g.fillStyle=SLOT_COLORS[i];g.fillRect(m.x*s-1,m.y*s-1,s+2,s+2)})}
-function gdCamera(x,y){const r=runOf(),f=document.querySelector('.gd-field'),mp=f&&f.querySelector('.gd-map');if(!mp)return;const b=r.battle,m=r.party[b.turn]||r.party[0];x=x??m.x;y=y??m.y;
+function gdCamera(x,y){const r=runOf(),f=document.querySelector('.gd-field'),mp=f&&f.querySelector('.gd-map');if(!mp)return;const b=r.battle,m=r.party[b.turn]||r.party[0];if(x==null&&DG&&DG.bcam)[x,y]=DG.bcam;x=x??m.x;y=y??m.y;
  const W=f.clientWidth,H=f.clientHeight,T=GD_T,mw=r.fl.w*T,mh=r.fl.h*T;let tx=W/2-(x+.5)*T,ty=H/2-(y+.5)*T;tx=Math.min(0,Math.max(W-mw,tx));ty=Math.min(0,Math.max(H-mh,ty));if(mw<W)tx=(W-mw)/2;if(mh<H)ty=(H-mh)/2;mp.style.transform='translate('+Math.round(tx)+'px,'+Math.round(ty)+'px)'}
 function gdHighlight(){const hl=document.querySelector('.gd-hl');if(!hl)return;const T=GD_T,H=DG&&DG.hl;hl.innerHTML=H?H.tiles.map(([x,y])=>'<i class="'+H.cls+'" style="left:'+x*T+'px;top:'+y*T+'px"></i>').join(''):''}
 // ---------- tapping the map ----------
@@ -142,13 +146,18 @@ function gdPanelBattle(msg){const r=runOf(),b=r.battle,m=r.party[b.turn],p=m&&pa
 // Free roam: while no wild Pokémon is in sight, moving doesn't use up anyone's turn. The picked Pokémon can keep walking
 // (up to 6 tiles a step, or more if it's faster), the rest of the team follows, and everyone slowly recovers HP.
 const GD_FREE_MV=6;
-function gdFree(r){r=r||runOf();return !!(r&&r.fl&&r.battle&&!r.battle.enemyPhase&&!gdFoeTargets(r).length)}
+function gdFree(r){r=r||runOf();return !!(r&&r.fl&&r.battle&&!r.battle.enemyPhase&&!gdFoeTargets(r).some(([e])=>e.aware))}
+// battles: the camera holds on the middle of the room (or between your team and the foes in a corridor)
+function gdBattleCam(r){const b=r.battle,m=r.party[b.turn]||r.party[0],ri=gdRoomOf(r.fl,m.x,m.y);if(ri>=0){const o=r.fl.rooms[ri];return [o[0]+(o[2]-1)/2,o[1]+(o[3]-1)/2]}
+ const pts=[m,...gdFoeTargets(r).filter(([e])=>e.aware).map(([e])=>e)];return [pts.reduce((a,p)=>a+p.x,0)/pts.length,pts.reduce((a,p)=>a+p.y,0)/pts.length]}
+// fainting: stagger, then the Sleep animation; foes then fade out (CSS does the motion)
+function gdKoFx(id,fade){setTimeout(()=>{const s=document.querySelector('.gd-units [data-u="'+id+'"] .dg-spr');if(s){s.dataset.anim='Sleep';s.classList.remove('ok');dgFillSprites()}},600);if(fade)setTimeout(()=>{const u=document.querySelector('.gd-units [data-u="'+id+'"]');if(u&&u.classList.contains('gd-faint'))u.remove()},1550)}
 function gdSelect(i){const r=runOf(),b=r&&r.battle;if(!b||b.enemyPhase||DG.busy)return;b.turn=i;DG.gmode='select';DG.hl=null;gdDrawBattle()}
 // ---------- moving ----------
 function gdMoveStart(){const r=runOf(),b=r.battle,m=r.party[b.turn];if(!m||m.hp<=0||DG.busy)return;const free=gdFree(r);if(!free&&(m.moved||m.acted))return;const fl=r.fl,mv=free?Math.max(GD_FREE_MV,gdMV(partyMon(m).species)):Math.max(1,gdMV(partyMon(m).species)+mdMoveAdj());
- const reach=gdBFS(fl,[m.x,m.y],(x,y)=>b.enemies.some(e=>(e.hp>0||e.gdOut)&&!e.done&&e.x===x&&e.y===y),mv);DG.reach=reach;DG.gmode='move';gdCamera(m.x,m.y);
+ const reach=gdBFS(fl,[m.x,m.y],(x,y)=>b.enemies.some(e=>(e.hp>0||e.gdOut)&&!e.done&&e.x===x&&e.y===y),mv);DG.reach=reach;DG.gmode='move';if(!DG.bcam)gdCamera(m.x,m.y);
  DG.hl={cls:'mv',tiles:[...reach.keys()].map(k=>k.split(',').map(Number)).filter(([x,y])=>!(x===m.x&&y===m.y)&&!gdUnitAt(r,x,y))};gdHighlight();$('dgPanel').innerHTML='<div class="dg-msg">👣 Tap a blue tile to move there (up to '+mv+' tiles).'+(free?' No foes in sight, so this doesn’t use up the turn.':'')+'</div><div class="dg-acts"><button class="btn" onclick="DG.gmode=\'select\';DG.hl=null;gdDrawBattle()">CANCEL</button></div>'}
-async function gdWalk(unitEl,obj,path,isFoe){const T=GD_T;for(let s=1;s<path.length;s++){const [x,y]=path[s],[px,py]=path[s-1];obj.dir=gdDirOf(x-px,y-py);obj.x=x;obj.y=y;if(unitEl){unitEl.style.left=x*T+'px';unitEl.style.top=y*T+'px';unitEl.style.zIndex=10+y;const sp=unitEl.querySelector('.dg-spr');if(sp&&+sp.dataset.row!==obj.dir){sp.dataset.row=obj.dir;sp.classList.remove('ok');dgFillSprites()}}if(!isFoe)gdCamera(x,y);await dgSleep(120)}}
+async function gdWalk(unitEl,obj,path,isFoe){const T=GD_T;for(let s=1;s<path.length;s++){const [x,y]=path[s],[px,py]=path[s-1];obj.dir=gdDirOf(x-px,y-py);obj.x=x;obj.y=y;if(unitEl){unitEl.style.left=x*T+'px';unitEl.style.top=y*T+'px';unitEl.style.zIndex=10+y;const sp=unitEl.querySelector('.dg-spr');if(sp&&+sp.dataset.row!==obj.dir){sp.dataset.row=obj.dir;sp.classList.remove('ok');dgFillSprites()}}if(!isFoe&&!(DG&&DG.bcam))gdCamera(x,y);await dgSleep(120)}}
 async function gdWalkTo(slot,x,y){const r=runOf(),b=r.battle,m=r.party[slot],path=gdPath(DG.reach,gdKey(x,y)),wasFree=gdFree(r);DG.gmode='select';DG.hl=null;DG.busy=1;gdHighlight();
  await gdWalk(document.querySelector('.dg-ally[data-i="'+slot+'"]'),m,path,false);if(!runOf()||runOf().battle!==b)return;
  if(wasFree)gdFollow(r,slot,path);gdSee(r);mdHazard(r,m,false,slot);
@@ -177,7 +186,7 @@ async function gdFight(){const r=runOf(),b=r&&r.battle;if(!b||b.enemyPhase||DG.b
  const lab=(id,n,mv)=>{const el=$(id);if(el){const sm=el.querySelector('small');if(sm)sm.insertAdjacentHTML('beforeend','<br>📐 '+gdShape(n,mv).label)}};lab('dgM1',p.fastMove,fast);lab('dgM2',p.discMove,disc);
  const choose=(name,mv,opts)=>{if(!opts.length)return;DG.gmode='target';DG.opts=opts;const T=new Set();opts.forEach(o=>o.hits.forEach(i=>T.add(i)));DG.hl={cls:'tg',tiles:[...T].map(i=>[b.enemies[i].x,b.enemies[i].y])};gdHighlight();
   const go=async o=>{DG.gmode='select';DG.hl=null;gdHighlight();DG.busy=1;const sl=b.turn,ep=dgEpoch,res=await dgQ('⚔️ FIGHT',{hint:true});const mult=r.slider?await dgSlider(res,dgBarSlow(b)):dgRandMult();const r2=runOf();if(ep!==dgEpoch||!r2||r2.battle!==b||b.turn!==sl||m.acted)return;if(mv[3]!=='fast'&&m.energy<mv[2]){DG.busy=0;gdDrawBattle();return}
-   const t0=b.enemies[o.key];m.dir=gdDirOf(t0.x-m.x,t0.y-m.y);const s=document.querySelector('.dg-ally[data-i="'+sl+'"] .dg-spr');if(s){s.dataset.row=m.dir;s.classList.remove('ok');await dgFillSprites()}
+   const t0=b.enemies[o.key];o.hits.forEach(j=>{if(b.enemies[j])b.enemies[j].aware=1});m.dir=gdDirOf(t0.x-m.x,t0.y-m.y);const s=document.querySelector('.dg-ally[data-i="'+sl+'"] .dg-spr');if(s){s.dataset.row=m.dir;s.classList.remove('ok');await dgFillSprites()}
    if(o.hits.length===1&&!MOVE_SPREAD.has(name))dgAttack(sl,o.key,name,mv,mult);else gdAttackMulti(sl,name,mv,mult,o.hits)};
   DG.pick=go;if(opts.length===1&&opts[0].all){go(opts[0]);return}$('dgPanel').innerHTML='<div class="dg-msg">🎯 Tap a highlighted foe.'+(gdShape(name,mv).k==='beam'?' The beam hits everything in that line.':'')+'</div><div class="dg-acts"><button class="btn" onclick="DG.gmode=\'select\';DG.hl=null;gdDrawBattle()">BACK</button></div>'};
  $('dgM1').onclick=()=>choose(p.fastMove,fast,o1);$('dgM2').onclick=()=>choose(p.discMove,disc,o2);
@@ -205,7 +214,10 @@ function gdKills(r){const b=r.battle,got=[];b.enemies.forEach(e=>{if(e.hp>0||e.d
    if(r.fl.boss){r.fl.stairsHidden=false;got.push('🪜 The stairs appeared!')}}});
  if(got.length&&DG)DG.msg=(DG.msg?DG.msg+'<br>':'')+got.join('<br>')}
 function gdAfterAction(){const r=runOf(),b=r&&r.battle;if(DG)DG.busy=0;if(!b||!r.fl)return;gdUnstash(b);const m=r.party[b.turn];if(m){m.acted=true;m.moved=true}r.party.forEach(q=>{if(!(q.energy>=0))q.energy=0});dgTarget=null;if(DG){DG.gmode='select';DG.hl=null}gdKills(r);
- if(r.party.every(q=>q.hp<=0)){dgLose();return}const next=r.party.findIndex((q,i)=>!q.acted&&(q.hp>0||!q.acted));
+ if(r.party.every(q=>q.hp<=0)){dgLose();return}
+ // no foe awake in sight: the battle is over (or never started), so everyone can move again
+ if(gdFree(r)){r.party.forEach(q=>{q.moved=false;q.acted=false;delete q.reviveTried});b.turn=Math.max(0,r.party.findIndex(q=>q.hp>0));b.guard={};save();gdDrawBattle();gdCamera();return}
+ const next=r.party.findIndex((q,i)=>!q.acted&&(q.hp>0||!q.acted));
  if(r.party.every(q=>q.acted||(q.hp<=0&&q.reviveTried))){save();gdEnemyPhase();return}if(next>=0)b.turn=next;save();gdDrawBattle()}
 function gdEndTurn(){const r=runOf(),b=r&&r.battle;if(!b||b.enemyPhase||DG.busy)return;if(r.party.some(q=>q.hp>0&&!q.acted)&&!confirm('End the turn? Pokémon that haven’t acted will skip their action.'))return;gdEnemyPhase()}
 // ---------- the enemies' turn ----------
