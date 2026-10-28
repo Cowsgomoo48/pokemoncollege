@@ -124,7 +124,7 @@ function dgcChooseFoe(fn){if(!runOf()||!runOf().battle)return;const b=runOf().ba
 function dgCrosshair(side,i,slot){document.querySelectorAll('.dg-xh').forEach(x=>x.innerHTML='');const el=document.querySelector((side==='foe'?'.dg-foe':'.dg-ally')+'[data-i="'+i+'"] .dg-xh');if(el)el.innerHTML='<i style="border-color:'+SLOT_COLORS[slot]+'"></i>'}
 function dgQ(title,opts){const ep=dgEpoch,r0=runOf(),bt=r0&&r0.battle,tn=bt&&bt.turn;
  // Do It Yourself: on some floors the first attack question is a practice problem you work out line by line
- let it=null,diy=false;if(bt&&bt.diy&&/FIGHT/.test(title)){bt.diy=false;const gens=DG.bank.filter(b=>b.kind==='gen'),weak=gens.filter(isWeak);if(gens.length){it=weak.length&&Math.random()<.5?weak[Math.floor(Math.random()*weak.length)]:gens[Math.floor(Math.random()*gens.length)];diy=true}}
+ let it=null,diy=false;if(bt&&bt.diy&&/FIGHT/.test(title)){bt.diy=false;const gens=DG.bank.filter(b=>b.kind==='gen'&&!(PR[b.gid]&&PR[b.gid].cmd)),weak=gens.filter(isWeak);if(gens.length){it=weak.length&&Math.random()<.5?weak[Math.floor(Math.random()*weak.length)]:gens[Math.floor(Math.random()*gens.length)];diy=true}}
  if(!it)it=DG.P.next();
  return (diy?askDIY(it,{title}):askQ(it,DG.bank,Object.assign({title},opts||{}))).then(res=>{const r1=runOf();if(ep!==dgEpoch||!DG||!r1||(bt&&(r1.battle!==bt||bt.turn!==tn)))return new Promise(()=>{});DG.P.report(it,res);if(res!=='full'&&__qMiss)recapAdd(it,__qMiss);if(diy&&res==='full'){r1.tickets=(r1.tickets||0)+5;r1.cogs=(r1.cogs||0)+5;toast('🛠 Worked it out! +5 🎟️')}if(bt&&res==='full')bt.qFull=(bt.qFull||0)+1;if(bt)bt.lastRes=res;apMaybePrompt();return res})}
 // ---------- autopilot check ----------

@@ -59,8 +59,8 @@ function askQ(item,bank,opts={}){__qMissReset();return new Promise(res=>{const o
  const plan=opts.typed!==false&&Math.random()<(opts.typedChance??.2)?saPlan(item):null;
  const show=(q,isMakeUp)=>{const t0=performance.now();let hinted=false;const typed=!!q.typed;
   ov.innerHTML='<div class="mgq-card">'+(opts.title?'<span class="badge">'+esc(opts.title)+'</span> ':'')+(isMakeUp?'<span class="badge mk">MAKE-UP</span>':'')+(typed?'<span class="badge sa-b">✍️ TYPE IT</span>':'')+'<h3>'+mathHTML(q.prompt)+'</h3><p class="small muted">'+esc(q.sub)+'</p>'+(opts.hint!==false?'<div class="mgq-hints"></div><button class="btn smallbtn mgq-hint">💡 Hint</button>':'')
-   +(typed?'<div class="sa-wrap"><input class="sa-in" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Your answer"><button class="btn red sa-go">CHECK</button></div>'+(q.math?saKeysHTML():''):q.options.map((o,i)=>'<button class="answer" data-i="'+i+'">'+mathHTML(o.t)+'</button>').join(''))
-   +(q.math||mathy(q.prompt,...q.options.map(o=>o.t))?calcHTML():'')+'</div>';calcInit(ov);
+   +(typed?'<div class="sa-wrap"><input class="sa-in" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Your answer"><button class="btn red sa-go">CHECK</button></div>'+(q.cmd?saKeysHTML(true):q.math?saKeysHTML():''):q.options.map((o,i)=>'<button class="answer" data-i="'+i+'">'+mathHTML(o.t)+'</button>').join(''))
+   +(!q.cmd&&(q.math||mathy(q.prompt,...q.options.map(o=>o.t)))?calcHTML():'')+'</div>';calcInit(ov);
   // hints come one step at a time; they explain the problem and never remove answers.
   // Questions without built-in steps ask the AI tutor to work out the steps the first time you tap.
   const hb=ov.querySelector('.mgq-hint'),ans=String((q.options.find(o=>o.ok)||{}).t||'');let H=q.steps&&q.steps.length?q.steps.map(x=>x[0]):null,hi=0,busy=false;
@@ -85,10 +85,10 @@ function askQ(item,bank,opts={}){__qMissReset();return new Promise(res=>{const o
    if(tutorIt)aiTutor(q.prompt,ans,q.options.map(o=>o.t)).then(st=>{const el=card.querySelector('.mgq-sol');if(!el)return;if(st)el.outerHTML=solOL(st);else el.textContent='The AI couldn’t work this one out right now.'});
    card.querySelector('.mgq-go').onclick=()=>{if(isMakeUp||opts.makeUp===false)done('fail');else show(mgQuestion(item,bank,1-v0),true)}};
   ov.querySelectorAll('.answer').forEach(b=>b.onclick=()=>answered(q.options[+b.dataset.i],b));
-  if(typed){const inp=ov.querySelector('.sa-in'),go=()=>{const v=inp.value.trim();if(!v){inp.focus();return}answered({t:v,ok:saMatch(v,q.short)},null)};ov.querySelector('.sa-go').onclick=go;inp.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();go()}};
+  if(typed){const inp=ov.querySelector('.sa-in'),go=()=>{const v=inp.value.trim();if(!v){inp.focus();return}answered({t:v,ok:q.cmd?cmdMatch(v,[q.short,...(q.alts||[])]):saMatch(v,q.short)},null)};ov.querySelector('.sa-go').onclick=go;inp.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();go()}};
    ov.querySelectorAll('.sa-keys button').forEach(b=>b.onclick=e=>{e.preventDefault();saInsert(inp,b.dataset.k)});setTimeout(()=>inp.focus(),60);
    const ci=ov.querySelector('.calc-in');if(ci){ci.insertAdjacentHTML('beforeend','<button type="button" class="btn smallbtn blue sa-put">↳ Use this result</button>');ci.querySelector('.sa-put').onclick=e=>{e.preventDefault();const v=((ov.querySelector('.calc-res')||{}).textContent||'').replace(/^=\s*/,'');if(v)saInsert(inp,v)}}}};
- show(plan?{typed:true,prompt:plan.prompt,sub:plan.sub,options:[{t:plan.answer,ok:true}],short:plan.answer,steps:plan.steps,explain:plan.explain,math:plan.math}:mgQuestion(item,bank,v0),false)})}
+ show(plan?{typed:true,prompt:plan.prompt,sub:plan.sub,options:[{t:plan.answer,ok:true}],short:plan.answer,steps:plan.steps,explain:plan.explain,math:plan.math,cmd:plan.cmd,alts:plan.alts}:mgQuestion(item,bank,v0),false)})}
 // ---------- menu & setup ----------
 const MG={dungeon:{name:'Mystery Dungeon',icon:'🏰',desc:'Lead up to 4 Pokémon through a study dungeon.'},tower:{name:'Battle Tower',icon:'🗼',desc:'Non-stop battles. A boss every 10 floors. How high can you climb?'},luxor:{name:'Luxor',icon:'🐍',desc:'Fire type-marbles to break the chain. Questions push it back.'},flash:{name:'Flashcards',icon:'🎴',desc:'Flip, check yourself, repeat.'},match:{name:'Match-Up',icon:'🧩',desc:'Flip-free card matching: pair each term with its meaning.'},speed:{name:'Speed Round',icon:'⏲',desc:'15 seconds a question. Faster answers score more.'}};
 const MG_ENDLESS={luxor:1,match:1,speed:1};

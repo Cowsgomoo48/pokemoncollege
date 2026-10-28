@@ -226,7 +226,7 @@ prDef('limits','Calculus','Limits (removable discontinuities)',/\blim\b|\blimits
  ['Factor the top: find two numbers that multiply to '+(r*s)+' and add to '+(-(r+s))+'.',num+' = (x '+(r<0?'+ '+(-r):'- '+r)+')(x '+(s<0?'+ '+(-s):'- '+s)+')'],
  ['Cancel the factor that matches the bottom, then plug in x = '+r+'.',prLin(1,-s)+' at x = '+r+'  →  '+r+' − ('+s+') = '+ans]])});
 // ---------------- Statistics ----------------
-prDef('center','Statistics','Mean, median, mode & range',/\bmean\b|\bmedian\b|\bmode\b|\baverage\b|measures? of (center|central tendency|spread)|\brange\b of (the|a) data/i,()=>{
+prDef('center','Statistics','Mean, median, mode & range',/\bmean\b|\bmedian\b|\bmodes? (of|is|=)|(mean|median)[^.\n]{0,20}\bmode\b|\baverage\b|measures? of (center|central tendency|spread)|\brange\b of (the|a) data/i,()=>{
  const n=prPick([5,6,7]),d=Array.from({length:n-1},()=>prR(1,20));d.push(d[prR(0,n-2)]);const s=[...d].sort((x,y)=>x-y),cnt={};s.forEach(v=>cnt[v]=(cnt[v]||0)+1);
  const top=Math.max(...Object.values(cnt)),modes=Object.keys(cnt).filter(k=>cnt[k]===top).map(Number);
  const mean=prNum(s.reduce((x,y)=>x+y,0)/n),med=n%2?String(s[(n-1)/2]):prNum((s[n/2-1]+s[n/2])/2),rng=String(s[n-1]-s[0]),mode=modes.length===1?String(modes[0]):null;

@@ -868,6 +868,7 @@ button.sd-done{min-height:0!important;padding:0;border:0;cursor:pointer}button.s
 .token .symbol{font-size:26px;line-height:1}
 .token strong{font-size:20px;font-weight:900;letter-spacing:.3px}
 @media(prefers-reduced-motion:reduce){.wander{transition:none}}
+code.cmd{font-family:ui-monospace,Menlo,monospace;font-size:.92em;background:#1d2433;color:#e8f0ff;padding:1px 5px;border-radius:5px;white-space:pre-wrap;word-break:break-word}
 </style><style id="bundled-animation-style">
 .safari-foreground{position:absolute;inset:0;z-index:10;pointer-events:auto;background:#071b0d;display:flex;align-items:center;justify-content:center;overflow:hidden}
 .safari-foreground img{width:100%;height:100%;object-fit:cover;image-rendering:pixelated}
@@ -929,6 +930,18 @@ function appError(msg,where){var raw=String(msg&&msg.message||msg||'Unknown erro
  try{var m=document.getElementById('toastMount');if(m){m.innerHTML='<div class="toast">Something hiccuped (logged in Settings → Error log)</div>';setTimeout(function(){m.innerHTML=''},3500)}}catch(e){}}
 window.addEventListener('error',function(e){if(e.error&&e.error.__pcLogged)return;appError(e.error||e.message,(e.filename||'').split('/').pop()+':'+e.lineno+':'+e.colno)});
 window.addEventListener('unhandledrejection',function(e){appError(e.reason||'Unhandled app error','promise')});
+// iOS only reports "Script error." for errors thrown inside timers, animation frames, observers and event callbacks.
+// Wrap those callbacks so the real error (with its stack) is logged first; the blank duplicate is then skipped.
+(function(){function wrap(fn,where){if(typeof fn!=='function'||fn.__pcW)return fn;var w=function(){try{return fn.apply(this,arguments)}catch(e){try{if(e&&typeof e==='object'&&!e.__pcLogged){appError(e,where+(fn.name?' '+fn.name:''));e.__pcLogged=1}}catch(_){}throw e}};w.__pcW=1;return w}
+ var st=window.setTimeout,si=window.setInterval,ra=window.requestAnimationFrame;
+ window.setTimeout=function(fn,ms){var a=[].slice.call(arguments);a[0]=wrap(fn,'timer');return st.apply(window,a)};
+ window.setInterval=function(fn,ms){var a=[].slice.call(arguments);a[0]=wrap(fn,'interval');return si.apply(window,a)};
+ if(ra)window.requestAnimationFrame=function(fn){return ra.call(window,wrap(fn,'frame'))};
+ var MO=window.MutationObserver;if(MO){window.MutationObserver=function(cb){return new MO(wrap(cb,'observer'))};window.MutationObserver.prototype=MO.prototype}
+ var ael=EventTarget.prototype.addEventListener,rel=EventTarget.prototype.removeEventListener,map=new WeakMap();
+ EventTarget.prototype.addEventListener=function(t,fn,o){if(typeof fn!=='function'||t==='error'||t==='unhandledrejection')return ael.call(this,t,fn,o);var w=map.get(fn);if(!w){w=wrap(fn,t+' event');map.set(fn,w)}return ael.call(this,t,w,o)};
+ EventTarget.prototype.removeEventListener=function(t,fn,o){return rel.call(this,t,(typeof fn==='function'&&map.get(fn))||fn,o)};
+ ['onload','onerror'].forEach(function(k){var d=Object.getOwnPropertyDescriptor(HTMLImageElement.prototype,k)||Object.getOwnPropertyDescriptor(HTMLElement.prototype,k);if(d&&d.set)Object.defineProperty(HTMLImageElement.prototype,k,{get:d.get,set:function(v){d.set.call(this,wrap(v,'image '+k.slice(2)))},configurable:true})})})();
 // PokémonCollege PWA local save bridge. No server receives saved progress.
 const STORAGE_MAIN='PokemonCollege-PWA-save-v1';
 const STORAGE_RECOVERY='PokemonCollege-PWA-recovery-v1';
@@ -2250,7 +2263,7 @@ prDef('limits','Calculus','Limits (removable discontinuities)',/\blim\b|\blimits
  ['Factor the top: find two numbers that multiply to '+(r*s)+' and add to '+(-(r+s))+'.',num+' = (x '+(r<0?'+ '+(-r):'- '+r)+')(x '+(s<0?'+ '+(-s):'- '+s)+')'],
  ['Cancel the factor that matches the bottom, then plug in x = '+r+'.',prLin(1,-s)+' at x = '+r+'  →  '+r+' − ('+s+') = '+ans]])});
 // ---------------- Statistics ----------------
-prDef('center','Statistics','Mean, median, mode & range',/\bmean\b|\bmedian\b|\bmode\b|\baverage\b|measures? of (center|central tendency|spread)|\brange\b of (the|a) data/i,()=>{
+prDef('center','Statistics','Mean, median, mode & range',/\bmean\b|\bmedian\b|\bmodes? (of|is|=)|(mean|median)[^.\n]{0,20}\bmode\b|\baverage\b|measures? of (center|central tendency|spread)|\brange\b of (the|a) data/i,()=>{
  const n=prPick([5,6,7]),d=Array.from({length:n-1},()=>prR(1,20));d.push(d[prR(0,n-2)]);const s=[...d].sort((x,y)=>x-y),cnt={};s.forEach(v=>cnt[v]=(cnt[v]||0)+1);
  const top=Math.max(...Object.values(cnt)),modes=Object.keys(cnt).filter(k=>cnt[k]===top).map(Number);
  const mean=prNum(s.reduce((x,y)=>x+y,0)/n),med=n%2?String(s[(n-1)/2]):prNum((s[n/2-1]+s[n/2])/2),rng=String(s[n-1]-s[0]),mode=modes.length===1?String(modes[0]):null;
@@ -2460,6 +2473,142 @@ function prOf(s){if(!s)return [];const l=Array.isArray(s.practice)?s.practice:pr
 // show a sample problem from the types ticked in the summary editor
 function prTry(){const ids=[...document.querySelectorAll('.pr-pick input[name=pr]:checked')].map(x=>x.value),el=$('prSample');if(!el)return;if(!ids.length){el.innerHTML='<p class="small muted">Tick a problem type first.</p>';return}const id=prPick(ids),p=prInstance(id);if(!p)return;el.innerHTML='<div class="notice"><small>'+esc(PR[id].name)+'</small><br><b>'+esc(p.q)+'</b><br>Answer: '+esc(p.a)+(p.steps&&p.steps.length?'<ol class="small muted pr-steps">'+p.steps.map(x=>'<li>'+esc(x[1])+'</li>').join('')+'</ol>':'<br><span class="small muted">'+esc(p.ex)+'</span>')+'</div>'}
 function prSubjects(){const out={};Object.values(PR).forEach(T=>(out[T.subject]=out[T.subject]||[]).push(T));return out}
+// ===================== PRACTICE PROBLEMS · Unix command line =====================
+// Command-line problems for study sets about Unix/Linux: navigating, viewing files, permissions, find, grep, pipes,
+// regex, wildcards and the everyday commands. File names, folders, users and numbers are random every time.
+// Commands are shown in `backticks` (drawn as code, never as maths). Typed answers are checked exactly (capitals and
+// options matter), but quotes around plain words, extra spaces and the order of find's options don't.
+const UX={files:['notes.txt','report.txt','log.txt','data.csv','todo.md','server.log','grades.txt','names.txt','errors.log','list.txt'],dirs:['docs','logs','src','projects','backup','scripts','reports','music'],
+ users:['bob','alice','sam','kim','maria','dev'],groups:['staff','students','admin','dev'],words:['error','warning','TODO','failed','admin','login','report','denied','timeout'],scripts:['foo.sh','run.sh','build.sh','backup.sh','start.sh','clean.sh']};
+const uxC=s=>'`'+s+'`';
+function prCmd(id,name,kw,make){prDef(id,'Unix / command line',name,kw,make);PR[id].cmd=true}
+// one command question: answer, three wrong commands, a short explanation, other accepted forms
+function uxQ(q,a,wrong,why,alts){const p=prMC(q,uxC(a),wrong.map(uxC),k=>uxC(a+' '+'?'.repeat(k+1)),why,[['Which command does this job? Then which option, and what comes last (the file or folder)?',why],['Put it together: command, options, then the target.','Answer: '+uxC(a)]]);p.alts=alts||[];return p}
+// typed commands: same text after tidying spaces and quotes (iPhone smart quotes and dashes too)
+function uxNorm(s){return String(s==null?'':s).replace(/`/g,'').replace(/[“”„]/g,'"').replace(/[‘’']/g,'"').replace(/[—–]/g,'--').trim().replace(/\s+/g,' ').replace(/ ?\| ?/g,' | ').replace(/"([^"\s|*?^$\[\]\\{}()]+)"/g,'$1')}
+function cmdMatch(user,answers){const u=uxNorm(user);return !!u&&answers.some(a=>uxNorm(a)===u)}
+const uxPerms=(p,r)=>p.length<2?[p]:p.flatMap((x,i)=>uxPerms(p.slice(0,i).concat(p.slice(i+1))).map(t=>[x,...t]));
+const uxOct=s=>[0,3,6].map(i=>(s[i]==='r'?4:0)+(s[i+1]==='w'?2:0)+(s[i+2]==='x'?1:0)).join('');
+const uxStr=d=>String(d).split('').map(n=>{n=+n;return (n&4?'r':'-')+(n&2?'w':'-')+(n&1?'x':'-')}).join('');
+
+prCmd('unix_nav','Navigating and listing (cd, ls, pwd, cat)',/\bcd\s+(path|\.\.|~|\w)|\bls\s+-[la]|\bpwd\b|hidden files?|relative (path|from)|absolute (path|vs)/i,()=>{
+ const d=prPick(UX.dirs),f=prPick(UX.files),h='.'+prPick(['secret','config','hidden','env','profile']);
+ const T=prPick([
+  ['List everything in the current folder, including hidden files.','ls -a',['ls -l','ls','ls -h'],'`ls -a` shows all entries, including names that start with a dot.'],
+  ['List the current folder with details (permissions, owner, size, date).','ls -l',['ls -a','ls -d','cat -l'],'`ls -l` is the long listing: permissions, owner, group, size and date.'],
+  ['Move into the folder '+d+', which is inside the folder you’re in now.','cd '+d,['ls '+d,'cd /'+d,'pwd '+d],'`cd PATH` changes folder. Without a leading `/` the path is relative to where you are.',['cd ./'+d,'cd '+d+'/']],
+  ['Go up to the parent folder.','cd ..',['cd .','cd ~','cd /'],'`..` means the parent folder and `.` the current one.',['cd ../']],
+  ['Print the full path of the folder you’re in.','pwd',['cd','ls -l','whoami'],'`pwd` prints the working directory.'],
+  ['Go to your home folder.','cd ~',['cd /','cd ..','cd .'],'`~` is your home folder (plain `cd` goes there too).',['cd','cd ~/']],
+  ['Show the contents of the hidden file '+h+' inside the folder '+d+'.','cat '+d+'/'+h,['cat '+d+'/'+h.slice(1),'ls -a '+d,'cat '+h],'Hidden files start with a dot. Give the path to it: folder/.name.',['cat ./'+d+'/'+h]],
+  ['Print the whole file '+f+'.','cat '+f,['less -a '+f,'ls '+f,'wc '+f],'`cat` prints a whole file.']]);
+ return uxQ(T[0],T[1],T[2],T[3],T[4])});
+
+prCmd('unix_view','Viewing and counting (wc, head, tail, less, fold)',/\bwc\s+-[lcw]|\bfold\b|\bhead\b|\btail\b|\bless\s+\w|count (the )?(lines|characters)/i,()=>{
+ const f=prPick(UX.files),n=prR(3,20),w=prPick([20,30,40,60,80]);
+ const T=prPick([
+  ['Count the lines in '+f+'.','wc -l '+f,['wc -c '+f,'wc -w '+f,'grep -c '+f],'`wc -l` counts lines, `-c` counts characters (bytes), `-w` counts words.'],
+  ['Count the characters in '+f+'.','wc -c '+f,['wc -l '+f,'wc -w '+f,'fold -c '+f],'`wc -c` counts characters (bytes), `-l` lines.',['wc -m '+f]],
+  ['Show the first '+n+' lines of '+f+'.','head -n '+n+' '+f,['tail -n '+n+' '+f,'head -c '+n+' '+f,'less -n '+n+' '+f],'`head` shows the start of a file and `tail` the end. `-n` sets how many lines.',['head -'+n+' '+f]],
+  ['Show the last '+n+' lines of '+f+'.','tail -n '+n+' '+f,['head -n '+n+' '+f,'tail -c '+n+' '+f,'tail -l '+n+' '+f],'`tail` shows the end of a file. `-n` sets how many lines.',['tail -'+n+' '+f]],
+  ['Wrap the lines of '+f+' so none is longer than '+w+' characters.','fold -w '+w+' '+f,['fold -c '+w+' '+f,'wc -w '+w+' '+f,'fold '+w+' '+f],'`fold -w n` wraps lines at n characters.'],
+  ['Page through '+f+' one screen at a time.','less '+f,['cat '+f,'head '+f,'wc '+f],'`less` shows a file a page at a time (q quits).',['more '+f]]]);
+ return uxQ(T[0],T[1],T[2],T[3],T[4])});
+
+prCmd('unix_chmod','Permissions with chmod (u/g/o, +/−, r/w/x) and running scripts',/chmod\s+[ugoa]*[+-][rwx]|\bchmod\b|executable|\.\/\w+\.sh|\bsudo\b/i,()=>{
+ const f=prPick(UX.files.concat(UX.scripts)),s=prPick(UX.scripts),d=prPick(UX.dirs);
+ if(Math.random()<.25){const T=prPick([
+   ['Run the script '+s+', which is in the folder you’re in now.','./'+s,[s,'run '+s,'cd '+s],'To run a file in the current folder, start with `./`.'],
+   ['Run the script '+s+' in the folder '+d+' (inside the folder you’re in now).','./'+d+'/'+s,['./'+s,'cd '+d+'/'+s,d+'./'+s],'Give the path to it: `./REL/PATH/file` (or the full `/ABS/PATH/file`).',[d+'/'+s]],
+   ['Run apt update with administrator privileges.','sudo apt update',['apt update sudo','su apt update','chmod +x apt update'],'Put `sudo` in front of a command to run it as an administrator.']]);return uxQ(T[0],T[1],T[2],T[3],T[4])}
+ const who=prPick(['u','g','o','a']),perm=prPick(['r','w','x']),op=Math.random()<.75?'+':'-';
+ const W={u:'you (the owner)',g:'its group',o:'everyone else (others)',a:'everyone'},P={r:'readable',w:'writable',x:'executable'};
+ const a='chmod '+who+op+perm+' '+f,swapW=prPick(['u','g','o','a'].filter(x=>x!==who)),swapP=prPick(['r','w','x'].filter(x=>x!==perm));
+ return uxQ('Make '+f+' '+(op==='+'?'':'no longer ')+P[perm]+' by '+W[who]+'.',a,['chmod '+swapW+op+perm+' '+f,'chmod '+who+op+swapP+' '+f,'chmod '+who+(op==='+'?'-':'+')+perm+' '+f],
+  '`u` = owner, `g` = group, `o` = others, `a` = everyone. `+` adds a permission and `-` takes it away. `r` read, `w` write, `x` execute.',who==='a'?['chmod '+op+perm+' '+f]:[])});
+
+prCmd('unix_octal','Octal permissions (chmod 755, reading -rwxr-xr-x)',/chmod\s+[0-7]{3}|octal|rwx|-rw|ls -l output|permissions? (string|number)/i,()=>{
+ const f=prPick(UX.files),D=[7,6,5,4,0],o=[prPick([7,6]),prPick(D),prPick(D)].join(''),str=uxStr(o),k=Math.random();
+ const flip=o.split('').map(n=>{n=+n;return (n&4?1:0)+(n&2?2:0)+(n&1?4:0)}).join(''),rev=o.split('').reverse().join('');
+ const desc=s=>['owner','group','others'].map((w,i)=>w+' '+s.slice(i*3,i*3+3)).join(', ');
+ if(k<.4)return uxQ('Give '+f+' these permissions: '+desc(str)+'. Which command does it with numbers?','chmod '+o+' '+f,['chmod '+(rev===o?flip:rev)+' '+f,'chmod '+flip+' '+f,'chmod '+str+' '+f].filter((x,i,a)=>x!=='chmod '+o+' '+f&&a.indexOf(x)===i).concat(['chmod +'+o+' '+f]).slice(0,3),
+  'r = 4, w = 2, x = 1. Add them for each group: owner, group, others.');
+ if(k<.75){const p=prMC(uxC('ls -l')+' shows '+uxC('-'+str)+' for '+f+'. What’s that in octal?',o,[rev,flip,String(+o[0]+1).slice(-1)+o.slice(1)],j=>prNear(+o,j,x=>String(x).padStart(3,'0')),'r = 4, w = 2, x = 1. Each group of three letters adds up to one digit: owner, group, others.',[['Split '+uxC(str)+' into three groups of three (skip the first character, it’s the file type).',str.slice(0,3)+' | '+str.slice(3,6)+' | '+str.slice(6)],['Add r = 4, w = 2, x = 1 in each group.','Answer: '+o]]);p.alts=[];return p}
+ const p=prMC('After '+uxC('chmod '+o+' '+f)+', what does '+uxC('ls -l')+' show for its permissions?','-'+str,['-'+uxStr(rev===o?flip:rev),'-'+uxStr(flip),'-'+str.split('').reverse().join('')],j=>'-'+uxStr(String((+o+j+1)%800).padStart(3,'0')),'Each digit is owner, group, others; 4 = r, 2 = w, 1 = x.',[['Turn each digit into three letters: 4 → r, 2 → w, 1 → x (add up the ones that fit).',o.split('').map(n=>n+' → '+uxStr(n)).join(', ')],['Put them together after the file-type dash.','Answer: -'+str]]);p.alts=[];return p});
+
+prCmd('unix_find','Finding files with find (-type, -name, -user, -size, -ctime, -perm)',/\bfind\s+(\.|~|\/|start)|-type [fd]|-ctime|-mtime|-perm\b|-size [+-]?\d|-name ["']?\*/i,()=>{
+ const start=prPick(['.','~','docs','/var/log','/home/'+prPick(UX.users)]),u=prPick(UX.users),g=prPick(UX.groups),n=prR(2,30),days=prR(2,14),unit=prPick([['c','bytes'],['k','kilobytes'],['M','megabytes']]),pm=prPick(['640','644','755','600','777','000']);
+ const pat=prPick([['"*.txt"','ending in .txt'],['"report*"','starting with “report”'],['"*.sh"','ending in .sh'],['"*log*"','containing “log”'],['"a*"','starting with “a”']]);
+ const type=Math.random()<.75?['-type f','regular files']:['-type d','folders'];
+ const pool=shuffle([['-name '+pat[0],'named '+pat[1]],['-user '+u,'owned by '+u],['-group '+g,'belonging to the group '+g],
+  ...[['+','larger than'],['-','smaller than'],['','exactly']].filter(()=>Math.random()<.34).slice(0,1).map(([s,w])=>['-size '+s+n+unit[0],w+' '+n+' '+unit[1]]),
+  ...[['+','more than'],['-','less than']].filter(()=>Math.random()<.5).slice(0,1).map(([s,w])=>['-ctime '+s+days,'changed '+w+' '+days+' days ago']),['-perm '+pm,'with permissions exactly '+pm]]).slice(0,prR(1,2));
+ const opts=[type,...pool],a='find '+start+' '+opts.map(o=>o[0]).join(' '),q='Find all '+type[1]+' under '+({'.':'the current folder (.)','~':'your home folder (~)'}[start]||start)+' '+pool.map(o=>o[1]).join(' and ')+'.';
+ const mut=o=>o.replace(/-size \+/,'-size -').replace(/-ctime \+/,'-ctime -').replace(/-type f/,'-type d').replace(/-user /,'-group ').replace(/-name /,'-regex ');
+ const wrong=['find '+start+' '+opts.map(o=>mut(o[0])).join(' '),'find '+opts.map(o=>o[0]).join(' ')+' '+start,'grep -r '+start+' '+opts.map(o=>o[0]).join(' '),'find '+start+' '+opts.slice(1).map(o=>o[0]).join(' ')].filter(x=>x!==a);
+ const alts=uxPerms(opts.map(o=>o[0])).map(p=>'find '+start+' '+p.join(' ')).concat(uxPerms(opts.map(o=>o[0])).map(p=>'find '+start+' '+p.join(' ').replace('-user ','-owner ')));
+ return uxQ(q,a,wrong.slice(0,3),'`find START` then one option per condition. `-type f` is files and `-type d` folders. `-size +N` means larger and `-N` smaller (c = bytes, k = KB, M = MB). `-ctime +n` means more than n days ago and `-n` less. Options can go in any order.',alts)});
+
+prCmd('unix_grep','Searching inside files with grep (-v, -c, -i, -n, -l, -r, -F, ^ $)',/\bgrep\b/i,()=>{
+ const w=prPick(UX.words),f=prPick(UX.files),d=prPick(UX.dirs);
+ const T=prPick([
+  ['Show the lines of '+f+' that contain “'+w+'”.','grep "'+w+'" '+f,['grep -v "'+w+'" '+f,'grep -c "'+w+'" '+f,'find "'+w+'" '+f],'`grep "REGEX" file` keeps the matching lines.'],
+  ['Show the lines of '+f+' that do NOT contain “'+w+'”.','grep -v "'+w+'" '+f,['grep "'+w+'" '+f,'grep -c "'+w+'" '+f,'grep -n "'+w+'" '+f],'`-v` flips grep: it keeps the lines that don’t match.'],
+  ['Count how many lines of '+f+' contain “'+w+'”.','grep -c "'+w+'" '+f,['wc -l '+f,'grep -n "'+w+'" '+f,'grep -v "'+w+'" '+f],'`-c` prints the number of matching lines instead of the lines.',['grep "'+w+'" '+f+' | wc -l']],
+  ['Show the lines of '+f+' that contain “'+w+'”, ignoring capital letters.','grep -i "'+w+'" '+f,['grep -c "'+w+'" '+f,'grep -I "'+w+'" '+f,'grep -v "'+w+'" '+f],'`-i` ignores case.'],
+  ['Show the lines of '+f+' containing “'+w+'”, with their line numbers.','grep -n "'+w+'" '+f,['grep -c "'+w+'" '+f,'grep -l "'+w+'" '+f,'wc -l "'+w+'" '+f],'`-n` puts the line number in front of each match.'],
+  ['List the files in the folder '+d+' that contain “'+w+'” (names only).','grep -l "'+w+'" '+d+'/*',['grep -c "'+w+'" '+d+'/*','grep -n "'+w+'" '+d+'/*','ls -l "'+w+'" '+d+'/*'],'`-l` lists the names of the files that have a match.',['grep -rl "'+w+'" '+d,'grep -lr "'+w+'" '+d,'grep -r -l "'+w+'" '+d,'grep -l -r "'+w+'" '+d]],
+  ['Search every file in the folder '+d+' (and its subfolders) for “'+w+'”.','grep -r "'+w+'" '+d,['grep -v "'+w+'" '+d,'grep -l "'+w+'" '+d,'find -r "'+w+'" '+d],'`-r` searches folders recursively.',['grep -R "'+w+'" '+d]],
+  ['Show the lines of '+f+' that start with “'+w+'”.','grep "^'+w+'" '+f,['grep "'+w+'$" '+f,'grep "'+w+'" '+f,'grep -v "^'+w+'" '+f],'`^` anchors the pattern to the start of the line.'],
+  ['Show the lines of '+f+' that end with “'+w+'”.','grep "'+w+'$" '+f,['grep "^'+w+'" '+f,'grep "$'+w+'" '+f,'grep "'+w+'" '+f],'`$` anchors the pattern to the end of the line.'],
+  ['Show the lines of '+f+' that contain a digit.','grep "[0-9]" '+f,['grep "0-9" '+f,'grep "[a-z]" '+f,'grep -c "[0-9]" '+f],'`[0-9]` matches any one digit.'],
+  ['Find the literal text “['+w+']” (with the brackets) in '+f+'.','grep -F "['+w+']" '+f,['grep "['+w+']" '+f,'grep -v "['+w+']" '+f,'grep -c "['+w+']" '+f],'Brackets mean “any one of” in a regex. `-F` searches for the text exactly as written.'],
+  ['Show the lines containing “'+w+'” in '+f+', with the file name in front of each.','grep -H "'+w+'" '+f,['grep -l "'+w+'" '+f,'grep -n "'+w+'" '+f,'grep -h "'+w+'" '+f],'`-H` prints the file name with each match.']]);
+ return uxQ(T[0],T[1],T[2],T[3],T[4])});
+
+prCmd('unix_pipe','Pipes: grep, sort, uniq and wc together',/\|\s*(sort|uniq|wc)|\bsort\b|\buniq\b|pipes?\b/i,()=>{
+ const w=prPick(UX.words),f=prPick(UX.files);
+ if(Math.random()<.2){const p=prMC('Why does '+uxC('sort')+' usually come before '+uxC('uniq')+' in a pipe?','uniq only removes duplicates that are next to each other',['uniq only works on numbers','sort removes the duplicates by itself','uniq has to read a file, not a pipe'],j=>'uniq needs option -'+'abcdefgh'[j],'`uniq` only catches repeated lines sitting next to each other, so `sort` puts the copies together first.',[['What does uniq look at when it decides a line is a duplicate?','Only the line right before it.'],['So what has to happen to the copies first?','Sort them so they sit together.']]);p.alts=[];return p}
+ const T=prPick([
+  ['How many lines of '+f+' contain “'+w+'”? Use a pipe.','grep "'+w+'" '+f+' | wc -l',['grep "'+w+'" | wc -l '+f,'wc -l '+f+' | grep "'+w+'"','grep -v "'+w+'" '+f+' | wc -l'],'Pipes run left to right: grep keeps the matching lines, then `wc -l` counts them.',['grep -c "'+w+'" '+f]],
+  ['Count the lines of '+f+' that don’t contain “'+w+'”.','grep -v "'+w+'" '+f+' | wc -l',['grep "'+w+'" '+f+' | wc -l','grep -v "'+w+'" '+f+' | wc -c','wc -l '+f+' | grep -v "'+w+'"'],'`grep -v` keeps the non-matching lines, then `wc -l` counts them.',['grep -vc "'+w+'" '+f,'grep -cv "'+w+'" '+f,'grep -c -v "'+w+'" '+f,'grep -v -c "'+w+'" '+f]],
+  ['Show the lines of '+f+' sorted, with duplicate lines removed.','sort '+f+' | uniq',['uniq '+f+' | sort','sort '+f+' | uniq -u','uniq '+f],'Sort first so copies sit together, then `uniq` drops the repeats.',['sort -u '+f]],
+  ['How many different lines does '+f+' have?','sort '+f+' | uniq | wc -l',['uniq '+f+' | wc -l','sort '+f+' | wc -l','sort '+f+' | uniq -u | wc -l'],'Sort, remove repeats with `uniq`, then count with `wc -l`.',['sort -u '+f+' | wc -l']],
+  ['Show only the lines that appear exactly once in '+f+'.','sort '+f+' | uniq -u',['uniq -u '+f,'sort -u '+f,'sort '+f+' | uniq'],'`uniq -u` keeps lines with no copies, but only if the input is sorted first.'],
+  ['How many lines containing “'+w+'” appear only once in '+f+'?','grep "'+w+'" '+f+' | sort | uniq -u | wc -l',['grep "'+w+'" '+f+' | uniq -u | wc -l','grep "'+w+'" '+f+' | sort | uniq | wc -l','sort '+f+' | uniq -u | grep "'+w+'"'],'Filter with grep, sort so copies sit together, keep the single ones with `uniq -u`, then count.']]);
+ return uxQ(T[0],T[1],T[2],T[3],T[4])});
+
+prCmd('unix_regex','Reading regex patterns (. .* ^ $ [0-9])',/regex|\.\*|"\^|\$"|\[0-9\]/i,()=>{
+ const pool=['cat','cart','coat','scat','act','car','cab','bat','boat','bet','abc','a1c','at','cut','cot','chat','tact','ace','a7c','art'];
+ const P=prPick([['^c','starts with c'],['t$','ends with t'],['^c.t$','is c, one character, then t'],['a.c','has a, any one character, then c'],['^b.*t$','starts with b and ends with t'],['[0-9]','has a digit'],['^a','starts with a'],['^ca','starts with ca']]),re=new RegExp(P[0]);
+ const yes=shuffle(pool.filter(x=>re.test(x))),no=shuffle(pool.filter(x=>!re.test(x)));if(!yes.length||no.length<3)throw 0;
+ const p=prMC('Which word is matched by '+uxC('grep "'+P[0]+'"')+'?',yes[0],no.slice(0,3),j=>no[(j+3)%no.length],'The pattern '+uxC('"'+P[0]+'"')+' means the line '+P[1]+'. `.` is exactly one character, `.*` is any number, `^` is the start and `$` the end.',[['Read the pattern piece by piece: ^ = start, $ = end, . = any one character, .* = anything.','This pattern: the line '+P[1]+'.'],['Check each choice against that.','Answer: '+yes[0]]]);p.alts=[];return p});
+
+prCmd('unix_glob','Wildcards (* and ?) in file names',/wildcard|\*\s*(as a|matches)|"\*"|\*\.\w+|\?\s*(matches|wildcard)/i,()=>{
+ const names=['report.txt','report1.txt','report.csv','notes.txt','reports.md','rep.txt','data1.csv','data22.csv','cat.sh','bat.sh','chat.sh','a.txt','ab.txt','log.old'];
+ const G=prPick(['*.txt','report*','*.csv','?at.sh','data?.csv','*.sh','a?.txt','rep*.txt']),re=new RegExp('^'+G.replace(/\./g,'\\.').replace(/\*/g,'.*').replace(/\?/g,'.')+'$');
+ const yes=shuffle(names.filter(x=>re.test(x))),no=shuffle(names.filter(x=>!re.test(x)));if(!yes.length||no.length<3)throw 0;
+ const p=prMC('Which file does '+uxC('ls '+G)+' list?',yes[0],no.slice(0,3),j=>no[(j+3)%no.length],'`*` matches any run of characters (even none) and `?` matches exactly one.',[['Line the pattern up with each name: * can stretch, ? is exactly one character, and everything else must match exactly.','Pattern: '+uxC(G)],['Which name fits all of it?','Answer: '+yes[0]]]);p.alts=[];return p});
+
+prCmd('unix_exec','Acting on what find finds (-exec … {} \\;)',/-exec\b|\{\}\s*\\;/i,()=>{
+ const d=prPick(UX.dirs),pat=prPick(['"*.sh"','"*.txt"','"*.log"']),act=prPick([['chmod +r {}','make every one readable'],['chmod +x {}','make every one executable'],['cat {}','print every one'],['rm {}','delete every one']]);
+ const a='find '+d+' -name '+pat+' -exec '+act[0]+' \\;';
+ return uxQ('Find the files named '+pat.replace(/"/g,'')+' under '+d+' and '+act[1]+'.',a,['find '+d+' -name '+pat+' -exec '+act[0],'find '+d+' -name '+pat+' | '+act[0].replace(' {}',''),'find '+d+' -name '+pat+' -exec '+act[0].replace(' {}','')+' \\;'],'`-exec CMD {} \\;` runs CMD on each file found; `{}` stands for the file and `\\;` ends the command.',['find '+d+' -name '+pat+' -exec '+act[0]+' ";"'])});
+
+prCmd('unix_basics','Everyday commands (cp, mv, rm, mkdir, touch, >, >>, chown, man, echo, whoami)',/\bcp\b|\bmv\b|\brm\b|\bmkdir\b|\btouch\b|\bchown\b|>>|\bman\s+\w|\bwhoami\b|\becho\b|redirect/i,()=>{
+ const f=prPick(UX.files),g=prPick(UX.files.filter(x=>x!==f)),d=prPick(UX.dirs),u=prPick(UX.users),c=prPick(['grep','find','chmod','ls','sort']);
+ const T=prPick([
+  ['Copy '+f+' into the folder '+d+'.','cp '+f+' '+d,['mv '+f+' '+d,'cp '+d+' '+f,'cat '+f+' '+d],'`cp SOURCE DEST` copies; `mv` moves (or renames).',['cp '+f+' '+d+'/','cp '+f+' ./'+d]],
+  ['Rename '+f+' to '+g+'.','mv '+f+' '+g,['cp '+f+' '+g,'mv '+g+' '+f,'rename '+f],'`mv OLD NEW` renames a file.'],
+  ['Delete the file '+f+'.','rm '+f,['rmdir '+f,'del '+f,'mv '+f],'`rm` removes files (`rmdir` removes empty folders).'],
+  ['Make a new folder called '+d+'.','mkdir '+d,['touch '+d,'cd '+d,'mkfile '+d],'`mkdir` makes a folder; `touch` makes an empty file.'],
+  ['Make a new, empty file called '+f+'.','touch '+f,['mkdir '+f,'cat '+f,'echo '+f],'`touch` makes an empty file (or updates its date).',['> '+f]],
+  ['Save the output of '+uxC('ls -l')+' into '+f+', replacing what’s there.','ls -l > '+f,['ls -l >> '+f,'ls -l | '+f,'ls -l < '+f],'`>` overwrites a file and `>>` adds to the end.'],
+  ['Add the line “done” to the end of '+f+' without erasing it.','echo "done" >> '+f,['echo "done" > '+f,'echo "done" | '+f,'cat "done" >> '+f],'`>>` appends; `>` would erase the file first.'],
+  ['Make '+u+' the owner of '+f+'.','chown '+u+' '+f,['chmod '+u+' '+f,'chown '+f+' '+u,'sudo '+u+' '+f],'`chown USER file` changes who owns a file (`chmod` changes permissions).'],
+  ['Open the manual page for '+c+'.','man '+c,[c+' -h','help '+c,'less '+c],'`man COMMAND` shows the manual (`COMMAND --help` gives a short summary).'],
+  ['Print your username.','whoami',['pwd','echo','id -g'],'`whoami` prints the user you’re logged in as.']]);
+ return uxQ(T[0],T[1],T[2],T[3],T[4])});
 // ===================== GEMINI (free online AI, optional) =====================
 // With a free Google AI Studio key, study guides come from Gemini: it reads the photos themselves (not the phone's OCR),
 // fills in gaps with standard facts, picks matching practice problem types, and writes quiz questions.
@@ -2567,7 +2716,7 @@ function mathFix(s){return String(s==null?'':s).replace(/\t(?=ext|imes|heta|au\b
  .replace(/\\\(|\\\)|\\\[|\\\]/g,'').replace(/\$\$?/g,'').replace(/\\left|\\right|\\displaystyle|\\,|\\;|\\!/g,m=>m==='\\,'||m==='\\;'?' ':'')}
 const mEsc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 // tiny LaTeX-ish renderer: returns HTML
-function mathHTML(src){const s=mathFix(src);let i=0;
+function mathHTML(src){if(String(src==null?'':src).includes('`'))return String(src).split('`').map((t,k)=>k%2?'<code class="cmd">'+mEsc(t)+'</code>':mathHTML(t)).join('');const s=mathFix(src);let i=0;
  const group=()=>{if(s[i]==='{'){i++;const h=seq('}');if(s[i]==='}')i++;return h}if(s[i]==='\\')return cmd();const c=s[i++]||'';return mEsc(c)};
  const word=()=>{let w='';while(i<s.length&&/[A-Za-z0-9.]/.test(s[i])&&w.length<12)w+=s[i++];return w};
  const cmd=()=>{i++;let n='';while(i<s.length&&/[A-Za-z]/.test(s[i]))n+=s[i++];if(!n){const c=s[i++]||'';return mEsc(c)}
@@ -2787,8 +2936,8 @@ function askQ(item,bank,opts={}){__qMissReset();return new Promise(res=>{const o
  const plan=opts.typed!==false&&Math.random()<(opts.typedChance??.2)?saPlan(item):null;
  const show=(q,isMakeUp)=>{const t0=performance.now();let hinted=false;const typed=!!q.typed;
   ov.innerHTML='<div class="mgq-card">'+(opts.title?'<span class="badge">'+esc(opts.title)+'</span> ':'')+(isMakeUp?'<span class="badge mk">MAKE-UP</span>':'')+(typed?'<span class="badge sa-b">✍️ TYPE IT</span>':'')+'<h3>'+mathHTML(q.prompt)+'</h3><p class="small muted">'+esc(q.sub)+'</p>'+(opts.hint!==false?'<div class="mgq-hints"></div><button class="btn smallbtn mgq-hint">💡 Hint</button>':'')
-   +(typed?'<div class="sa-wrap"><input class="sa-in" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Your answer"><button class="btn red sa-go">CHECK</button></div>'+(q.math?saKeysHTML():''):q.options.map((o,i)=>'<button class="answer" data-i="'+i+'">'+mathHTML(o.t)+'</button>').join(''))
-   +(q.math||mathy(q.prompt,...q.options.map(o=>o.t))?calcHTML():'')+'</div>';calcInit(ov);
+   +(typed?'<div class="sa-wrap"><input class="sa-in" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Your answer"><button class="btn red sa-go">CHECK</button></div>'+(q.cmd?saKeysHTML(true):q.math?saKeysHTML():''):q.options.map((o,i)=>'<button class="answer" data-i="'+i+'">'+mathHTML(o.t)+'</button>').join(''))
+   +(!q.cmd&&(q.math||mathy(q.prompt,...q.options.map(o=>o.t)))?calcHTML():'')+'</div>';calcInit(ov);
   // hints come one step at a time; they explain the problem and never remove answers.
   // Questions without built-in steps ask the AI tutor to work out the steps the first time you tap.
   const hb=ov.querySelector('.mgq-hint'),ans=String((q.options.find(o=>o.ok)||{}).t||'');let H=q.steps&&q.steps.length?q.steps.map(x=>x[0]):null,hi=0,busy=false;
@@ -2813,10 +2962,10 @@ function askQ(item,bank,opts={}){__qMissReset();return new Promise(res=>{const o
    if(tutorIt)aiTutor(q.prompt,ans,q.options.map(o=>o.t)).then(st=>{const el=card.querySelector('.mgq-sol');if(!el)return;if(st)el.outerHTML=solOL(st);else el.textContent='The AI couldn’t work this one out right now.'});
    card.querySelector('.mgq-go').onclick=()=>{if(isMakeUp||opts.makeUp===false)done('fail');else show(mgQuestion(item,bank,1-v0),true)}};
   ov.querySelectorAll('.answer').forEach(b=>b.onclick=()=>answered(q.options[+b.dataset.i],b));
-  if(typed){const inp=ov.querySelector('.sa-in'),go=()=>{const v=inp.value.trim();if(!v){inp.focus();return}answered({t:v,ok:saMatch(v,q.short)},null)};ov.querySelector('.sa-go').onclick=go;inp.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();go()}};
+  if(typed){const inp=ov.querySelector('.sa-in'),go=()=>{const v=inp.value.trim();if(!v){inp.focus();return}answered({t:v,ok:q.cmd?cmdMatch(v,[q.short,...(q.alts||[])]):saMatch(v,q.short)},null)};ov.querySelector('.sa-go').onclick=go;inp.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();go()}};
    ov.querySelectorAll('.sa-keys button').forEach(b=>b.onclick=e=>{e.preventDefault();saInsert(inp,b.dataset.k)});setTimeout(()=>inp.focus(),60);
    const ci=ov.querySelector('.calc-in');if(ci){ci.insertAdjacentHTML('beforeend','<button type="button" class="btn smallbtn blue sa-put">↳ Use this result</button>');ci.querySelector('.sa-put').onclick=e=>{e.preventDefault();const v=((ov.querySelector('.calc-res')||{}).textContent||'').replace(/^=\s*/,'');if(v)saInsert(inp,v)}}}};
- show(plan?{typed:true,prompt:plan.prompt,sub:plan.sub,options:[{t:plan.answer,ok:true}],short:plan.answer,steps:plan.steps,explain:plan.explain,math:plan.math}:mgQuestion(item,bank,v0),false)})}
+ show(plan?{typed:true,prompt:plan.prompt,sub:plan.sub,options:[{t:plan.answer,ok:true}],short:plan.answer,steps:plan.steps,explain:plan.explain,math:plan.math,cmd:plan.cmd,alts:plan.alts}:mgQuestion(item,bank,v0),false)})}
 // ---------- menu & setup ----------
 const MG={dungeon:{name:'Mystery Dungeon',icon:'🏰',desc:'Lead up to 4 Pokémon through a study dungeon.'},tower:{name:'Battle Tower',icon:'🗼',desc:'Non-stop battles. A boss every 10 floors. How high can you climb?'},luxor:{name:'Luxor',icon:'🐍',desc:'Fire type-marbles to break the chain. Questions push it back.'},flash:{name:'Flashcards',icon:'🎴',desc:'Flip, check yourself, repeat.'},match:{name:'Match-Up',icon:'🧩',desc:'Flip-free card matching: pair each term with its meaning.'},speed:{name:'Speed Round',icon:'⏲',desc:'15 seconds a question. Faster answers score more.'}};
 const MG_ENDLESS={luxor:1,match:1,speed:1};
@@ -2984,11 +3133,12 @@ function saMatch(user,ans){let u=saNorm(user),a=saNorm(ans);if(!u)return false;i
  // words: allow a small typo
  if(!/\d/.test(a)&&a.length>=4)return saLev(u,a)<=Math.max(1,Math.floor(a.length/6));return false}
 // which questions can be typed: practice problems, terms (type the term), and quiz questions with a short answer
-function saPlan(item){if(item.kind==='gen'){const p=prInstance(item.gid)||{q:item.front,a:item.back,steps:item.steps,ex:item.explain};return {prompt:p.q,answer:p.a,sub:(PR[item.gid]?PR[item.gid].name+' · ':'')+'type your answer.',steps:p.steps||[],explain:p.ex,math:true}}
+function saPlan(item){if(item.kind==='gen'){const p=prInstance(item.gid)||{q:item.front,a:item.back,steps:item.steps,ex:item.explain};const cmd=!!(PR[item.gid]&&PR[item.gid].cmd);return {prompt:p.q,answer:p.a,sub:(PR[item.gid]?PR[item.gid].name+' · ':'')+(cmd?'type the command.':'type your answer.'),steps:p.steps||[],explain:p.ex,math:!cmd,cmd,alts:p.alts||[]}}
  if(item.kind==='term'&&String(item.front).length<=32)return {prompt:item.back,answer:item.front,sub:'Type the term that matches this definition.',steps:[],explain:'“'+item.front+'” means: '+item.back};
  if(item.kind==='mc'&&String(item.back).length<=24&&String(item.back).split(/\s+/).length<=3)return {prompt:item.front,answer:item.back,sub:'Type your answer.',steps:[],explain:'The answer is “'+item.back+'”.'};return null}
 const SA_KEYS=['x','²','^','√','π','×','÷','−','/','(',')','=','.'];
-function saKeysHTML(){return '<div class="sa-keys">'+SA_KEYS.map(k=>'<button type="button" data-k="'+k+'">'+k+'</button>').join('')+'</div>'}
+const SA_CMD_KEYS=['"','*','.','/','|','-','^','$','~','>','{}','\\;'];
+function saKeysHTML(cmd){return '<div class="sa-keys">'+(cmd?SA_CMD_KEYS:SA_KEYS).map(k=>'<button type="button" data-k="'+k+'">'+k+'</button>').join('')+'</div>'}
 function saInsert(inp,t){if(!inp)return;const a=inp.selectionStart??inp.value.length,b=inp.selectionEnd??a;inp.value=inp.value.slice(0,a)+t+inp.value.slice(b);inp.focus();const c=a+t.length;try{inp.setSelectionRange(c,c)}catch(e){}}
 // the calculator's current expression and result, ready to drop into a line
 function saCalcText(root){const ex=(root.querySelector('.calc-exp')||{}).value||'',rs=((root.querySelector('.calc-res')||{}).textContent||'').replace(/^=\s*/,'');return ex?(rs&&rs!==ex?ex+' = '+rs:ex):rs}
@@ -3166,7 +3316,7 @@ function dgcChooseFoe(fn){if(!runOf()||!runOf().battle)return;const b=runOf().ba
 function dgCrosshair(side,i,slot){document.querySelectorAll('.dg-xh').forEach(x=>x.innerHTML='');const el=document.querySelector((side==='foe'?'.dg-foe':'.dg-ally')+'[data-i="'+i+'"] .dg-xh');if(el)el.innerHTML='<i style="border-color:'+SLOT_COLORS[slot]+'"></i>'}
 function dgQ(title,opts){const ep=dgEpoch,r0=runOf(),bt=r0&&r0.battle,tn=bt&&bt.turn;
  // Do It Yourself: on some floors the first attack question is a practice problem you work out line by line
- let it=null,diy=false;if(bt&&bt.diy&&/FIGHT/.test(title)){bt.diy=false;const gens=DG.bank.filter(b=>b.kind==='gen'),weak=gens.filter(isWeak);if(gens.length){it=weak.length&&Math.random()<.5?weak[Math.floor(Math.random()*weak.length)]:gens[Math.floor(Math.random()*gens.length)];diy=true}}
+ let it=null,diy=false;if(bt&&bt.diy&&/FIGHT/.test(title)){bt.diy=false;const gens=DG.bank.filter(b=>b.kind==='gen'&&!(PR[b.gid]&&PR[b.gid].cmd)),weak=gens.filter(isWeak);if(gens.length){it=weak.length&&Math.random()<.5?weak[Math.floor(Math.random()*weak.length)]:gens[Math.floor(Math.random()*gens.length)];diy=true}}
  if(!it)it=DG.P.next();
  return (diy?askDIY(it,{title}):askQ(it,DG.bank,Object.assign({title},opts||{}))).then(res=>{const r1=runOf();if(ep!==dgEpoch||!DG||!r1||(bt&&(r1.battle!==bt||bt.turn!==tn)))return new Promise(()=>{});DG.P.report(it,res);if(res!=='full'&&__qMiss)recapAdd(it,__qMiss);if(diy&&res==='full'){r1.tickets=(r1.tickets||0)+5;r1.cogs=(r1.cogs||0)+5;toast('🛠 Worked it out! +5 🎟️')}if(bt&&res==='full')bt.qFull=(bt.qFull||0)+1;if(bt)bt.lastRes=res;apMaybePrompt();return res})}
 // ---------- autopilot check ----------
@@ -4847,7 +4997,7 @@ $('navHome').style.display='none';
  if(pcStorageReady)ensureMoveData();
  if(pcStorageReady&&permRoll())save();
  render();scheduleNotifs();aiCheck();window.__pcBooted=true;setTimeout(()=>{try{mdSync()}catch(e){}},1500);setTimeout(()=>{try{facTick()}catch(e){}},2500);setInterval(()=>{try{facTick();if(currentPage==='home'&&hab.scene&&hab.scene!=='home')drawHabitat()}catch(e){}},60000);
- window.__pcVersion='0.59.2';
+ window.__pcVersion='0.60.0';
  document.addEventListener('pointerdown',function(e){try{var t=e.target.closest&&e.target.closest('[onclick],button,a,[id]');if(!t)return;var oc=t.getAttribute('onclick');window.__pcLastTap=(oc?oc.slice(0,60):(t.id?'#'+t.id:t.tagName.toLowerCase()+'.'+String(t.className).split(' ')[0])).replace(/\s+/g,' ')}catch(_){}} ,true);
  Object.keys(window).forEach(function(k){var f=window[k];if(typeof f!=='function'||/^[A-Z]/.test(k)||k==='appError'||k==='$'||k==='esc'||/\[native code\]/.test(Function.prototype.toString.call(f)))return;
   var w=function(){try{return f.apply(this,arguments)}catch(err){if(err&&typeof err==='object'&&!err.__pcLogged){try{err.__pcLogged=1}catch(_){}appError(err,k)}throw err}};try{window[k]=w}catch(_){}});
