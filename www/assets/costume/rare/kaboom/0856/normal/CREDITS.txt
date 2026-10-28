@@ -1,0 +1,10 @@
+Hatenna — Variant (witch costume)
+Source: https://github.com/PMDCollab/SpriteCollab/tree/f663e2331a5f83504d1e7a01573dc53a6708f4c7/sprite/0856
+
+Repository artist summary:
+baronessfaron
+
+See credits.txt for the original per-animation contribution history.
+Base artwork by the artists above; the witch-costume recolor, hat, feather and cloak pixels were added on top of it.
+Repository license: CC BY-NC 4.0; see root LICENSE.md.
+Official game assets retain their original rights holders.
