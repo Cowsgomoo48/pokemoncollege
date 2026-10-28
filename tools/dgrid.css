@@ -26,7 +26,7 @@
 .gd-u.ko .dg-spr{opacity:.35;filter:grayscale(1)}
 .gd-u.asleep .dg-spr{filter:brightness(.8)}
 .gd-u.asleep::after{content:'z';position:absolute;right:2px;top:-6px;font:700 12px/1 system-ui;color:#fff;text-shadow:0 1px 2px #000}
-.gd-u.guard::after{content:'🛡';position:absolute;right:-2px;top:-4px;font-size:13px}
+.gd-u.guard::after{content:'';position:absolute;right:-2px;top:-4px;width:16px;height:16px;background:url(assets/ico/shield.png) 0 0/contain no-repeat}
 .gd-hp{position:absolute;left:6px;right:6px;top:-6px;height:4px;border-radius:2px;background:rgba(0,0,0,.55);overflow:hidden;z-index:2}
 .gd-hp i{display:block;height:100%;background:#4cd964;transition:width .3s}
 .gd-hp i.mid{background:#ffcc00}.gd-hp i.low{background:#ff3b30}

@@ -61,3 +61,14 @@
 .tw-cardgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .tw-perks{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:16px;margin:4px 0;background:none;border:1px dashed #b9c6d2;border-radius:10px;padding:3px 8px;cursor:pointer;color:inherit;width:100%}
 .tw-perks small{margin-left:auto;font-size:11px;font-weight:700}
+
+.tw-tag.boss{left:auto;right:8px}
+.tw-envbtn{position:absolute;left:8px;top:6px;z-index:4;width:40px;height:40px;border-radius:50%;border:2px solid #fff;background:radial-gradient(circle at 35% 30%,#3a5a86,#0d1b2e);color:#fff;font-size:19px;line-height:1;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px #0007;padding:0;cursor:pointer}
+.tw-envbtn b{position:absolute;bottom:-7px;left:50%;transform:translateX(-50%);font-size:9px;background:#0d1b2e;border:1px solid #fff;border-radius:999px;padding:0 4px;white-space:nowrap}
+.tw-envbtn img.ico{width:24px;height:24px}
+.tw-envpop{position:absolute;left:50%;top:40%;transform:translate(-50%,-50%);z-index:6;pointer-events:none;background:#0d1b2ed9;color:#fff;font-weight:800;font-size:15px;padding:8px 16px;border-radius:12px;border:2px solid #ffffff55;white-space:nowrap;animation:twpop 1.9s ease-out forwards}
+@keyframes twpop{0%{opacity:0;transform:translate(-50%,-30%) scale(.9)}12%{opacity:1;transform:translate(-50%,-50%) scale(1)}80%{opacity:1}100%{opacity:0;transform:translate(-50%,-62%)}}
+.dg-float.env{color:#d6a8ff;font-size:19px}
+.tw-envinfo{height:110px;border-radius:12px;background-size:cover;background-position:center;display:flex;align-items:center;justify-content:center;margin-bottom:8px}
+.tw-envinfo span{font-size:42px;width:70px;height:70px;border-radius:50%;background:#0d1b2ecc;display:flex;align-items:center;justify-content:center;border:3px solid #fff}
+.tw-envinfo img.ico{width:46px;height:46px}

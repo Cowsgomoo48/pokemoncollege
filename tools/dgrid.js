@@ -15,12 +15,12 @@ const GD_DIRS=[[0,1],[1,1],[1,0],[1,-1],[0,-1],[-1,-1],[-1,0],[-1,1]]; // sprite
 const GD_SPECIAL={shop:{icon:'🛒',name:'Kecleon Shop'},chest:{icon:'💎',name:'Treasure Chest'},spring:{icon:'⛲',name:'Healing Spring'}};
 function gdDirOf(dx,dy){const i=GD_DIRS.findIndex(d=>d[0]===Math.sign(dx)&&d[1]===Math.sign(dy));return i<0?0:i}
 function gdMV(species){const s=((SPECIES_DATA[species]||{}).stats||[0,0,0,0,0,60])[5];return s<50?2:s<80?3:s<110?4:5}
-function gdTheme(r){return GD_THEMES[(Math.floor(r.floor/(GD_DEPTH[r.diff]||3))+(r.themeOff||0))%GD_THEMES.length]}
-function gdIsBossFloor(r){return (r.floor+1)%(GD_DEPTH[r.diff]||3)===0}
-function gdTile(fl,x,y){return x<0||y<0||x>=fl.w||y>=fl.h?0:+fl.tiles[y][x]}
+function gdTheme(r){return mdTheme(r)}
+function gdIsBossFloor(r){return (r.floor+1)%(GD_DEPTH[r.diff]||3)===0||mdIsLast(r)}
+function gdTile(fl,x,y){return x<0||y<0||x>=fl.w||y>=fl.h?0:fl.ob&&fl.ob[y*fl.w+x]==='1'?0:+fl.tiles[y][x]}
 const gdKey=(x,y)=>x+','+y,gdCheb=(a,b)=>Math.max(Math.abs(a.x-b.x),Math.abs(a.y-b.y));
 // ---------- floor generation ----------
-function gdNewFloor(r){const [W,H,NR]=GD_SIZE[r.diff]||GD_SIZE.easy,g=Array.from({length:H},()=>Array(W).fill(0)),rooms=[],rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+function gdNewFloor(r){mdPlan(r);const [W,H,NR]=GD_SIZE[r.diff]||GD_SIZE.easy,g=Array.from({length:H},()=>Array(W).fill(0)),rooms=[],rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
  for(let t=0;t<400&&rooms.length<NR;t++){const w=rnd(4,7),h=rnd(4,6),x=rnd(1,W-w-2),y=rnd(1,H-h-2);if(rooms.some(o=>x<o[0]+o[2]+2&&o[0]<x+w+2&&y<o[1]+o[3]+2&&o[1]<y+h+2))continue;rooms.push([x,y,w,h])}
  rooms.sort((a,b)=>a[0]-b[0]);rooms.forEach(([x,y,w,h])=>{for(let j=y;j<y+h;j++)for(let i=x;i<x+w;i++)g[j][i]=1});
  const ctr=o=>[o[0]+(o[2]>>1),o[1]+(o[3]>>1)],dig=(a,b)=>{let [x,y]=a;const [tx,ty]=b,set=()=>{if(!g[y][x])g[y][x]=2};const hf=Math.random()<.5;
@@ -34,19 +34,22 @@ function gdNewFloor(r){const [W,H,NR]=GD_SIZE[r.diff]||GD_SIZE.easy,g=Array.from
  // your team starts together in the first room
  const s0=ctr(rooms[0]),spots=[[0,0],[1,0],[0,1],[1,1],[-1,0],[0,-1]].map(([dx,dy])=>[s0[0]+dx,s0[1]+dy]).filter(([x,y])=>gdTile(fl,x,y)===1);
  r.party.forEach((m,i)=>{const p=spots[i]||takeIn(rooms[0]);m.x=p[0];m.y=p[1];m.dir=0;m.moved=false;m.acted=false;taken.add(gdKey(m.x,m.y));delete m.hurt;delete m.hurtR;delete m.koR});
+ // this sublayer's obstacles and hazards; nothing else spawns on them or anywhere they wall off
+ mdDress(r,fl,taken);if(fl.ob)for(let k=0;k<fl.ob.length;k++)if(fl.ob[k]==='1')taken.add(gdKey(k%W,Math.floor(k/W)));if(fl.hz)Object.keys(fl.hz).forEach(k=>taken.add(k));
+ {const rch=gdBFS(fl,s0,()=>false,999);rooms.forEach(o=>{for(let j=o[1];j<o[1]+o[3];j++)for(let i=o[0];i<o[0]+o[2];i++)if(!rch.has(gdKey(i,j)))taken.add(gdKey(i,j))})}
  // wild Pokémon
  const D=DIFF[r.diff],seg=Math.floor(r.floor/(GD_DEPTH[r.diff]||3)),inSeg=r.floor%(GD_DEPTH[r.diff]||3),bump=(dgGamey(r)?seg*(D.step||2):0)+inSeg,avg=partyAvgLv()+bump,cap=avg+D.cap;
  const spread=(mid,sd,lo,hi)=>{const z=(Math.random()+Math.random()+Math.random()-1.5)*2;return Math.max(1,Math.min(hi,Math.max(lo,Math.round(mid+z*sd))))},sd=r.diff==='hard'?3.5:r.diff==='easy'?2.5:3,en=[];
  const put=(e,o)=>{const t=takeIn(o);if(!t)return;e.x=t[0];e.y=t[1];e.dir=0;e.mv=gdMV(e.species);en.push(e)};
  rooms.forEach((o,i)=>{if(!i)return;
-  if(i===far&&fl.boss){const kind=r.diff==='easy'?'boss':Math.random()<.4?(r.diff==='hard'&&Math.random()<.5?'alpha':'totem'):'boss',evolved=MONS.filter(m=>PRE_EVO[m[0]]&&m[2]>=1),sp=kind==='boss'?speciesOfTier(2,4):evolved[Math.floor(Math.random()*evolved.length)][0];
+  if(i===far&&fl.boss){const kind=r.diff==='easy'?'boss':Math.random()<.4?(r.diff==='hard'&&Math.random()<.5?'alpha':'totem'):'boss',evolved=MONS.filter(m=>PRE_EVO[m[0]]&&m[2]>=1),sp=kind==='boss'?mdSp(2,4):evolved[Math.floor(Math.random()*evolved.length)][0];
    const b=makeEnemy(sp,cap+rnd(0,2),{hpMul:D.bh*(kind==='totem'?.85:kind==='alpha'?1.2:1),atkMul:kind==='alpha'?1.3:1.2,boss:kind,twice:kind==='alpha'});taken.delete(gdKey(...fl.stairs));b.x=fl.stairs[0];b.y=fl.stairs[1];b.dir=0;b.mv=gdMV(sp);b.aware=1;en.push(b);taken.add(gdKey(b.x,b.y));
-   if(kind==='totem'){const pre=PRE_EVO[sp]||sp;for(let k=0;k<rnd(2,3);k++)put(makeEnemy(pre,spread(avg-2,2,avg-6,avg+1),{hpMul:.8}),o)}else put(makeEnemy(speciesOfTier(0,2),spread(avg,sd,avg-4,cap)),o);return}
-  if(i>1&&Math.random()<.14){const sp=speciesOfTier(0,0);for(let k=0;k<rnd(4,6);k++){const e=makeEnemy(sp,spread(avg-6,2,avg-10,avg-3),{hpMul:.7,atkMul:.75});e.swarm=1;put(e,o)}return}
-  if(Math.random()<.62){const n=rnd(1,r.diff==='hard'?3:2);for(let k=0;k<n;k++)put(makeEnemy(speciesOfTier(0,2),spread(avg+(cap-avg)*.4,sd,avg-6,cap+3),{hpMul:1.15}),o)}});
+   if(kind==='totem'){const pre=PRE_EVO[sp]||sp;for(let k=0;k<rnd(2,3);k++)put(makeEnemy(pre,spread(avg-2,2,avg-6,avg+1),{hpMul:.8}),o)}else put(makeEnemy(mdSp(0,2),spread(avg,sd,avg-4,cap)),o);return}
+  if(i>1&&Math.random()<.14){const sp=mdSp(0,0);for(let k=0;k<rnd(4,6);k++){const e=makeEnemy(sp,spread(avg-6,2,avg-10,avg-3),{hpMul:.7,atkMul:.75});e.swarm=1;put(e,o)}return}
+  if(Math.random()<.62){const n=rnd(1,r.diff==='hard'?3:2);for(let k=0;k<n;k++)put(makeEnemy(mdSp(0,2),spread(avg+(cap-avg)*.4,sd,avg-6,cap+3),{hpMul:1.15}),o)}});
  // items lying on the ground, and special spots
- const mid=rooms.map((o,i)=>i).filter(i=>i&&i!==far);for(let k=0;k<rnd(2,4);k++){const o=rooms[rnd(0,rooms.length-1)],t=takeIn(o);if(!t)continue;
-  if(Math.random()<.35)fl.items.push({x:t[0],y:t[1],tickets:rnd(3,8)+inSeg});else{const pool=Object.keys(DITEMS).filter(id=>id!=='snag'||Math.random()<.15).map(id=>({id,w:DITEM_TIER_W[DITEMS[id].tier||0]}));fl.items.push({x:t[0],y:t[1],k:pickWeighted(pool).id})}}
+ const mid=rooms.map((o,i)=>i).filter(i=>i&&i!==far),nIt=rnd(2,4)+(mdFx(r).items||0);for(let k=0;k<nIt;k++){const o=rooms[rnd(0,rooms.length-1)],t=takeIn(o);if(!t)continue;
+  if(Math.random()<.35)fl.items.push({x:t[0],y:t[1],tickets:mdTix(rnd(3,8)+inSeg)});else{const pool=Object.keys(DITEMS).filter(id=>id!=='snag'||Math.random()<.15).map(id=>({id,w:DITEM_TIER_W[DITEMS[id].tier||0]}));fl.items.push({x:t[0],y:t[1],k:pickWeighted(pool).id})}}
  const sp2=[['chest',.65],['spring',.35],['shop',.25]];for(const [k,p] of sp2){if(Math.random()>p||!mid.length)continue;const t=takeIn(rooms[mid[rnd(0,mid.length-1)]]);if(t)fl.specials.push({x:t[0],y:t[1],k})}
  r.fl=fl;r.battle={kind:'floor',enemies:en,turn:0,round:1,overclock:0,skip:false,guard:{},done:false,enemyPhase:false,diy:fl.boss||Math.random()<.5};gdSee(r);if(DG){DG.gmode='select';DG.msg=''}}
 // breadth-first search over walkable tiles; blocked(x,y) says a tile can't be entered
@@ -59,7 +62,7 @@ function gdAliveFoes(b){return b.enemies.map((e,i)=>[e,i]).filter(([e])=>(e.hp>0
 function gdUnitAt(r,x,y){const b=r.battle;const ai=r.party.findIndex(m=>m.x===x&&m.y===y);if(ai>=0)return {side:'ally',i:ai};const fi=b.enemies.findIndex(e=>(e.hp>0||e.gdOut)&&!e.done&&e.x===x&&e.y===y);return fi>=0?{side:'foe',i:fi}:null}
 // ---------- what you can see ----------
 function gdRoomOf(fl,x,y){return fl.rooms.findIndex(o=>x>=o[0]&&x<o[0]+o[2]&&y>=o[1]&&y<o[1]+o[3])}
-function gdLit(r){const fl=r.fl,L=new Set();r.party.forEach(m=>{const ri=gdRoomOf(fl,m.x,m.y);if(ri>=0){const o=fl.rooms[ri];for(let j=o[1]-1;j<=o[1]+o[3];j++)for(let i=o[0]-1;i<=o[0]+o[2];i++)L.add(gdKey(i,j))}
+function gdLit(r){const fl=r.fl,L=new Set();r.party.forEach(m=>{const ri=gdRoomOf(fl,m.x,m.y);if(ri>=0&&!mdFx(r).dark){const o=fl.rooms[ri];for(let j=o[1]-1;j<=o[1]+o[3];j++)for(let i=o[0]-1;i<=o[0]+o[2];i++)L.add(gdKey(i,j))}
   for(let dy=-2;dy<=2;dy++)for(let dx=-2;dx<=2;dx++)L.add(gdKey(m.x+dx,m.y+dy))});return L}
 function gdSee(r){const fl=r.fl,L=gdLit(r),s=fl.seen.split('');L.forEach(k=>{const [x,y]=k.split(',').map(Number);if(x>=0&&y>=0&&x<fl.w&&y<fl.h)s[y*fl.w+x]='1'});fl.seen=s.join('');
  // wild Pokémon that can see your team wake up and start hunting
@@ -79,17 +82,17 @@ function gdFoeTargets(r){const L=gdLit(r);return gdAliveFoes(r.battle).filter(([
 // ---------- drawing ----------
 function gdTilesCanvas(r){const fl=r.fl,th=gdTheme(r),T=GD_T;if(DG&&DG.tilesFor===fl.id&&DG.tiles)return DG.tiles;const c=document.createElement('canvas');c.width=fl.w*T;c.height=fl.h*T;const g=c.getContext('2d');
  let seed=7;const rr=()=>{seed=(seed*16807)%2147483647;return seed/2147483647};
- for(let y=0;y<fl.h;y++)for(let x=0;x<fl.w;x++){const t=gdTile(fl,x,y),X=x*T,Y=y*T;
+ for(let y=0;y<fl.h;y++)for(let x=0;x<fl.w;x++){const t=+fl.tiles[y][x],X=x*T,Y=y*T;
   if(t){g.fillStyle=(x+y)%2?th.f1:th.f2;g.fillRect(X,Y,T,T);if(rr()<.25){g.fillStyle=th.g;g.fillRect(X+4+rr()*26,Y+4+rr()*26,4,3)}}
   else{g.fillStyle=th.w1;g.fillRect(X,Y,T,T);g.fillStyle=th.w2;g.fillRect(X+2,Y+2,T-4,T-4);if(rr()<.3){g.fillStyle=th.e;g.fillRect(X+8+rr()*20,Y+8+rr()*20,6,6)}
    // edge shading where a wall meets a floor tile, so walls read as raised
-   if(gdTile(fl,x,y+1)){g.fillStyle=th.e;g.fillRect(X,Y+T-7,T,7)}}}
- if(DG){DG.tiles=c;DG.tilesFor=fl.id}return c}
+   if(+((fl.tiles[y+1]||'')[x]||0)){g.fillStyle=th.e;g.fillRect(X,Y+T-7,T,7)}}}
+ mdDecorate(g,r,fl,th);if(DG){DG.tiles=c;DG.tilesFor=fl.id}return c}
 function gdDrawBattle(entering){const r=runOf(),b=r&&r.battle,st=$('dgStage');if(!b||!st||!r.fl)return;const fl=r.fl,T=GD_T,L=gdSee(r),th=gdTheme(r);
- let field=st.querySelector('.gd-field');if(!field||entering){st.innerHTML='<div class="dg-field gd-field"><div class="gd-map"><canvas class="gd-tiles"></canvas><div class="gd-objs"></div><canvas class="gd-fog"></canvas><div class="gd-hl"></div><div class="gd-units"></div></div><canvas class="gd-mini"></canvas><div class="gd-floor"></div></div>';field=st.querySelector('.gd-field');field.addEventListener('click',gdTap);
+ let field=st.querySelector('.gd-field');if(!field||entering){st.innerHTML='<div class="dg-field gd-field"><div class="gd-map"><canvas class="gd-tiles"></canvas><div class="gd-objs"></div><canvas class="gd-fog"></canvas><div class="gd-hl"></div><div class="gd-units"></div></div><canvas class="gd-mini"></canvas><div class="gd-envslot"></div><div class="gd-floor"></div></div>';field=st.querySelector('.gd-field');field.addEventListener('click',gdTap);
   const mp=field.querySelector('.gd-map');mp.style.width=fl.w*T+'px';mp.style.height=fl.h*T+'px';const tc=field.querySelector('.gd-tiles');tc.width=fl.w*T;tc.height=fl.h*T;tc.getContext('2d').drawImage(gdTilesCanvas(r),0,0)}
  let tk=field.querySelector('.dg-ticker');if(DG&&DG.msg){if(!tk){tk=document.createElement('div');tk.className='dg-ticker';field.appendChild(tk)}tk.innerHTML=DG.msg}else if(tk)tk.remove();
- field.querySelector('.gd-floor').innerHTML='B'+(r.floor+1)+'F · '+th.name+(fl.boss?' · 👑':'');
+ field.querySelector('.gd-floor').innerHTML='B'+(r.floor+1)+'F · '+th.name+(fl.boss?' · 👑':'');field.querySelector('.gd-envslot').innerHTML=mdEnvBtn(r);field.style.background=mdShade(th.w2,.45);
  // fog: black where you've never been, dim where you can't see right now
  const fc=field.querySelector('.gd-fog');fc.width=fl.w*T;fc.height=fl.h*T;const fg=fc.getContext('2d');for(let y=0;y<fl.h;y++)for(let x=0;x<fl.w;x++){const seen=fl.seen[y*fl.w+x]==='1';if(!seen){fg.fillStyle='#05070d';fg.fillRect(x*T,y*T,T,T)}else if(!L.has(gdKey(x,y))){fg.fillStyle='rgba(5,7,13,.45)';fg.fillRect(x*T,y*T,T,T)}}
  const vis=(x,y)=>L.has(gdKey(x,y)),seenAt=(x,y)=>fl.seen[y*fl.w+x]==='1';
@@ -132,23 +135,23 @@ function gdPanelBattle(msg){const r=runOf(),b=r.battle,m=r.party[b.turn],p=m&&pa
  if(ultResting(b,m)&&!m.acted){m.acted=true;m.moved=true;save()}
  const free=gdFree(r),c=combatant(p),fast=MOVE_STATS[p.fastMove]||['Normal',8,8,'fast'],disc=MOVE_STATS[p.discMove]||['Normal',80,50,'charged'],foes=gdFoeTargets(r),U=ultOf(p),canHit=gdOptions(r.fl,m.x,m.y,gdShape(p.fastMove,fast),foes).length>0||(m.energy>=disc[2]&&gdOptions(r.fl,m.x,m.y,gdShape(p.discMove,disc),foes).length>0)||(U&&m.energy>=100&&(U.t==='none'||foes.some(([e])=>gdCheb(e,m)<=(U.t==='all'?3:5))));
  const chips='<div class="gd-chips">'+r.party.map((q,i)=>{const pp=partyMon(q),cc=combatant(pp);return '<button class="gd-chip'+(i===b.turn?' on':'')+(q.acted?' done':'')+(q.hp<=0?' ko':'')+'" style="--c:'+SLOT_COLORS[i]+'" onclick="gdSelect('+i+')">'+monSprite(pp,'',28)+'<small>'+(q.acted?'✓':q.hp<=0?'💤':q.hp+'/'+cc.hp)+'</small></button>'}).join('')+'</div>';
- const head='<div class="dg-msg"><b style="color:'+SLOT_COLORS[b.turn]+'">'+esc(p.nickname||p.species)+'</b> · '+m.hp+'/'+c.hp+' HP · ⚡'+m.energy+' · 👣 '+gdMV(p.species)+(msg?'<br>'+msg:free?'<br>🧭 No wild Pokémon in sight: walk freely, your team follows.':m.acted?' · done this turn':m.moved?' · moved, can still act':'')+'</div>';
+ const head='<div class="dg-msg"><b style="color:'+SLOT_COLORS[b.turn]+'">'+esc(p.nickname||p.species)+'</b> · '+m.hp+'/'+c.hp+' HP · ⚡'+m.energy+' · 👣 '+Math.max(1,gdMV(p.species)+mdMoveAdj())+(msg?'<br>'+msg:free?'<br>🧭 No wild Pokémon in sight: walk freely, your team follows.':m.acted?' · done this turn':m.moved?' · moved, can still act':'')+'</div>';
  const acts=m.hp<=0?'<div class="dg-acts"><button class="btn red" '+(m.acted?'disabled':'')+' onclick="dgRevive()">💫 ANSWER TO REVIVE</button></div>'
   :'<div class="dg-acts gd-acts"><button class="btn'+(free?' blue':'')+'" '+(!free&&(m.moved||m.acted)?'disabled':'')+' onclick="gdMoveStart()">👣 MOVE</button><button class="btn red" '+(m.acted||!canHit?'disabled':'')+' onclick="dgFight()">⚔️ FIGHT'+(canHit||m.acted?'':'<small>no foe in reach</small>')+'</button><button class="btn blue" '+(m.acted?'disabled':'')+' onclick="dgItem()">🎒 ITEM</button><button class="btn" '+(m.acted?'disabled':'')+' onclick="dgGuard()">🛡 GUARD</button></div>';
- $('dgPanel').innerHTML=head+chips+acts+'<div class="dg-row"><button class="btn smallbtn red" onclick="gdEndTurn()">⏭ END TURN</button><span>⏱ <b id="dgTime">'+fmtMin(r.studyMs)+'</b></span><span>🎟️ '+(r.tickets||0)+'</span><button class="btn smallbtn" onclick="dgSettings()">⚙</button><button class="btn smallbtn" onclick="dgSaveExit()">💾</button></div>'}
+ $('dgPanel').innerHTML=head+chips+acts+'<div class="dg-row"><button class="btn smallbtn red" onclick="gdEndTurn()">⏭ END TURN</button><span>⏱ <b id="dgTime">'+fmtMin(r.studyMs)+'</b></span><span>🎟️ '+(r.tickets||0)+'</span><button class="btn smallbtn" onclick="dgSettings()">🔧</button><button class="btn smallbtn" onclick="dgSaveExit()">💾</button></div>'}
 // Free roam: while no wild Pokémon is in sight, moving doesn't use up anyone's turn. The picked Pokémon can keep walking
 // (up to 6 tiles a step, or more if it's faster), the rest of the team follows, and everyone slowly recovers HP.
 const GD_FREE_MV=6;
 function gdFree(r){r=r||runOf();return !!(r&&r.fl&&r.battle&&!r.battle.enemyPhase&&!gdFoeTargets(r).length)}
 function gdSelect(i){const r=runOf(),b=r&&r.battle;if(!b||b.enemyPhase||DG.busy)return;b.turn=i;DG.gmode='select';DG.hl=null;gdDrawBattle()}
 // ---------- moving ----------
-function gdMoveStart(){const r=runOf(),b=r.battle,m=r.party[b.turn];if(!m||m.hp<=0||DG.busy)return;const free=gdFree(r);if(!free&&(m.moved||m.acted))return;const fl=r.fl,mv=free?Math.max(GD_FREE_MV,gdMV(partyMon(m).species)):gdMV(partyMon(m).species);
+function gdMoveStart(){const r=runOf(),b=r.battle,m=r.party[b.turn];if(!m||m.hp<=0||DG.busy)return;const free=gdFree(r);if(!free&&(m.moved||m.acted))return;const fl=r.fl,mv=free?Math.max(GD_FREE_MV,gdMV(partyMon(m).species)):Math.max(1,gdMV(partyMon(m).species)+mdMoveAdj());
  const reach=gdBFS(fl,[m.x,m.y],(x,y)=>b.enemies.some(e=>(e.hp>0||e.gdOut)&&!e.done&&e.x===x&&e.y===y),mv);DG.reach=reach;DG.gmode='move';gdCamera(m.x,m.y);
  DG.hl={cls:'mv',tiles:[...reach.keys()].map(k=>k.split(',').map(Number)).filter(([x,y])=>!(x===m.x&&y===m.y)&&!gdUnitAt(r,x,y))};gdHighlight();$('dgPanel').innerHTML='<div class="dg-msg">👣 Tap a blue tile to move there (up to '+mv+' tiles).'+(free?' No foes in sight, so this doesn’t use up the turn.':'')+'</div><div class="dg-acts"><button class="btn" onclick="DG.gmode=\'select\';DG.hl=null;gdDrawBattle()">CANCEL</button></div>'}
 async function gdWalk(unitEl,obj,path,isFoe){const T=GD_T;for(let s=1;s<path.length;s++){const [x,y]=path[s],[px,py]=path[s-1];obj.dir=gdDirOf(x-px,y-py);obj.x=x;obj.y=y;if(unitEl){unitEl.style.left=x*T+'px';unitEl.style.top=y*T+'px';unitEl.style.zIndex=10+y;const sp=unitEl.querySelector('.dg-spr');if(sp&&+sp.dataset.row!==obj.dir){sp.dataset.row=obj.dir;sp.classList.remove('ok');dgFillSprites()}}if(!isFoe)gdCamera(x,y);await dgSleep(120)}}
 async function gdWalkTo(slot,x,y){const r=runOf(),b=r.battle,m=r.party[slot],path=gdPath(DG.reach,gdKey(x,y)),wasFree=gdFree(r);DG.gmode='select';DG.hl=null;DG.busy=1;gdHighlight();
  await gdWalk(document.querySelector('.dg-ally[data-i="'+slot+'"]'),m,path,false);if(!runOf()||runOf().battle!==b)return;
- if(wasFree)gdFollow(r,slot,path);gdSee(r);
+ if(wasFree)gdFollow(r,slot,path);gdSee(r);mdHazard(r,m,false,slot);
  // still nothing in sight: the walk was free. A foe came into view: this walk counts as the move, and the battle starts
  if(wasFree&&gdFree(r)){m.moved=false;r.party.forEach(q=>{const c=combatant(partyMon(q));if(q.hp>0&&q.hp<c.hp)q.hp=Math.min(c.hp,q.hp+Math.max(1,Math.round(c.hp*.03)))})}else{m.moved=true;if(wasFree)r.party.forEach((q,i)=>{if(i!==slot)q.moved=false})}
  save();DG.busy=0;
@@ -165,7 +168,7 @@ function gdFollow(r,slot,path){const b=r.battle,lead=r.party[slot],trail=path.sl
  const spots=[...trail,...GD_DIRS.map(([dx,dy])=>[lead.x+dx,lead.y+dy])].filter(([x,y])=>gdTile(r.fl,x,y));
  fol.forEach(([q,i])=>{if(gdCheb(q,lead)<=1){taken.add(gdKey(q.x,q.y));return}const t=spots.find(([x,y])=>!taken.has(gdKey(x,y)));if(!t){taken.add(gdKey(q.x,q.y));return}
   q.dir=gdDirOf(lead.x-t[0],lead.y-t[1]);q.x=t[0];q.y=t[1];taken.add(gdKey(t[0],t[1]))})}
-function gdStairs(){const r=runOf();if(!r||!r.fl||r.fl.stairsHidden||!r.party.some(m=>m.x===r.fl.stairs[0]&&m.y===r.fl.stairs[1]))return;if(r.fl.boss){dgFloorClear();return}r.floor++;r.party.forEach(m=>{const c=combatant(partyMon(m));m.energy=Math.min(100,m.energy+10);if(m.hp>0)m.hp=Math.min(c.hp,m.hp+Math.ceil(c.hp*.2));if(m.starf&&--m.starf.rooms<=0)m.starf=null});gdNewFloor(r);save();toast('⬇ B'+(r.floor+1)+'F'+(r.fl.boss?' · something big is waiting here…':''));gdDrawBattle(true)}
+function gdStairs(){const r=runOf();if(!r||!r.fl||r.fl.stairsHidden||!r.party.some(m=>m.x===r.fl.stairs[0]&&m.y===r.fl.stairs[1]))return;if(r.fl.boss){dgFloorClear();return}r.floor++;r.party.forEach(m=>{const c=combatant(partyMon(m));m.energy=Math.min(100,m.energy+10);if(m.hp>0)m.hp=Math.min(c.hp,m.hp+Math.ceil(c.hp*.2));if(m.starf&&--m.starf.rooms<=0)m.starf=null});gdNewFloor(r);save();toast('⬇ B'+(r.floor+1)+'F'+(r.fl.boss?' · something big is waiting here…':''));gdDrawBattle(true);if(r.sub&&r.sub.fresh)mdDig(r)}
 // ---------- fighting ----------
 async function gdFight(){const r=runOf(),b=r&&r.battle;if(!b||b.enemyPhase||DG.busy)return;const m=r.party[b.turn],p=partyMon(m);if(!m||m.acted||m.hp<=0)return;
  const fast=MOVE_STATS[p.fastMove]||['Normal',8,8,'fast'],disc=MOVE_STATS[p.discMove]||['Normal',80,50,'charged'],X=dgCtx(b.turn),foes=gdFoeTargets(r),U=ultOf(p);
@@ -196,7 +199,7 @@ function gdChooseFoe(fn){const r=runOf(),b=r&&r.battle;if(!b)return;const m=r.pa
 // ---------- after each action ----------
 function gdUnstash(b){b.enemies.forEach(e=>{if(e.gdOut){e.hp=e.gdHp;delete e.gdHp;delete e.gdOut}})}
 function gdKills(r){const b=r.battle,got=[];b.enemies.forEach(e=>{if(e.hp>0||e.done||e.gdOut)return;e.done=1;const boss=!!e.boss,tix=(boss?(e.boss==='boss'?12:18):e.swarm?1:2)+(dgGamey(r)?Math.floor(r.floor/2):0),exp=Math.round((boss?4500:e.swarm?500:1000)*(1+(dgGamey(r)?.1*r.floor:0)));
-  r.tickets=(r.tickets||0)+tix;r.cogs=(r.cogs||0)+tix;r.party.forEach(m=>{const p=partyMon(m);if(p)p.pxp=(p.pxp||0)+exp});got.push((e.caught?'🧲 ':'')+esc(e.species)+': +'+tix+'🎟️ · team +'+money(exp)+' EXP');
+  const tx=mdTix(tix);r.tickets=(r.tickets||0)+tx;r.cogs=(r.cogs||0)+tx;r.party.forEach(m=>{const p=partyMon(m);if(p)p.pxp=(p.pxp||0)+exp});got.push((e.caught?'🧲 ':'')+esc(e.species)+': +'+tx+'🎟️ · team +'+money(exp)+' EXP');
   if(boss){const bk=Math.random()<.5?'apple':'starf';r.bag[bk]=(r.bag[bk]||0)+1;got.push(DITEMS[bk].icon+' '+DITEMS[bk].name);if(Math.random()<.2){db.candies++;got.push('🍬 Rare Candy')}
    if(e.boss==='totem'||e.boss==='alpha'){const sp=PRE_EVO[e.species]||e.species,mm=giveMon(dgBossMon(sp,e.boss));got.push('🎁 '+(mm.shiny?'✨ Shiny ':'')+mm.species+' joined your Box!')}
    if(r.fl.boss){r.fl.stairsHidden=false;got.push('🪜 The stairs appeared!')}}});
@@ -217,12 +220,12 @@ async function gdEnemyPhase(){const r=runOf(),b=r.battle;b.enemyPhase=true;DG.gm
    if(!opts.length&&k===0){// walk toward your team: the closest tile it can attack from, otherwise as close as it can get
     const reach=gdBFS(r.fl,[e.x,e.y],(x,y)=>r.party.some(m=>m.x===x&&m.y===y)||b.enemies.some((o,j)=>j!==i&&o.hp>0&&!o.done&&o.x===x&&o.y===y),e.mv||3);let best=null,bd=1e9;
     reach.forEach((v,kk)=>{const [x,y]=kk.split(',').map(Number),o=gdOptions(r.fl,x,y,shape,allies());const near=Math.min(...allies().map(([m])=>gdCheb(m,{x,y})));const score=o.length?v.d:100+near*10+v.d;if(score<bd){bd=score;best=kk}});
-    if(best&&best!==gdKey(e.x,e.y)){const el=document.querySelector('.dg-foe[data-i="'+i+'"]');await gdWalk(el,e,gdPath(reach,best),true);gdDrawBattle();}
+    if(best&&best!==gdKey(e.x,e.y)){const el=document.querySelector('.dg-foe[data-i="'+i+'"]');await gdWalk(el,e,gdPath(reach,best),true);gdDrawBattle();if(mdHazard(r,e,true,i)&&e.hp<=0){gdKills(r);gdDrawBattle();break}}
     opts=gdOptions(r.fl,e.x,e.y,shape,allies())}
    if(!opts.length)break;const o=opts.sort((a,c)=>c.hits.length-a.hits.length)[0];await gdEnemyStrike(i,e,o.hits,useDisc,name,mv0);if(r.party.every(m=>m.hp<=0))break}}
  if(ep!==dgEpoch||!runOf()||runOf().battle!==b)return;
  const bossUp=b.enemies.find(e=>e.boss&&e.hp>0&&!e.done&&e.aware);if(bossUp&&!b.charge&&r.party.filter(m=>m.hp>0).length>1&&(b.round%3===2||Math.random()<.2)){b.charge=true;DG.msg='⚠ '+esc(bossUp.species)+' is gathering power for a blast that hits everyone within 3 tiles! 🛡 Guard or get away.'}
- dgSaltTick(b);await ultEndOfRound(r,b);if(!runOf()||runOf().battle!==b)return;gdKills(r);
+ dgSaltTick(b);await ultEndOfRound(r,b);if(!runOf()||runOf().battle!==b)return;await mdRoundEnd(r,b);if(!runOf()||runOf().battle!==b)return;gdKills(r);
  b.guard={};b.enemyPhase=false;b.round++;
  // like in the games, your team slowly recovers while no wild Pokémon is chasing it
  const Lr=gdLit(r),calm=!b.enemies.some(e=>e.hp>0&&!e.done&&e.aware&&Lr.has(gdKey(e.x,e.y)));if(calm)r.party.forEach(m=>{const c=combatant(partyMon(m));if(m.hp>0&&m.hp<c.hp)m.hp=Math.min(c.hp,m.hp+Math.ceil(c.hp*.05))});
@@ -230,7 +233,7 @@ async function gdEnemyPhase(){const r=runOf(),b=r.battle;b.enemyPhase=true;DG.gm
  if(r.party.every(m=>m.hp<=0)){dgLose();return}save();gdDrawBattle()}
 async function gdEnemyStrike(i,e,targets,useDisc,name,mv0){const r=runOf(),b=r.battle,disc=MOVE_STATS[e.disc],eh=dgEnemyHits(name),mv=eh>1?Object.assign([mv0[0],Math.round(mv0[1]*eh),mv0[2],mv0[3]],{cat:moveCat(mv0)}):mv0,sc=targets.length>1?.75:1,fsel='.dg-foe[data-i="'+i+'"]';
  const t0=r.party[targets[0]];e.dir=gdDirOf(t0.x-e.x,t0.y-e.y);const s=document.querySelector(fsel+' .dg-spr');if(s){s.dataset.row=e.dir;s.classList.remove('ok');await dgFillSprites()}
- const hits=targets.map(ti=>{const tm=r.party[ti],tp=partyMon(tm),tc=combatant(tp),{dmg:raw0}=dgDamage({atk:e.atk,spa:e.spa,types:e.types},{def:tc.def+(tm.starf&&tm.starf.stat==='def'?2:0),spd:tc.spd+(tm.starf&&tm.starf.stat==='spd'?2:0),types:tc.types},mv,(.85+Math.random()*.3)*sc),capF=(e.boss?(useDisc?.75:.55):(useDisc?.6:.45))*(DIFF[r.diff].dm||1)*sc,raw=Math.min(raw0,Math.ceil(tc.hp*capF*(.9+Math.random()*.2))),dodged=Math.random()<dgDodge(tc.spe+(tm.starf&&tm.starf.stat==='spe'?2:0),e.spe),dmg=dodged?0:ultGuardDmg(b,Math.max(1,Math.round(raw*(1-Math.min(.9,(b.guard[ti]||0)+(b.wall===b.round?.1:0))))));
+ const hits=targets.map(ti=>{const tm=r.party[ti],tp=partyMon(tm),tc=combatant(tp),{dmg:raw0}=dgDamage({atk:e.atk,spa:e.spa,types:e.types},{def:tc.def+(tm.starf&&tm.starf.stat==='def'?2:0),spd:tc.spd+(tm.starf&&tm.starf.stat==='spd'?2:0),types:tc.types},mv,(.85+Math.random()*.3)*sc*mdFoeMult(mv[0],tc.types)),capF=(e.boss?(useDisc?.75:.55):(useDisc?.6:.45))*(DIFF[r.diff].dm||1)*sc,raw=Math.min(raw0,Math.ceil(tc.hp*capF*(.9+Math.random()*.2))),dodged=Math.random()<dgDodge(tc.spe+(tm.starf&&tm.starf.stat==='spe'?2:0),e.spe),dmg=dodged?0:ultGuardDmg(b,Math.max(1,Math.round(raw*(1-Math.min(.9,(b.guard[ti]||0)+(b.wall===b.round?.1:0))))));
   tm.hp=Math.max(0,tm.hp-dmg);dgHurt(b,tm,dmg);return {ti,tm,tp,dmg,dodged,eff:typeEff(mv[0],tc.types)}});
  if(useDisc)e.energy-=disc[2];else e.energy=Math.min(100,e.energy+mv0[2]);e.acted=1;save();
  DG.msg=esc(e.species)+' used <b>'+esc(name)+'</b>'+(hits.length>1?' on '+hits.length+' of your team':' on <b style="color:'+SLOT_COLORS[hits[0].ti]+'">'+esc(hits[0].tp.nickname||hits[0].tp.species)+'</b>')+'! '+hits.map(h=>h.dodged?'💨 '+esc(h.tp.nickname||h.tp.species)+' dodged!':'−'+h.dmg+(b.guard[h.ti]?'🛡':'')).join(' · ')+(eh>1?' (hit '+Math.round(eh)+' times)':'')+(hits.some(h=>h.eff>1.2&&!h.dodged)?' <span class="t-sup">Super effective!</span>':'')+hits.filter(h=>h.tm.hp<=0).map(h=>' '+esc(h.tp.nickname||h.tp.species)+' fainted!').join('');
@@ -254,8 +257,8 @@ function dgChooseFoe(fn){return gdTower()?dgcChooseFoe(fn):gdChooseFoe(fn)}
 function dgFight(){return gdTower()?dgcFight():gdFight()}
 function dgNextRoom(){const r=runOf();if(!r)return;if(r.tower){twShopDone();return}save();gdDrawBattle(true)}
 function dgWin(){return gdTower()?dgcWin():gdAfterAction()}
-function dgDescend(){const r=runOf();if(!r)return;r.floor++;r.party.forEach(m=>{const c=combatant(partyMon(m));if(m.hp>0)m.hp=Math.min(c.hp,m.hp+Math.round(c.hp*.3))});gdNewFloor(r);save();toast('⬇ B'+(r.floor+1)+'F'+(dgGamey(r)?'. The air feels heavier…':''));gdDrawBattle(true)}
-function dgFloorClear(){const r=runOf(),D=DIFF[r.diff],seg=Math.floor(r.floor/(GD_DEPTH[r.diff]||3))+1;r.clearedFloors=Math.max(r.clearedFloors||0,seg);save();const bonus=dgFloorBonus(r),g=dgGamey(r);
+function dgDescend(){const r=runOf();if(!r)return;r.floor++;r.party.forEach(m=>{const c=combatant(partyMon(m));if(m.hp>0)m.hp=Math.min(c.hp,m.hp+Math.round(c.hp*.3))});gdNewFloor(r);save();toast('⬇ B'+(r.floor+1)+'F'+(dgGamey(r)?'. The air feels heavier…':''));gdDrawBattle(true);if(r.sub&&r.sub.fresh)mdDig(r)}
+function dgFloorClear(){if(mdIsLast(runOf()))return mdFinal();const r=runOf(),D=DIFF[r.diff],seg=Math.floor(r.floor/(GD_DEPTH[r.diff]||3))+1;r.clearedFloors=Math.max(r.clearedFloors||0,seg);save();const bonus=dgFloorBonus(r),g=dgGamey(r);
  $('dgStage').innerHTML='<div class="dg-room"><span class="dg-big">🏁</span><h3>B'+(r.floor+1)+'F boss beaten!</h3><p>Leave now to collect a <b>'+bonus+' Cog</b> bonus'+(g?' ('+r.clearedFloors+' boss'+(r.clearedFloors>1?'es':'')+' × '+(D.fb||10)+')':'')+'.</p><p class="small">'+(g?'Or go deeper: the next floors are about '+((seg)*(D.step||2))+' levels stronger. Your team recovers 30% HP. If your team faints down there, you lose the bonus.':'Or keep exploring deeper. Casual floors stay the same strength, and your team recovers 30% HP on the way down.')+'</p><div class="actions"><button class="btn" onclick="dgEnd(true)">🏠 LEAVE WITH REWARDS</button><button class="btn red" onclick="dgDescend()">⬇ GO DEEPER</button></div></div>';$('dgPanel').innerHTML=dgPanelMap()}
 // items that hit "every enemy" hit every foe you can see
 async function dgBlastItem(k){if(gdTower())return dgcBlastItem(k);const r=runOf(),b=r.battle,slot=b.turn,I=DITEMS[k],who=partyMon(r.party[slot]);dgCrosshair('ally',slot,slot);const res=await dgQ(I.icon+' '+I.name.toUpperCase());
@@ -270,9 +273,10 @@ async function dgRevive(){if(gdTower())return dgcRevive();const r=runOf(),b=r&&r
 function dgStartRun(){dgMode='dungeon';const sids=[...document.querySelectorAll('.mg-sets input:checked')].map(x=>x.value),mode=(document.querySelector('input[name=mgm]:checked')||{}).value||'smart',diff=(document.querySelector('input[name=dgd]:checked')||{}).value||'easy',style=(document.querySelector('input[name=dgs]:checked')||{}).value||'casual';if(!sids.length){toast('Pick at least one study set');return}
  if(mode==='weak'&&!sids.some(id=>(db.learned||{})[id])){toast('Finish Learn mode on one of these sets first');return}
  if(!mgPicker(mgBank(sids),mode).bank.length){toast('No questions for that mode here');return}
- db.run={diff,style,sids,mode,party:dgPick.map(id=>{const p=db.pokemon.find(x=>x.id===id),c=combatant(p);return {id,hp:c.hp,energy:20,starf:null}}),floor:0,bag:{oran:2},studyMs:0,cogs:0,tickets:0,rooms:0,startedAt:stamp(),slider:true,battle:null,themeOff:Math.floor(Math.random()*GD_THEMES.length),log:[]};dgPick=[];gdNewFloor(db.run);save();closeModal();go('minigames');dgOpen()}
+ db.run={diff,style,sids,mode,party:dgPick.map(id=>{const p=db.pokemon.find(x=>x.id===id),c=combatant(p);return {id,hp:c.hp,energy:20,starf:null}}),floor:0,bag:{oran:2},studyMs:0,cogs:0,tickets:0,rooms:0,startedAt:stamp(),slider:true,battle:null,themeOff:Math.floor(Math.random()*GD_THEMES.length),log:[]};dgPick=[];gdNewFloor(db.run);save();closeModal();go('minigames');dgOpen();mdDig(db.run)}
 function dgOpen(mode){if(mode)dgMode=mode;if(dgMode==='tower')return dgcOpen();const r=runOf();if(!r)return;dgEpoch++;mgState={game:'dungeon',startedAt:Date.now(),stop:()=>{clearInterval(DG&&DG.clock);dgEpoch++;document.querySelectorAll('.mgq,.dg-slider').forEach(x=>x.remove());document.body.classList.remove('mg-on');DG=null}};DG={clock:setInterval(()=>{const rr=runOf();if(!rr||currentPage!=='minigames'||document.hidden)return;rr.studyMs+=1000;const t=$('dgTime');if(t)t.textContent=fmtMin(rr.studyMs)},1000),bank:mgBank(r.sids),gmode:'select'};DG.P=mgPicker(DG.bank,r.mode);document.body.classList.add('mg-on');
  const el=$('mgArea');el.innerHTML='<div class="dg gd"><div class="dg-stage" id="dgStage"></div><div class="dg-panel" id="dgPanel"></div></div>';
  // a run saved by the old room-map version continues on a fresh tile floor
  if(!r.fl||!r.battle||r.battle.kind!=='floor'){r.floor=r.floor||0;if(r.themeOff==null)r.themeOff=0;gdNewFloor(r);save()}
+ if(!r.sub){mdPlan(r);r.sub.fresh=false;save()}
  gdDrawBattle(true);if(r.battle.enemyPhase)gdEnemyPhase()}

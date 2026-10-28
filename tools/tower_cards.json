@@ -363,11 +363,11 @@
 "id": "frenzy",
 "name": "Frenzy",
 "el": "grass",
-"rar": 3,
+"rar": 5,
 "stack": 0,
 "emoji": "💥",
 "text": "Extra damage beyond what a knockout needed turns into Tickets.",
-"w": 3
+"w": 0.8
 },
 {
 "id": "quickball",

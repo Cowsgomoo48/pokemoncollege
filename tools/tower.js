@@ -10,18 +10,18 @@ const TW_ENVS={
  psychic:{name:'Psychic Mindscape',icon:'🔮',desc:'Psychic-type moves deal 30% more damage.',boost:{psychic:1.3},plat:'#a95fbe'},
  concrete:{name:'Concrete Jungle',icon:'🏙️',desc:'Grass- and Rock-type moves deal 15% more damage.',boost:{grass:1.15,rock:1.15},plat:'#9a9aa2'},
  wilds:{name:'Vicious Wilds',icon:'🐾',desc:'Multi-hit moves only hit once.',single:true,plat:'#96683f'},
- holy:{name:'Holy Sanctum',icon:'🕊️',desc:'At the end of your turn, your Pokémon heal 2 HP.',heal:2},
- sludge:{name:'Sludge Hell',icon:'☣️',desc:'After both sides have moved, the floor bubbles: 1 damage to every Pokémon that isn’t Poison or Steel type.',chip:{d:1,safe:['poison','steel'],icon:'☣️'}},
+ holy:{name:'Holy Sanctum',icon:'🕊️',desc:'At the end of your turn, your Pokémon heal 2 HP.',heal:2,pop:'🕊️ Holy light washes over your team…'},
+ sludge:{name:'Sludge Hell',icon:'☣️',desc:'After both sides have moved, the floor bubbles: 1 damage to every Pokémon that isn’t Poison or Steel type. It can’t knock out your Pokémon.',chip:{d:1,safe:['poison','steel'],icon:'☣️',pop:'☣️ The sludge bubbles up…'}},
  dragon:{name:'Dragon Cavern',icon:'🐉',desc:'Dragon-type Pokémon take 10% less damage from all attacks.',dragon:true},
  legend:{name:'Legend’s Temple',icon:'🏛️',desc:'Legendary Pokémon take 5% less damage and deal 10% more damage.',legend:true},
  trepid:{name:'Trepidation Habitat',icon:'🌊',desc:'Water-type attacks deal extra damage equal to 5% of the attacker’s max HP.',water:true},
  sleepless:{name:'Sleepless Hollow',icon:'🌙',desc:'Items can’t be used.',noItems:true},
  dank:{name:'Dank Depths',icon:'🦇',desc:'Dark-types dodge as if they had +4 Speed. Foe Dark-types can dodge your attack: 20% after a Make-Up answer, 40% after a wrong one.',dank:true},
- crystal:{name:'Crystal Mines',icon:'💎',desc:'Rock- and Ground-type foes are more common. After both sides have moved, every Pokémon that isn’t Ground, Steel or Rock type takes 1 damage.',chip:{d:1,safe:['ground','steel','rock'],icon:'💎'},rockFoes:true},
+ crystal:{name:'Crystal Mines',icon:'💎',desc:'Rock- and Ground-type foes are more common. After both sides have moved, every Pokémon that isn’t Ground, Steel or Rock type takes 1 damage. It can’t knock out your Pokémon.',chip:{d:1,safe:['ground','steel','rock'],icon:'💎',pop:'💎 Jagged crystals rain down…'},rockFoes:true},
  snow:{name:'Snowscape',icon:'❄️',desc:'Ice-types take 10% less damage from attacks.',ice:true},
  dice:{name:'Dice Arena',icon:'🎲',desc:'Moves that hit 2–5 times always hit at least 3 times.',dice:true},
  spook:{name:'Spook Zone',icon:'👻',desc:'Every attack heals the attacker 10% of each hit’s damage (rounded down, at least 1 HP per hit).',spook:true},
- king:{name:'King’s Battlefield',icon:'👑',desc:'The highest-level Pokémon on each side glows gold: it deals 15% more damage and takes 5% less. If it faints, each of its teammates loses 20% of their max HP.',king:true},
+ king:{name:'King’s Battlefield',icon:'👑',desc:'The highest-level Pokémon on each side glows gold: it deals 15% more damage and takes 5% less. If it faints, each of its teammates loses 20% of their max HP (your own Pokémon never drop below 1 HP from this).',king:true},
  center:{name:'Pokémon Center',icon:'🏥',desc:'Revived Pokémon get back up with 15% of their max HP instead of 1 HP.',center:true},
  lifeblock:{name:'Lifeblock Gym',icon:'🧱',desc:'Guarding also heals the guard for half the Stamina it gains (rounded down).',lifeblock:true}};
 // Perk cards: 45 cards in 3 elements (🔥 Fire = offense, 💧 Water = defense, 🌿 Grass = utility) and 5 rarities.
@@ -63,7 +63,7 @@ const TW_CARDS={
  scopelens:{"name": "Scope Lens", "el": "fire", "rar": 3, "stack": 0, "emoji": "🎯", "text": "The critical-hit zone on the timing bar is 50% wider.", "w": 3},
  focussash:{"name": "Focus Sash", "el": "water", "rar": 3, "stack": 0, "emoji": "🎗️", "text": "Once per battle, a Pokémon at full HP survives a knockout hit with 1 HP.", "w": 3},
  shellbell:{"name": "Shell Bell", "el": "water", "rar": 3, "stack": 0, "emoji": "🔔", "text": "Attacks heal the attacker 8% of the damage dealt (at least 1).", "w": 3},
- frenzy:{"name": "Frenzy", "el": "grass", "rar": 3, "stack": 0, "emoji": "💥", "text": "Extra damage beyond what a knockout needed turns into Tickets.", "w": 3},
+ frenzy:{"name": "Frenzy", "el": "grass", "rar": 5, "stack": 0, "emoji": "💥", "text": "Extra damage beyond what a knockout needed turns into Tickets.", "w": 0.8},
  quickball:{"name": "Quick Ball", "el": "grass", "rar": 3, "stack": 0, "emoji": "⚡", "text": "Foes skip their first turn in every battle.", "w": 3},
  thief:{"name": "Thief", "el": "grass", "rar": 3, "stack": 0, "emoji": "💰", "text": "25% chance after each battle to snatch a random item.", "w": 3},
  choiceband:{"name": "Choice Band", "el": "fire", "rar": 4, "stack": 0, "emoji": "🎽", "text": "Charged attacks deal 25% more damage.", "w": 1.5},
@@ -81,8 +81,8 @@ const TW_CHAL={
 function twEnvKey(r){r=r||runOf();if(!r||!r.envs)return 'electric';if(r.envs.length<Object.keys(TW_ENVS).length){const miss=Object.keys(TW_ENVS).filter(k=>!r.envs.includes(k));r.envs.push(...shuffle(miss))}return r.envs[Math.floor(Math.max(0,(r.floor||1)-1)/10)%r.envs.length]}
 function twEnv(r){return TW_ENVS[twEnvKey(r)]}
 // hooks used by the battle engine (always 1 / false outside the Tower)
-function dgEnvMult(type){const r=runOf();if(!r||!r.tower)return 1;const e=twEnv(r);return (e.boost&&e.boost[String(type).toLowerCase()])||1}
-function dgEnvSingle(){const r=runOf();return !!(r&&r.tower&&twEnv(r).single)}
+function dgEnvMult(type){const r=runOf();if(!r)return 1;if(!r.tower)return mdTypeMult(type);const e=twEnv(r);return (e.boost&&e.boost[String(type).toLowerCase()])||1}
+function dgEnvSingle(){const r=runOf();return !!(r&&(r.tower?twEnv(r).single:mdFx(r).single))}
 function twPowMult(){return 1}
 function dgFoeMult(type){const r=runOf();if(!r||!r.tower)return 1;return dgEnvMult(type)}
 function twStats(){return db.towerStats||(db.towerStats={best:0,bosses:0,runs:0,floors:0,challenges:0,bestAt:null})}
@@ -97,7 +97,7 @@ function twStartRun(){const sids=[...document.querySelectorAll('.mg-sets input:c
  db.tower={tower:true,diff:'balanced',style:'game',sids,mode,party:dgPick.map(id=>{const p=db.pokemon.find(x=>x.id===id),c=combatant(p);return {id,hp:c.hp,energy:20,starf:null}}),floor:0,cleared:0,bag:{oran:2},tickets:0,cogs:0,studyMs:0,rooms:0,startedAt:stamp(),slider:true,battle:null,
   envs:shuffle(Object.keys(TW_ENVS)),cards:{},perkDone:[],bosses:0,challengesWon:0,log:[]};dgPick=[];dgPickFor='dungeon';save();closeModal();go('minigames');dgOpen('tower')}
 // ---------- floors ----------
-function twPanel(){const r=runOf();return '<div class="dg-row"><span>⏱ <b id="dgTime">'+fmtMin(r.studyMs)+'</b></span><span>🗼 '+(r.floor||1)+'F</span><span>🎟️ '+(r.tickets||0)+'</span><span>'+twEnv(r).icon+'</span></div><div class="dg-partyrow">'+r.party.map((m,i)=>{const p=partyMon(m),c=combatant(p);return '<div class="dg-mini" style="--c:'+SLOT_COLORS[i]+'">'+monSprite(p,'',34)+'<span><i style="width:'+Math.max(0,m.hp/c.hp*100)+'%"></i></span><small>'+m.hp+'/'+c.hp+' · ⚡'+m.energy+'</small></div>'}).join('')+'</div><div class="dg-bag">'+(Object.keys(r.bag).filter(k=>r.bag[k]>0).map(k=>'<span title="'+DITEMS[k].name+'">'+DITEMS[k].icon+'×'+r.bag[k]+'</span>').join('')||'<span class="small muted">No items</span>')+'</div>'+twCardsRow(r)+'<div class="dg-row"><button class="btn smallbtn" onclick="dgSettings()">⚙</button><button class="btn smallbtn" onclick="dgSaveExit()">💾 SAVE & EXIT</button></div>'}
+function twPanel(){const r=runOf();return '<div class="dg-row"><span>⏱ <b id="dgTime">'+fmtMin(r.studyMs)+'</b></span><span>🗼 '+(r.floor||1)+'F</span><span>🎟️ '+(r.tickets||0)+'</span><span>'+twEnv(r).icon+'</span></div><div class="dg-partyrow">'+r.party.map((m,i)=>{const p=partyMon(m),c=combatant(p);return '<div class="dg-mini" style="--c:'+SLOT_COLORS[i]+'">'+monSprite(p,'',34)+'<span><i style="width:'+Math.max(0,m.hp/c.hp*100)+'%"></i></span><small>'+m.hp+'/'+c.hp+' · ⚡'+m.energy+'</small></div>'}).join('')+'</div><div class="dg-bag">'+(Object.keys(r.bag).filter(k=>r.bag[k]>0).map(k=>'<span title="'+DITEMS[k].name+'">'+DITEMS[k].icon+'×'+r.bag[k]+'</span>').join('')||'<span class="small muted">No items</span>')+'</div>'+twCardsRow(r)+'<div class="dg-row"><button class="btn smallbtn" onclick="dgSettings()">🔧</button><button class="btn smallbtn" onclick="dgSaveExit()">💾 SAVE & EXIT</button></div>'}
 // after a win (or when opening a run between floors): perk every 5 floors, then the next floor
 function twNext(){const r=runOf();if(!r)return;if(r.cleared&&r.cleared%5===0&&!r.perkDone.includes(r.cleared)){twPerkPick();return}twClimb(r.cleared+1)}
 function twFloor(f){const r=runOf();r.floor=f;save();const st=$('dgStage');if(!st)return;const newEnv=(f-1)%10===0,boss=f%10===0;
@@ -237,18 +237,25 @@ const twIsType=(types,t)=>(types||[]).some(x=>String(x).toLowerCase()===t),twLeg
 function twOn(){const r=runOf();return r&&r.tower?twEnv(r):null}
 // the attacker's damage boost (Legend's Temple) and the target's damage cut (Dragon Cavern, Legend's Temple)
 function dgEnvAtk(types,sp,u){const e=twOn();if(!e)return 1;let k=1;if(e.legend&&twLegend(sp))k*=1.1;if(e.king&&u&&u.king)k*=1.15;return k}
-function dgEnvDef(types,sp,u){const e=twOn();if(!e)return 1;let k=1;if(e.dragon&&twIsType(types,'dragon'))k*=.9;if(e.legend&&twLegend(sp))k*=.95;if(e.ice&&twIsType(types,'ice'))k*=.9;if(e.king&&u&&u.king)k*=.95;return k}
+function dgEnvDef(types,sp,u){const e=twOn();if(!e)return mdDefMult(types);let k=1;if(e.dragon&&twIsType(types,'dragon'))k*=.9;if(e.legend&&twLegend(sp))k*=.95;if(e.ice&&twIsType(types,'ice'))k*=.9;if(e.king&&u&&u.king)k*=.95;return k}
 // Trepidation Habitat: a Water-type attacker adds 5% of its max HP to each hit target
 function dgEnvFlat(types,maxhp){const e=twOn();return e&&e.water&&twIsType(types,'water')?Math.max(1,Math.round(maxhp*.05)):0}
 function dgEnvNoItems(){const e=twOn();return !!(e&&e.noItems)}
 // a foe's hit on your team, after the usual damage cap
 function twFoeHit(raw,e,types,sp,u,mv){twCur=twOn()?{att:e,types}:null;if(!twOn()||raw<=0)return raw;return Math.max(1,Math.round(raw*dgEnvAtk(e.types,e.species,e)*dgEnvDef(types,sp,u)*twCardDef(types,sp,mv)))+dgEnvFlat(e.types,e.maxhp)}
 // Holy Sanctum: your team heals when your turn ends
-function twTurnEnd(r,b){const e=r&&r.tower?twEnv(r):null;if(!e||!e.heal)return;r.party.forEach((m,i)=>{if(m.hp<=0)return;const c=combatant(partyMon(m)),h=Math.min(e.heal,c.hp-m.hp);if(h>0){m.hp+=h;setTimeout(()=>dgFloat('.dg-ally[data-i="'+i+'"]','+'+h+' 🕊️','heal'),60)}})}
-// Sludge Hell and Crystal Mines: after both sides have moved, everyone without a safe type takes 1 damage
-function twRoundEnd(r,b){twCur=null;twCardRound(r,b);const e=r&&r.tower?twEnv(r):null;if(!e||!e.chip)return;const C=e.chip,safe=t=>C.safe.some(x=>twIsType(t,x));
- r.party.forEach((m,i)=>{if(m.hp<=0)return;const c=combatant(partyMon(m));if(safe(c.types))return;m.hp=Math.max(0,m.hp-C.d);dgHurt(b,m,C.d);dgFloat('.dg-ally[data-i="'+i+'"]','-'+C.d+' '+C.icon,'weak')});
- b.enemies.forEach((f,i)=>{if(f.hp<=0||safe(f.types))return;f.hp=Math.max(0,f.hp-C.d);dgFloat('.dg-foe[data-i="'+i+'"]','-'+C.d+' '+C.icon,'weak')});twKingCheck(r,b)}
+function twTurnEnd(r,b){const e=r&&r.tower?twEnv(r):null;if(!e||!e.heal)return;let any=0;r.party.forEach((m,i)=>{if(m.hp<=0)return;const c=combatant(partyMon(m)),h=Math.min(e.heal,c.hp-m.hp);if(h>0){any=1;m.hp+=h;setTimeout(()=>dgFloat('.dg-ally[data-i="'+i+'"]','+'+h+' 🕊️','heal'),60)}});if(any)setTimeout(()=>twEnvPop(e.pop),40)}
+// Sludge Hell and Crystal Mines: after both sides have moved, everyone without a safe type takes 1 damage.
+// Environment damage never knocks out your own Pokémon: at 1 HP they take nothing.
+async function twRoundEnd(r,b){twCur=null;twCardRound(r,b);const e=r&&r.tower?twEnv(r):null;if(!e||!e.chip)return;const C=e.chip,safe=t=>C.safe.some(x=>twIsType(t,x)),fl=[];
+ r.party.forEach((m,i)=>{if(m.hp<=0)return;const c=combatant(partyMon(m));if(safe(c.types))return;const d=Math.min(C.d,m.hp-1);if(d<=0)return;m.hp-=d;dgHurt(b,m,d);fl.push(['.dg-ally[data-i="'+i+'"]',d])});
+ b.enemies.forEach((f,i)=>{if(f.hp<=0||safe(f.types))return;const d=Math.min(C.d,f.hp);f.hp-=d;fl.push(['.dg-foe[data-i="'+i+'"]',d])});
+ twKingCheck(r,b);if(!fl.length)return;save();dgDrawBattle();twEnvPop(C.pop);fl.forEach(([sel,d],k)=>setTimeout(()=>dgFloat(sel,'-'+d+' '+C.icon,'env'),250+k*60));await dgSleep(1300)}
+// a short banner across the field when the environment acts ("The sludge bubbles up…")
+function twEnvPop(text){const f=document.querySelector('#dgStage .dg-field')||$('dgStage');if(!f||!text)return;f.querySelectorAll('.tw-envpop').forEach(x=>x.remove());const d=document.createElement('div');d.className='tw-envpop';d.innerHTML=text;f.appendChild(d);setTimeout(()=>d.remove(),1900)}
+// the round button at the top of the field: tap it to see the floor and what the environment does
+function twEnvBtn(r){const e=twEnv(r);return '<button class="tw-envbtn" onclick="event.stopPropagation();twEnvInfo()" aria-label="Environment">'+e.icon+'<b>'+r.floor+'F</b></button>'}
+function twEnvInfo(){const r=runOf();if(!r)return;const e=twEnv(r),f=r.floor||1,lo=Math.floor((f-1)/10)*10+1;modal(e.icon+' '+e.name.toUpperCase(),'<div class="tw-envinfo" style="background-image:url(./assets/tower/'+twEnvKey(r)+'.jpg)"><span>'+e.icon+'</span></div><p><b>Floor '+f+'</b>'+(f%10===0?' · 👑 Boss floor':'')+'</p><p>'+e.desc+'</p><p class="small">This environment lasts for floors '+lo+'–'+(lo+9)+'.</p><div class="actions"><button class="btn red" onclick="closeModal()">OK</button></div>')}
 // Dice Arena
 function dgEnvDice(){const e=twOn();return !!(e&&e.dice)}
 // Dank Depths: Dark-types on your team dodge as if 4 Speed faster; foe Dark-types can dodge after a Make-Up or wrong answer
@@ -267,7 +274,7 @@ function twCrown(r,b){r.party.forEach(m=>delete m.king);b.enemies.forEach(f=>del
  const al=r.party.filter(m=>m.hp>0).sort((x,y)=>monLv(partyMon(y))-monLv(partyMon(x)))[0];if(al)al.king=true;const fo=[...b.enemies].sort((x,y)=>y.lv-x.lv)[0];if(fo)fo.king=true;b.kingDown={}}
 function twKingCheck(r,b){if(!r||!r.tower||!twEnv(r).king)return;b.kingDown=b.kingDown||{};
  const ak=r.party.find(m=>m.king),fk=b.enemies.find(f=>f.king);
- if(ak&&ak.hp<=0&&!b.kingDown.a){b.kingDown.a=1;r.party.forEach((m,i)=>{if(m===ak||m.hp<=0)return;const d=Math.ceil(combatant(partyMon(m)).hp*.2);m.hp=Math.max(0,m.hp-d);if(m.hp<=0){m.koR=b.round;b.koAny=1}setTimeout(()=>dgFloat('.dg-ally[data-i="'+i+'"]','-'+d+' 👑','super'),200)});if(DG)DG.msg=(DG.msg?DG.msg+'<br>':'')+'👑 Your king fell! The rest of your team loses 20% HP.';save()}
- if(fk&&fk.hp<=0&&!b.kingDown.f){b.kingDown.f=1;b.enemies.forEach((f,i)=>{if(f===fk||f.hp<=0)return;const d=Math.ceil(f.maxhp*.2);f.hp=Math.max(0,f.hp-d);setTimeout(()=>dgFloat('.dg-foe[data-i="'+i+'"]','-'+d+' 👑','super'),200)});if(DG)DG.msg=(DG.msg?DG.msg+'<br>':'')+'👑 The foe’s king fell! Its teammates lose 20% HP.';save()}}
+ if(ak&&ak.hp<=0&&!b.kingDown.a){b.kingDown.a=1;r.party.forEach((m,i)=>{if(m===ak||m.hp<=0)return;const d=Math.min(Math.ceil(combatant(partyMon(m)).hp*.2),m.hp-1);if(d<=0)return;m.hp-=d;setTimeout(()=>dgFloat('.dg-ally[data-i="'+i+'"]','-'+d+' 👑','env'),200)});setTimeout(()=>twEnvPop('👑 Your king has fallen…'),150);if(DG)DG.msg=(DG.msg?DG.msg+'<br>':'')+'👑 Your king fell! The rest of your team loses 20% HP.';save()}
+ if(fk&&fk.hp<=0&&!b.kingDown.f){b.kingDown.f=1;b.enemies.forEach((f,i)=>{if(f===fk||f.hp<=0)return;const d=Math.ceil(f.maxhp*.2);f.hp=Math.max(0,f.hp-d);setTimeout(()=>dgFloat('.dg-foe[data-i="'+i+'"]','-'+d+' 👑','env'),200)});setTimeout(()=>twEnvPop('👑 The foe’s king has fallen…'),150);if(DG)DG.msg=(DG.msg?DG.msg+'<br>':'')+'👑 The foe’s king fell! Its teammates lose 20% HP.';save()}}
 // Crystal Mines: Rock- and Ground-types show up more
 function twSp(min,max){const r=runOf();if(r&&r.tower&&twEnv(r).rockFoes&&Math.random()<.6){const ch=MONS.filter(m=>m[2]>=min&&m[2]<=max&&SPECIES_DATA[m[0]]&&(SPECIES_DATA[m[0]].types||[]).some(t=>t==='rock'||t==='ground'));if(ch.length)return ch[Math.floor(Math.random()*ch.length)][0]}return speciesOfTier(min,max)}
