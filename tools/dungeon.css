@@ -50,3 +50,14 @@
 .dg-room.rest.over{z-index:78;background:radial-gradient(ellipse at 50% 60%,#2a180a55,#05070d88 80%);-webkit-backdrop-filter:blur(1px) brightness(.8);backdrop-filter:blur(1px) brightness(.8);animation:dgrestfade .35s ease-out}
 .dg-room.rest.over h3,.dg-room.rest.over p{text-shadow:0 2px 4px #000}
 @keyframes dgrestfade{from{opacity:0}}
+
+/* run bag (same look as the main Bag) */
+.dgb-wrap{z-index:70}
+.dgb-sheet{height:min(70vh,560px)}
+.dgb-detail{flex:0 0 auto;min-height:92px;background:#fff;border:1px solid #dde7ec;border-radius:16px;padding:10px 12px;margin:4px 0 8px;display:flex;flex-direction:column;gap:8px;color:#1f3550}
+.dgb-row{display:flex;gap:12px;align-items:center}.dgb-row p{margin:3px 0 0;font-size:13px;color:#33485c}.dgb-row i{color:#b4513a;font-style:normal;font-weight:700}
+.dgb-big{flex:0 0 auto;font-size:34px;line-height:1}.dgb-big img.ico.ico{width:40px!important;height:40px!important}
+.dgb-use{align-self:stretch;min-height:40px}
+.dgb-hint{margin:auto 0;text-align:center;color:#7a8e9d;font-size:13px}
+.dgb-slot .dgb-ico{font-size:26px;line-height:1;display:grid;place-items:center;width:58%;height:58%}.dgb-slot .dgb-ico img.ico.ico{width:100%!important;height:100%!important}
+.dgb-slot.sel{box-shadow:0 0 0 3px #ff6b6b}.dgb-slot.off{opacity:.45;filter:grayscale(.6)}

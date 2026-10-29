@@ -63,7 +63,7 @@ function mdStonesHTML(r){const s=r.stones||{};return ['fire','water','leaf'].map
 // ---------- dig spots ----------
 function mdPlaceDigs(r,fl,takeIn,rooms){const rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1)),n=rnd(1,2)+mdLvOf(r,'spots'),lo=Math.min(5,2+mdLvOf(r,'deeper'));fl.digs=[];
  for(let k=0;k<n;k++){const o=rooms[rnd(1,Math.max(1,rooms.length-1))]||rooms[0],t=takeIn(o);if(t)fl.digs.push({x:t[0],y:t[1],max:rnd(lo,5),done:0})}}
-function mdDigHTML(r,fl,T,seenAt){const L=mdLvOf(r,'patches'),lv=L<=1?L:L-1;return (fl.digs||[]).filter(d=>d.done<d.max&&seenAt(d.x,d.y)).map(d=>'<div class="gd-obj md-dig-spot lv'+lv+'" style="left:'+d.x*T+'px;top:'+d.y*T+'px;--d:'+((d.x*7+d.y*3)%10)/10+'s">'+icoHTML('dig_sparkle')+'</div>').join('')}
+function mdDigHTML(r,fl,T,seenAt){const L=mdLvOf(r,'patches'),lv=L<=1?L:L-1;return (fl.digs||[]).filter(d=>d.done<d.max&&seenAt(d.x,d.y)).map(d=>'<div class="gd-obj md-dig-spot lv'+lv+(gdFree(r)?'':' gd-off')+'" style="left:'+d.x*T+'px;top:'+d.y*T+'px;--d:'+((d.x*7+d.y*3)%10)/10+'s">'+icoHTML('dig_sparkle')+'</div>').join('')}
 // which question each dig asks: 1 normal, 2 harder (both multiple choice), 3 typed, 4 typed from your weak spots,
 // 5 typed from the hard ones you miss most
 function mdDigItem(tier){const B=DG.bank,S=db.qstats||{},st=b=>S[b.key]||{r:0,w:0},typ=b=>{try{return !!saPlan(b)}catch(e){return false}},any=a=>a[Math.floor(Math.random()*a.length)];

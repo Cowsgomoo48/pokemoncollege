@@ -1,5 +1,5 @@
 // ===================== MYSTERY DUNGEON =====================
-const DIFF={easy:{name:'Easy',floors:1,rows:7,cap:1,step:2,fb:8,bh:1.8,dm:1.2,treasure:.12,shop:.10,mins:'15–20'},balanced:{name:'Balanced',floors:2,rows:8,cap:2,step:3,fb:12,bh:3.6,dm:.55,treasure:.17,shop:.10,mins:'25–30'},hard:{name:'Hard',floors:3,rows:9,cap:4,step:4,fb:18,bh:4.6,dm:.5,treasure:.17,shop:.11,mins:'45–60'}};
+const DIFF={easy:{name:'Easy',floors:1,rows:7,cap:1,step:2,fb:8,bh:1.8,dm:.5,treasure:.12,shop:.10,mins:'15–20'},balanced:{name:'Balanced',floors:2,rows:8,cap:2,step:3,fb:12,bh:3.6,dm:.65,treasure:.17,shop:.10,mins:'25–30'},hard:{name:'Hard',floors:3,rows:9,cap:4,step:4,fb:18,bh:4.6,dm:1.2,treasure:.17,shop:.11,mins:'45–60'}};
 const DITEMS={apple:{name:'Apple',icon:'🍎',desc:'Restores 20 HP to a teammate.',target:'ally',cost:12,tier:0},oran:{name:'Oran Berry',icon:'🫐',desc:'Restores 10 HP to a teammate.',target:'ally',cost:6,tier:0},starf:{name:'Starf Berry',icon:'⭐',desc:'+2 to a random stat for 3 rooms.',target:'ally',cost:15,tier:1},overclock:{name:'Overclock',icon:'⚙️',desc:'Answer 5 questions: the whole team deals +15% damage, +5% per correct answer, for this battle.',target:'none',cost:25,tier:2},timegear:{name:'Time Gear',icon:'⏱️',desc:'Answer 1–4 questions: with 50%+ right, every enemy skips its next turn.',target:'none',cost:30,tier:2},
  voltorb:{name:'Pocket Voltorb',icon:'💥',desc:'Deals 3 damage to every enemy.',target:'none',cost:18,tier:1,aoe:3},
  stellar:{name:'Stellar Storm',icon:'🌠',desc:'Deals 6 damage to every enemy.',target:'none',cost:35,tier:2,aoe:6},
@@ -277,7 +277,22 @@ async function dgAttack(slot,ti,name,mv,mult){if(MOVE_SPREAD.has(name))return dg
  await dgSleep(e.hp<=0?1000:800);dgAfterAction()}
 async function dgcRevive(){const _r=runOf(),_b=_r&&_r.battle;if(!_b||_b.enemyPhase||!_r.party[_b.turn])return;if(DG.busy)return;DG.busy=1;const r=runOf(),b=r.battle,m=r.party[b.turn];const res=await dgQ('💫 REVIVE');if(res!=='fail'){m.hp=twReviveHp(m);save();dgDrawBattle();dgFloat('.dg-ally[data-i="'+b.turn+'"]','Back up! ('+m.hp+' HP)','eff');await dgSleep(700)}else{toast('Still fainted. Try again next turn.')}dgAfterAction()}
 function dgItem(){const _r=runOf(),_b=_r&&_r.battle;if(!_b||_b.enemyPhase||!_r.party[_b.turn])return;if(DG.busy)return;if(dgEnvNoItems()){toast('🌙 Sleepless Hollow: items can’t be used here');return}DG.busy=1;const r=runOf(),b=r.battle,ks=Object.keys(r.bag).filter(k=>r.bag[k]>0);if(!ks.length){DG.busy=0;toast('The run bag is empty. Pick up items on the floor, or find a chest or Kecleon Shop.');return}
- $('dgPanel').innerHTML='<div class="dg-msg">Use which item?</div><div class="dg-items">'+ks.map(k=>'<button class="btn" '+(DITEMS[k].ko&&!r.party.some(q=>q.hp<=0)?'disabled':'')+' onclick="dgUseItem(\''+k+'\')">'+DITEMS[k].icon+' '+DITEMS[k].name+' ×'+r.bag[k]+'<small>'+(DITEMS[k].ko&&!r.party.some(q=>q.hp<=0)?'Nobody has fainted. ':'')+DITEMS[k].desc+'</small></button>').join('')+'<button class="btn smallbtn" onclick="DG.busy=0;dgPanelBattle()">BACK</button></div>'}
+ dgBagOpen()}
+// ---- run bag: a slide-up sheet like the main-menu Bag (tabs, round slots, tap one for details + USE) ----
+let dgBagTab='all',dgBagSel=null;
+function dgBagKind(k){const d=DITEMS[k];return d.ko||/HP/.test(d.desc)&&d.target==='ally'?'heal':d.aoe||d.split||d.target==='foe'?'attack':'boost'}
+function dgBagWhyNot(k){const r=runOf(),d=DITEMS[k];return d.ko&&!r.party.some(q=>q.hp<=0)?'Nobody has fainted.':''}
+function dgBagOpen(){let w=$('dgBagWrap');if(!w){w=document.createElement('div');w.id='dgBagWrap';w.className='inv-wrap dgb-wrap';w.innerHTML='<div class="bx-backdrop" onclick="dgBagClose()"></div><div class="inv-sheet dgb-sheet" role="dialog" aria-label="Run bag"><div class="inv-grab" onclick="dgBagClose()"></div><div class="inv-title"><b>🎒 RUN BAG</b><button onclick="dgBagClose()" aria-label="Close">✕</button></div><div class="inv-tabs" id="dgbTabs"></div><div class="dgb-detail" id="dgbDetail"></div><div class="inv-grid" id="dgbGrid"></div></div>';document.body.appendChild(w)}
+ dgBagSel=null;dgBagDraw();requestAnimationFrame(()=>w.classList.add('open'))}
+function dgBagClose(back){const w=$('dgBagWrap');if(w)w.classList.remove('open');if(back!==false){DG.busy=0;dgPanelBattle()}}
+function dgBagDraw(){const r=runOf();if(!r)return;const ks=Object.keys(r.bag).filter(k=>r.bag[k]>0&&DITEMS[k]),tabs={all:'All',heal:'Healing',attack:'Attack',boost:'Boosts'};
+ if(dgBagTab!=='all'&&!ks.some(k=>dgBagKind(k)===dgBagTab))dgBagTab='all';
+ $('dgbTabs').innerHTML=Object.entries(tabs).filter(([t])=>t==='all'||ks.some(k=>dgBagKind(k)===t)).map(([t,n])=>'<button class="'+(t===dgBagTab?'on':'')+'" onclick="dgBagTab=\''+t+'\';dgBagDraw()">'+n+'</button>').join('');
+ const show=ks.filter(k=>dgBagTab==='all'||dgBagKind(k)===dgBagTab);if(dgBagSel&&!show.includes(dgBagSel))dgBagSel=null;
+ $('dgbGrid').innerHTML=show.map(k=>'<button class="inv-slot dgb-slot'+(k===dgBagSel?' sel':'')+(dgBagWhyNot(k)?' off':'')+'" aria-label="'+esc(DITEMS[k].name)+'" onclick="dgBagSel=\''+k+'\';dgBagDraw()"><span class="dgb-ico">'+DITEMS[k].icon+'</span><b>×'+r.bag[k]+'</b></button>').join('');
+ const k=dgBagSel,d=k&&DITEMS[k],why=k?dgBagWhyNot(k):'';
+ $('dgbDetail').innerHTML=d?'<div class="dgb-row"><span class="dgb-big">'+d.icon+'</span><div><b>'+esc(d.name)+' ×'+r.bag[k]+'</b><p>'+(why?'<i>'+why+'</i> ':'')+esc(d.desc)+'</p></div></div><button class="btn red dgb-use" '+(why?'disabled':'')+' onclick="dgBagUse(\''+k+'\')">USE</button>':'<p class="dgb-hint">Tap an item to see what it does.</p>'}
+function dgBagUse(k){if(dgBagWhyNot(k))return;dgBagClose(false);dgUseItem(k)}
 function dgUseItem(k){const r=runOf(),b=r.battle,slot=b.turn;if(b)b.usedItem=true;
  if(k==='overclock'){dgOverclock();return}if(k==='timegear'){dgTimeGear();return}if(k==='wakemint'){dgWakeMint();return}
  if(k==='salts'&&!r.party.some(q=>q.hp<=0)){toast('Nobody has fainted');DG.busy=0;dgItem();return}let dgTarget0;
