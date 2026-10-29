@@ -491,7 +491,7 @@ body.mg-busy .inv-handle{display:none}
 /* ===================== MYSTERY DUNGEON · grid floors ===================== */
 .dg.gd .dg-stage{overflow:hidden;background:#05070d}
 .gd-field{position:relative;width:100%;height:100%;min-height:100%;overflow:hidden;display:block;padding:0;background:#05070d;touch-action:manipulation}
-.gd-map{position:absolute;left:0;top:0;transform-origin:0 0;transition:transform .3s ease-out;image-rendering:pixelated}
+.gd-map{position:absolute;left:0;top:0;transform-origin:0 0;transition:transform .42s cubic-bezier(.25,.8,.3,1);image-rendering:pixelated}
 .gd-map>canvas,.gd-map>div{position:absolute;left:0;top:0}
 .gd-tiles{image-rendering:pixelated}
 .gd-fog{pointer-events:none;z-index:50}
@@ -3895,9 +3895,27 @@ function gdFree(r){r=r||runOf();return !!(r&&r.fl&&r.battle&&!r.battle.enemyPhas
 // battles: the camera holds on the middle of the room (or between your team and the foes in a corridor)
 // The camera centres on the middle of the line between the ally and the awake foe that are furthest apart, and zooms
 // out (down to 62%) when they wouldn't both fit. It's worked out again on every redraw, so it follows the fight.
-function gdBattleCam(r){const b=r.battle,A=r.party.filter(m=>m.hp>0),F=gdFoeTargets(r).filter(([e])=>e.aware).map(([e])=>e),m=r.party[b.turn]||r.party[0];if(!A.length||!F.length)return [m.x,m.y,1];
- let best=null,bd=-1;A.forEach(a=>F.forEach(f=>{const d=Math.hypot(a.x-f.x,a.y-f.y);if(d>bd){bd=d;best=[a,f]}}));const [a,f]=best,fe=document.querySelector('.gd-field'),W=fe?fe.clientWidth:390,H=fe?fe.clientHeight:400,T=GD_T;
- const sc=Math.max(.62,Math.min(1,(W-28)/((Math.abs(a.x-f.x)+2)*T),(H-70)/((Math.abs(a.y-f.y)+2)*T)));return [(a.x+f.x)/2,(a.y+f.y)/2,sc]}
+// Battle camera. Frames everyone in the fight (living allies + awake foes) inside a safe area that keeps clear of the floor
+// badge / minimap / info button. If that won't fit at the zoom limit, it frames the Pokémon whose turn it is (or the foe
+// that's acting) with its move range and nearest opponent. Dead zone: the view only changes when something it must show
+// is near the edge or off screen, or when it could zoom in a fair bit, so it doesn't jump on every step.
+const GD_CAM={min:.62,L:22,R:22,T:66,B:18};
+function gdCamFocus(r){const b=r.battle;return DG&&DG.camFocus||r.party[b.turn]||r.party[0]}
+function gdCamFit(pts,W,H){const xs=pts.map(p=>p.x),ys=pts.map(p=>p.y),x0=Math.min(...xs),x1=Math.max(...xs),y0=Math.min(...ys),y1=Math.max(...ys),T=GD_T;
+ const sc=Math.min(1,(W-GD_CAM.L-GD_CAM.R)/((x1-x0+1.4)*T),(H-GD_CAM.T-GD_CAM.B)/((y1-y0+1.4)*T));
+ // centre of the safe area, not the field, so the badge/minimap margin is honoured
+ const oy=(GD_CAM.T-GD_CAM.B)/2/(T*Math.max(sc,GD_CAM.min)),ox=(GD_CAM.L-GD_CAM.R)/2/(T*Math.max(sc,GD_CAM.min));
+ return {sc,cx:(x0+x1)/2-ox,cy:(y0+y1)/2-oy}}
+function gdCamSees(pts,W,H){const c=DG&&DG.cam;if(!c)return false;return pts.every(p=>{const sx=(p.x+.5)*c.T+c.tx,sy=(p.y+.5)*c.T+c.ty;return sx>=GD_CAM.L+c.T*.5&&sx<=W-GD_CAM.R-c.T*.5&&sy>=GD_CAM.T+c.T*.5&&sy<=H-GD_CAM.B-c.T*.4})}
+function gdBattleCam(r){const b=r.battle,A=r.party.filter(m=>m.hp>0),F=gdFoeTargets(r).filter(([e])=>e.aware).map(([e])=>e),m=gdCamFocus(r);if(!A.length||!F.length)return [m.x,m.y,1];
+ const fe=document.querySelector('.gd-field'),W=fe?fe.clientWidth:390,H=fe?fe.clientHeight:400;let pts=A.concat(F),fit=gdCamFit(pts,W,H);
+ if(fit.sc<GD_CAM.min){// too spread out: the acting Pokémon, the tiles it can reach, and the closest Pokémon on the other side
+  const isFoe=F.includes(m),opp=isFoe?A:F,near=opp.slice().sort((a,c)=>gdCheb(a,m)-gdCheb(c,m))[0],mv=isFoe?(m.mv||3):(()=>{try{return Math.max(1,gdMV(partyMon(m).species)+mdMoveAdj())}catch(e){return 3}})();
+  pts=[m,{x:m.x-mv,y:m.y},{x:m.x+mv,y:m.y},{x:m.x,y:m.y-mv},{x:m.x,y:m.y+mv}];fit=gdCamFit(pts.concat(near?[near]:[]),W,H);if(fit.sc<GD_CAM.min){fit=gdCamFit(pts,W,H)}pts=[m].concat(near&&fit.sc>=GD_CAM.min?[near]:[])}
+ const sc=Math.max(GD_CAM.min,fit.sc),prev=DG&&DG.bcam;
+ // dead zone: keep the current view if it already shows everything needed and isn't zoomed out much more than it needs to be
+ if(prev&&prev[2]&&gdCamSees(pts,W,H)&&sc-prev[2]<.12)return prev;
+ return [fit.cx,fit.cy,sc]}
 // fainting: stagger, then the Sleep animation; foes then fade out (CSS does the motion)
 function gdKoFx(id,fade){setTimeout(()=>{const s=document.querySelector('.gd-units [data-u="'+id+'"] .dg-spr');if(s){s.dataset.anim='Sleep';s.classList.remove('ok');dgFillSprites()}},600);if(fade)setTimeout(()=>{const u=document.querySelector('.gd-units [data-u="'+id+'"]');if(u&&u.classList.contains('gd-faint'))u.remove()},1550)}
 function gdSelect(i){const r=runOf(),b=r&&r.battle;if(!b||b.enemyPhase||DG.busy)return;b.turn=i;DG.gmode='select';DG.hl=null;gdDrawBattle()}
@@ -3905,7 +3923,7 @@ function gdSelect(i){const r=runOf(),b=r&&r.battle;if(!b||b.enemyPhase||DG.busy)
 function gdMoveStart(){const r=runOf(),b=r.battle,m=r.party[b.turn];if(!m||m.hp<=0||DG.busy)return;const free=gdFree(r);if(!free&&(m.moved||m.acted))return;const fl=r.fl,mv=free?Math.max(GD_FREE_MV,gdMV(partyMon(m).species)):Math.max(1,gdMV(partyMon(m).species)+mdMoveAdj());
  const reach=gdBFS(fl,[m.x,m.y],(x,y)=>b.enemies.some(e=>(e.hp>0||e.gdOut)&&!e.done&&e.x===x&&e.y===y),mv);DG.reach=reach;DG.gmode='move';if(!DG.bcam)gdCamera(m.x,m.y);
  DG.hl={cls:'mv',tiles:[...reach.keys()].map(k=>k.split(',').map(Number)).filter(([x,y])=>!(x===m.x&&y===m.y)&&!gdUnitAt(r,x,y))};gdHighlight();$('dgPanel').innerHTML='<div class="dg-msg">👣 Tap a blue tile to move there (up to '+mv+' tiles).'+(free?' No foes in sight, so this doesn’t use up the turn.':'')+'</div><div class="dg-acts"><button class="btn" onclick="DG.gmode=\'select\';DG.hl=null;gdDrawBattle()">CANCEL</button></div>'}
-async function gdWalk(unitEl,obj,path,isFoe){const T=GD_T;for(let s=1;s<path.length;s++){const [x,y]=path[s],[px,py]=path[s-1];obj.dir=gdDirOf(x-px,y-py);obj.x=x;obj.y=y;if(unitEl){unitEl.style.left=x*T+'px';unitEl.style.top=y*T+'px';unitEl.style.zIndex=10+y;const sp=unitEl.querySelector('.dg-spr');if(sp&&+sp.dataset.row!==obj.dir){sp.dataset.row=obj.dir;sp.classList.remove('ok');dgFillSprites()}}if(!isFoe)gdDigPing(unitEl,x,y);if(!isFoe&&!(DG&&DG.bcam))gdCamera(x,y);else gdOverlap();gdOverlays();await dgSleep(120)}gdOverlays();setTimeout(gdOverlays,340)}
+async function gdWalk(unitEl,obj,path,isFoe){const T=GD_T;for(let s=1;s<path.length;s++){const [x,y]=path[s],[px,py]=path[s-1];obj.dir=gdDirOf(x-px,y-py);obj.x=x;obj.y=y;if(unitEl){unitEl.style.left=x*T+'px';unitEl.style.top=y*T+'px';unitEl.style.zIndex=10+y;const sp=unitEl.querySelector('.dg-spr');if(sp&&+sp.dataset.row!==obj.dir){sp.dataset.row=obj.dir;sp.classList.remove('ok');dgFillSprites()}}if(!isFoe)gdDigPing(unitEl,x,y);if(DG&&DG.bcam){const nc=gdBattleCam(runOf());if(nc!==DG.bcam){DG.bcam=nc;gdCamera()}else gdOverlap()}else if(!isFoe)gdCamera(x,y);else gdOverlap();gdOverlays();await dgSleep(120)}gdOverlays();setTimeout(gdOverlays,340)}
 async function gdWalkTo(slot,x,y){const r=runOf(),b=r.battle,m=r.party[slot],path=gdPath(DG.reach,gdKey(x,y)),wasFree=gdFree(r);DG.gmode='select';DG.hl=null;DG.busy=1;gdHighlight();
  await gdWalk(document.querySelector('.dg-ally[data-i="'+slot+'"]'),m,path,false);if(!runOf()||runOf().battle!==b)return;
  if(wasFree)gdFollow(r,slot,path);gdSee(r);mdHazard(r,m,false,slot);
@@ -3974,6 +3992,7 @@ function gdEndTurn(){const r=runOf(),b=r&&r.battle;if(!b||b.enemyPhase||DG.busy)
 async function gdEnemyPhase(){const r=runOf(),b=r.battle;b.enemyPhase=true;DG.gmode='select';DG.hl=null;save();gdDrawBattle();const ep=dgEpoch;
  if(b.skip){b.skip=false;dgPanelBattle('⏱ The enemies are frozen in time!');await dgSleep(1100)}
  else for(let i=0;i<b.enemies.length;i++){const e=b.enemies[i];if(e.hp<=0||e.done)continue;gdSee(r);if(!e.aware)continue;
+  if(DG.bcam){DG.camFocus=e;const nc=gdBattleCam(r);if(nc!==DG.bcam){DG.bcam=nc;gdCamera()}}
   for(let k=0;k<(e.twice?2:1);k++){if(ep!==dgEpoch||!runOf()||runOf().battle!==b)return;if(r.party.every(m=>m.hp<=0))break;
    if(k===0&&(e.para||e.flinch)){const why=e.para?'is paralyzed':'flinched';e.para=false;e.flinch=false;DG.msg=esc(e.species)+' '+why+' and can’t move!';gdDrawBattle();await dgSleep(700);break}
    if(e.boss&&k===0&&b.charge){b.charge=false;await gdBossBlast(i,e);continue}
@@ -3985,7 +4004,7 @@ async function gdEnemyPhase(){const r=runOf(),b=r.battle;b.enemyPhase=true;DG.gm
     if(best&&best!==gdKey(e.x,e.y)){const el=document.querySelector('.dg-foe[data-i="'+i+'"]');await gdWalk(el,e,gdPath(reach,best),true);gdDrawBattle();if(mdHazard(r,e,true,i)&&e.hp<=0){gdKills(r);gdDrawBattle();break}}
     opts=gdOptions(r.fl,e.x,e.y,shape,allies())}
    if(!opts.length)break;const o=opts.sort((a,c)=>c.hits.length-a.hits.length)[0];await gdEnemyStrike(i,e,o.hits,useDisc,name,mv0);if(r.party.every(m=>m.hp<=0))break}}
- if(ep!==dgEpoch||!runOf()||runOf().battle!==b)return;
+ DG.camFocus=null;if(ep!==dgEpoch||!runOf()||runOf().battle!==b)return;
  const bossUp=b.enemies.find(e=>e.boss&&e.hp>0&&!e.done&&e.aware);if(bossUp&&!b.charge&&r.party.filter(m=>m.hp>0).length>1&&(b.round%3===2||Math.random()<.2)){b.charge=true;DG.msg='⚠ '+esc(bossUp.species)+' is gathering power for a blast that hits everyone within 3 tiles! 🛡 Guard or get away.'}
  dgSaltTick(b);await ultEndOfRound(r,b);if(!runOf()||runOf().battle!==b)return;await mdRoundEnd(r,b);if(!runOf()||runOf().battle!==b)return;gdKills(r);
  b.guard={};b.enemyPhase=false;b.round++;
@@ -5345,7 +5364,7 @@ $('navHome').style.display='none';
  if(pcStorageReady)ensureMoveData();
  if(pcStorageReady&&permRoll())save();
  render();scheduleNotifs();aiCheck();window.__pcBooted=true;setTimeout(()=>{try{mdSync()}catch(e){}},1500);setTimeout(()=>{try{facTick()}catch(e){}},2500);setInterval(()=>{try{facTick();if(currentPage==='home'&&hab.scene&&hab.scene!=='home')drawHabitat()}catch(e){}},60000);
- window.__pcVersion='0.62.5';
+ window.__pcVersion='0.62.6';
  document.addEventListener('pointerdown',function(e){try{var t=e.target.closest&&e.target.closest('[onclick],button,a,[id]');if(!t)return;var oc=t.getAttribute('onclick');window.__pcLastTap=(oc?oc.slice(0,60):(t.id?'#'+t.id:t.tagName.toLowerCase()+'.'+String(t.className).split(' ')[0])).replace(/\s+/g,' ')}catch(_){}} ,true);
  Object.keys(window).forEach(function(k){var f=window[k];if(typeof f!=='function'||/^[A-Z]/.test(k)||k==='appError'||k==='$'||k==='esc'||/\[native code\]/.test(Function.prototype.toString.call(f)))return;
   var w=function(){try{return f.apply(this,arguments)}catch(err){if(err&&typeof err==='object'&&!err.__pcLogged){try{err.__pcLogged=1}catch(_){}appError(err,k)}throw err}};try{window[k]=w}catch(_){}});
