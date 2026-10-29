@@ -25,7 +25,7 @@ const MDU={
  evasion:{tab:'water',name:'Evasion Drills',ico:'dash',max:10,t:9,d:l=>'Your Pokémon dodge attacks '+mdPct('evasion',l)+'% more often.'},
  footing:{tab:'water',name:'Sure Footing',ico:'paw',max:5,t:6,d:l=>mdPct('footing',l)+'% chance to step over a hazard without getting hurt.'},
  stairrest:{tab:'water',name:'Stairwell Rest',ico:'ladder',max:10,t:6,d:l=>'Going down the stairs heals '+(20+MD_PER.stairrest*100*l)+'% HP instead of 20%.'},
- patches:{tab:'leaf',name:'Shinier Patches',ico:'sparkles',max:5,t:6,d:l=>['Dig spots are faint sparkles that are easy to miss.','Dig spots sparkle more.','Dig spots sparkle much more often.','Dig spots show as little craters.','Dig spots give off a little light, so you can see them from further away.','Dig spots also show on the minimap.'][l]},
+ patches:{tab:'leaf',name:'Shinier Patches',ico:'sparkles',max:5,t:6,d:l=>['Dig spots are faint sparkles that are easy to miss.','Dig spots sparkle brighter.','A “?” pops over an ally’s head for a moment when they step onto a dig spot.','Dig spots sparkle much more often.','Dig spots show as little craters.','Dig spots give off a little light, so you can see them from further away.'][l]},
  deeper:{tab:'leaf',name:'Deeper Digs',ico:'pickaxe',max:3,t:12,d:l=>'Dig spots can be dug at least '+(2+l)+' times (up to 5).'},
  spots:{tab:'leaf',name:'Prospector',ico:'flag',max:5,t:9,d:l=>'+'+l+' dig spot'+(l===1?'':'s')+' on every floor.'},
  lucky:{tab:'leaf',name:'Lucky Finds',ico:'gem',max:10,t:8,d:l=>'Foes drop stones '+mdPct('lucky',l)+'% more often.'},
@@ -63,7 +63,7 @@ function mdStonesHTML(r){const s=r.stones||{};return ['fire','water','leaf'].map
 // ---------- dig spots ----------
 function mdPlaceDigs(r,fl,takeIn,rooms){const rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1)),n=rnd(1,2)+mdLvOf(r,'spots'),lo=Math.min(5,2+mdLvOf(r,'deeper'));fl.digs=[];
  for(let k=0;k<n;k++){const o=rooms[rnd(1,Math.max(1,rooms.length-1))]||rooms[0],t=takeIn(o);if(t)fl.digs.push({x:t[0],y:t[1],max:rnd(lo,5),done:0})}}
-function mdDigHTML(r,fl,T,seenAt){const lv=mdLvOf(r,'patches');return (fl.digs||[]).filter(d=>d.done<d.max&&seenAt(d.x,d.y)).map(d=>'<div class="gd-obj md-dig-spot lv'+lv+'" style="left:'+d.x*T+'px;top:'+d.y*T+'px;--d:'+((d.x*7+d.y*3)%10)/10+'s">'+icoHTML('dig_sparkle')+'</div>').join('')}
+function mdDigHTML(r,fl,T,seenAt){const L=mdLvOf(r,'patches'),lv=L<=1?L:L-1;return (fl.digs||[]).filter(d=>d.done<d.max&&seenAt(d.x,d.y)).map(d=>'<div class="gd-obj md-dig-spot lv'+lv+'" style="left:'+d.x*T+'px;top:'+d.y*T+'px;--d:'+((d.x*7+d.y*3)%10)/10+'s">'+icoHTML('dig_sparkle')+'</div>').join('')}
 // which question each dig asks: 1 normal, 2 harder (both multiple choice), 3 typed, 4 typed from your weak spots,
 // 5 typed from the hard ones you miss most
 function mdDigItem(tier){const B=DG.bank,S=db.qstats||{},st=b=>S[b.key]||{r:0,w:0},typ=b=>{try{return !!saPlan(b)}catch(e){return false}},any=a=>a[Math.floor(Math.random()*a.length)];
@@ -81,10 +81,10 @@ function mdLootText(L){return [L.tix?'+'+L.tix+' 🎟️':'',L.st.map(t=>MD_TABS
 async function mdDigSpot(sp){const r=runOf();if(!r||!DG||DG.busy)return;if(!gdFree(r)){toast('⛏ Can’t dig with a foe awake nearby');return}DG.busy=1;const tierName=['','A question from your set','A harder one (multiple choice)','Type the answer','Type it: one you’ve struggled with','Type it: a hard one you often miss'];
  let exit=false;$('dgPanel').innerHTML='<div class="dg-msg">⛏ Digging… ('+sp.done+'/'+sp.max+')</div>';
  while(sp.done<sp.max&&!exit){const tier=sp.done+1,it=mdDigItem(tier);let exitRes;const ex=new Promise(res=>exitRes=res);
-  const q=askQ(it,DG.bank,{title:'⛏ DIG '+tier+'/'+sp.max+' · '+tierName[tier].toUpperCase(),typed:tier>=3?undefined:false,typedChance:tier>=3?1:0});
+  const q=askQ(it,DG.bank,{title:'⛏ DIG '+tier+'/'+sp.max+' · '+tierName[tier].toUpperCase(),typed:tier>=3?undefined:false,typedChance:tier>=3?1:0,halfsies:!!r.halfsies});
   if(sp.done>0)setTimeout(()=>{const ov=[...document.querySelectorAll('.mgq')].pop(),card=ov&&ov.querySelector('.mgq-card');if(card&&!card.querySelector('.md-exitdig')){const b=document.createElement('button');b.className='btn md-exitdig';b.textContent='EXIT DIG (keep what you found)';b.onclick=()=>{ov.remove();exitRes('exit')};card.appendChild(b)}},60);
-  const res=await Promise.race([q,ex]);if(res==='exit'){exit=true;break}
-  if(DG&&DG.P)DG.P.report(it,res);if(res!=='full'&&__qMiss)recapAdd(it,__qMiss);if(res==='full')r.qOk=(r.qOk||0)+1;
+  let res=await Promise.race([q,ex]);if(res==='exit'){exit=true;break}const half=res==='half';if(half)res='makeup';
+  if(DG&&DG.P)DG.P.report(it,half?'fail':res);if(res!=='full'&&__qMiss)recapAdd(it,__qMiss);if(res==='full')r.qOk=(r.qOk||0)+1;
   if(res==='fail'){sp.done=sp.max;save();toast('💥 The dig spot caved in! You keep what you found.');break}
   sp.done++;const L=mdDigLoot(tier,res==='makeup');r.tickets=(r.tickets||0)+L.tix;r.cogs=(r.cogs||0)+L.tix;L.st.forEach(t=>mdGive(r,t,1));L.items.forEach(k=>r.bag[k]=(r.bag[k]||0)+1);if(L.soul)r.souls=(r.souls||0)+1;r.digTotal=(r.digTotal||0)+1;save();
   toast('⛏ Dig '+tier+': '+mdLootText(L)+(sp.done<sp.max?' · keep digging for better finds!':' · the spot is dug out.'))}
@@ -98,7 +98,7 @@ let mdTab='fire';
 function mdShopOpen(ghost){const r=runOf();if(!ghost&&!mdUpRun())return;document.querySelectorAll('.mds').forEach(x=>x.remove());const ov=document.createElement('div');ov.className='mds'+(ghost?' ghost':'');document.body.appendChild(ov);mdShopDraw(ghost);setTimeout(()=>ov.classList.add('on'),10);mdSay(ghost)}
 function mdShopClose(){const ov=document.querySelector('.mds');if(!ov)return;ov.classList.remove('on');setTimeout(()=>ov.remove(),250);const r=runOf();if(r&&r.fl&&!r.tower&&$('dgStage')){save();gdDrawBattle(true)}}
 function mdSay(ghost,line){const b=document.querySelector('.mds-say');if(!b)return;const L=MD_SAY[ghost?'ghost':'shop'];b.textContent=line||L[Math.floor(Math.random()*L.length)];b.classList.remove('pop');void b.offsetWidth;b.classList.add('pop')}
-function mdShopDraw(ghost){const ov=document.querySelector('.mds');if(!ov)return;const r=runOf(),run=ghost?null:r,souls=db.mdSouls||0;
+function mdShopDraw(ghost){const ov=document.querySelector('.mds');if(!ov)return;const r=runOf(),run=ghost?null:r,souls=mdSouls();
  const cur=ghost?'<span class="mds-cur">'+icoHTML('soul_stone')+'<b>'+souls+'</b></span>':'<span class="mds-cur">'+icoHTML('ticket')+'<b>'+(run.tickets||0)+'</b></span>'+mdStonesHTML(run);
  const stock=ghost?'':'<div class="mds-h">Today’s stock <small>items for this run · paid in Tickets</small></div><div class="mds-stock">'+mdShopStock(run).map((k,i)=>{const sold=(run.mdSold||[]).includes(i),p=mdItemPrice(k);return '<button class="mds-item'+(sold?' sold':'')+'" '+(sold||(run.tickets||0)<p?'disabled':'')+' onclick="mdBuyItem('+i+')">'+icoHTML(ICO_MAP[DITEMS[k].icon.replace(/️/g,'')]||'gift')+'<b>'+esc(DITEMS[k].name)+'</b><small>'+(sold?'SOLD':p+' 🎟️')+'</small></button>'}).join('')+'</div>';
  const tabs='<div class="mds-tabs">'+Object.entries(MD_TABS).map(([k,T])=>'<button class="'+(mdTab===k?'on':'')+'" onclick="mdTab=\''+k+'\';mdShopDraw('+(ghost?1:0)+')">'+icoHTML(T.ico)+'<span>'+T.name+'</span></button>').join('')+'</div>';
@@ -108,13 +108,17 @@ function mdShopDraw(ghost){const ov=document.querySelector('.mds');if(!ov)return
   +'<div class="mds-scene"><div class="mds-say"></div><img class="mds-keeper" src="./assets/mdshop/'+(ghost?'ghost':'hatterene')+'.png" alt="Hatterene" onclick="this.classList.remove(\'squish\');void this.offsetWidth;this.classList.add(\'squish\');mdSay('+(ghost?1:0)+')"><div class="mds-counter"></div></div>'
   +'<div class="mds-body">'+(ghost?'<p class="small mds-note">Levels bought here are <b>permanent</b>: every run starts with them. Levels bought from Hatterene during a run stack on top and last only for that run.</p>':'<p class="small mds-note">Upgrades bought here last for <b>this run</b>. Permanent levels come from the Death Deals at the end of a run.</p>')+stock+tabs+cards+'</div>';mdSay(ghost)}
 function mdBuyItem(i){const r=mdUpRun();if(!r)return;const k=mdShopStock(r)[i],p=mdItemPrice(k);if((r.mdSold||[]).includes(i)||(r.tickets||0)<p)return;r.tickets-=p;r.bag[k]=(r.bag[k]||0)+1;(r.mdSold=r.mdSold||[]).push(i);save();mdShopDraw(0);mdSay(0,'A '+DITEMS[k].name+'. Good choice.')}
-function mdCardOpen(id,ghost){const U=MDU[id],r=runOf(),pl=mdPerm(id),lv=ghost?pl:mdLvOf(r,id),n=lv+1,maxed=lv>=U.max,c=mdCost(id,n),sc=mdSoulCost(id,n),souls=db.mdSouls||0,can=!maxed&&(ghost?souls>=sc:(r.stones||{})[U.tab]>=c.stones&&(r.tickets||0)>=c.tix);
+function mdCardOpen(id,ghost){const U=MDU[id],r=runOf(),pl=mdPerm(id),lv=ghost?pl:mdLvOf(r,id),n=lv+1,maxed=lv>=U.max,c=mdCost(id,n),sc=mdSoulCost(id,n),souls=mdSouls(),can=!maxed&&(ghost?souls>=sc:(r.stones||{})[U.tab]>=c.stones&&(r.tickets||0)>=c.tix);
  modal(U.name.toUpperCase(),'<div class="mds-big t-'+U.tab+'"><span class="mds-ic">'+icoHTML(U.ico)+'<i>Lv '+lv+'/'+U.max+'</i></span><div><p><b>Now:</b> '+esc(lv?U.d(lv):'Not learned yet.')+'</p>'+(maxed?'<p><b>Maxed out.</b></p>':'<p><b>Next (Lv '+n+'):</b> '+esc(U.d(n))+'</p>')+(!ghost&&pl?'<p class="small muted">Lv '+pl+' of this is permanent (from Death Deals).</p>':'')+'</div></div>'
   +(maxed?'':'<p class="mds-price">Cost: '+(ghost?icoHTML('soul_stone')+' '+sc+' Soul Stone'+(sc>1?'s':''):icoHTML(MD_TABS[U.tab].ico)+' '+c.stones+' '+MD_TABS[U.tab].name.replace('Offense','Fire').replace('Defense','Water').replace('Utility','Leaf')+' Stone'+(c.stones>1?'s':'')+' + '+icoHTML('ticket')+' '+c.tix+' Tickets')+'</p>')
   +'<div class="actions"><button class="btn" onclick="closeModal()">BACK</button>'+(maxed?'':'<button class="btn red" '+(can?'':'disabled')+' onclick="mdUpgrade(\''+id+'\','+(ghost?1:0)+')">'+(ghost?'MAKE IT PERMANENT':'UPGRADE')+'</button>')+'</div>')}
-function mdUpgrade(id,ghost){const U=MDU[id],r=runOf();if(ghost){const n=mdPerm(id)+1,sc=mdSoulCost(id,n);if(n>U.max||(db.mdSouls||0)<sc)return;db.mdSouls-=sc;db.mdPerm=db.mdPerm||{};db.mdPerm[id]=n;save();closeModal();mdShopDraw(1);mdSay(1,U.name+' is yours now. Forever.');return}
+function mdUpgrade(id,ghost){const U=MDU[id],r=runOf();if(ghost){const n=mdPerm(id)+1,sc=mdSoulCost(id,n);if(n>U.max||mdSouls()<sc)return;mdSoulAdd(-sc);db.mdPerm=db.mdPerm||{};db.mdPerm[id]=n;save();closeModal();mdShopDraw(1);mdSay(1,U.name+' is yours now. Forever.');return}
  if(!r||!mdUpRun())return;const lv=mdLvOf(r,id),n=lv+1,c=mdCost(id,n);if(n>U.max||(r.stones||{})[U.tab]<c.stones||(r.tickets||0)<c.tix)return;r.stones[U.tab]-=c.stones;r.tickets-=c.tix;r.up=r.up||{};r.up[id]=(r.up[id]||0)+1;save();closeModal();mdShopDraw(0);mdSay(0,U.name+' Lv '+n+'. Don’t waste it.')}
 // ---------- end of a run: Soul Stones and the Death Deals ----------
 function mdSoulsFor(r,cleared){const st=r.stones||{},left=(st.fire||0)+(st.water||0)+(st.leaf||0);return Math.max(1,(r.floor||0)+1+3*(r.clearedFloors||0)+Math.floor((r.qOk||0)/4)+Math.floor(left/3)+(r.souls||0)+(cleared?2:0))}
 function mdDeathOpen(){mdTab='fire';mdShopOpen(true)}
 function mdDeathClose(){mdShopClose()}
+// Soul Stones live in the Bag (db.inv.soulstone) and are spent from there
+ITEMS.soulstone={name:'Soul Stone',kind:'soul',tier:3,w:0,desc:'Earned at the end of a Mystery Dungeon run. Spend them at the ghostly Hatterene’s Death Deals on permanent upgrades.'};
+function mdSouls(){if(db.mdSouls){inv().soulstone=(inv().soulstone||0)+db.mdSouls;delete db.mdSouls}return inv().soulstone||0}
+function mdSoulAdd(n){const v=mdSouls()+n;if(v>0)inv().soulstone=v;else delete inv().soulstone;save()}

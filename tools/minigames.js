@@ -1,7 +1,8 @@
 // ===================== MINIGAMES =====================
 // Question bank from summaries: "Term: definition" lines and AI quiz questions.
-function mgBank(sids){const out=[];for(const s of db.summaries){if(!sids.includes(s.id))continue;
- termsFor(s).forEach(t=>out.push({kind:'term',sid:s.id,key:s.id+'|t|'+t.term,front:t.term,back:t.definition}));
+function mgBank(sids){const out=[];for(const s of db.summaries){if(!sids.includes(s.id))continue;const cmdSet=prOf(s).some(id=>PR[id].cmd);
+ // in command-line sets, only terms that are real commands or options are used (asked as "Which command…?")
+ termsFor(s).forEach(t=>{const f=cmdSet?uxTermClean(t.term):t.term,cmd=cmdSet&&uxIsCmd(f);if(cmdSet&&!cmd)return;out.push({kind:'term',sid:s.id,key:s.id+'|t|'+t.term,front:f,back:t.definition,cmd})});
  (s.quiz||[]).forEach(q=>out.push({kind:'mc',sid:s.id,key:s.id+'|q|'+q.question,front:q.question,back:q.answer,wrong:(q.wrong||[]).slice(0,3)}));
  // practice problems made in code: two fresh ones per problem type each game
  prOf(s).forEach(id=>{for(let k=0;k<(PR[id].cmd?4:2);k++){const p=prInstance(id);if(p)out.push({kind:'gen',gid:id,sid:s.id,key:s.id+'|g|'+id+'|'+k,front:p.q,back:p.a,wrong:p.w,explain:p.ex,steps:p.steps})}})}return out}
@@ -33,6 +34,7 @@ function mgQuestion(item,bank,variant){const others=bank.filter(b=>b!==item),pic
  if(item.kind==='gen'){const p=prInstance(item.gid)||{q:item.front,a:item.back,w:item.wrong,ex:item.explain,steps:item.steps};return {prompt:p.q,sub:(PR[item.gid]?PR[item.gid].name+' · ':'')+'work it out.',options:shuffle([{t:p.a,ok:true},...p.w.map(w=>({t:w,ok:false}))]),explain:p.ex,short:p.a,steps:p.steps||[]}}
  if(item.kind==='mc'&&variant===0)return {prompt:item.front,sub:'Choose the right answer.',options:shuffle([{t:item.back,ok:true},...item.wrong.map(w=>({t:w,ok:false}))]),explain:'The answer is “'+item.back+'”.'};
  if(item.kind==='mc'){const tie=bank.find(b=>b.kind==='term'&&b.front.toLowerCase()===String(item.back).toLowerCase());if(tie)return mgQuestion(tie,bank,1);return {prompt:item.front,sub:'Make-Up: think it through once more.',options:shuffle([{t:item.back,ok:true},...item.wrong.map(w=>({t:w,ok:false}))]),explain:'The answer is “'+item.back+'”.'}}
+ if(item.kind==='term'&&item.cmd)return uxTermQ(item,bank,variant);
  const terms=others.filter(b=>b.kind==='term');
  if(variant===0)return {prompt:item.back,sub:'Which term matches this definition?',options:shuffle([{t:item.front,ok:true},...pick(terms,()=>true).map(b=>({t:b.front,ok:false}))]),explain:'“'+item.front+'” means: '+item.back};
  return {prompt:'What does “'+item.front+'” mean?',sub:'Pick the best definition.',options:shuffle([{t:item.back,ok:true},...pick(terms,()=>true).map(b=>({t:b.back,ok:false}))]),explain:'“'+item.front+'” means: '+item.back}}
@@ -78,12 +80,14 @@ function askQ(item,bank,opts={}){__qMissReset();return new Promise(res=>{const o
      let fin=false;const pick=c=>{if(fin)return;fin=true;if(c==='g'){qGuessed(item);toast('🤔 Got it. That one will come back for practice.')}done('full')};
      card.querySelectorAll('.mgq-conf button').forEach(x=>x.onclick=()=>pick(x.dataset.c));setTimeout(()=>pick('k'),6000);return}
     setTimeout(()=>done(isMakeUp?'makeup':'full'),typed?700:550);return}
+   // Halfsies (a run setting): a typed answer that's at least half right still wins the turn, but counts as a miss
+   const half=typed&&!isMakeUp&&opts.halfsies&&saHalf(o.t,q)>=.5;
    if(b)b.classList.add('wrong');qRecord(item,false,{pick:o.t,prompt:q.prompt,answer:q.short||ans,hints:hi});
    __qMissSet({prompt:/Which term matches|Type the term/.test(q.sub||'')?'Which term means “'+q.prompt+'”?':q.prompt,pick:o.t,answer:q.short||ans,why:q.steps&&q.steps.length?(q.steps[q.steps.length-1][1]||q.steps[q.steps.length-1][0]):q.explain});
    const solOL=st=>'<ol>'+st.map(x=>'<li>'+mathHTML(x[0])+(x[1]?'<span class="mgq-work">'+mathHTML(x[1])+'</span>':'')+'</li>').join('')+'</ol>',tutorIt=!(q.steps&&q.steps.length)&&item.kind!=='term'&&aiAny();
-   card.insertAdjacentHTML('beforeend',(q.steps&&q.steps.length?'<div class="notice mgq-ex"><b>Answer:</b> '+mathHTML(q.short||ans)+'</div><details class="mgq-long" open><summary>Full solution</summary>'+solOL(q.steps)+'</details>':tutorIt?'<div class="notice mgq-ex"><b>Answer:</b> '+mathHTML(ans)+'</div><details class="mgq-long" open><summary>Full solution</summary><div class="mgq-sol small muted">💭 Working it out step by step…</div></details>':'<div class="notice mgq-ex">'+(typed?'<b>Answer:</b> '+mathHTML(q.short||ans)+'<br>':'')+mathHTML(q.explain)+'</div>')+'<button class="btn '+(isMakeUp||opts.makeUp===false?'blue':'red')+' mgq-go">'+(isMakeUp||opts.makeUp===false?'CONTINUE':'MAKE-UP QUESTION →')+'</button>');
+   card.insertAdjacentHTML('beforeend',(q.steps&&q.steps.length?'<div class="notice mgq-ex"><b>Answer:</b> '+mathHTML(q.short||ans)+'</div><details class="mgq-long" open><summary>Full solution</summary>'+solOL(q.steps)+'</details>':tutorIt?'<div class="notice mgq-ex"><b>Answer:</b> '+mathHTML(ans)+'</div><details class="mgq-long" open><summary>Full solution</summary><div class="mgq-sol small muted">💭 Working it out step by step…</div></details>':'<div class="notice mgq-ex">'+(typed?'<b>Answer:</b> '+mathHTML(q.short||ans)+'<br>':'')+mathHTML(q.explain)+'</div>')+(half?'<div class="notice mgq-half">🍰 <b>Halfsies!</b> Close enough to count in battle. It still goes on your weak spots, so look over the answer above.</div><button class="btn red mgq-go">CONTINUE</button>':'<button class="btn '+(isMakeUp||opts.makeUp===false?'blue':'red')+' mgq-go">'+(isMakeUp||opts.makeUp===false?'CONTINUE':'MAKE-UP QUESTION →')+'</button>'));
    if(tutorIt)aiTutor(q.prompt,ans,q.options.map(o=>o.t)).then(st=>{const el=card.querySelector('.mgq-sol');if(!el)return;if(st)el.outerHTML=solOL(st);else el.textContent='The AI couldn’t work this one out right now.'});
-   card.querySelector('.mgq-go').onclick=()=>{if(isMakeUp||opts.makeUp===false)done('fail');else show(mgQuestion(item,bank,1-v0),true)}};
+   card.querySelector('.mgq-go').onclick=()=>{if(half){done('half');return}if(isMakeUp||opts.makeUp===false)done('fail');else show(mgQuestion(item,bank,1-v0),true)}};
   ov.querySelectorAll('.answer').forEach(b=>b.onclick=()=>answered(q.options[+b.dataset.i],b));
   if(typed){const inp=ov.querySelector('.sa-in'),go=()=>{const v=inp.value.trim();if(!v){inp.focus();return}answered({t:v,ok:q.cmd?cmdMatch(v,[q.short,...(q.alts||[])]):saMatch(v,q.short)},null)};ov.querySelector('.sa-go').onclick=go;inp.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();go()}};
    ov.querySelectorAll('.sa-keys button').forEach(b=>b.onclick=e=>{e.preventDefault();saInsert(inp,b.dataset.k)});setTimeout(()=>inp.focus(),60);

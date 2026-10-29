@@ -24,6 +24,8 @@ function saMatch(user,ans){let u=saNorm(user),a=saNorm(ans);if(!u)return false;i
  if(!/\d/.test(a)&&a.length>=4)return saLev(u,a)<=Math.max(1,Math.floor(a.length/6));return false}
 // which questions can be typed: practice problems, terms (type the term), and quiz questions with a short answer
 function saPlan(item){if(item.kind==='gen'){const p=prInstance(item.gid)||{q:item.front,a:item.back,steps:item.steps,ex:item.explain};const cmd=!!(PR[item.gid]&&PR[item.gid].cmd);if(cmd&&!/`/.test(p.a))return null;return {prompt:p.q,answer:p.a,sub:(PR[item.gid]?PR[item.gid].name+' · ':'')+(cmd?'type the command.':'type your answer.'),steps:p.steps||[],explain:p.ex,math:!cmd,cmd,alts:p.alts||[]}}
+ if(item.kind==='term'&&item.cmd&&/[A-Z]{3,}/.test(item.front))return null;
+ if(item.kind==='term'&&item.cmd)return {prompt:'Type the command or option that does this: '+item.back,answer:'`'+String(item.front).replace(/^`|`$/g,'')+'`',sub:'Type the command.',steps:[],explain:'`'+item.front+'`: '+item.back,cmd:true,alts:[]};
  if(item.kind==='term'&&String(item.front).length<=32)return {prompt:item.back,answer:item.front,sub:'Type the term that matches this definition.',steps:[],explain:'“'+item.front+'” means: '+item.back};
  if(item.kind==='mc'&&String(item.back).length<=24&&String(item.back).split(/\s+/).length<=3)return {prompt:item.front,answer:item.back,sub:'Type your answer.',steps:[],explain:'The answer is “'+item.back+'”.'};return null}
 const SA_KEYS=['x','²','^','√','π','×','÷','−','/','(',')','=','.'];
@@ -79,3 +81,5 @@ function askDIY(item,opts={}){return new Promise(res=>{const p=prInstance(item.g
    try{const r=await gmGenerate([{text:'A college student solved this problem line by line.\nProblem: '+p.q+'\nCorrect answer: '+p.a+'\nTheir lines:\n'+lines.map((l,i)=>(i+1)+'. '+l).join('\n')+'\n\nAs a kind, concise tutor: say whether their method works, point to the first line with a mistake (if any) and explain the slip in one or two sentences, then give one tip for writing solution steps more clearly. Plain text with Unicode math, no LaTeX.'}],{type:'OBJECT',properties:{feedback:{type:'STRING'}},required:['feedback']});out.innerHTML=mathHTML(mathPlain(String(r.json.feedback||'')));ab.remove()}
    catch(e){ab.disabled=false;ab.textContent='💭 Ask the tutor where I went wrong';out.textContent='The tutor couldn’t answer right now.'}};
   card.querySelector('.mgq-go').onclick=()=>{ov.remove();res(ok?'full':'fail')}}})}
+// Halfsies: how much of the right answer a typed answer has (1 = all of it), by edit distance
+function saHalf(user,q){const norm=q.cmd?uxNorm:saNorm,u=norm(user);if(!u)return 0;return Math.max(...[q.short,...(q.alts||[])].map(a=>{const t=norm(a);if(!t)return 0;return 1-saLev(u,t)/Math.max(u.length,t.length)}))}

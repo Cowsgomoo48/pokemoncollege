@@ -40,3 +40,13 @@
 .mgq .ans-gone{opacity:.25;pointer-events:none;text-decoration:line-through}.mgq-hint{margin:4px 0 6px}
 .dg-acts .btn.dg-boost{box-shadow:0 0 0 2px #ff3b30,0 0 14px 4px rgba(255,59,48,.7);animation:dgBoost 1.1s ease-in-out infinite}@keyframes dgBoost{50%{box-shadow:0 0 0 2px #ff3b30,0 0 24px 9px rgba(255,59,48,.95)}}
 .dg-foe.snagging .dg-spr{animation:dgSnag .45s ease-in-out infinite!important;filter:brightness(1.6) saturate(.3)}@keyframes dgSnag{0%,100%{transform:rotate(0)}25%{transform:rotate(-10deg)}75%{transform:rotate(10deg)}}
+
+/* resting room campfire art */
+.dg-room.rest{padding-bottom:16px}
+.dg-room.rest .btn,.dg.gd .dg-stage>.dg-room.rest>.btn.red:last-child{position:static;margin-top:0;flex:0 0 auto;box-shadow:none}
+.dg.gd .dg-stage>.dg-room.rest>.dg-rest-art{flex:1 1 0;height:0;min-height:140px}
+.dg-rest-art{display:block;flex:1 1 0;min-height:140px;width:100%;max-width:420px;height:auto;object-fit:contain;margin:4px auto 10px;filter:drop-shadow(0 4px 8px #0004);animation:dgrestin .5s ease-out}
+@keyframes dgrestin{from{opacity:0;transform:translateY(8px) scale(.97)}}
+.dg-room.rest.over{z-index:78;background:radial-gradient(ellipse at 50% 60%,#2a180a55,#05070d88 80%);-webkit-backdrop-filter:blur(1px) brightness(.8);backdrop-filter:blur(1px) brightness(.8);animation:dgrestfade .35s ease-out}
+.dg-room.rest.over h3,.dg-room.rest.over p{text-shadow:0 2px 4px #000}
+@keyframes dgrestfade{from{opacity:0}}

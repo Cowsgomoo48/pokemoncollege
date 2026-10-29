@@ -478,6 +478,16 @@ body.mg-busy .inv-handle{display:none}
 .mgq .ans-gone{opacity:.25;pointer-events:none;text-decoration:line-through}.mgq-hint{margin:4px 0 6px}
 .dg-acts .btn.dg-boost{box-shadow:0 0 0 2px #ff3b30,0 0 14px 4px rgba(255,59,48,.7);animation:dgBoost 1.1s ease-in-out infinite}@keyframes dgBoost{50%{box-shadow:0 0 0 2px #ff3b30,0 0 24px 9px rgba(255,59,48,.95)}}
 .dg-foe.snagging .dg-spr{animation:dgSnag .45s ease-in-out infinite!important;filter:brightness(1.6) saturate(.3)}@keyframes dgSnag{0%,100%{transform:rotate(0)}25%{transform:rotate(-10deg)}75%{transform:rotate(10deg)}}
+
+/* resting room campfire art */
+.dg-room.rest{padding-bottom:16px}
+.dg-room.rest .btn,.dg.gd .dg-stage>.dg-room.rest>.btn.red:last-child{position:static;margin-top:0;flex:0 0 auto;box-shadow:none}
+.dg.gd .dg-stage>.dg-room.rest>.dg-rest-art{flex:1 1 0;height:0;min-height:140px}
+.dg-rest-art{display:block;flex:1 1 0;min-height:140px;width:100%;max-width:420px;height:auto;object-fit:contain;margin:4px auto 10px;filter:drop-shadow(0 4px 8px #0004);animation:dgrestin .5s ease-out}
+@keyframes dgrestin{from{opacity:0;transform:translateY(8px) scale(.97)}}
+.dg-room.rest.over{z-index:78;background:radial-gradient(ellipse at 50% 60%,#2a180a55,#05070d88 80%);-webkit-backdrop-filter:blur(1px) brightness(.8);backdrop-filter:blur(1px) brightness(.8);animation:dgrestfade .35s ease-out}
+.dg-room.rest.over h3,.dg-room.rest.over p{text-shadow:0 2px 4px #000}
+@keyframes dgrestfade{from{opacity:0}}
 /* ===================== MYSTERY DUNGEON · grid floors ===================== */
 .dg.gd .dg-stage{overflow:hidden;background:#05070d}
 .gd-field{position:relative;width:100%;height:100%;min-height:100%;overflow:hidden;display:block;padding:0;background:#05070d;touch-action:manipulation}
@@ -626,6 +636,11 @@ body.mg-busy .inv-handle{display:none}
 .md-dig-spot.lv3:before,.md-dig-spot.lv4:before,.md-dig-spot.lv5:before{content:'';position:absolute;left:9px;top:16px;width:22px;height:12px;border-radius:50%;background:radial-gradient(#3a2a1a99,#3a2a1a33 60%,transparent 70%);box-shadow:inset 0 2px 0 #0003}
 .md-dig-spot.lv3 img.ico.ico,.md-dig-spot.lv4 img.ico.ico,.md-dig-spot.lv5 img.ico.ico{width:20px!important;height:20px!important;animation:mdtw2 1.4s ease-in-out infinite;animation-delay:var(--d)}
 .md-dig-spot.lv4:after,.md-dig-spot.lv5:after{content:'';position:absolute;left:-30px;top:-30px;width:100px;height:100px;border-radius:50%;background:radial-gradient(#fff6c066,transparent 65%);z-index:-1}
+
+/* Shinier Patches Lv2: "?" over an ally on a dig spot */
+.gd-digq{position:absolute;left:50%;top:-14px;transform:translateX(-50%);font:900 18px/1 system-ui,sans-serif;color:#ffe14a;text-shadow:0 0 3px #000,0 2px 0 #7a5200;pointer-events:none;z-index:30;animation:gddigq 1.3s ease-out forwards}
+@keyframes gddigq{0%{opacity:0;transform:translate(-50%,6px) scale(.6)}15%{opacity:1;transform:translate(-50%,0) scale(1.15)}30%{transform:translate(-50%,0) scale(1)}75%{opacity:1}100%{opacity:0;transform:translate(-50%,-8px)}}
+.md-digbtn small{display:block;font-size:10px;opacity:.85}
 /* ===================== BATTLE TOWER ===================== */
 .dg-field.tower{background-size:cover;background-position:center bottom}
 .dg-field.tower .dg-ticker{top:32px}
@@ -889,6 +904,21 @@ img.ico.ico{display:inline-block;width:1.25em!important;height:1.25em!important;
 @keyframes umspike{0%{transform:translateY(-100%) scaleY(0)}35%{transform:translateY(-100%) scaleY(1.1)}70%{transform:translateY(-100%) scaleY(1)}100%{transform:translateY(-100%) scaleY(0)}}
 .ufx.orb.big{width:20px;height:20px;margin:-10px}
 .ufx.ribbon{width:26px;height:6px;margin:-3px -13px;border-radius:6px;background:linear-gradient(90deg,transparent,#ffb3d6,#ff6fae);box-shadow:0 0 6px #ff9fc9}
+
+/* Bug weak: chomp */
+.ufx.chomp{transform:translate(-50%,-50%);z-index:9}
+.ufx.chomp svg{position:absolute;left:0;width:100%;overflow:visible}
+.ufx.chomp .up,.ufx.chomp .dn{height:50%;top:25%;filter:drop-shadow(0 2px 0 #0003)}
+.ufx.chomp .burst{top:0;height:100%;transform:scale(0)}
+/* Water strong: steam + geyser */
+.ufx.gpool{height:14px;margin-top:-7px;transform:translateX(-50%);border-radius:50%;background:radial-gradient(#1b3f6acc,#2b5f9a88 55%,transparent 72%);animation:mvpool 1.9s ease-out forwards}
+@keyframes mvpool{0%{transform:translateX(-50%) scale(.2);opacity:0}25%{opacity:1}85%{transform:translateX(-50%) scale(1);opacity:1}100%{opacity:0}}
+.ufx.steam{width:var(--sz);height:var(--sz);border-radius:50%;background:radial-gradient(#ffffff,#eef6ffd0 55%,transparent 72%);filter:blur(.5px);z-index:8}
+.ufx.geyser{transform-origin:50% 100%;z-index:9;border-radius:45% 45% 12% 12%/18% 18% 6% 6%;background:repeating-linear-gradient(90deg,#ffffff00 0 6px,#ffffff55 6px 8px),linear-gradient(90deg,#2f6fd099,#8cc6ff77 28%,#e9f6ff66 50%,#8cc6ff77 72%,#2f6fd099);box-shadow:0 0 10px #9fd0ff99,inset 0 0 8px #ffffff88;mix-blend-mode:screen}
+.ufx.geyser i{position:absolute;border-radius:50%;background:#f4fbff;box-shadow:0 0 4px #bfe2ff}
+.ufx.geyser i:nth-child(1){left:-12%;top:-6%;width:52%;height:16%}
+.ufx.geyser i:nth-child(2){right:-12%;top:-4%;width:50%;height:14%}
+.ufx.geyser i:nth-child(3){left:22%;top:-12%;width:56%;height:18%}
 
 .xp-buffs{display:inline-flex;gap:3px;margin-left:6px;vertical-align:middle}.xp-buff{min-height:0!important;width:22px;height:22px;padding:0;border:0;background:#ffffff22;border-radius:6px;display:grid;place-items:center;animation:xpbuf 1.6s ease-in-out infinite}.xp-buff img{width:18px;height:18px;object-fit:contain}@keyframes xpbuf{50%{filter:drop-shadow(0 0 4px #ffe066)}}
 .mp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-height:60vh;overflow:auto}.mp-mon{min-height:0!important;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px;border:2px solid #d5e3e9;border-radius:12px;background:#fff;position:relative;height:96px}.mp-mon small{font-size:11px;font-weight:800;color:#1f3550}
@@ -1889,6 +1919,7 @@ function invItem(id){const it=ITEMS[id];if(!it)return;let act='';
  else if(it.kind==='box')act='<button class="btn red" onclick="openBoxItem(\''+id+'\')">OPEN</button>';
  else if(it.kind==='ticket')act='<button class="btn red" onclick="useTicket(\''+id+'\')">USE AT THE SAFARI</button>';
  else if(it.kind==='shinyticket')act='<button class="btn red" onclick="useShinyTicket()">USE</button>';
+ else if(it.kind==='soul')act='<button class="btn red" onclick="closeModal();closeInv();mdDeathOpen()">👻 SPEND AT THE DEATH DEALS</button>';
  else if(it.kind==='monticket'||it.kind==='cap')act='<button class="btn red" onclick="useMonItem(\''+id+'\')">CHOOSE A POKÉMON</button>';
  else if(it.kind==='expticket')act='<button class="btn red" onclick="useExpTicket(\''+id+'\')">USE</button>';
  else if(it.kind==='facility')act='<button class="btn red" onclick="facUnlock(\''+id+'\')">'+(facs()[it.fac]?'ALREADY UNLOCKED':'UNLOCK')+'</button>';
@@ -2097,7 +2128,7 @@ function guideFinish(body,O){body=String(body||'').trim();let m=body.match(/^SUM
  if(sum&&GUIDE_ECHO.test(sum))sum='';if(!sum&&O)sum=O.overview;
  return ((sum?'SUMMARY\n'+sum+'\n\n':'')+(rest?rest+'\n\n':'')+(O?'TOPICS TO STUDY\n'+O.lines.join('\n'):'')).trim()}
 async function aiEnrich(sid,text,check){if(!aiAny()||!text||!text.trim())return;let s=db.summaries.find(x=>x.id===sid);if(!s)return;s.aiBusy=true;delete s.aiErr;delete s.gmErr;drawSummaries();try{drawPics()}catch(e){}let lis=null;try{
- if(gmKey()){try{const photoIds=s.bound?ppPics().filter(p=>p.folder===s.bound).map(p=>p.id):null;const g=await gmGuide(photoIds&&photoIds.length?{photoIds}:{text:guideAiText(text)},t=>{const x=db.summaries.find(y=>y.id===sid);if(x){x.aiProg=t;drawSummaries();try{drawPics()}catch(e){}}});
+ if(gmKey()){try{const photoIds=s.bound?ppPics().filter(p=>p.folder===s.bound).map(p=>p.id):null;const g=await gmGuide(Object.assign(photoIds&&photoIds.length?{photoIds}:{text:guideAiText(text)},{comp:gmIsComp((s.title||'')+' '+(s.name||'')+' '+String(text||'').slice(0,4000))}),t=>{const x=db.summaries.find(y=>y.id===sid);if(x){x.aiProg=t;drawSummaries();try{drawPics()}catch(e){}}});
    s=db.summaries.find(x=>x.id===sid);if(!s||(check&&!check()))return;
    if(((g.problemTypes||[]).length+(g.formulas||[]).length+(g.concepts||[]).length)>0){s.body=guideFinish(formatGuide(g),guideOutline(text));s.guide=true;s.ai=true;s.aiBy='Gemini';s.quiz=g.questions.length?g.questions:(s.quiz||null);s.practice=[...new Set([...prOf(s),...g.practice,...prDetect(s.body)])];s.updatedAt=stamp();toast('✨ “'+s.title+'” study guide ready (Gemini)');return}
    throw new Error('Gemini found nothing to study in this set')}
@@ -2560,7 +2591,7 @@ const UX={files:['notes.txt','report.txt','log.txt','data.csv','todo.md','server
 const uxC=s=>'`'+s+'`';
 function prCmd(id,name,kw,make){prDef(id,'Unix / command line',name,kw,make);PR[id].cmd=true}
 // one command question: answer, three wrong commands, a short explanation, other accepted forms
-function uxQ(q,a,wrong,why,alts){const p=prMC(q,uxC(a),wrong.map(uxC),k=>uxC(a+' '+'?'.repeat(k+1)),why,[['Which command does this job? Then which option, and what comes last (the file or folder)?',why],['Put it together: command, options, then the target.','Answer: '+uxC(a)]]);p.alts=alts||[];return p}
+function uxQ(q,a,wrong,why,alts){q='What command would you type to '+q.charAt(0).toLowerCase()+q.slice(1).replace(/[.?]\s*$/,'')+'?';const p=prMC(q,uxC(a),wrong.map(uxC),k=>uxC(a+' '+'?'.repeat(k+1)),why,[['Which command does this job? Then which option, and what comes last (the file or folder)?',why],['Put it together: command, options, then the target.','Answer: '+uxC(a)]]);p.alts=alts||[];return p}
 // typed commands: same text after tidying spaces and quotes (iPhone smart quotes and dashes too)
 function uxNorm(s){return String(s==null?'':s).replace(/`/g,'').replace(/[“”„]/g,'"').replace(/[‘’']/g,'"').replace(/[—–]/g,'--').trim().replace(/\s+/g,' ').replace(/ ?\| ?/g,' | ').replace(/"([^"\s|*?^$\[\]\\{}()&#;<>!]+)"/g,'$1')}
 function cmdMatch(user,answers){const u=uxNorm(user);return !!u&&answers.some(a=>uxNorm(a)===u)}
@@ -2647,12 +2678,12 @@ prCmd('unix_pipe','Pipes: grep, sort, uniq and wc together',/\|\s*(sort|uniq|wc)
  const w=prPick(UX.words),f=prPick(UX.files);
  if(Math.random()<.2){const p=prMC('Why does '+uxC('sort')+' usually come before '+uxC('uniq')+' in a pipe?','uniq only removes duplicates that are next to each other',['uniq only works on numbers','sort removes the duplicates by itself','uniq has to read a file, not a pipe'],j=>'uniq needs option -'+'abcdefgh'[j],'`uniq` only catches repeated lines sitting next to each other, so `sort` puts the copies together first.',[['What does uniq look at when it decides a line is a duplicate?','Only the line right before it.'],['So what has to happen to the copies first?','Sort them so they sit together.']]);p.alts=[];return p}
  const T=prPick([
-  ['How many lines of '+f+' contain “'+w+'”? Use a pipe.','grep "'+w+'" '+f+' | wc -l',['grep "'+w+'" | wc -l '+f,'wc -l '+f+' | grep "'+w+'"','grep -v "'+w+'" '+f+' | wc -l'],'Pipes run left to right: grep keeps the matching lines, then `wc -l` counts them.',['grep -c "'+w+'" '+f]],
+  ['count how many lines of '+f+' contain “'+w+'”, using a pipe.','grep "'+w+'" '+f+' | wc -l',['grep "'+w+'" | wc -l '+f,'wc -l '+f+' | grep "'+w+'"','grep -v "'+w+'" '+f+' | wc -l'],'Pipes run left to right: grep keeps the matching lines, then `wc -l` counts them.',['grep -c "'+w+'" '+f]],
   ['Count the lines of '+f+' that don’t contain “'+w+'”.','grep -v "'+w+'" '+f+' | wc -l',['grep "'+w+'" '+f+' | wc -l','grep -v "'+w+'" '+f+' | wc -c','wc -l '+f+' | grep -v "'+w+'"'],'`grep -v` keeps the non-matching lines, then `wc -l` counts them.',['grep -vc "'+w+'" '+f,'grep -cv "'+w+'" '+f,'grep -c -v "'+w+'" '+f,'grep -v -c "'+w+'" '+f]],
   ['Show the lines of '+f+' sorted, with duplicate lines removed.','sort '+f+' | uniq',['uniq '+f+' | sort','sort '+f+' | uniq -u','uniq '+f],'Sort first so copies sit together, then `uniq` drops the repeats.',['sort -u '+f]],
-  ['How many different lines does '+f+' have?','sort '+f+' | uniq | wc -l',['uniq '+f+' | wc -l','sort '+f+' | wc -l','sort '+f+' | uniq -u | wc -l'],'Sort, remove repeats with `uniq`, then count with `wc -l`.',['sort -u '+f+' | wc -l']],
+  ['count how many different lines '+f+' has.','sort '+f+' | uniq | wc -l',['uniq '+f+' | wc -l','sort '+f+' | wc -l','sort '+f+' | uniq -u | wc -l'],'Sort, remove repeats with `uniq`, then count with `wc -l`.',['sort -u '+f+' | wc -l']],
   ['Show only the lines that appear exactly once in '+f+'.','sort '+f+' | uniq -u',['uniq -u '+f,'sort -u '+f,'sort '+f+' | uniq'],'`uniq -u` keeps lines with no copies, but only if the input is sorted first.'],
-  ['How many lines containing “'+w+'” appear only once in '+f+'?','grep "'+w+'" '+f+' | sort | uniq -u | wc -l',['grep "'+w+'" '+f+' | uniq -u | wc -l','grep "'+w+'" '+f+' | sort | uniq | wc -l','sort '+f+' | uniq -u | grep "'+w+'"'],'Filter with grep, sort so copies sit together, keep the single ones with `uniq -u`, then count.']]);
+  ['count how many lines containing “'+w+'” appear only once in '+f+'.','grep "'+w+'" '+f+' | sort | uniq -u | wc -l',['grep "'+w+'" '+f+' | uniq -u | wc -l','grep "'+w+'" '+f+' | sort | uniq | wc -l','sort '+f+' | uniq -u | grep "'+w+'"'],'Filter with grep, sort so copies sit together, keep the single ones with `uniq -u`, then count.']]);
  return uxQ(T[0],T[1],T[2],T[3],T[4])});
 
 prCmd('unix_regex','Reading regex patterns (. .* ^ $ [0-9])',/regex|\.\*|"\^|\$"|\[0-9\]/i,()=>{
@@ -2720,6 +2751,18 @@ prCmd('unix_paths','Paths and awkward file names (relative, absolute, quoting)',
   [uxNeedsQ(name)||name.startsWith('-')?'Look at the file name: does anything in it mean something special to the shell?':'Which command does the job, and does it need anything after the path?',why],
   ['Put the command and the path together.','Answer: '+uxC(a)+(absForms.length?' (or '+uxC(wrap(absForms[0])[0])+')':'')]]);
  p.alts=all;return p});
+// ---------- command-style flashcard terms ----------
+// In sets with command-line problems, only terms that are actual commands or options (like "ls -l" or "-type f") are
+// asked, as "Which command…?" questions. Vague summary terms ("text presentation") are skipped.
+const UX_CMDRX=/^(sudo\s+|\.\/)?(cd|ls|pwd|cat|less|more|head|tail|wc|fold|chmod|chown|find|grep|sort|uniq|cp|mv|rm|rmdir|mkdir|touch|echo|man|whoami|sudo|apt|exec)\b|^-{1,2}[a-z]|^[*?~>|]|^\$\(|^>>/i;
+function uxIsCmd(t){return UX_CMDRX.test(String(t||'').trim().replace(/^`|`$/g,''))}
+const UX_FILL=['ls -a','wc -l','chmod +x file','grep -v "word" file','sort file | uniq','find . -type d','cd ..','cat file'];
+function uxTermQ(item,bank,variant){const others=bank.filter(b=>b!==item&&b.kind==='term'&&b.cmd),c=t=>uxC(String(t).replace(/^`|`$/g,'')),pk=shuffle(others).slice(0,3),def=String(item.back).replace(/[.\s]+$/,'');
+ if(variant===0){const opts=pk.map(b=>c(b.front));for(const f of shuffle(UX_FILL)){if(opts.length>=3)break;if(f!==item.front&&!opts.includes(uxC(f)))opts.push(uxC(f))}
+  return {prompt:'Which command or option does this: '+def.charAt(0).toLowerCase()+def.slice(1)+'?',sub:'Pick the command.',options:shuffle([{t:c(item.front),ok:true},...opts.map(t=>({t,ok:false}))]),explain:c(item.front)+': '+item.back}}
+ return {prompt:'What does '+c(item.front)+' do?',sub:'Pick what it does.',options:shuffle([{t:item.back,ok:true},...pk.map(b=>({t:b.back,ok:false}))]),explain:c(item.front)+': '+item.back}}
+// "grep – grep "PATTERN" FILE" (a formula line) → grep "PATTERN" FILE; "wildcard – "*"" → *
+function uxTermClean(t){t=String(t||'').trim();const m=t.match(/^[\w ]+\s[–—-]\s+(.+)$/);if(m)t=m[1].trim();if(/^"[^"\s]+"$/.test(t))t=t.slice(1,-1);return t}
 // ===================== GEMINI (free online AI, optional) =====================
 // With a free Google AI Studio key, study guides come from Gemini: it reads the photos themselves (not the phone's OCR),
 // fills in gaps with standard facts, picks matching practice problem types, and writes quiz questions.
@@ -2790,13 +2833,26 @@ function gmPrompt(n,of){return 'You are building a study guide for a college stu
  +'- practice: choose ONLY from these practice-problem ids, the ones that clearly match the material (it is fine to choose none): '+Object.values(PR).map(T=>T.id+' = '+T.name).join('; ')+'.\n'
  +'- questions: 6 to 10 multiple-choice questions that test understanding of the concepts (not copied homework), each with the correct answer and exactly 3 plausible wrong answers.\n'
  +'- overview: 3 to 5 plain sentences on what this set covers and what the student must be able to do.'}
+// computer courses (the title or notes say "computer" or "comp") get their own builder: commands and syntax instead of formulas
+function gmIsComp(t){return /\bcomputers?\b|\bcomp\b|\bcomp[\s.-]?sci|\bcompsci\b|\bcomp\s?\d{2,4}\b/i.test(String(t||''))}
+function gmPromptComp(n,of){return 'You are building a study guide for a college student in a computer course (command line, programming or systems) from '+(n?'photos of their class notes and worksheets':'their class notes')+(of>1?' (part '+n+' of '+of+')':'')+'.\n'
+ +'- Work out which tools, commands and topics this covers. Ignore crossed-out, cut-off or unreadable bits and never copy gibberish.\n'
+ +'- Where notes are incomplete but the command or topic is clear, fill in the standard, correct behaviour so every item is complete and would actually work if typed.\n'
+ +'- Write every command, option, path and code snippet exactly as it would be typed, wrapped in backticks (for example `ls -la ~/docs`). Keep quotes, dashes and spacing exact. No LaTeX.\n'
+ +'- problemTypes: the kinds of tasks the student must handle (for example "read a file in another directory", "change permissions", "find files by name"), each with one sentence on which command and options do it.\n'
+ +'- formulas: use these for COMMANDS and SYNTAX instead of math. name = what it does, formula = the general syntax in backticks (for example `find DIR -name "PATTERN"`), when = when to use it and what the key options change.\n'
+ +'- concepts: key ideas, one sentence each (for example relative vs absolute paths, what . and .. mean, permissions bits, pipes and redirection, quoting names with spaces or special characters).\n'
+ +'- examples: up to 6 concrete scenarios written as "situation → exact command", for example "You are in /home/ana and want to read notes.txt inside docs → `cat docs/notes.txt`". Include awkward file names (spaces, quotes, leading dashes) when the material covers them.\n'
+ +'- practice: choose ONLY from these practice-problem ids, the ones that clearly match the material (it is fine to choose none; prefer the command-line ones for command-line material): '+Object.values(PR).map(T=>T.id+' = '+T.name).join('; ')+'.\n'
+ +'- questions: 6 to 10 multiple-choice questions phrased like "What command would you type to …?" or "What does this option do?", each with the correct answer and exactly 3 plausible wrong answers that are real-looking commands with a small mistake (wrong option, wrong path, missing quotes).\n'
+ +'- overview: 3 to 5 plain sentences on what this set covers and which commands the student must be able to type from memory.'}
 async function gmPhotoPart(id){const src=ppSrc(id);if(!src)return null;const b=await (await fetch(src)).blob();const d=await new Promise((ok,no)=>{const fr=new FileReader();fr.onload=()=>ok(fr.result);fr.onerror=no;fr.readAsDataURL(b)});return {inline_data:{mime_type:'image/jpeg',data:String(d).split(',')[1]}}}
 // builds the guide from photos (in batches of 6) or from text; merges the batches
-async function gmGuide({photoIds,text},onProg){const batches=[];if(photoIds&&photoIds.length){for(let i=0;i<photoIds.length;i+=6)batches.push(photoIds.slice(i,i+6))}else{const t=String(text||'');for(let i=0;i<t.length&&batches.length<10;i+=60000)batches.push(t.slice(i,i+60000))}
+async function gmGuide({photoIds,text,comp},onProg){const P=comp?gmPromptComp:gmPrompt;const batches=[];if(photoIds&&photoIds.length){for(let i=0;i<photoIds.length;i+=6)batches.push(photoIds.slice(i,i+6))}else{const t=String(text||'');for(let i=0;i<t.length&&batches.length<10;i+=60000)batches.push(t.slice(i,i+60000))}
  const all={overview:'',problemTypes:[],formulas:[],concepts:[],examples:[],practice:[],questions:[]};let model='';
  for(let i=0;i<batches.length;i++){onProg&&onProg('Gemini · part '+(i+1)+' of '+batches.length);let parts;
-  if(photoIds&&photoIds.length){parts=[{text:gmPrompt(i+1,batches.length)}];for(const id of batches[i]){try{const p=await gmPhotoPart(id);if(p)parts.push(p)}catch(e){}}if(parts.length<2)continue}
-  else parts=[{text:gmPrompt(0,batches.length)+'\n\nNotes:\n'+batches[i]}];
+  if(photoIds&&photoIds.length){parts=[{text:P(i+1,batches.length)}];for(const id of batches[i]){try{const p=await gmPhotoPart(id);if(p)parts.push(p)}catch(e){}}if(parts.length<2)continue}
+  else parts=[{text:P(0,batches.length)+'\n\nNotes:\n'+batches[i]}];
   const r=await gmGenerate(parts,GM_GUIDE_SCHEMA,w=>onProg&&onProg('Gemini · waiting '+w+' s for the free limit'));model=r.model;const g=r.json||{};
   if(g.overview&&!all.overview)all.overview=g.overview;['problemTypes','formulas','concepts','examples','practice','questions'].forEach(k=>{if(Array.isArray(g[k]))all[k].push(...g[k])})}
  all.practice=[...new Set(all.practice)].filter(id=>PR[id]);const qs=new Set();all.questions=all.questions.filter(q=>q&&q.question&&q.answer&&Array.isArray(q.wrong)&&q.wrong.length>=1&&!qs.has(q.question)&&qs.add(q.question)).map(q=>({question:q.question,answer:q.answer,wrong:q.wrong.filter(w=>w&&w!==q.answer).slice(0,3)})).slice(0,30);all.model=model;return all}
@@ -2988,8 +3044,9 @@ function facInfo(id){const f=facs()[id],L=facLv(f),B=FAC[id].levels,next=L<10?FA
 function habTabsHTML(){if(!facOwned())return '◉ COMPANION HABITAT';const s=hab.scene||'home';return '<span class="hab-tabs">'+[['home','◉ HABITAT']].concat(Object.keys(facs()).map(id=>[id,FAC[id].icon+' '+FAC[id].name.toUpperCase().replace('WORKOUT ','')])).map(([k,n])=>'<button class="'+(s===k?'on':'')+'" onclick="event.stopPropagation();hab.scene=\''+k+'\';hab.edit=false;drawHabitat()">'+n+'</button>').join('')+'</span>'}
 // ===================== MINIGAMES =====================
 // Question bank from summaries: "Term: definition" lines and AI quiz questions.
-function mgBank(sids){const out=[];for(const s of db.summaries){if(!sids.includes(s.id))continue;
- termsFor(s).forEach(t=>out.push({kind:'term',sid:s.id,key:s.id+'|t|'+t.term,front:t.term,back:t.definition}));
+function mgBank(sids){const out=[];for(const s of db.summaries){if(!sids.includes(s.id))continue;const cmdSet=prOf(s).some(id=>PR[id].cmd);
+ // in command-line sets, only terms that are real commands or options are used (asked as "Which command…?")
+ termsFor(s).forEach(t=>{const f=cmdSet?uxTermClean(t.term):t.term,cmd=cmdSet&&uxIsCmd(f);if(cmdSet&&!cmd)return;out.push({kind:'term',sid:s.id,key:s.id+'|t|'+t.term,front:f,back:t.definition,cmd})});
  (s.quiz||[]).forEach(q=>out.push({kind:'mc',sid:s.id,key:s.id+'|q|'+q.question,front:q.question,back:q.answer,wrong:(q.wrong||[]).slice(0,3)}));
  // practice problems made in code: two fresh ones per problem type each game
  prOf(s).forEach(id=>{for(let k=0;k<(PR[id].cmd?4:2);k++){const p=prInstance(id);if(p)out.push({kind:'gen',gid:id,sid:s.id,key:s.id+'|g|'+id+'|'+k,front:p.q,back:p.a,wrong:p.w,explain:p.ex,steps:p.steps})}})}return out}
@@ -3021,6 +3078,7 @@ function mgQuestion(item,bank,variant){const others=bank.filter(b=>b!==item),pic
  if(item.kind==='gen'){const p=prInstance(item.gid)||{q:item.front,a:item.back,w:item.wrong,ex:item.explain,steps:item.steps};return {prompt:p.q,sub:(PR[item.gid]?PR[item.gid].name+' · ':'')+'work it out.',options:shuffle([{t:p.a,ok:true},...p.w.map(w=>({t:w,ok:false}))]),explain:p.ex,short:p.a,steps:p.steps||[]}}
  if(item.kind==='mc'&&variant===0)return {prompt:item.front,sub:'Choose the right answer.',options:shuffle([{t:item.back,ok:true},...item.wrong.map(w=>({t:w,ok:false}))]),explain:'The answer is “'+item.back+'”.'};
  if(item.kind==='mc'){const tie=bank.find(b=>b.kind==='term'&&b.front.toLowerCase()===String(item.back).toLowerCase());if(tie)return mgQuestion(tie,bank,1);return {prompt:item.front,sub:'Make-Up: think it through once more.',options:shuffle([{t:item.back,ok:true},...item.wrong.map(w=>({t:w,ok:false}))]),explain:'The answer is “'+item.back+'”.'}}
+ if(item.kind==='term'&&item.cmd)return uxTermQ(item,bank,variant);
  const terms=others.filter(b=>b.kind==='term');
  if(variant===0)return {prompt:item.back,sub:'Which term matches this definition?',options:shuffle([{t:item.front,ok:true},...pick(terms,()=>true).map(b=>({t:b.front,ok:false}))]),explain:'“'+item.front+'” means: '+item.back};
  return {prompt:'What does “'+item.front+'” mean?',sub:'Pick the best definition.',options:shuffle([{t:item.back,ok:true},...pick(terms,()=>true).map(b=>({t:b.back,ok:false}))]),explain:'“'+item.front+'” means: '+item.back}}
@@ -3066,12 +3124,14 @@ function askQ(item,bank,opts={}){__qMissReset();return new Promise(res=>{const o
      let fin=false;const pick=c=>{if(fin)return;fin=true;if(c==='g'){qGuessed(item);toast('🤔 Got it. That one will come back for practice.')}done('full')};
      card.querySelectorAll('.mgq-conf button').forEach(x=>x.onclick=()=>pick(x.dataset.c));setTimeout(()=>pick('k'),6000);return}
     setTimeout(()=>done(isMakeUp?'makeup':'full'),typed?700:550);return}
+   // Halfsies (a run setting): a typed answer that's at least half right still wins the turn, but counts as a miss
+   const half=typed&&!isMakeUp&&opts.halfsies&&saHalf(o.t,q)>=.5;
    if(b)b.classList.add('wrong');qRecord(item,false,{pick:o.t,prompt:q.prompt,answer:q.short||ans,hints:hi});
    __qMissSet({prompt:/Which term matches|Type the term/.test(q.sub||'')?'Which term means “'+q.prompt+'”?':q.prompt,pick:o.t,answer:q.short||ans,why:q.steps&&q.steps.length?(q.steps[q.steps.length-1][1]||q.steps[q.steps.length-1][0]):q.explain});
    const solOL=st=>'<ol>'+st.map(x=>'<li>'+mathHTML(x[0])+(x[1]?'<span class="mgq-work">'+mathHTML(x[1])+'</span>':'')+'</li>').join('')+'</ol>',tutorIt=!(q.steps&&q.steps.length)&&item.kind!=='term'&&aiAny();
-   card.insertAdjacentHTML('beforeend',(q.steps&&q.steps.length?'<div class="notice mgq-ex"><b>Answer:</b> '+mathHTML(q.short||ans)+'</div><details class="mgq-long" open><summary>Full solution</summary>'+solOL(q.steps)+'</details>':tutorIt?'<div class="notice mgq-ex"><b>Answer:</b> '+mathHTML(ans)+'</div><details class="mgq-long" open><summary>Full solution</summary><div class="mgq-sol small muted">💭 Working it out step by step…</div></details>':'<div class="notice mgq-ex">'+(typed?'<b>Answer:</b> '+mathHTML(q.short||ans)+'<br>':'')+mathHTML(q.explain)+'</div>')+'<button class="btn '+(isMakeUp||opts.makeUp===false?'blue':'red')+' mgq-go">'+(isMakeUp||opts.makeUp===false?'CONTINUE':'MAKE-UP QUESTION →')+'</button>');
+   card.insertAdjacentHTML('beforeend',(q.steps&&q.steps.length?'<div class="notice mgq-ex"><b>Answer:</b> '+mathHTML(q.short||ans)+'</div><details class="mgq-long" open><summary>Full solution</summary>'+solOL(q.steps)+'</details>':tutorIt?'<div class="notice mgq-ex"><b>Answer:</b> '+mathHTML(ans)+'</div><details class="mgq-long" open><summary>Full solution</summary><div class="mgq-sol small muted">💭 Working it out step by step…</div></details>':'<div class="notice mgq-ex">'+(typed?'<b>Answer:</b> '+mathHTML(q.short||ans)+'<br>':'')+mathHTML(q.explain)+'</div>')+(half?'<div class="notice mgq-half">🍰 <b>Halfsies!</b> Close enough to count in battle. It still goes on your weak spots, so look over the answer above.</div><button class="btn red mgq-go">CONTINUE</button>':'<button class="btn '+(isMakeUp||opts.makeUp===false?'blue':'red')+' mgq-go">'+(isMakeUp||opts.makeUp===false?'CONTINUE':'MAKE-UP QUESTION →')+'</button>'));
    if(tutorIt)aiTutor(q.prompt,ans,q.options.map(o=>o.t)).then(st=>{const el=card.querySelector('.mgq-sol');if(!el)return;if(st)el.outerHTML=solOL(st);else el.textContent='The AI couldn’t work this one out right now.'});
-   card.querySelector('.mgq-go').onclick=()=>{if(isMakeUp||opts.makeUp===false)done('fail');else show(mgQuestion(item,bank,1-v0),true)}};
+   card.querySelector('.mgq-go').onclick=()=>{if(half){done('half');return}if(isMakeUp||opts.makeUp===false)done('fail');else show(mgQuestion(item,bank,1-v0),true)}};
   ov.querySelectorAll('.answer').forEach(b=>b.onclick=()=>answered(q.options[+b.dataset.i],b));
   if(typed){const inp=ov.querySelector('.sa-in'),go=()=>{const v=inp.value.trim();if(!v){inp.focus();return}answered({t:v,ok:q.cmd?cmdMatch(v,[q.short,...(q.alts||[])]):saMatch(v,q.short)},null)};ov.querySelector('.sa-go').onclick=go;inp.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();go()}};
    ov.querySelectorAll('.sa-keys button').forEach(b=>b.onclick=e=>{e.preventDefault();saInsert(inp,b.dataset.k)});setTimeout(()=>inp.focus(),60);
@@ -3245,6 +3305,8 @@ function saMatch(user,ans){let u=saNorm(user),a=saNorm(ans);if(!u)return false;i
  if(!/\d/.test(a)&&a.length>=4)return saLev(u,a)<=Math.max(1,Math.floor(a.length/6));return false}
 // which questions can be typed: practice problems, terms (type the term), and quiz questions with a short answer
 function saPlan(item){if(item.kind==='gen'){const p=prInstance(item.gid)||{q:item.front,a:item.back,steps:item.steps,ex:item.explain};const cmd=!!(PR[item.gid]&&PR[item.gid].cmd);if(cmd&&!/`/.test(p.a))return null;return {prompt:p.q,answer:p.a,sub:(PR[item.gid]?PR[item.gid].name+' · ':'')+(cmd?'type the command.':'type your answer.'),steps:p.steps||[],explain:p.ex,math:!cmd,cmd,alts:p.alts||[]}}
+ if(item.kind==='term'&&item.cmd&&/[A-Z]{3,}/.test(item.front))return null;
+ if(item.kind==='term'&&item.cmd)return {prompt:'Type the command or option that does this: '+item.back,answer:'`'+String(item.front).replace(/^`|`$/g,'')+'`',sub:'Type the command.',steps:[],explain:'`'+item.front+'`: '+item.back,cmd:true,alts:[]};
  if(item.kind==='term'&&String(item.front).length<=32)return {prompt:item.back,answer:item.front,sub:'Type the term that matches this definition.',steps:[],explain:'“'+item.front+'” means: '+item.back};
  if(item.kind==='mc'&&String(item.back).length<=24&&String(item.back).split(/\s+/).length<=3)return {prompt:item.front,answer:item.back,sub:'Type your answer.',steps:[],explain:'The answer is “'+item.back+'”.'};return null}
 const SA_KEYS=['x','²','^','√','π','×','÷','−','/','(',')','=','.'];
@@ -3300,6 +3362,8 @@ function askDIY(item,opts={}){return new Promise(res=>{const p=prInstance(item.g
    try{const r=await gmGenerate([{text:'A college student solved this problem line by line.\nProblem: '+p.q+'\nCorrect answer: '+p.a+'\nTheir lines:\n'+lines.map((l,i)=>(i+1)+'. '+l).join('\n')+'\n\nAs a kind, concise tutor: say whether their method works, point to the first line with a mistake (if any) and explain the slip in one or two sentences, then give one tip for writing solution steps more clearly. Plain text with Unicode math, no LaTeX.'}],{type:'OBJECT',properties:{feedback:{type:'STRING'}},required:['feedback']});out.innerHTML=mathHTML(mathPlain(String(r.json.feedback||'')));ab.remove()}
    catch(e){ab.disabled=false;ab.textContent='💭 Ask the tutor where I went wrong';out.textContent='The tutor couldn’t answer right now.'}};
   card.querySelector('.mgq-go').onclick=()=>{ov.remove();res(ok?'full':'fail')}}})}
+// Halfsies: how much of the right answer a typed answer has (1 = all of it), by edit distance
+function saHalf(user,q){const norm=q.cmd?uxNorm:saNorm,u=norm(user);if(!u)return 0;return Math.max(...[q.short,...(q.alts||[])].map(a=>{const t=norm(a);if(!t)return 0;return 1-saLev(u,t)/Math.max(u.length,t.length)}))}
 
 // ===================== MYSTERY DUNGEON =====================
 const DIFF={easy:{name:'Easy',floors:1,rows:7,cap:1,step:2,fb:8,bh:1.8,dm:1.2,treasure:.12,shop:.10,mins:'15–20'},balanced:{name:'Balanced',floors:2,rows:8,cap:2,step:3,fb:12,bh:3.6,dm:.55,treasure:.17,shop:.10,mins:'25–30'},hard:{name:'Hard',floors:3,rows:9,cap:4,step:4,fb:18,bh:4.6,dm:.5,treasure:.17,shop:.11,mins:'45–60'}};
@@ -3351,7 +3415,7 @@ function dgConfirmParty(){if(!dgPick.length)return;if(dgPick.includes(db.mainId)
   modal('NEW COMPANION','<p class="small">Your ★ companion is joining the run. Who keeps you company at home?</p><div class="dg-pick">'+others.map(p=>'<button class="dg-pk" onclick="dgSwapMain(\''+p.id+'\')">'+monSprite(p,'',48)+'<b>'+esc(p.nickname||p.species)+'</b><small>Lv '+monLv(p)+'</small></button>').join('')+'</div>');return}dgSetupSets()}
 function dgSwapMain(id){{const fo=facOf(id);if(fo)facs()[fo].mon=null}for(const p of db.pokemon){if(p.id===db.mainId&&p.mainSince){buffBake(p);p.mainSeconds=mainSeconds(p);p.mainSince=null}}const p=db.pokemon.find(x=>x.id===id);db.mainId=id;p.mainSince=stamp();save();dgSetupSets()}
 function dgSetupSets(){if(dgPickFor==='tower')return twSetupSets();const sets=db.summaries.filter(s=>termsFor(s).length+(s.quiz?s.quiz.length:0)+prOf(s).length>0);if(!sets.length){modal('MYSTERY DUNGEON','<div class="notice">The dungeon asks questions from your study sets. Add a summary with “Term: Definition” lines first.</div>');return}
- modal('STUDY SETS & DIFFICULTY','<div class="mg-sets">'+sets.map(s=>'<label><input type="checkbox" value="'+s.id+'" checked> <span>'+esc(s.title)+'<small>'+(termsFor(s).length+(s.quiz?s.quiz.length:0))+' items</small></span></label>').join('')+'</div><p class="small" style="margin-top:10px">Study mode</p><div class="mg-modes"><label><input type="radio" name="mgm" value="smart" checked> <b>Smart Study</b></label><label><input type="radio" name="mgm" value="learn"> <b>Learn</b></label><label><input type="radio" name="mgm" value="weak"> <b>Review Weak Points</b></label></div><p class="small" style="margin-top:10px">Run style</p><div class="mg-modes"><label><input type="radio" name="dgs" value="casual" checked> <b>Casual</b><small>Study mode: the floors don’t get harder, so you can keep going as long as you like</small></label><label><input type="radio" name="dgs" value="game"> <b>Videogamey</b><small>Every boss you beat makes the floors below stronger; the boss bonus grows but is lost if your team faints</small></label></div><p class="small" style="margin-top:10px">Difficulty</p><div class="mg-modes">'+Object.entries(DIFF).map(([k,d],i)=>'<label><input type="radio" name="dgd" value="'+k+'" '+(i===0?'checked':'')+'> <b>'+d.name+'</b><small>'+(GD_DEPTH[k]||3)+' floors to each boss · '+(GD_SIZE[k]||[0,0,6])[2]+' rooms a floor'+(k==='balanced'?' · Totem bosses possible':k==='hard'?' · Totem & Alpha bosses possible':'')+'</small></label>').join('')+'</div><div class="actions">'+((db.mdSouls||0)>0||Object.keys(db.mdPerm||{}).length?'<button class="btn" onclick="mdDeathOpen()">👻 DEATH DEALS ('+(db.mdSouls||0)+' 🟣)</button>':'')+'<button class="btn red" onclick="dgStartRun()">ENTER THE DUNGEON</button></div>')}
+ modal('STUDY SETS & DIFFICULTY','<div class="mg-sets">'+sets.map(s=>'<label><input type="checkbox" value="'+s.id+'" checked> <span>'+esc(s.title)+'<small>'+(termsFor(s).length+(s.quiz?s.quiz.length:0))+' items</small></span></label>').join('')+'</div><p class="small" style="margin-top:10px">Study mode</p><div class="mg-modes"><label><input type="radio" name="mgm" value="smart" checked> <b>Smart Study</b></label><label><input type="radio" name="mgm" value="learn"> <b>Learn</b></label><label><input type="radio" name="mgm" value="weak"> <b>Review Weak Points</b></label></div><p class="small" style="margin-top:10px">Run style</p><div class="mg-modes"><label><input type="radio" name="dgs" value="casual" checked> <b>Casual</b><small>Study mode: the floors don’t get harder, so you can keep going as long as you like</small></label><label><input type="radio" name="dgs" value="game"> <b>Videogamey</b><small>Every boss you beat makes the floors below stronger; the boss bonus grows but is lost if your team faints</small></label></div><p class="small" style="margin-top:10px">Difficulty</p><div class="mg-modes">'+Object.entries(DIFF).map(([k,d],i)=>'<label><input type="radio" name="dgd" value="'+k+'" '+(i===0?'checked':'')+'> <b>'+d.name+'</b><small>'+(GD_DEPTH[k]||3)+' floors to each boss · '+(GD_SIZE[k]||[0,0,6])[2]+' rooms a floor'+(k==='balanced'?' · Totem bosses possible':k==='hard'?' · Totem & Alpha bosses possible':'')+'</small></label>').join('')+'</div><div class="actions">'+(mdSouls()>0||Object.keys(db.mdPerm||{}).length?'<button class="btn" onclick="mdDeathOpen()">👻 DEATH DEALS ('+mdSouls()+' 🟣)</button>':'')+'<button class="btn red" onclick="dgStartRun()">ENTER THE DUNGEON</button></div>')}
 function dgStartRun(){const sids=[...document.querySelectorAll('.mg-sets input:checked')].map(x=>x.value),mode=(document.querySelector('input[name=mgm]:checked')||{}).value||'smart',diff=(document.querySelector('input[name=dgd]:checked')||{}).value||'easy',style=(document.querySelector('input[name=dgs]:checked')||{}).value||'casual';if(!sids.length){toast('Pick at least one study set');return}
  if(mode==='weak'&&!sids.some(id=>(db.learned||{})[id])){toast('Finish Learn mode on one of these sets first');return}
  if(!mgPicker(mgBank(sids),mode).bank.length){toast('No questions for that mode here');return}
@@ -3363,7 +3427,7 @@ function dgcOpen(mode){if(mode)dgMode=mode;const r=runOf();if(!r)return;dgEpoch+
  const el=$('mgArea');el.innerHTML='<div class="dg"><div class="dg-stage" id="dgStage"></div><div class="dg-panel" id="dgPanel"></div></div>';if(r.battle){dgDrawBattle();if(r.battle.enemyPhase)dgEnemyPhase()}else if(r.tower)twNext();else dgDrawMap()}
 function fmtMin(ms){const m=Math.floor(ms/60000),s=Math.floor(ms%60000/1000);return m+':'+String(s).padStart(2,'0')}
 function dgSaveExit(){save();mgQuit();toast('Run saved. Continue it from Minigames.')}
-function dgSettings(){const r=runOf();modal('RUN SETTINGS','<label class="small" style="display:flex;gap:8px;align-items:center"><input type="checkbox" '+(r.slider?'checked':'')+' onchange="runOf().slider=this.checked;save()"> Timing slider on attacks (off = random strength from the table)</label><button class="btn smallbtn" style="margin:8px 0" onclick="recapShow()">📋 MISTAKES THIS RUN ('+((r.recap||[]).length)+')</button><p class="small muted">Study sets: '+r.sids.map(id=>esc((db.summaries.find(s=>s.id===id)||{}).title||'?')).join(', ')+' · '+({smart:'Smart Study',learn:'Learn',weak:'Review Weak Points'})[r.mode]+'</p><div class="actions"><button class="btn" onclick="if(confirm(\'End this run now? You keep what you earned so far.\')){closeModal();dgEnd(false,true)}">END RUN</button><button class="btn blue" onclick="closeModal()">CLOSE</button></div>')}
+function dgSettings(){const r=runOf();modal('RUN SETTINGS','<label class="small" style="display:flex;gap:8px;align-items:center"><input type="checkbox" '+(r.slider?'checked':'')+' onchange="runOf().slider=this.checked;save()"> Timing slider on attacks (off = random strength from the table)</label><label class="small" style="display:flex;gap:8px;align-items:flex-start;margin-top:8px"><input type="checkbox" '+(r.halfsies?'checked':'')+' onchange="runOf().halfsies=this.checked;save()"> <span><b>Allow Halfsies?</b> A typed answer that’s at least half right still counts as a hit in battle. You still see the full answer, and it’s saved as a miss and a weak spot.</span></label><button class="btn smallbtn" style="margin:8px 0" onclick="recapShow()">📋 MISTAKES THIS RUN ('+((r.recap||[]).length)+')</button><p class="small muted">Study sets: '+r.sids.map(id=>esc((db.summaries.find(s=>s.id===id)||{}).title||'?')).join(', ')+' · '+({smart:'Smart Study',learn:'Learn',weak:'Review Weak Points'})[r.mode]+'</p><div class="actions"><button class="btn" onclick="if(confirm(\'End this run now? You keep what you earned so far.\')){closeModal();dgEnd(false,true)}">END RUN</button><button class="btn blue" onclick="closeModal()">CLOSE</button></div>')}
 function dgPanelMap(){const r=runOf();if(r&&r.tower)return twPanel();return '<div class="dg-row"><span>⏱ <b id="dgTime">'+fmtMin(r.studyMs)+'</b></span><span>B'+(r.floor+1)+'F</span><span>Room '+r.rooms+'</span><span>🎟️ '+(r.tickets||0)+'</span></div><div class="dg-partyrow">'+r.party.map((m,i)=>{const p=partyMon(m),c=combatant(p);return '<div class="dg-mini" style="--c:'+SLOT_COLORS[i]+'">'+monSprite(p,'',34)+'<span><i style="width:'+Math.max(0,m.hp/c.hp*100)+'%"></i></span><small>'+m.hp+'/'+c.hp+' · ⚡'+m.energy+'</small></div>'}).join('')+'</div><div class="dg-bag">'+(Object.keys(r.bag).filter(k=>r.bag[k]>0).map(k=>'<span title="'+DITEMS[k].name+'">'+DITEMS[k].icon+'×'+r.bag[k]+'</span>').join('')||'<span class="small muted">No items</span>')+'</div><div class="dg-row"><button class="btn smallbtn" onclick="dgSettings()">🔧</button><button class="btn smallbtn" onclick="dgSaveExit()">💾 SAVE & EXIT</button></div>'}
 // ---------- map ----------
 function dgDrawMap(){const r=runOf(),rows=r.map[r.floor],st=$('dgStage');
@@ -3381,7 +3445,10 @@ function dgFloorClear(){const r=runOf();r.clearedFloors=Math.max(r.clearedFloors
 function dgDescend(){const r=runOf();if(!r)return;r.floor++;if(!r.map[r.floor])r.map[r.floor]=genMap(r.diff,dgGamey(r)?r.floor:0)[0];r.row=-1;r.col=null;r.party.forEach(m=>{const c=combatant(partyMon(m));if(m.hp>0)m.hp=Math.min(c.hp,m.hp+Math.round(c.hp*.3))});save();toast('⬇ B'+(r.floor+1)+'F'+(dgGamey(r)?'. The air feels heavier…':''));dgDrawMap()}
 // ---------- rooms ----------
 function dgRest(){const r=runOf();r.party.forEach(m=>{const c=combatant(partyMon(m));m.energy=Math.min(100,m.energy+10);if(m.hp>0)m.hp=Math.min(c.hp,m.hp+Math.ceil(c.hp*.2))});save();
- $('dgStage').scrollTop=0;$('dgStage').innerHTML='<div class="dg-room rest"><span class="dg-big">🔥</span><h3>Resting Room</h3><p>Your team rests by the fire.<br>+10 Energy and 20% HP each (fainted Pokémon stay down).</p><button class="btn red" onclick="dgNextRoom()">CONTINUE</button></div>';$('dgPanel').innerHTML=dgPanelMap()}
+ const st=$('dgStage');st.scrollTop=0;const html='<div class="dg-room rest"><h3>Resting Room</h3><p>Your team rests by the fire.<br>+10 Energy and 20% HP each (fainted Pokémon stay down).</p><img class="dg-rest-art" src="assets/rest_camp.webp" alt="Your team resting around a campfire"><button class="btn red" onclick="this.closest(\'.dg-room\').remove();dgNextRoom()">LEAVE</button></div>';
+ // Mystery Dungeon: the room sits over the current floor (dimmed) instead of replacing it
+ if(r.fl&&st.querySelector('.gd-field')){st.querySelectorAll('.dg-room.rest').forEach(e=>e.remove());st.insertAdjacentHTML('beforeend',html.replace('dg-room rest','dg-room rest over'))}else st.innerHTML=html;
+ $('dgPanel').innerHTML=dgPanelMap()}
 async function dgTreasure(){const r=runOf(),n=2+Math.floor(Math.random()*3);$('dgStage').innerHTML='<div class="dg-room"><span class="dg-big">💎</span><h3>Treasure Room</h3><p>Answer '+n+' questions. The more you get right, the better the treasure.</p></div>';$('dgPanel').innerHTML=dgPanelMap();await dgSleep(700);
  let score=0;for(let i=0;i<n;i++){const it=DG.P.next(),res=await askQ(it,DG.bank,{title:'TREASURE '+(i+1)+'/'+n,makeUp:false});DG.P.report(it,res);if(res==='full')score++}
  const pct=score/n,bonus=r.diff==='easy'?1:1.4,cogs=Math.round((4+10*pct)*bonus),got=['+'+cogs+' 🎟️ Tickets'];r.tickets=(r.tickets||0)+cogs;r.cogs=(r.cogs||0)+cogs;
@@ -3429,7 +3496,7 @@ function dgQ(title,opts){const ep=dgEpoch,r0=runOf(),bt=r0&&r0.battle,tn=bt&&bt.
  // Do It Yourself: on some floors the first attack question is a practice problem you work out line by line
  let it=null,diy=false;if(bt&&bt.diy&&/FIGHT/.test(title)){bt.diy=false;const gens=DG.bank.filter(b=>b.kind==='gen'&&!(PR[b.gid]&&PR[b.gid].cmd)),weak=gens.filter(isWeak);if(gens.length){it=weak.length&&Math.random()<.5?weak[Math.floor(Math.random()*weak.length)]:gens[Math.floor(Math.random()*gens.length)];diy=true}}
  if(!it)it=DG.P.next();
- return (diy?askDIY(it,{title}):askQ(it,DG.bank,Object.assign({title},opts||{}))).then(res=>{const r1=runOf();if(ep!==dgEpoch||!DG||!r1||(bt&&(r1.battle!==bt||bt.turn!==tn)))return new Promise(()=>{});DG.P.report(it,res);if(res==='full')r1.qOk=(r1.qOk||0)+1;if(res!=='full'&&__qMiss)recapAdd(it,__qMiss);if(diy&&res==='full'){r1.tickets=(r1.tickets||0)+5;r1.cogs=(r1.cogs||0)+5;toast('🛠 Worked it out! +5 🎟️')}if(bt&&res==='full')bt.qFull=(bt.qFull||0)+1;if(bt)bt.lastRes=res;apMaybePrompt();return res})}
+ return (diy?askDIY(it,{title}):askQ(it,DG.bank,Object.assign({title,halfsies:!!(r0&&r0.halfsies)},opts||{}))).then(res=>{let half=false;if(res==='half'){half=true;res='full';toast('🍰 Halfsies! It counts in battle, and it’s saved as a weak spot.')}const r1=runOf();if(ep!==dgEpoch||!DG||!r1||(bt&&(r1.battle!==bt||bt.turn!==tn)))return new Promise(()=>{});DG.P.report(it,half?'fail':res);if(res==='full'&&!half)r1.qOk=(r1.qOk||0)+1;if((res!=='full'||half)&&__qMiss)recapAdd(it,__qMiss);if(diy&&res==='full'){r1.tickets=(r1.tickets||0)+5;r1.cogs=(r1.cogs||0)+5;toast('🛠 Worked it out! +5 🎟️')}if(bt&&res==='full')bt.qFull=(bt.qFull||0)+1;if(bt)bt.lastRes=res;apMaybePrompt();return res})}
 // ---------- autopilot check ----------
 // Answers that come faster than the question could be read (and especially fast wrong ones) mean focus has run out.
 // After a few of those in a row, the game offers to save and take a break. It asks at most once every 12 questions.
@@ -3660,7 +3727,7 @@ function dgBossMon(species,kind){const tier=INDEX[species]?INDEX[species].tier:0
  if(kind==='totem'&&m.size<.95&&Math.random()<.25)m.size=steps[Math.max(0,idx-1)];if(kind==='alpha'&&m.size>1.05&&Math.random()<.25)m.size=steps[Math.min(6,idx+1)];return m}
 function dgLose(){if(runOf()&&runOf().tower){if(twSecondWind())return;return twLoseScreen()}const r=runOf();r.battle=null;save();if(!$('dgStage'))return;$('dgStage').innerHTML='<div class="dg-room"><span class="dg-big">💤</span><h3>Your team fainted…</h3><p>The run is over. Your leftover 🎟️ Tickets turn into Cogs, and you keep the EXP and Pokémon you earned.</p><button class="btn red" onclick="dgEnd(false)">LEAVE THE DUNGEON</button></div>';$('dgPanel').innerHTML=''}
 function dgEnd(cleared,quit){if(dgMode==='tower')return twEnd(quit);const r=runOf();if(!r)return;let bonus=0;const tix=Math.max(0,Math.round(r.tickets||0));db.cogs=Math.round(db.cogs+tix);const fl=r.clearedFloors||0;if(cleared&&fl){bonus=dgFloorBonus(r);db.cogs=Math.round(db.cogs+bonus);grantXp(20+10*fl)}else grantXp(15);
- const souls=mdSoulsFor(r,cleared&&fl);db.mdSouls=(db.mdSouls||0)+souls;const lines=[(cleared&&fl?'🏆 Beat '+fl+' boss'+(fl>1?'es':'')+'! +'+bonus+' Cogs bonus':quit?'Run ended early.':'Run over.'),'🎟️ Tickets earned: '+(r.cogs||0)+' · '+tix+' left over → +'+tix+' Cogs','Cogs from this run: '+(tix+bonus),'Deepest floor: B'+(r.floor+1)+'F','Time studying: '+fmtMin(r.studyMs),'🟣 Soul Stones: +'+souls+' (you have '+db.mdSouls+')'];db.run=null;save();if(mgState)mgState.stop&&mgState.stop();mgState=null;render();
+ const souls=mdSoulsFor(r,cleared&&fl);mdSoulAdd(souls);const lines=[(cleared&&fl?'🏆 Beat '+fl+' boss'+(fl>1?'es':'')+'! +'+bonus+' Cogs bonus':quit?'Run ended early.':'Run over.'),'🎟️ Tickets earned: '+(r.cogs||0)+' · '+tix+' left over → +'+tix+' Cogs','Cogs from this run: '+(tix+bonus),'Deepest floor: B'+(r.floor+1)+'F','Time studying: '+fmtMin(r.studyMs),'🟣 Soul Stones: +'+souls+' (you have '+mdSouls()+')'];db.run=null;save();if(mgState)mgState.stop&&mgState.stop();mgState=null;render();
  $('mgArea').innerHTML='<div class="reveal mg-end"><h2>🏰 Mystery Dungeon</h2>'+lines.map(l=>'<p>'+l+'</p>').join('')+recapHTML(r.recap)+'<div class="actions"><button class="btn" onclick="mgQuit()">MENU</button><button class="btn red" onclick="mdDeathOpen()">👻 DEATH DEALS</button></div></div>';setTimeout(mdDeathOpen,900)}
 // Wake Mint: one question, then every fainted teammate gets back up with 50% HP
 async function dgWakeMint(){const r=runOf(),b=r.battle,slot=b.turn,I=DITEMS.wakemint;if(!r.party.some(q=>q.hp<=0)){toast('Nobody has fainted');DG.busy=0;dgItem();return}dgCrosshair('ally',slot,slot);const res=await dgQ(I.icon+' '+I.name.toUpperCase());
@@ -3789,7 +3856,7 @@ function gdFit(){const dg=document.querySelector('.dg.gd');if(!dg)return;const d
 addEventListener('resize',()=>{if(document.querySelector('.dg.gd')){gdFit();gdCamera()}});
 function gdMini(r,L){const fl=r.fl,c=document.querySelector('.gd-mini');if(!c)return;const s=4;c.width=fl.w*s;c.height=fl.h*s;const g=c.getContext('2d');g.clearRect(0,0,c.width,c.height);
  for(let y=0;y<fl.h;y++)for(let x=0;x<fl.w;x++)if(fl.seen[y*fl.w+x]==='1'&&gdTile(fl,x,y)){g.fillStyle=L.has(gdKey(x,y))?'#ffffffcc':'#ffffff66';g.fillRect(x*s,y*s,s,s)}
- const sc=mdLvOf(r,'scout');if(sc>=2||mdLvOf(r,'patches')>=5)(fl.digs||[]).forEach(d=>{if(d.done<d.max){g.fillStyle='#ffe066';g.fillRect(d.x*s,d.y*s,s,s)}});if(sc>=3)fl.items.forEach(it=>{g.fillStyle='#ffd34d';g.fillRect(it.x*s,it.y*s,s,s)});
+ const sc=mdLvOf(r,'scout');if(sc>=2)(fl.digs||[]).forEach(d=>{if(d.done<d.max){g.fillStyle='#ffe066';g.fillRect(d.x*s,d.y*s,s,s)}});if(sc>=3)fl.items.forEach(it=>{g.fillStyle='#ffd34d';g.fillRect(it.x*s,it.y*s,s,s)});
  if(!fl.stairsHidden&&(sc>=1||fl.seen[fl.stairs[1]*fl.w+fl.stairs[0]]==='1')){g.fillStyle='#4aa3ff';g.fillRect(fl.stairs[0]*s-1,fl.stairs[1]*s-1,s+2,s+2)}
  fl.items.forEach(it=>{if(fl.seen[it.y*fl.w+it.x]==='1'){g.fillStyle='#ffd34d';g.fillRect(it.x*s,it.y*s,s,s)}});
  r.battle.enemies.forEach(e=>{if(e.hp>0&&!e.done&&L.has(gdKey(e.x,e.y))){g.fillStyle='#ff4d4d';g.fillRect(e.x*s,e.y*s,s,s)}});
@@ -3819,7 +3886,7 @@ function gdPanelBattle(msg){const r=runOf(),b=r.battle,m=r.party[b.turn],p=m&&pa
  const chips='<div class="gd-chips">'+r.party.map((q,i)=>{const pp=partyMon(q),cc=combatant(pp);return '<button class="gd-chip'+(i===b.turn?' on':'')+(q.acted?' done':'')+(q.hp<=0?' ko':'')+'" style="--c:'+SLOT_COLORS[i]+'" onclick="gdSelect('+i+')">'+monSprite(pp,'',28)+'<small>'+(q.acted?'✓':q.hp<=0?'💤':q.hp+'/'+cc.hp)+'</small></button>'}).join('')+'</div>';
  const head='<div class="dg-msg"><b style="color:'+SLOT_COLORS[b.turn]+'">'+esc(p.nickname||p.species)+'</b> · '+m.hp+'/'+c.hp+' HP · ⚡'+m.energy+' · 👣 '+Math.max(1,gdMV(p.species)+mdMoveAdj())+(msg?'<br>'+msg:free?'<br>🧭 No wild Pokémon in sight: walk freely, your team follows.':m.acted?' · done this turn':m.moved?' · moved, can still act':'')+'</div>';
  const acts=m.hp<=0?'<div class="dg-acts"><button class="btn red" '+(m.acted?'disabled':'')+' onclick="dgRevive()">💫 ANSWER TO REVIVE</button></div>'
-  :'<div class="dg-acts gd-acts"><button class="btn'+(free?' blue':'')+'" '+(!free&&(m.moved||m.acted)?'disabled':'')+' onclick="gdMoveStart()">👣 MOVE</button><button class="btn red" '+(m.acted||!canHit?'disabled':'')+' onclick="dgFight()">⚔️ FIGHT'+(canHit||m.acted?'':'<small>no foe in reach</small>')+'</button><button class="btn blue" '+(m.acted?'disabled':'')+' onclick="dgItem()">🎒 ITEM</button><button class="btn" '+(m.acted?'disabled':'')+' onclick="dgGuard()">🛡 GUARD</button></div>';
+  :'<div class="dg-acts gd-acts">'+(()=>{const dg=free&&gdDigAt(r,m),mv0='<button class="btn'+(free?' blue':'')+'" '+(!free&&(m.moved||m.acted)?'disabled':'')+' onclick="gdMoveStart()">👣 MOVE</button>',fight='<button class="btn red" '+(m.acted||!canHit?'disabled':'')+' onclick="dgFight()">⚔️ FIGHT'+(canHit||m.acted?'':'<small>no foe in reach</small>')+'</button>';return mv0+(dg?'<button class="btn red md-digbtn" onclick="gdDigHere()">⛏ DIG<small>'+dg.done+'/'+dg.max+' dug</small></button>':fight)})()+'<button class="btn blue" '+(m.acted?'disabled':'')+' onclick="dgItem()">🎒 ITEM</button><button class="btn" '+(m.acted?'disabled':'')+' onclick="dgGuard()">🛡 GUARD</button></div>';
  $('dgPanel').innerHTML=head+chips+acts+'<div class="dg-row"><button class="btn smallbtn red" onclick="gdEndTurn()">⏭ END TURN</button><span>⏱ <b id="dgTime">'+fmtMin(r.studyMs)+'</b></span><span>🎟️ '+(r.tickets||0)+'</span><button class="btn smallbtn" onclick="dgSettings()">🔧</button><button class="btn smallbtn" onclick="dgSaveExit()">💾</button></div>'}
 // Free roam: while no wild Pokémon is in sight, moving doesn't use up anyone's turn. The picked Pokémon can keep walking
 // (up to 6 tiles a step, or more if it's faster), the rest of the team follows, and everyone slowly recovers HP.
@@ -3838,7 +3905,7 @@ function gdSelect(i){const r=runOf(),b=r&&r.battle;if(!b||b.enemyPhase||DG.busy)
 function gdMoveStart(){const r=runOf(),b=r.battle,m=r.party[b.turn];if(!m||m.hp<=0||DG.busy)return;const free=gdFree(r);if(!free&&(m.moved||m.acted))return;const fl=r.fl,mv=free?Math.max(GD_FREE_MV,gdMV(partyMon(m).species)):Math.max(1,gdMV(partyMon(m).species)+mdMoveAdj());
  const reach=gdBFS(fl,[m.x,m.y],(x,y)=>b.enemies.some(e=>(e.hp>0||e.gdOut)&&!e.done&&e.x===x&&e.y===y),mv);DG.reach=reach;DG.gmode='move';if(!DG.bcam)gdCamera(m.x,m.y);
  DG.hl={cls:'mv',tiles:[...reach.keys()].map(k=>k.split(',').map(Number)).filter(([x,y])=>!(x===m.x&&y===m.y)&&!gdUnitAt(r,x,y))};gdHighlight();$('dgPanel').innerHTML='<div class="dg-msg">👣 Tap a blue tile to move there (up to '+mv+' tiles).'+(free?' No foes in sight, so this doesn’t use up the turn.':'')+'</div><div class="dg-acts"><button class="btn" onclick="DG.gmode=\'select\';DG.hl=null;gdDrawBattle()">CANCEL</button></div>'}
-async function gdWalk(unitEl,obj,path,isFoe){const T=GD_T;for(let s=1;s<path.length;s++){const [x,y]=path[s],[px,py]=path[s-1];obj.dir=gdDirOf(x-px,y-py);obj.x=x;obj.y=y;if(unitEl){unitEl.style.left=x*T+'px';unitEl.style.top=y*T+'px';unitEl.style.zIndex=10+y;const sp=unitEl.querySelector('.dg-spr');if(sp&&+sp.dataset.row!==obj.dir){sp.dataset.row=obj.dir;sp.classList.remove('ok');dgFillSprites()}}if(!isFoe&&!(DG&&DG.bcam))gdCamera(x,y);else gdOverlap();gdOverlays();await dgSleep(120)}gdOverlays();setTimeout(gdOverlays,340)}
+async function gdWalk(unitEl,obj,path,isFoe){const T=GD_T;for(let s=1;s<path.length;s++){const [x,y]=path[s],[px,py]=path[s-1];obj.dir=gdDirOf(x-px,y-py);obj.x=x;obj.y=y;if(unitEl){unitEl.style.left=x*T+'px';unitEl.style.top=y*T+'px';unitEl.style.zIndex=10+y;const sp=unitEl.querySelector('.dg-spr');if(sp&&+sp.dataset.row!==obj.dir){sp.dataset.row=obj.dir;sp.classList.remove('ok');dgFillSprites()}}if(!isFoe)gdDigPing(unitEl,x,y);if(!isFoe&&!(DG&&DG.bcam))gdCamera(x,y);else gdOverlap();gdOverlays();await dgSleep(120)}gdOverlays();setTimeout(gdOverlays,340)}
 async function gdWalkTo(slot,x,y){const r=runOf(),b=r.battle,m=r.party[slot],path=gdPath(DG.reach,gdKey(x,y)),wasFree=gdFree(r);DG.gmode='select';DG.hl=null;DG.busy=1;gdHighlight();
  await gdWalk(document.querySelector('.dg-ally[data-i="'+slot+'"]'),m,path,false);if(!runOf()||runOf().battle!==b)return;
  if(wasFree)gdFollow(r,slot,path);gdSee(r);mdHazard(r,m,false,slot);
@@ -3847,7 +3914,8 @@ async function gdWalkTo(slot,x,y){const r=runOf(),b=r.battle,m=r.party[slot],pat
  save();DG.busy=0;
  // pick up what's on the tile
  const fl=r.fl,ii=fl.items.findIndex(it=>it.x===m.x&&it.y===m.y);if(ii>=0){const it=fl.items.splice(ii,1)[0];if(it.tickets){r.tickets=(r.tickets||0)+it.tickets;r.cogs=(r.cogs||0)+it.tickets;toast('🎟️ Found '+it.tickets+' Tickets!')}else{r.bag[it.k]=(r.bag[it.k]||0)+1;toast(DITEMS[it.k].icon+' Picked up '+DITEMS[it.k].name+'!')}save()}
- const di=(fl.digs||[]).findIndex(d=>d.x===m.x&&d.y===m.y&&d.done<d.max);if(di>=0&&gdFree(r)){gdDrawBattle();mdDigSpot(fl.digs[di]);return}
+ // dig spots don't start by themselves: standing on one out of battle swaps FIGHT for DIG
+ if(gdDigAt(r,m)&&gdFree(r)){gdDrawBattle();return}
  const si=fl.specials.findIndex(s=>s.x===m.x&&s.y===m.y);if(si>=0){const s=fl.specials.splice(si,1)[0];save();r.rooms=(r.rooms||0)+1;if(s.k==='shop'){gdDrawBattle();mdShopOpen()}else if(s.k==='chest')dgTreasure();else dgRest();return}
  if(!fl.stairsHidden&&m.x===fl.stairs[0]&&m.y===fl.stairs[1]){gdDrawBattle();modal('🪜 STAIRS','<p>'+(fl.boss?'The way out of this part of the dungeon.':'Go down to <b>B'+(r.floor+2)+'F</b>? Your whole team comes along.')+'</p><div class="actions"><button class="btn" onclick="closeModal()">NOT YET</button><button class="btn red" onclick="closeModal();gdStairs()">'+(fl.boss?'CONTINUE':'GO DOWN')+'</button></div>');return}
  gdDrawBattle();if(gdFree(r)&&r.battle.turn===slot&&m.hp>0)gdMoveStart()}
@@ -3977,6 +4045,12 @@ function dgOpen(mode){if(mode)dgMode=mode;if(dgMode==='tower')return dgcOpen();c
 // The floor label, sublayer button and minimap stay solid, but go see-through and let taps pass when a Pokémon is under them
 function gdOverlays(){const f=document.querySelector('.gd-field');if(!f)return;const U=[...f.querySelectorAll('.gd-u')].map(u=>u.getBoundingClientRect()).filter(b=>b.width);
  f.querySelectorAll('.gd-envslot .tw-envbtn,.gd-floor,.gd-mini').forEach(o=>{const a=o.getBoundingClientRect(),hit=U.some(b=>b.right>a.left+2&&b.left<a.right-2&&b.bottom>a.top+2&&b.top<a.bottom-2);o.classList.toggle('gd-under',hit)})}
+
+// ---- dig spots: the unit standing on one (out of battle) gets a DIG button ----
+function gdDigAt(r,m){const fl=r&&r.fl;if(!fl||!m||m.hp<=0)return null;return (fl.digs||[]).find(d=>d.x===m.x&&d.y===m.y&&d.done<d.max)||null}
+function gdDigHere(){const r=runOf();if(!r||!r.battle||DG.busy)return;const m=r.party[r.battle.turn],d=gdDigAt(r,m);if(!d)return;if(!gdFree(r)){toast('⛏ Can’t dig with a foe awake nearby');return}mdDigSpot(d)}
+// Shinier Patches Lv2+: a "?" pops over an ally who steps onto a dig spot
+function gdDigPing(unitEl,x,y){const r=runOf();if(!unitEl||!r||!r.fl||mdLvOf(r,'patches')<2)return;if(!(r.fl.digs||[]).some(d=>d.x===x&&d.y===y&&d.done<d.max))return;const q=document.createElement('div');q.className='gd-digq';q.textContent='?';unitEl.appendChild(q);setTimeout(()=>q.remove(),1300)}
 // ===================== MYSTERY DUNGEON · cave layers =====================
 // The dungeon is dug downward through 8 layers (152 floors). Each layer is split into sublayers: a sublayer lasts 1–3
 // floors, has its own look (floor colours, props, obstacles, wall decorations) and an effect on battles. A short digging
@@ -4371,7 +4445,7 @@ const MDU={
  evasion:{tab:'water',name:'Evasion Drills',ico:'dash',max:10,t:9,d:l=>'Your Pokémon dodge attacks '+mdPct('evasion',l)+'% more often.'},
  footing:{tab:'water',name:'Sure Footing',ico:'paw',max:5,t:6,d:l=>mdPct('footing',l)+'% chance to step over a hazard without getting hurt.'},
  stairrest:{tab:'water',name:'Stairwell Rest',ico:'ladder',max:10,t:6,d:l=>'Going down the stairs heals '+(20+MD_PER.stairrest*100*l)+'% HP instead of 20%.'},
- patches:{tab:'leaf',name:'Shinier Patches',ico:'sparkles',max:5,t:6,d:l=>['Dig spots are faint sparkles that are easy to miss.','Dig spots sparkle more.','Dig spots sparkle much more often.','Dig spots show as little craters.','Dig spots give off a little light, so you can see them from further away.','Dig spots also show on the minimap.'][l]},
+ patches:{tab:'leaf',name:'Shinier Patches',ico:'sparkles',max:5,t:6,d:l=>['Dig spots are faint sparkles that are easy to miss.','Dig spots sparkle brighter.','A “?” pops over an ally’s head for a moment when they step onto a dig spot.','Dig spots sparkle much more often.','Dig spots show as little craters.','Dig spots give off a little light, so you can see them from further away.'][l]},
  deeper:{tab:'leaf',name:'Deeper Digs',ico:'pickaxe',max:3,t:12,d:l=>'Dig spots can be dug at least '+(2+l)+' times (up to 5).'},
  spots:{tab:'leaf',name:'Prospector',ico:'flag',max:5,t:9,d:l=>'+'+l+' dig spot'+(l===1?'':'s')+' on every floor.'},
  lucky:{tab:'leaf',name:'Lucky Finds',ico:'gem',max:10,t:8,d:l=>'Foes drop stones '+mdPct('lucky',l)+'% more often.'},
@@ -4409,7 +4483,7 @@ function mdStonesHTML(r){const s=r.stones||{};return ['fire','water','leaf'].map
 // ---------- dig spots ----------
 function mdPlaceDigs(r,fl,takeIn,rooms){const rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1)),n=rnd(1,2)+mdLvOf(r,'spots'),lo=Math.min(5,2+mdLvOf(r,'deeper'));fl.digs=[];
  for(let k=0;k<n;k++){const o=rooms[rnd(1,Math.max(1,rooms.length-1))]||rooms[0],t=takeIn(o);if(t)fl.digs.push({x:t[0],y:t[1],max:rnd(lo,5),done:0})}}
-function mdDigHTML(r,fl,T,seenAt){const lv=mdLvOf(r,'patches');return (fl.digs||[]).filter(d=>d.done<d.max&&seenAt(d.x,d.y)).map(d=>'<div class="gd-obj md-dig-spot lv'+lv+'" style="left:'+d.x*T+'px;top:'+d.y*T+'px;--d:'+((d.x*7+d.y*3)%10)/10+'s">'+icoHTML('dig_sparkle')+'</div>').join('')}
+function mdDigHTML(r,fl,T,seenAt){const L=mdLvOf(r,'patches'),lv=L<=1?L:L-1;return (fl.digs||[]).filter(d=>d.done<d.max&&seenAt(d.x,d.y)).map(d=>'<div class="gd-obj md-dig-spot lv'+lv+'" style="left:'+d.x*T+'px;top:'+d.y*T+'px;--d:'+((d.x*7+d.y*3)%10)/10+'s">'+icoHTML('dig_sparkle')+'</div>').join('')}
 // which question each dig asks: 1 normal, 2 harder (both multiple choice), 3 typed, 4 typed from your weak spots,
 // 5 typed from the hard ones you miss most
 function mdDigItem(tier){const B=DG.bank,S=db.qstats||{},st=b=>S[b.key]||{r:0,w:0},typ=b=>{try{return !!saPlan(b)}catch(e){return false}},any=a=>a[Math.floor(Math.random()*a.length)];
@@ -4427,10 +4501,10 @@ function mdLootText(L){return [L.tix?'+'+L.tix+' 🎟️':'',L.st.map(t=>MD_TABS
 async function mdDigSpot(sp){const r=runOf();if(!r||!DG||DG.busy)return;if(!gdFree(r)){toast('⛏ Can’t dig with a foe awake nearby');return}DG.busy=1;const tierName=['','A question from your set','A harder one (multiple choice)','Type the answer','Type it: one you’ve struggled with','Type it: a hard one you often miss'];
  let exit=false;$('dgPanel').innerHTML='<div class="dg-msg">⛏ Digging… ('+sp.done+'/'+sp.max+')</div>';
  while(sp.done<sp.max&&!exit){const tier=sp.done+1,it=mdDigItem(tier);let exitRes;const ex=new Promise(res=>exitRes=res);
-  const q=askQ(it,DG.bank,{title:'⛏ DIG '+tier+'/'+sp.max+' · '+tierName[tier].toUpperCase(),typed:tier>=3?undefined:false,typedChance:tier>=3?1:0});
+  const q=askQ(it,DG.bank,{title:'⛏ DIG '+tier+'/'+sp.max+' · '+tierName[tier].toUpperCase(),typed:tier>=3?undefined:false,typedChance:tier>=3?1:0,halfsies:!!r.halfsies});
   if(sp.done>0)setTimeout(()=>{const ov=[...document.querySelectorAll('.mgq')].pop(),card=ov&&ov.querySelector('.mgq-card');if(card&&!card.querySelector('.md-exitdig')){const b=document.createElement('button');b.className='btn md-exitdig';b.textContent='EXIT DIG (keep what you found)';b.onclick=()=>{ov.remove();exitRes('exit')};card.appendChild(b)}},60);
-  const res=await Promise.race([q,ex]);if(res==='exit'){exit=true;break}
-  if(DG&&DG.P)DG.P.report(it,res);if(res!=='full'&&__qMiss)recapAdd(it,__qMiss);if(res==='full')r.qOk=(r.qOk||0)+1;
+  let res=await Promise.race([q,ex]);if(res==='exit'){exit=true;break}const half=res==='half';if(half)res='makeup';
+  if(DG&&DG.P)DG.P.report(it,half?'fail':res);if(res!=='full'&&__qMiss)recapAdd(it,__qMiss);if(res==='full')r.qOk=(r.qOk||0)+1;
   if(res==='fail'){sp.done=sp.max;save();toast('💥 The dig spot caved in! You keep what you found.');break}
   sp.done++;const L=mdDigLoot(tier,res==='makeup');r.tickets=(r.tickets||0)+L.tix;r.cogs=(r.cogs||0)+L.tix;L.st.forEach(t=>mdGive(r,t,1));L.items.forEach(k=>r.bag[k]=(r.bag[k]||0)+1);if(L.soul)r.souls=(r.souls||0)+1;r.digTotal=(r.digTotal||0)+1;save();
   toast('⛏ Dig '+tier+': '+mdLootText(L)+(sp.done<sp.max?' · keep digging for better finds!':' · the spot is dug out.'))}
@@ -4444,7 +4518,7 @@ let mdTab='fire';
 function mdShopOpen(ghost){const r=runOf();if(!ghost&&!mdUpRun())return;document.querySelectorAll('.mds').forEach(x=>x.remove());const ov=document.createElement('div');ov.className='mds'+(ghost?' ghost':'');document.body.appendChild(ov);mdShopDraw(ghost);setTimeout(()=>ov.classList.add('on'),10);mdSay(ghost)}
 function mdShopClose(){const ov=document.querySelector('.mds');if(!ov)return;ov.classList.remove('on');setTimeout(()=>ov.remove(),250);const r=runOf();if(r&&r.fl&&!r.tower&&$('dgStage')){save();gdDrawBattle(true)}}
 function mdSay(ghost,line){const b=document.querySelector('.mds-say');if(!b)return;const L=MD_SAY[ghost?'ghost':'shop'];b.textContent=line||L[Math.floor(Math.random()*L.length)];b.classList.remove('pop');void b.offsetWidth;b.classList.add('pop')}
-function mdShopDraw(ghost){const ov=document.querySelector('.mds');if(!ov)return;const r=runOf(),run=ghost?null:r,souls=db.mdSouls||0;
+function mdShopDraw(ghost){const ov=document.querySelector('.mds');if(!ov)return;const r=runOf(),run=ghost?null:r,souls=mdSouls();
  const cur=ghost?'<span class="mds-cur">'+icoHTML('soul_stone')+'<b>'+souls+'</b></span>':'<span class="mds-cur">'+icoHTML('ticket')+'<b>'+(run.tickets||0)+'</b></span>'+mdStonesHTML(run);
  const stock=ghost?'':'<div class="mds-h">Today’s stock <small>items for this run · paid in Tickets</small></div><div class="mds-stock">'+mdShopStock(run).map((k,i)=>{const sold=(run.mdSold||[]).includes(i),p=mdItemPrice(k);return '<button class="mds-item'+(sold?' sold':'')+'" '+(sold||(run.tickets||0)<p?'disabled':'')+' onclick="mdBuyItem('+i+')">'+icoHTML(ICO_MAP[DITEMS[k].icon.replace(/️/g,'')]||'gift')+'<b>'+esc(DITEMS[k].name)+'</b><small>'+(sold?'SOLD':p+' 🎟️')+'</small></button>'}).join('')+'</div>';
  const tabs='<div class="mds-tabs">'+Object.entries(MD_TABS).map(([k,T])=>'<button class="'+(mdTab===k?'on':'')+'" onclick="mdTab=\''+k+'\';mdShopDraw('+(ghost?1:0)+')">'+icoHTML(T.ico)+'<span>'+T.name+'</span></button>').join('')+'</div>';
@@ -4454,16 +4528,20 @@ function mdShopDraw(ghost){const ov=document.querySelector('.mds');if(!ov)return
   +'<div class="mds-scene"><div class="mds-say"></div><img class="mds-keeper" src="./assets/mdshop/'+(ghost?'ghost':'hatterene')+'.png" alt="Hatterene" onclick="this.classList.remove(\'squish\');void this.offsetWidth;this.classList.add(\'squish\');mdSay('+(ghost?1:0)+')"><div class="mds-counter"></div></div>'
   +'<div class="mds-body">'+(ghost?'<p class="small mds-note">Levels bought here are <b>permanent</b>: every run starts with them. Levels bought from Hatterene during a run stack on top and last only for that run.</p>':'<p class="small mds-note">Upgrades bought here last for <b>this run</b>. Permanent levels come from the Death Deals at the end of a run.</p>')+stock+tabs+cards+'</div>';mdSay(ghost)}
 function mdBuyItem(i){const r=mdUpRun();if(!r)return;const k=mdShopStock(r)[i],p=mdItemPrice(k);if((r.mdSold||[]).includes(i)||(r.tickets||0)<p)return;r.tickets-=p;r.bag[k]=(r.bag[k]||0)+1;(r.mdSold=r.mdSold||[]).push(i);save();mdShopDraw(0);mdSay(0,'A '+DITEMS[k].name+'. Good choice.')}
-function mdCardOpen(id,ghost){const U=MDU[id],r=runOf(),pl=mdPerm(id),lv=ghost?pl:mdLvOf(r,id),n=lv+1,maxed=lv>=U.max,c=mdCost(id,n),sc=mdSoulCost(id,n),souls=db.mdSouls||0,can=!maxed&&(ghost?souls>=sc:(r.stones||{})[U.tab]>=c.stones&&(r.tickets||0)>=c.tix);
+function mdCardOpen(id,ghost){const U=MDU[id],r=runOf(),pl=mdPerm(id),lv=ghost?pl:mdLvOf(r,id),n=lv+1,maxed=lv>=U.max,c=mdCost(id,n),sc=mdSoulCost(id,n),souls=mdSouls(),can=!maxed&&(ghost?souls>=sc:(r.stones||{})[U.tab]>=c.stones&&(r.tickets||0)>=c.tix);
  modal(U.name.toUpperCase(),'<div class="mds-big t-'+U.tab+'"><span class="mds-ic">'+icoHTML(U.ico)+'<i>Lv '+lv+'/'+U.max+'</i></span><div><p><b>Now:</b> '+esc(lv?U.d(lv):'Not learned yet.')+'</p>'+(maxed?'<p><b>Maxed out.</b></p>':'<p><b>Next (Lv '+n+'):</b> '+esc(U.d(n))+'</p>')+(!ghost&&pl?'<p class="small muted">Lv '+pl+' of this is permanent (from Death Deals).</p>':'')+'</div></div>'
   +(maxed?'':'<p class="mds-price">Cost: '+(ghost?icoHTML('soul_stone')+' '+sc+' Soul Stone'+(sc>1?'s':''):icoHTML(MD_TABS[U.tab].ico)+' '+c.stones+' '+MD_TABS[U.tab].name.replace('Offense','Fire').replace('Defense','Water').replace('Utility','Leaf')+' Stone'+(c.stones>1?'s':'')+' + '+icoHTML('ticket')+' '+c.tix+' Tickets')+'</p>')
   +'<div class="actions"><button class="btn" onclick="closeModal()">BACK</button>'+(maxed?'':'<button class="btn red" '+(can?'':'disabled')+' onclick="mdUpgrade(\''+id+'\','+(ghost?1:0)+')">'+(ghost?'MAKE IT PERMANENT':'UPGRADE')+'</button>')+'</div>')}
-function mdUpgrade(id,ghost){const U=MDU[id],r=runOf();if(ghost){const n=mdPerm(id)+1,sc=mdSoulCost(id,n);if(n>U.max||(db.mdSouls||0)<sc)return;db.mdSouls-=sc;db.mdPerm=db.mdPerm||{};db.mdPerm[id]=n;save();closeModal();mdShopDraw(1);mdSay(1,U.name+' is yours now. Forever.');return}
+function mdUpgrade(id,ghost){const U=MDU[id],r=runOf();if(ghost){const n=mdPerm(id)+1,sc=mdSoulCost(id,n);if(n>U.max||mdSouls()<sc)return;mdSoulAdd(-sc);db.mdPerm=db.mdPerm||{};db.mdPerm[id]=n;save();closeModal();mdShopDraw(1);mdSay(1,U.name+' is yours now. Forever.');return}
  if(!r||!mdUpRun())return;const lv=mdLvOf(r,id),n=lv+1,c=mdCost(id,n);if(n>U.max||(r.stones||{})[U.tab]<c.stones||(r.tickets||0)<c.tix)return;r.stones[U.tab]-=c.stones;r.tickets-=c.tix;r.up=r.up||{};r.up[id]=(r.up[id]||0)+1;save();closeModal();mdShopDraw(0);mdSay(0,U.name+' Lv '+n+'. Don’t waste it.')}
 // ---------- end of a run: Soul Stones and the Death Deals ----------
 function mdSoulsFor(r,cleared){const st=r.stones||{},left=(st.fire||0)+(st.water||0)+(st.leaf||0);return Math.max(1,(r.floor||0)+1+3*(r.clearedFloors||0)+Math.floor((r.qOk||0)/4)+Math.floor(left/3)+(r.souls||0)+(cleared?2:0))}
 function mdDeathOpen(){mdTab='fire';mdShopOpen(true)}
 function mdDeathClose(){mdShopClose()}
+// Soul Stones live in the Bag (db.inv.soulstone) and are spent from there
+ITEMS.soulstone={name:'Soul Stone',kind:'soul',tier:3,w:0,desc:'Earned at the end of a Mystery Dungeon run. Spend them at the ghostly Hatterene’s Death Deals on permanent upgrades.'};
+function mdSouls(){if(db.mdSouls){inv().soulstone=(inv().soulstone||0)+db.mdSouls;delete db.mdSouls}return inv().soulstone||0}
+function mdSoulAdd(n){const v=mdSouls()+n;if(v>0)inv().soulstone=v;else delete inv().soulstone;save()}
 // ===================== BATTLE TOWER =====================
 // Battles back to back: no map, rooms or rests. A boss waits every 10th floor. Battles can drop Tickets and battle items
 // into the run bag. Every 5 floors you choose a perk, and every 10 floors the environment changes. Uses the same battle
@@ -4993,6 +5071,29 @@ function mvCurve(from,to,cls,ms,bend,style){const d=fxEl(cls,Object.assign({left
  d.animate([{transform:'translate(-50%,-50%)'},{transform:'translate(calc(-50% + '+(dx*.3+nx)+'px),calc(-50% + '+(dy*.3+ny)+'px))'},{transform:'translate(calc(-50% + '+(dx*.7+nx*.6)+'px),calc(-50% + '+(dy*.7+ny*.6)+'px))'},{transform:'translate(calc(-50% + '+dx+'px),calc(-50% + '+dy+'px))'}],{duration:ms,easing:'ease-in',fill:'forwards'});fxGone(d,ms+40)}
 function mvSparks(at,color,n,spread){for(let k=0;k<n;k++){const a=Math.random()*6.28,r=(spread||34)*(.5+Math.random()*.7);fxFly(at,{x:at.x+Math.cos(a)*r,y:at.y+Math.sin(a)*r},'spark',360+Math.random()*160,{'--c':color},'ease-out')}}
 function mvSlash(at,color,w){fxGone(fxEl('slash',{left:at.x+'px',top:at.y+'px','--c':color||'#fff','--w':(w||70)+'px'}),450)}
+// Bug (weak): a pair of white fanged jaws snap shut over the target, with a pink burst and sparkles behind them
+function mvJawPath(n,len){const P=[],top=x=>12+14*((x-50)/45)**2;for(let x=5;x<=95;x+=5)P.push(x+','+top(x).toFixed(1));const w=90/n;
+ for(let k=n-1;k>=0;k--){const xa=5+k*w,xb=xa+w,xm=(xa+xb)/2,c=1-Math.abs(xm-50)/50,tip=top(xm)+12+len*(.55+.45*c);P.push(xb+','+(top(xb)+12).toFixed(1),xm+','+tip.toFixed(1),xa+','+(top(xa)+12).toFixed(1))}
+ return 'M'+P.join(' L')+' Z'}
+async function mvChomp(T){const W=Math.max(44,T.w*.75),H=W*.95,spikes=Array.from({length:28},(_,k)=>{const a=k/28*6.283,r=k%2?28:48;return (50+Math.cos(a)*r).toFixed(1)+','+(50+Math.sin(a)*r).toFixed(1)}).join(' ');
+ const jaw=(n,len,cls)=>'<svg class="'+cls+'" viewBox="0 0 100 60" preserveAspectRatio="none"><defs><linearGradient id="mvjg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d9f78f"/><stop offset="1" stop-color="#8cc63a"/></linearGradient></defs><path d="'+mvJawPath(n,len)+'" fill="url(#mvjg)" stroke="#4d7a12" stroke-width="2" stroke-linejoin="round"/></svg>';
+ const d=fxEl('chomp',{left:T.x+'px',top:T.y+'px',width:W+'px',height:H+'px'},'<svg class="burst" viewBox="0 0 100 100"><polygon points="'+spikes+'" fill="#5fae1e"/><polygon points="'+spikes+'" fill="#c6ef72" transform="translate(50 50) scale(.55) translate(-50 -50)"/></svg>'+jaw(7,30,'up')+jaw(8,24,'dn'));if(!d){await dgSleep(400);return}
+ const up=d.querySelector('.up'),dn=d.querySelector('.dn'),b=d.querySelector('.burst');
+ up.animate([{transform:'translateY(-62%)',opacity:0},{transform:'translateY(-48%)',opacity:1,offset:.45},{transform:'translateY(-8%)',offset:.62},{transform:'translateY(-12%)',offset:.72},{transform:'translateY(-12%)',opacity:1,offset:.88},{transform:'translateY(-12%)',opacity:0}],{duration:820,easing:'ease-in',fill:'forwards'});
+ dn.animate([{transform:'scaleY(-1) translateY(-62%)',opacity:0},{transform:'scaleY(-1) translateY(-48%)',opacity:1,offset:.45},{transform:'scaleY(-1) translateY(-8%)',offset:.62},{transform:'scaleY(-1) translateY(-12%)',offset:.72},{transform:'scaleY(-1) translateY(-12%)',opacity:1,offset:.88},{transform:'scaleY(-1) translateY(-12%)',opacity:0}],{duration:820,easing:'ease-in',fill:'forwards'});
+ b.animate([{transform:'scale(0) rotate(0)',opacity:0},{transform:'scale(0) rotate(0)',opacity:0,offset:.55},{transform:'scale(1.15) rotate(20deg)',opacity:.95,offset:.68},{transform:'scale(1) rotate(30deg)',opacity:.8,offset:.85},{transform:'scale(1.1) rotate(36deg)',opacity:0}],{duration:820,fill:'forwards'});
+ fxGone(d,860);await dgSleep(510)}
+// Water (strong): steam leaks from under the target's feet, then a geyser erupts and throws them upward (the hit lands on the way up)
+async function mvGeyser(T,tSel){const S=dgSleep,W=Math.max(46,T.w*.8),H=Math.max(120,T.h*2.4);
+ fxGone(fxEl('gpool',{left:T.x+'px',top:(T.b-4)+'px',width:(W*1.3)+'px'}),1900);
+ for(let k=0;k<18;k++){setTimeout(()=>{const x=T.x+(Math.random()-.5)*W*.9,p=fxEl('steam',{left:x+'px',top:(T.b-6)+'px','--sz':(10+Math.random()*12)+'px'});if(!p)return;p.animate([{transform:'translate(-50%,-50%) scale(.4)',opacity:0},{opacity:.75,offset:.25},{transform:'translate(calc(-50% + '+((Math.random()-.5)*16)+'px),calc(-50% - '+(26+Math.random()*24)+'px)) scale(1.4)',opacity:0}],{duration:700,easing:'ease-out',fill:'forwards'});fxGone(p,720)},k*38)}
+ mvShake(tSel,640);await S(720);
+ const g=fxEl('geyser',{left:T.x+'px',top:T.b+'px',width:W+'px',height:H+'px'},'<i></i><i></i><i></i>');
+ if(g){g.animate([{transform:'translate(-50%,-100%) scaleY(0)',opacity:1},{transform:'translate(-50%,-100%) scaleY(1.05)',offset:.22},{transform:'translate(-50%,-100%) scaleY(.95)',offset:.4},{transform:'translate(-50%,-100%) scaleY(1)',opacity:1,offset:.75},{transform:'translate(-50%,-100%) scaleY(.2)',opacity:0}],{duration:1150,easing:'ease-out',fill:'forwards'});fxGone(g,1180)}
+ fxRing({x:T.x,y:T.b-4},'#9fd0ff',500,2.5);
+ mvMove(tSel,[{y:0,rotate:'0deg'},{y:-H*.55,rotate:'-10deg',offset:.4},{y:-H*.6,rotate:'8deg',offset:.55},{y:0,rotate:'0deg'}],1250);
+ for(let k=0;k<14;k++)setTimeout(()=>{const top={x:T.x,y:T.b-H*.9},a=-1.57+(Math.random()-.5)*2.4,r=30+Math.random()*40;fxFly(top,{x:top.x+Math.cos(a)*r,y:top.y+Math.sin(a)*r+40},'spark',520,{'--c':'#a8d4ff'},'ease-out')},120+k*30);
+ await S(420);fxBoom({x:T.x,y:T.y-H*.5},'#5b9dff',62);await S(160)}
 async function moveFx(type,strong,uSel,tSel){try{const U=fxPos(uSel),T=fxPos(tSel),S=dgSleep;if(!U||!T){await S(300);return}const c=TC(type),t=String(type).toLowerCase();
  switch(t+(strong?'+':'')){
  case 'normal':mvRush(uSel,T,.18,520);mvAttackAnim(uSel);await S(200);fxFly(U,T,'orb',260,{'--c':'#f4f1e6'});await S(260);fxBoom(T,'#ffffff',54);break;
@@ -5000,7 +5101,7 @@ async function moveFx(type,strong,uSel,tSel){try{const U=fxPos(uSel),T=fxPos(tSe
  case 'fire':fxFly(U,T,'fireball',330,{},'ease-in');await S(330);fxBoom(T,'#ff8a3c',48);mvSparks(T,'#ffb347',9);break;
  case 'fire+':{const g=fxEl('kanji',{left:U.x+'px',top:(U.y-30)+'px'},'火');await S(420);if(g)g.remove();fxFly({x:U.x,y:U.y-30},T,'kanji fly',360,{},'ease-in');await S(360);fxGone(fxEl('kanji boom',{left:T.x+'px',top:T.y+'px'},'火'),650);fxBoom(T,'#ff7a2c',90);mvShake(tSel);await S(300);break}
  case 'water':fxBeam(U,T,'#5b9dff',520,9);await S(330);mvSparks(T,'#a8d4ff',8,28);break;
- case 'water+':fxGone(fxEl('whirl',{left:T.x+'px',top:(T.b-6)+'px'}),1000);await S(150);mvMove(tSel,[{y:0},{y:26,offset:.45},{y:26,offset:.7},{y:0}],850);await S(850);mvSparks({x:T.x,y:T.b-8},'#a8d4ff',10,40);break;
+ case 'water+':{await mvGeyser(T,tSel);break}
  case 'electric':{const d=fxEl('zap',{},'<svg width="100%" height="100%"><polyline points="'+[0,1,2,3,4,5].map(s=>{const k=s/5;return (U.x+(T.x-U.x)*k+(s&&s<5?(Math.random()-.5)*28:0))+','+(U.y+(T.y-U.y)*k+(s&&s<5?(Math.random()-.5)*28:0))}).join(' ')+'" fill="none" stroke="#fff27a" stroke-width="4" stroke-linejoin="round"/></svg>');fxGone(d,240);await S(240);fxBoom(T,'#f7d02c',56);break}
  case 'electric+':{fxGone(fxEl('cloud',{left:T.x+'px',top:(T.y-62)+'px'}),1000);await S(450);const d=fxEl('zap',{},'<svg width="100%" height="100%"><polyline points="'+T.x+','+(T.y-50)+' '+(T.x-9)+','+(T.y-28)+' '+(T.x+7)+','+(T.y-20)+' '+(T.x-4)+','+T.y+'" fill="none" stroke="#fff6a0" stroke-width="6" stroke-linejoin="round"/></svg>');fxGone(d,260);fxOver('flash',260);fxBoom(T,'#f7d02c',84);mvShake(tSel);await S(420);break}
  case 'grass':for(let k=0;k<8;k++)setTimeout(()=>fxFly({x:U.x+(Math.random()-.5)*20,y:U.y+(Math.random()-.5)*20},{x:T.x+(Math.random()-.5)*36,y:T.y+(Math.random()-.5)*30},'leaf',380,{transform:'rotate('+(Math.random()*360)+'deg)'},'ease-out'),k*40);await S(700);fxBoom(T,'#7ac74c',44);break;
@@ -5017,7 +5118,7 @@ async function moveFx(type,strong,uSel,tSel){try{const U=fxPos(uSel),T=fxPos(tSe
  case 'flying+':fxGone(fxEl('twister',{left:T.x+'px',top:T.b+'px'}),1150);mvMove(tSel,[{y:0,rotate:'0deg'},{y:-40,rotate:'360deg',offset:.6},{y:-40,rotate:'540deg',offset:.75},{y:0,rotate:'720deg'}],1100);await S(1100);fxBoom({x:T.x,y:T.b-6},'#a98ff3',76);fxShake();await S(200);break;
  case 'psychic':for(let k=0;k<3;k++)setTimeout(()=>fxRing(T,'#f95587',520,2.4),k*140);mvShake(tSel,700);await S(800);break;
  case 'psychic+':fxGone(fxEl('eye',{left:T.x+'px',top:(T.y-64)+'px'}),900);await S(650);fxGone(fxEl('star4',{left:T.x+'px',top:T.y+'px'}),600);fxBoom(T,'#c06bff',90);mvShake(tSel);await S(380);break;
- case 'bug':fxFly(U,T,'needle',240,{transform:'rotate('+(Math.atan2(T.y-U.y,T.x-U.x)*57.3)+'deg)'},'linear');await S(240);fxBoom(T,'#a6b91a',46);break;
+ case 'bug':{mvRush(uSel,T,.55,760,.12);mvAttackAnim(uSel);await S(120);await mvChomp(T);fxBoom(T,'#8fd13a',40);mvSparks(T,'#e6f77a',7,30);mvShake(tSel,380);await S(260);break}
  case 'bug+':{const dx=U.x-T.x,dy=U.y-T.y,L=Math.hypot(dx,dy)||1,ux=dx/L,uy=dy/L,ang=Math.atan2(-uy,-ux)*57.3,st={x:T.x+ux*(T.h*.5+34),y:T.y+uy*(T.h*.5+34)};
   const h=fxEl('horn2',{left:st.x+'px',top:st.y+'px',transform:'translate(-50%,-50%) rotate('+ang+'deg)'});if(h){h.animate([{translate:'0 0',opacity:0},{translate:(ux*14)+'px '+(uy*14)+'px',opacity:1,offset:.4},{translate:(-ux*(T.h*.5+30))+'px '+(-uy*(T.h*.5+30))+'px',opacity:1}],{duration:700,easing:'cubic-bezier(.6,0,.9,.6)',fill:'forwards'});fxGone(h,760)}
   await S(700);for(let k=0;k<14;k++){const a=Math.atan2(uy,ux)+(Math.random()-.5)*1.3,r=30+Math.random()*40;fxFly(T,{x:T.x+Math.cos(a)*r,y:T.y+Math.sin(a)*r},'spark',380,{'--c':k%2?'#e4f08a':'#a6b91a'},'ease-out')}
@@ -5136,10 +5237,11 @@ let safariRevealId=null,safariRevealUntil=0;
 const RARE_COSTUMES={Ralts:{id:'battle_machine',name:'Battle Machine',num:'0280',sheets:true},Gardevoir:{id:'battle_machine',name:'Battle Machine',num:'0282',sheets:true},
  Charcadet:{id:'sage',name:'Sage',num:'0935',sheets:true},Armarouge:{id:'sage',name:'Sage',num:'0936',sheets:true},Ceruledge:{id:'sage',name:'Sage',num:'0937',sheets:true},
  Snorunt:{id:'miku',name:'Miku',num:'0361',sheets:true},Froslass:{id:'miku',name:'Miku',num:'0478',sheets:true},
- Hatenna:{id:'kaboom',name:'Kaboom',num:'0856',sheets:true},Hattrem:{id:'kaboom',name:'Kaboom',num:'0857',sheets:true},Hatterene:{id:'kaboom',name:'Kaboom',num:'0858',sheets:true}};
+ Hatenna:{id:'kaboom',name:'Kaboom',num:'0856',sheets:true},Hattrem:{id:'kaboom',name:'Kaboom',num:'0857',sheets:true},Hatterene:{id:'kaboom',name:'Kaboom',num:'0858',sheets:true},
+ Braixen:{id:'navigator',name:'Navigator',num:'0654',sheets:true,noShiny:true},Delphox:{id:'navigator',name:'Navigator',num:'0655',sheets:true,noShiny:true}};
 let rareManifest=null;
-function rareDir(r,p){return './assets/costume/rare/'+r.id+'/'+r.num+'/'+(p&&p.shiny?'shiny':'normal')+'/'}
-async function loadRareAnims(r){if(!rareManifest)rareManifest=fetch('./assets/costume/rare/manifest.json').then(x=>x.json());const all=await rareManifest,a=all[r.id+'|'+r.num+'|'+r.variant];if(!a)throw new Error('costume sheets missing');return a}
+function rareDir(r,p){return './assets/costume/rare/'+r.id+'/'+r.num+'/'+(p&&p.shiny&&!r.noShiny?'shiny':'normal')+'/'}
+async function loadRareAnims(r){if(!rareManifest)rareManifest=fetch('./assets/costume/rare/manifest.json').then(x=>x.json());const all=await rareManifest,a=all[r.id+'|'+r.num+'|'+r.variant]||all[r.id+'|'+r.num+'|normal'];if(!a)throw new Error('costume sheets missing');return a}
 function rareCostume(p){const r=p&&p.costume&&RARE_COSTUMES[p.species];return r&&r.id===p.costume?r:null}
 function costumeName(p){const r=rareCostume(p);return r?r.name:p&&p.costume&&COSTUMES.hats[p.costume]?COSTUMES.hats[p.costume].name:''}
 // Box: each Pokémon is shown by its animated southwest-facing (row 7) idle sprite instead of a portrait,
@@ -5243,7 +5345,7 @@ $('navHome').style.display='none';
  if(pcStorageReady)ensureMoveData();
  if(pcStorageReady&&permRoll())save();
  render();scheduleNotifs();aiCheck();window.__pcBooted=true;setTimeout(()=>{try{mdSync()}catch(e){}},1500);setTimeout(()=>{try{facTick()}catch(e){}},2500);setInterval(()=>{try{facTick();if(currentPage==='home'&&hab.scene&&hab.scene!=='home')drawHabitat()}catch(e){}},60000);
- window.__pcVersion='0.61.2';
+ window.__pcVersion='0.62.5';
  document.addEventListener('pointerdown',function(e){try{var t=e.target.closest&&e.target.closest('[onclick],button,a,[id]');if(!t)return;var oc=t.getAttribute('onclick');window.__pcLastTap=(oc?oc.slice(0,60):(t.id?'#'+t.id:t.tagName.toLowerCase()+'.'+String(t.className).split(' ')[0])).replace(/\s+/g,' ')}catch(_){}} ,true);
  Object.keys(window).forEach(function(k){var f=window[k];if(typeof f!=='function'||/^[A-Z]/.test(k)||k==='appError'||k==='$'||k==='esc'||/\[native code\]/.test(Function.prototype.toString.call(f)))return;
   var w=function(){try{return f.apply(this,arguments)}catch(err){if(err&&typeof err==='object'&&!err.__pcLogged){try{err.__pcLogged=1}catch(_){}appError(err,k)}throw err}};try{window[k]=w}catch(_){}});

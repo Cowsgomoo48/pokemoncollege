@@ -8,7 +8,7 @@ const UX={files:['notes.txt','report.txt','log.txt','data.csv','todo.md','server
 const uxC=s=>'`'+s+'`';
 function prCmd(id,name,kw,make){prDef(id,'Unix / command line',name,kw,make);PR[id].cmd=true}
 // one command question: answer, three wrong commands, a short explanation, other accepted forms
-function uxQ(q,a,wrong,why,alts){const p=prMC(q,uxC(a),wrong.map(uxC),k=>uxC(a+' '+'?'.repeat(k+1)),why,[['Which command does this job? Then which option, and what comes last (the file or folder)?',why],['Put it together: command, options, then the target.','Answer: '+uxC(a)]]);p.alts=alts||[];return p}
+function uxQ(q,a,wrong,why,alts){q='What command would you type to '+q.charAt(0).toLowerCase()+q.slice(1).replace(/[.?]\s*$/,'')+'?';const p=prMC(q,uxC(a),wrong.map(uxC),k=>uxC(a+' '+'?'.repeat(k+1)),why,[['Which command does this job? Then which option, and what comes last (the file or folder)?',why],['Put it together: command, options, then the target.','Answer: '+uxC(a)]]);p.alts=alts||[];return p}
 // typed commands: same text after tidying spaces and quotes (iPhone smart quotes and dashes too)
 function uxNorm(s){return String(s==null?'':s).replace(/`/g,'').replace(/[“”„]/g,'"').replace(/[‘’']/g,'"').replace(/[—–]/g,'--').trim().replace(/\s+/g,' ').replace(/ ?\| ?/g,' | ').replace(/"([^"\s|*?^$\[\]\\{}()&#;<>!]+)"/g,'$1')}
 function cmdMatch(user,answers){const u=uxNorm(user);return !!u&&answers.some(a=>uxNorm(a)===u)}
@@ -95,12 +95,12 @@ prCmd('unix_pipe','Pipes: grep, sort, uniq and wc together',/\|\s*(sort|uniq|wc)
  const w=prPick(UX.words),f=prPick(UX.files);
  if(Math.random()<.2){const p=prMC('Why does '+uxC('sort')+' usually come before '+uxC('uniq')+' in a pipe?','uniq only removes duplicates that are next to each other',['uniq only works on numbers','sort removes the duplicates by itself','uniq has to read a file, not a pipe'],j=>'uniq needs option -'+'abcdefgh'[j],'`uniq` only catches repeated lines sitting next to each other, so `sort` puts the copies together first.',[['What does uniq look at when it decides a line is a duplicate?','Only the line right before it.'],['So what has to happen to the copies first?','Sort them so they sit together.']]);p.alts=[];return p}
  const T=prPick([
-  ['How many lines of '+f+' contain “'+w+'”? Use a pipe.','grep "'+w+'" '+f+' | wc -l',['grep "'+w+'" | wc -l '+f,'wc -l '+f+' | grep "'+w+'"','grep -v "'+w+'" '+f+' | wc -l'],'Pipes run left to right: grep keeps the matching lines, then `wc -l` counts them.',['grep -c "'+w+'" '+f]],
+  ['count how many lines of '+f+' contain “'+w+'”, using a pipe.','grep "'+w+'" '+f+' | wc -l',['grep "'+w+'" | wc -l '+f,'wc -l '+f+' | grep "'+w+'"','grep -v "'+w+'" '+f+' | wc -l'],'Pipes run left to right: grep keeps the matching lines, then `wc -l` counts them.',['grep -c "'+w+'" '+f]],
   ['Count the lines of '+f+' that don’t contain “'+w+'”.','grep -v "'+w+'" '+f+' | wc -l',['grep "'+w+'" '+f+' | wc -l','grep -v "'+w+'" '+f+' | wc -c','wc -l '+f+' | grep -v "'+w+'"'],'`grep -v` keeps the non-matching lines, then `wc -l` counts them.',['grep -vc "'+w+'" '+f,'grep -cv "'+w+'" '+f,'grep -c -v "'+w+'" '+f,'grep -v -c "'+w+'" '+f]],
   ['Show the lines of '+f+' sorted, with duplicate lines removed.','sort '+f+' | uniq',['uniq '+f+' | sort','sort '+f+' | uniq -u','uniq '+f],'Sort first so copies sit together, then `uniq` drops the repeats.',['sort -u '+f]],
-  ['How many different lines does '+f+' have?','sort '+f+' | uniq | wc -l',['uniq '+f+' | wc -l','sort '+f+' | wc -l','sort '+f+' | uniq -u | wc -l'],'Sort, remove repeats with `uniq`, then count with `wc -l`.',['sort -u '+f+' | wc -l']],
+  ['count how many different lines '+f+' has.','sort '+f+' | uniq | wc -l',['uniq '+f+' | wc -l','sort '+f+' | wc -l','sort '+f+' | uniq -u | wc -l'],'Sort, remove repeats with `uniq`, then count with `wc -l`.',['sort -u '+f+' | wc -l']],
   ['Show only the lines that appear exactly once in '+f+'.','sort '+f+' | uniq -u',['uniq -u '+f,'sort -u '+f,'sort '+f+' | uniq'],'`uniq -u` keeps lines with no copies, but only if the input is sorted first.'],
-  ['How many lines containing “'+w+'” appear only once in '+f+'?','grep "'+w+'" '+f+' | sort | uniq -u | wc -l',['grep "'+w+'" '+f+' | uniq -u | wc -l','grep "'+w+'" '+f+' | sort | uniq | wc -l','sort '+f+' | uniq -u | grep "'+w+'"'],'Filter with grep, sort so copies sit together, keep the single ones with `uniq -u`, then count.']]);
+  ['count how many lines containing “'+w+'” appear only once in '+f+'.','grep "'+w+'" '+f+' | sort | uniq -u | wc -l',['grep "'+w+'" '+f+' | uniq -u | wc -l','grep "'+w+'" '+f+' | sort | uniq | wc -l','sort '+f+' | uniq -u | grep "'+w+'"'],'Filter with grep, sort so copies sit together, keep the single ones with `uniq -u`, then count.']]);
  return uxQ(T[0],T[1],T[2],T[3],T[4])});
 
 prCmd('unix_regex','Reading regex patterns (. .* ^ $ [0-9])',/regex|\.\*|"\^|\$"|\[0-9\]/i,()=>{
@@ -168,3 +168,15 @@ prCmd('unix_paths','Paths and awkward file names (relative, absolute, quoting)',
   [uxNeedsQ(name)||name.startsWith('-')?'Look at the file name: does anything in it mean something special to the shell?':'Which command does the job, and does it need anything after the path?',why],
   ['Put the command and the path together.','Answer: '+uxC(a)+(absForms.length?' (or '+uxC(wrap(absForms[0])[0])+')':'')]]);
  p.alts=all;return p});
+// ---------- command-style flashcard terms ----------
+// In sets with command-line problems, only terms that are actual commands or options (like "ls -l" or "-type f") are
+// asked, as "Which command…?" questions. Vague summary terms ("text presentation") are skipped.
+const UX_CMDRX=/^(sudo\s+|\.\/)?(cd|ls|pwd|cat|less|more|head|tail|wc|fold|chmod|chown|find|grep|sort|uniq|cp|mv|rm|rmdir|mkdir|touch|echo|man|whoami|sudo|apt|exec)\b|^-{1,2}[a-z]|^[*?~>|]|^\$\(|^>>/i;
+function uxIsCmd(t){return UX_CMDRX.test(String(t||'').trim().replace(/^`|`$/g,''))}
+const UX_FILL=['ls -a','wc -l','chmod +x file','grep -v "word" file','sort file | uniq','find . -type d','cd ..','cat file'];
+function uxTermQ(item,bank,variant){const others=bank.filter(b=>b!==item&&b.kind==='term'&&b.cmd),c=t=>uxC(String(t).replace(/^`|`$/g,'')),pk=shuffle(others).slice(0,3),def=String(item.back).replace(/[.\s]+$/,'');
+ if(variant===0){const opts=pk.map(b=>c(b.front));for(const f of shuffle(UX_FILL)){if(opts.length>=3)break;if(f!==item.front&&!opts.includes(uxC(f)))opts.push(uxC(f))}
+  return {prompt:'Which command or option does this: '+def.charAt(0).toLowerCase()+def.slice(1)+'?',sub:'Pick the command.',options:shuffle([{t:c(item.front),ok:true},...opts.map(t=>({t,ok:false}))]),explain:c(item.front)+': '+item.back}}
+ return {prompt:'What does '+c(item.front)+' do?',sub:'Pick what it does.',options:shuffle([{t:item.back,ok:true},...pk.map(b=>({t:b.back,ok:false}))]),explain:c(item.front)+': '+item.back}}
+// "grep – grep "PATTERN" FILE" (a formula line) → grep "PATTERN" FILE; "wildcard – "*"" → *
+function uxTermClean(t){t=String(t||'').trim();const m=t.match(/^[\w ]+\s[–—-]\s+(.+)$/);if(m)t=m[1].trim();if(/^"[^"\s]+"$/.test(t))t=t.slice(1,-1);return t}

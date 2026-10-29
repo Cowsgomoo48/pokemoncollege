@@ -17,6 +17,29 @@ function mvCurve(from,to,cls,ms,bend,style){const d=fxEl(cls,Object.assign({left
  d.animate([{transform:'translate(-50%,-50%)'},{transform:'translate(calc(-50% + '+(dx*.3+nx)+'px),calc(-50% + '+(dy*.3+ny)+'px))'},{transform:'translate(calc(-50% + '+(dx*.7+nx*.6)+'px),calc(-50% + '+(dy*.7+ny*.6)+'px))'},{transform:'translate(calc(-50% + '+dx+'px),calc(-50% + '+dy+'px))'}],{duration:ms,easing:'ease-in',fill:'forwards'});fxGone(d,ms+40)}
 function mvSparks(at,color,n,spread){for(let k=0;k<n;k++){const a=Math.random()*6.28,r=(spread||34)*(.5+Math.random()*.7);fxFly(at,{x:at.x+Math.cos(a)*r,y:at.y+Math.sin(a)*r},'spark',360+Math.random()*160,{'--c':color},'ease-out')}}
 function mvSlash(at,color,w){fxGone(fxEl('slash',{left:at.x+'px',top:at.y+'px','--c':color||'#fff','--w':(w||70)+'px'}),450)}
+// Bug (weak): a pair of white fanged jaws snap shut over the target, with a pink burst and sparkles behind them
+function mvJawPath(n,len){const P=[],top=x=>12+14*((x-50)/45)**2;for(let x=5;x<=95;x+=5)P.push(x+','+top(x).toFixed(1));const w=90/n;
+ for(let k=n-1;k>=0;k--){const xa=5+k*w,xb=xa+w,xm=(xa+xb)/2,c=1-Math.abs(xm-50)/50,tip=top(xm)+12+len*(.55+.45*c);P.push(xb+','+(top(xb)+12).toFixed(1),xm+','+tip.toFixed(1),xa+','+(top(xa)+12).toFixed(1))}
+ return 'M'+P.join(' L')+' Z'}
+async function mvChomp(T){const W=Math.max(44,T.w*.75),H=W*.95,spikes=Array.from({length:28},(_,k)=>{const a=k/28*6.283,r=k%2?28:48;return (50+Math.cos(a)*r).toFixed(1)+','+(50+Math.sin(a)*r).toFixed(1)}).join(' ');
+ const jaw=(n,len,cls)=>'<svg class="'+cls+'" viewBox="0 0 100 60" preserveAspectRatio="none"><defs><linearGradient id="mvjg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d9f78f"/><stop offset="1" stop-color="#8cc63a"/></linearGradient></defs><path d="'+mvJawPath(n,len)+'" fill="url(#mvjg)" stroke="#4d7a12" stroke-width="2" stroke-linejoin="round"/></svg>';
+ const d=fxEl('chomp',{left:T.x+'px',top:T.y+'px',width:W+'px',height:H+'px'},'<svg class="burst" viewBox="0 0 100 100"><polygon points="'+spikes+'" fill="#5fae1e"/><polygon points="'+spikes+'" fill="#c6ef72" transform="translate(50 50) scale(.55) translate(-50 -50)"/></svg>'+jaw(7,30,'up')+jaw(8,24,'dn'));if(!d){await dgSleep(400);return}
+ const up=d.querySelector('.up'),dn=d.querySelector('.dn'),b=d.querySelector('.burst');
+ up.animate([{transform:'translateY(-62%)',opacity:0},{transform:'translateY(-48%)',opacity:1,offset:.45},{transform:'translateY(-8%)',offset:.62},{transform:'translateY(-12%)',offset:.72},{transform:'translateY(-12%)',opacity:1,offset:.88},{transform:'translateY(-12%)',opacity:0}],{duration:820,easing:'ease-in',fill:'forwards'});
+ dn.animate([{transform:'scaleY(-1) translateY(-62%)',opacity:0},{transform:'scaleY(-1) translateY(-48%)',opacity:1,offset:.45},{transform:'scaleY(-1) translateY(-8%)',offset:.62},{transform:'scaleY(-1) translateY(-12%)',offset:.72},{transform:'scaleY(-1) translateY(-12%)',opacity:1,offset:.88},{transform:'scaleY(-1) translateY(-12%)',opacity:0}],{duration:820,easing:'ease-in',fill:'forwards'});
+ b.animate([{transform:'scale(0) rotate(0)',opacity:0},{transform:'scale(0) rotate(0)',opacity:0,offset:.55},{transform:'scale(1.15) rotate(20deg)',opacity:.95,offset:.68},{transform:'scale(1) rotate(30deg)',opacity:.8,offset:.85},{transform:'scale(1.1) rotate(36deg)',opacity:0}],{duration:820,fill:'forwards'});
+ fxGone(d,860);await dgSleep(510)}
+// Water (strong): steam leaks from under the target's feet, then a geyser erupts and throws them upward (the hit lands on the way up)
+async function mvGeyser(T,tSel){const S=dgSleep,W=Math.max(46,T.w*.8),H=Math.max(120,T.h*2.4);
+ fxGone(fxEl('gpool',{left:T.x+'px',top:(T.b-4)+'px',width:(W*1.3)+'px'}),1900);
+ for(let k=0;k<18;k++){setTimeout(()=>{const x=T.x+(Math.random()-.5)*W*.9,p=fxEl('steam',{left:x+'px',top:(T.b-6)+'px','--sz':(10+Math.random()*12)+'px'});if(!p)return;p.animate([{transform:'translate(-50%,-50%) scale(.4)',opacity:0},{opacity:.75,offset:.25},{transform:'translate(calc(-50% + '+((Math.random()-.5)*16)+'px),calc(-50% - '+(26+Math.random()*24)+'px)) scale(1.4)',opacity:0}],{duration:700,easing:'ease-out',fill:'forwards'});fxGone(p,720)},k*38)}
+ mvShake(tSel,640);await S(720);
+ const g=fxEl('geyser',{left:T.x+'px',top:T.b+'px',width:W+'px',height:H+'px'},'<i></i><i></i><i></i>');
+ if(g){g.animate([{transform:'translate(-50%,-100%) scaleY(0)',opacity:1},{transform:'translate(-50%,-100%) scaleY(1.05)',offset:.22},{transform:'translate(-50%,-100%) scaleY(.95)',offset:.4},{transform:'translate(-50%,-100%) scaleY(1)',opacity:1,offset:.75},{transform:'translate(-50%,-100%) scaleY(.2)',opacity:0}],{duration:1150,easing:'ease-out',fill:'forwards'});fxGone(g,1180)}
+ fxRing({x:T.x,y:T.b-4},'#9fd0ff',500,2.5);
+ mvMove(tSel,[{y:0,rotate:'0deg'},{y:-H*.55,rotate:'-10deg',offset:.4},{y:-H*.6,rotate:'8deg',offset:.55},{y:0,rotate:'0deg'}],1250);
+ for(let k=0;k<14;k++)setTimeout(()=>{const top={x:T.x,y:T.b-H*.9},a=-1.57+(Math.random()-.5)*2.4,r=30+Math.random()*40;fxFly(top,{x:top.x+Math.cos(a)*r,y:top.y+Math.sin(a)*r+40},'spark',520,{'--c':'#a8d4ff'},'ease-out')},120+k*30);
+ await S(420);fxBoom({x:T.x,y:T.y-H*.5},'#5b9dff',62);await S(160)}
 async function moveFx(type,strong,uSel,tSel){try{const U=fxPos(uSel),T=fxPos(tSel),S=dgSleep;if(!U||!T){await S(300);return}const c=TC(type),t=String(type).toLowerCase();
  switch(t+(strong?'+':'')){
  case 'normal':mvRush(uSel,T,.18,520);mvAttackAnim(uSel);await S(200);fxFly(U,T,'orb',260,{'--c':'#f4f1e6'});await S(260);fxBoom(T,'#ffffff',54);break;
@@ -24,7 +47,7 @@ async function moveFx(type,strong,uSel,tSel){try{const U=fxPos(uSel),T=fxPos(tSe
  case 'fire':fxFly(U,T,'fireball',330,{},'ease-in');await S(330);fxBoom(T,'#ff8a3c',48);mvSparks(T,'#ffb347',9);break;
  case 'fire+':{const g=fxEl('kanji',{left:U.x+'px',top:(U.y-30)+'px'},'火');await S(420);if(g)g.remove();fxFly({x:U.x,y:U.y-30},T,'kanji fly',360,{},'ease-in');await S(360);fxGone(fxEl('kanji boom',{left:T.x+'px',top:T.y+'px'},'火'),650);fxBoom(T,'#ff7a2c',90);mvShake(tSel);await S(300);break}
  case 'water':fxBeam(U,T,'#5b9dff',520,9);await S(330);mvSparks(T,'#a8d4ff',8,28);break;
- case 'water+':fxGone(fxEl('whirl',{left:T.x+'px',top:(T.b-6)+'px'}),1000);await S(150);mvMove(tSel,[{y:0},{y:26,offset:.45},{y:26,offset:.7},{y:0}],850);await S(850);mvSparks({x:T.x,y:T.b-8},'#a8d4ff',10,40);break;
+ case 'water+':{await mvGeyser(T,tSel);break}
  case 'electric':{const d=fxEl('zap',{},'<svg width="100%" height="100%"><polyline points="'+[0,1,2,3,4,5].map(s=>{const k=s/5;return (U.x+(T.x-U.x)*k+(s&&s<5?(Math.random()-.5)*28:0))+','+(U.y+(T.y-U.y)*k+(s&&s<5?(Math.random()-.5)*28:0))}).join(' ')+'" fill="none" stroke="#fff27a" stroke-width="4" stroke-linejoin="round"/></svg>');fxGone(d,240);await S(240);fxBoom(T,'#f7d02c',56);break}
  case 'electric+':{fxGone(fxEl('cloud',{left:T.x+'px',top:(T.y-62)+'px'}),1000);await S(450);const d=fxEl('zap',{},'<svg width="100%" height="100%"><polyline points="'+T.x+','+(T.y-50)+' '+(T.x-9)+','+(T.y-28)+' '+(T.x+7)+','+(T.y-20)+' '+(T.x-4)+','+T.y+'" fill="none" stroke="#fff6a0" stroke-width="6" stroke-linejoin="round"/></svg>');fxGone(d,260);fxOver('flash',260);fxBoom(T,'#f7d02c',84);mvShake(tSel);await S(420);break}
  case 'grass':for(let k=0;k<8;k++)setTimeout(()=>fxFly({x:U.x+(Math.random()-.5)*20,y:U.y+(Math.random()-.5)*20},{x:T.x+(Math.random()-.5)*36,y:T.y+(Math.random()-.5)*30},'leaf',380,{transform:'rotate('+(Math.random()*360)+'deg)'},'ease-out'),k*40);await S(700);fxBoom(T,'#7ac74c',44);break;
@@ -41,7 +64,7 @@ async function moveFx(type,strong,uSel,tSel){try{const U=fxPos(uSel),T=fxPos(tSe
  case 'flying+':fxGone(fxEl('twister',{left:T.x+'px',top:T.b+'px'}),1150);mvMove(tSel,[{y:0,rotate:'0deg'},{y:-40,rotate:'360deg',offset:.6},{y:-40,rotate:'540deg',offset:.75},{y:0,rotate:'720deg'}],1100);await S(1100);fxBoom({x:T.x,y:T.b-6},'#a98ff3',76);fxShake();await S(200);break;
  case 'psychic':for(let k=0;k<3;k++)setTimeout(()=>fxRing(T,'#f95587',520,2.4),k*140);mvShake(tSel,700);await S(800);break;
  case 'psychic+':fxGone(fxEl('eye',{left:T.x+'px',top:(T.y-64)+'px'}),900);await S(650);fxGone(fxEl('star4',{left:T.x+'px',top:T.y+'px'}),600);fxBoom(T,'#c06bff',90);mvShake(tSel);await S(380);break;
- case 'bug':fxFly(U,T,'needle',240,{transform:'rotate('+(Math.atan2(T.y-U.y,T.x-U.x)*57.3)+'deg)'},'linear');await S(240);fxBoom(T,'#a6b91a',46);break;
+ case 'bug':{mvRush(uSel,T,.55,760,.12);mvAttackAnim(uSel);await S(120);await mvChomp(T);fxBoom(T,'#8fd13a',40);mvSparks(T,'#e6f77a',7,30);mvShake(tSel,380);await S(260);break}
  case 'bug+':{const dx=U.x-T.x,dy=U.y-T.y,L=Math.hypot(dx,dy)||1,ux=dx/L,uy=dy/L,ang=Math.atan2(-uy,-ux)*57.3,st={x:T.x+ux*(T.h*.5+34),y:T.y+uy*(T.h*.5+34)};
   const h=fxEl('horn2',{left:st.x+'px',top:st.y+'px',transform:'translate(-50%,-50%) rotate('+ang+'deg)'});if(h){h.animate([{translate:'0 0',opacity:0},{translate:(ux*14)+'px '+(uy*14)+'px',opacity:1,offset:.4},{translate:(-ux*(T.h*.5+30))+'px '+(-uy*(T.h*.5+30))+'px',opacity:1}],{duration:700,easing:'cubic-bezier(.6,0,.9,.6)',fill:'forwards'});fxGone(h,760)}
   await S(700);for(let k=0;k<14;k++){const a=Math.atan2(uy,ux)+(Math.random()-.5)*1.3,r=30+Math.random()*40;fxFly(T,{x:T.x+Math.cos(a)*r,y:T.y+Math.sin(a)*r},'spark',380,{'--c':k%2?'#e4f08a':'#a6b91a'},'ease-out')}
