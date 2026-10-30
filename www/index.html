@@ -5548,7 +5548,7 @@ $('navHome').style.display='none';
  if(pcStorageReady)ensureMoveData();
  if(pcStorageReady&&permRoll())save();
  render();scheduleNotifs();aiCheck();window.__pcBooted=true;setTimeout(()=>{try{mdSync()}catch(e){}},1500);setTimeout(()=>{try{facTick()}catch(e){}},2500);setInterval(()=>{try{facTick();if(currentPage==='home'&&hab.scene&&hab.scene!=='home')drawHabitat()}catch(e){}},60000);
- window.__pcVersion='0.63.7';
+ window.__pcVersion='0.63.8';
  document.addEventListener('pointerdown',function(e){try{var t=e.target.closest&&e.target.closest('[onclick],button,a,[id]');if(!t)return;var oc=t.getAttribute('onclick');window.__pcLastTap=(oc?oc.slice(0,60):(t.id?'#'+t.id:t.tagName.toLowerCase()+'.'+String(t.className).split(' ')[0])).replace(/\s+/g,' ')}catch(_){}} ,true);
  Object.keys(window).forEach(function(k){var f=window[k];if(typeof f!=='function'||/^[A-Z]/.test(k)||k==='appError'||k==='$'||k==='esc'||/\[native code\]/.test(Function.prototype.toString.call(f)))return;
   var w=function(){try{return f.apply(this,arguments)}catch(err){if(err&&typeof err==='object'&&!err.__pcLogged){try{err.__pcLogged=1}catch(_){}appError(err,k)}throw err}};try{window[k]=w}catch(_){}});
@@ -5565,7 +5565,10 @@ $('navHome').style.display='none';
 // Oceanic Crust guardian. All combat/telegraph state is plain data in the saved run.
 const OC_CONFIG={easy:{hp:100,mult:1.2,rain:[5,10],balloons:[2,3]},balanced:{hp:125,mult:1.45,rain:[8,14],balloons:[3,4]},hard:{hp:145,mult:1.65,rain:[10,18],balloons:[4,5]}};
 function ocRand(a,b){return a+Math.floor(Math.random()*(b-a+1))}
-function ocBoss(r){return r&&r.fl&&r.fl.oc==='arena'&&r.battle.enemies.find(e=>e.ocBoss&&!e.done)}
+// Boss non-HP stats use the same /10 scale as owned Pokémon (100 base -> 10).
+// Upgrade saved arena opponents in place; keep HP, phase, telegraphs and turn progress.
+function ocBalanceStats(r,e){if(!e||e.ocStatVersion===2)return e;const C=OC_CONFIG[r.diff]||OC_CONFIG.easy,s=Math.round(10*C.mult);for(const k of ['atk','def','spa','spd','spe'])e[k]=s;e.ocStatVersion=2;return e}
+function ocBoss(r){const e=r&&r.fl&&r.fl.oc==='arena'&&r.battle&&r.battle.enemies.find(e=>e.ocBoss&&!e.done);return e?ocBalanceStats(r,e):e}
 function ocAlive(r){return !!(r&&r===runOf()&&DG)}
 function ocTiles(fl){const out=[];for(let y=0;y<fl.h;y++)for(let x=0;x<fl.w;x++)if(gdTile(fl,x,y))out.push([x,y]);return out}
 function ocAttach(r){const fl=r.fl;if(fl.oc)return;const off=18,W=fl.w,oldH=fl.h,cx=W>>1,oldRoom=fl.rooms.find(o=>gdInRect({x:fl.stairs[0],y:fl.stairs[1]},o));
@@ -5584,7 +5587,7 @@ function ocTouchDoor(r,m){const fl=r.fl;if(fl.oc!=='approach'||!fl.ocDoor||m.x!=
 function ocDoorNo(){closeModal();const r=runOf();if(!r||r.fl.oc!=='approach')return;const [x,y]=r.fl.ocDoor;const lead=r.party[r.battle.turn];lead.x=x;lead.y=y+1;const spots=[[x,y+1],[x-1,y+1],[x+1,y+1],[x,y+2]];r.party.filter(m=>m!==lead).forEach((m,i)=>{m.x=spots[i+1][0];m.y=spots[i+1][1]});save();gdDrawBattle();gdCamera()}
 function ocArena(r){const W=21,tiles=Array.from({length:W},(_,y)=>Array.from({length:W},(_,x)=>Math.hypot(x-10,y-10)<=9.5?'1':'0').join(''));
  r.fl={w:W,h:W,tiles,rooms:[[1,1,19,19]],items:[],specials:[],digs:[],seen:'1'.repeat(W*W),stairs:[10,10],stairsHidden:true,boss:true,oc:'arena',id:uid()};
- r.party.forEach((m,i)=>{m.x=8+i;m.y=18;m.dir=4;m.moved=false;m.acted=false});const C=OC_CONFIG[r.diff]||OC_CONFIG.easy,s=Math.round(100*C.mult),e={id:'manaphy-'+uid(),species:'Manaphy',lv:partyAvgLv(),hp:C.hp,maxhp:C.hp,atk:s,def:s,spa:s,spd:s,spe:s,types:['water'],fast:'Bubble',disc:'Surf',energy:0,boss:'boss',ocBoss:true,x:10,y:10,dir:0,mv:3,aware:1,phase:1,daze:0,diveAge:0,pending:[],lastSpecial:'',turns:0};
+ r.party.forEach((m,i)=>{m.x=8+i;m.y=18;m.dir=4;m.moved=false;m.acted=false});const C=OC_CONFIG[r.diff]||OC_CONFIG.easy,s=Math.round(10*C.mult),e={id:'manaphy-'+uid(),species:'Manaphy',lv:partyAvgLv(),hp:C.hp,maxhp:C.hp,atk:s,def:s,spa:s,spd:s,spe:s,types:['water'],fast:'Bubble',disc:'Surf',energy:0,boss:'boss',ocBoss:true,ocStatVersion:2,x:10,y:10,dir:0,mv:3,aware:1,phase:1,daze:0,diveAge:0,pending:[],lastSpecial:'',turns:0};
  r.battle={kind:'floor',enemies:[e],turn:Math.max(0,r.party.findIndex(m=>m.hp>0)),round:1,overclock:0,skip:false,guard:{},done:false,enemyPhase:false};r.ocEntering=false;DG.tilesFor=null;DG.bcam=null;DG.wasFree=false;save()}
 function ocTargets(r,name,normal){const e=ocBoss(r);return name==='Surf'&&e&&e.diving?normal.concat([[e,r.battle.enemies.indexOf(e)]]):normal}
 function ocDigAt(r,m){const e=ocBoss(r);return e&&e.hp>0&&e.diving&&m.x===e.x&&m.y===e.y?{oc:true,done:0,max:5}:null}
