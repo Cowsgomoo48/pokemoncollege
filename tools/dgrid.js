@@ -96,10 +96,10 @@ function gdTilesCanvas(r){const fl=r.fl,th=gdTheme(r),T=GD_T;if(DG&&DG.tilesFor=
    if(+((fl.tiles[y+1]||'')[x]||0)){g.fillStyle=th.e;g.fillRect(X,Y+T-7,T,7)}}}
  mdDecorate(g,r,fl,th);if(DG){DG.tiles=c;DG.tilesFor=fl.id}return c}
 function gdDrawBattle(entering){const r=runOf(),b=r&&r.battle,st=$('dgStage');if(!b||!st||!r.fl)return;const fl=r.fl,T=GD_T,L=gdSee(r),th=gdTheme(r);
- let field=st.querySelector('.gd-field');if(!field||entering){st.innerHTML='<div class="dg-field gd-field"><div class="gd-map"><canvas class="gd-tiles"></canvas><div class="gd-objs"></div><canvas class="gd-fog"></canvas><div class="gd-hl"></div><div class="gd-units"></div></div><canvas class="gd-mini"></canvas><div class="gd-envslot"></div><div class="gd-floor"></div></div>';field=st.querySelector('.gd-field');field.addEventListener('click',gdTap);
+ let field=st.querySelector('.gd-field');if(!field||entering){st.innerHTML='<div class="dg-field gd-field"><div class="gd-map"><canvas class="gd-tiles"></canvas><div class="gd-objs"></div><canvas class="gd-fog"></canvas><div class="gd-hl"></div><div class="gd-units"></div></div><canvas class="gd-mini"></canvas><div class="gd-envslot"></div><div class="gd-floor"></div><div class="gd-stones" role="group" aria-label="Stones carried in this dungeon run"></div></div>';field=st.querySelector('.gd-field');field.addEventListener('click',gdTap);
   const mp=field.querySelector('.gd-map');mp.style.width=fl.w*T+'px';mp.style.height=fl.h*T+'px';const tc=field.querySelector('.gd-tiles');tc.width=fl.w*T;tc.height=fl.h*T;tc.getContext('2d').drawImage(gdTilesCanvas(r),0,0)}
  let tk=field.querySelector('.dg-ticker');if(DG&&DG.msg){if(!tk){tk=document.createElement('div');tk.className='dg-ticker';field.appendChild(tk)}tk.innerHTML=DG.msg}else if(tk)tk.remove();
- field.querySelector('.gd-floor').innerHTML='B'+(r.floor+1)+'F · '+th.name+(fl.boss?' · 👑':'');field.querySelector('.gd-envslot').innerHTML=mdEnvBtn(r);field.style.background=mdShade(th.w2,.45);
+ field.querySelector('.gd-floor').innerHTML='B'+(r.floor+1)+'F · '+th.name+(fl.boss?' · 👑':'');field.querySelector('.gd-envslot').innerHTML=mdEnvBtn(r);field.style.background=mdShade(th.w2,.45);field.querySelector('.gd-stones').innerHTML=mdStonesHTML(r);
  // fog: black where you've never been, dim where you can't see right now
  const fc=field.querySelector('.gd-fog');fc.width=fl.w*T;fc.height=fl.h*T;const fg=fc.getContext('2d');for(let y=0;y<fl.h;y++)for(let x=0;x<fl.w;x++){const seen=fl.seen[y*fl.w+x]==='1';if(!seen){fg.fillStyle='#05070d';fg.fillRect(x*T,y*T,T,T)}else if(!L.has(gdKey(x,y))){fg.fillStyle='rgba(5,7,13,.45)';fg.fillRect(x*T,y*T,T,T)}}
  const vis=(x,y)=>L.has(gdKey(x,y)),seenAt=(x,y)=>fl.seen[y*fl.w+x]==='1';
@@ -137,7 +137,7 @@ function gdCamera(x,y){const r=runOf(),f=document.querySelector('.gd-field'),mp=
 // Pokémon is underneath one. Worked out from where the camera is heading, so it's right before the slide finishes.
 function gdOverlap(){const f=document.querySelector('.gd-field'),r=runOf();if(!f||!DG||!DG.cam||!r||!r.battle)return;const {tx,ty,T}=DG.cam,fr=f.getBoundingClientRect(),pts=[];
  r.party.forEach(m=>pts.push([m.x,m.y]));r.battle.enemies.forEach(e=>{if((e.hp>0||e.gdOut)&&!e.done)pts.push([e.x,e.y])});
- f.querySelectorAll('.gd-floor,.gd-envslot .tw-envbtn,.gd-mini,.dg-ticker,.oc-health').forEach(el=>{const b=el.getBoundingClientRect();if(!b.width)return;const L=b.left-fr.left,Tp=b.top-fr.top,R=L+b.width,B=Tp+b.height;
+ f.querySelectorAll('.gd-floor,.gd-envslot .tw-envbtn,.gd-mini,.gd-stones,.dg-ticker,.oc-health').forEach(el=>{const b=el.getBoundingClientRect();if(!b.width)return;const L=b.left-fr.left,Tp=b.top-fr.top,R=L+b.width,B=Tp+b.height;
   const hit=pts.some(([x,y])=>{const ux=tx+x*T,uy=ty+(y-.4)*T;return ux<R&&ux+T>L&&uy<B&&uy+T*1.4>Tp});el.classList.toggle('see-thru',hit)})}
 function gdHighlight(){const hl=document.querySelector('.gd-hl');if(!hl)return;const T=GD_T,H=DG&&DG.hl;hl.innerHTML=H?H.tiles.map(([x,y])=>'<i class="'+H.cls+'" style="left:'+x*T+'px;top:'+y*T+'px"></i>').join(''):''}
 // ---------- tapping the map ----------
@@ -334,7 +334,7 @@ function dgOpen(mode){if(mode)dgMode=mode;if(dgMode==='tower')return dgcOpen();c
  if(r.fl.oc==='arena'){const guardian=ocBoss(r);if(guardian)guardian.defeating=false}gdDrawBattle(true);if(r.fl.oc==='arena'&&r.battle.enemies.some(e=>e.ocBoss&&e.hp<=0&&!e.done))gdKills(r);if(r.ocEntering)setTimeout(()=>{if(runOf()===r&&DG)ocEnter()},0);else if(r.rescueDrill)setTimeout(()=>{if(runOf()===r&&DG)mdRescueDrill()},0);else if(r.battle.enemyPhase)gdEnemyPhase()}
 // The floor label, sublayer button and minimap stay solid, but go see-through and let taps pass when a Pokémon is under them
 function gdOverlays(){const f=document.querySelector('.gd-field');if(!f)return;const U=[...f.querySelectorAll('.gd-u')].map(u=>u.getBoundingClientRect()).filter(b=>b.width);
- f.querySelectorAll('.gd-envslot .tw-envbtn,.gd-floor,.gd-mini').forEach(o=>{const a=o.getBoundingClientRect(),hit=U.some(b=>b.right>a.left+2&&b.left<a.right-2&&b.bottom>a.top+2&&b.top<a.bottom-2);o.classList.toggle('gd-under',hit)})}
+ f.querySelectorAll('.gd-envslot .tw-envbtn,.gd-floor,.gd-mini,.gd-stones').forEach(o=>{const a=o.getBoundingClientRect(),hit=U.some(b=>b.right>a.left+2&&b.left<a.right-2&&b.bottom>a.top+2&&b.top<a.bottom-2);o.classList.toggle('gd-under',hit)})}
 
 // ---- dig spots: the unit standing on one (out of battle) gets a DIG button ----
 function gdDigAt(r,m){const fl=r&&r.fl;if(!fl||!m||m.hp<=0)return null;const oc=ocDigAt(r,m);if(oc)return oc;return (fl.digs||[]).find(d=>d.x===m.x&&d.y===m.y&&d.done<d.max)||null}

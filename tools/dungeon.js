@@ -224,7 +224,7 @@ const MOVE_SPECIAL={
 function moveNote(n){const S=MOVE_SPECIAL[n],h=MOVE_MULTI[n],d=MOVE_DRAIN[n],a=[];if(h)a.push(h==='2-5'?'Hits 2–5 times in a row, each hit on its own':h==='party'?'Hits once for each teammate still standing':Array.isArray(h)?'Hits 3 times, each hit stronger than the last':'Hits '+h+' times in a row, each hit on its own');if(S&&S.note)a.push(S.note);if(d)a.push('Heals the user by '+(d[1]===2?'half':'¾')+' of the damage dealt');return a.join('. ')}
 function dgCtx(slot){const r=runOf(),b=r.battle,m=r.party[slot],p=partyMon(m);return {r,b,m,p,c:combatant(p),slot,log:(b.mlog||{})[slot]||null,e0:m.energy}}
 function dgBlock(n,x){const S=MOVE_SPECIAL[n];try{return S&&S.block?S.block(x):null}catch(e){return null}}
-function dgBoosted(n,x){const S=MOVE_SPECIAL[n];try{return !!(S&&S.boost&&S.boost(x))}catch(e){return false}}
+function dgBoosted(n,x){const S=MOVE_SPECIAL[n];try{return ultWaterMult(x.b,(MOVE_STATS[n]||[])[0])>1||!!(S&&S.boost&&S.boost(x))}catch(e){return false}}
 function dgHitPlan(n,x){const h=MOVE_MULTI[n];if(!h||dgEnvSingle())return {ks:[1],S:1};
  if(h==='2-5'){const v=Math.random();let k=v<.35?2:v<.7?3:v<.85?4:5;if(dgEnvDice())k=Math.max(3,k);return {ks:Array(k).fill(1),S:3.1}}
  if(h==='party'){const k=Math.max(1,x.r.party.filter(q=>q.hp>0).length);return {ks:Array(k).fill(1),S:k}}
@@ -237,7 +237,7 @@ function dgStrike(x,n,mv,e,mult,scale){let ocSurf=false;if(e.ocBoss&&e.diving){i
  let eff=S.eff?S.eff(e):typeEff(mv[0],e.types),crit=mult>=2;const melt=e.melt>0?1.15:1,tags=[];if(S.crit){crit=true;if(mult<1.5)mult=1.5}
  const xm=S.x?S.x(x,e):1;if(xm>1)tags.push(S.xTag||'Power ×'+xm+'!');
  if(S.fixed){eff=eff<.5?eff:1;const d=Math.max(1,Math.round(S.fixed(x,e)*eff*melt));e.hp=Math.max(0,e.hp-d);e.hitR=x.b.round;return {dmg:d,eff,parts:[d],tags,crit:false}}
- const pw=S.pw?S.pw(x,e):mv[1],H=dgHitPlan(n,x),cat=moveCat(mv),extra=(1+(x.b.overclock||0)+(x.b.teamBoost||0))*xm*dgEnvMult(mv[0])*twPowMult()*dgEnvAtk(x.c.types,x.p.species,x.m)*dgEnvDef(e.types,e.species,e)*twCardAtk(x,e,mv)*mdUpAtk(x,e,mv,eff),parts=[];let ovk=0;
+ const pw=S.pw?S.pw(x,e):mv[1],H=dgHitPlan(n,x),cat=moveCat(mv),extra=(1+(x.b.overclock||0)+(x.b.teamBoost||0))*xm*ultWaterMult(x.b,mv[0])*dgEnvMult(mv[0])*twPowMult()*dgEnvAtk(x.c.types,x.p.species,x.m)*dgEnvDef(e.types,e.species,e)*twCardAtk(x,e,mv)*mdUpAtk(x,e,mv,eff),parts=[];let ovk=0;
  for(const k of H.ks){if(e.hp<=0)break;const one=c=>dgDamage(att,def,[mv[0],pw*k,mv[2],mv[3]],mult*(scale||1),extra,c,k/H.S,eff).dmg;const d=Math.max(1,Math.round((S.best?Math.max(one('P'),one('S')):one(cat))*melt))*(ocSurf?2:1);if(d>e.hp)ovk+=d-e.hp;e.hp=Math.max(0,e.hp-d);parts.push(d)}
  {const fl=dgEnvFlat(x.c.types,x.c.hp);if(fl&&parts.length&&e.hp>0){const d=Math.min(e.hp,fl);e.hp-=d;parts[parts.length-1]+=d}}
  {const sh=twSpookHeal(x.m,x.c.hp,parts);if(sh)tags.push('👻 +'+sh+' HP')}

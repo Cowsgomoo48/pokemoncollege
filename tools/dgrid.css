@@ -83,3 +83,9 @@
 
 .gd-obj.gd-off{filter:grayscale(1) brightness(.75);opacity:.5}
 .md-dig-spot.gd-off img.ico.ico{animation:none!important;opacity:.7!important}
+
+/* Current run stones, kept small and clear of touch controls. */
+.gd-stones{position:absolute;left:50%;bottom:8px;transform:translateX(-50%);z-index:60;display:flex;gap:6px;pointer-events:none;transition:opacity .2s}
+.gd-stones .mds-cur{display:inline-flex;align-items:center;justify-content:center;gap:4px;min-width:44px;padding:4px 8px;margin:0;border:1px solid rgba(255,255,255,.25);border-radius:999px;background:rgba(5,7,13,.82);color:#fff;font:700 12px/1.2 system-ui;box-sizing:border-box;white-space:nowrap}
+.gd-stones .ico{width:20px;height:20px;object-fit:contain}
+.gd-stones.gd-under{opacity:.24}

@@ -1,6 +1,7 @@
 // ---- Legendary Ultimates: a third ability (Power 180, costs the full Stamina Bar), unlocked for 25 Rare Candy in the Box ----
 const ULT_COST=25;
 const ULTS={
+ 'Manaphy':{move:'Sudden Breath',type:'Water',t:'all',fx:'suddenbreath',desc:'Floods all targets and blasts them upward with geysers. During your next turn, all Water-type moves used by Manaphy and allies deal 10% more damage.'},
  'Mew':{move:'Genetic Implosion',type:'Psychic',t:'one',fx:'orbs',desc:'Always neutral. Its damage also hits every Pokémon (allies included) of the target\'s species; super effective if 3+ of that species are on the field.'},
  'Celebi':{move:'Time Warp',type:'Grass',t:'none',fx:'warp',desc:'No damage. On a correct answer, every enemy skips its next turn (like a Time Gear).'},
  'Regirock':{move:'Earthen Barricade',type:'Rock',t:'all',fx:'slam',desc:'Hits all foes. Your team takes 10% less damage during the enemy\'s next turn, on top of Guard.'},
@@ -26,7 +27,7 @@ const ULTS={
  'Regigigas':{move:'Display of Power',type:'Normal',t:'all',fx:'mountain',desc:'Hits all foes. On your next turn your team takes 2 less damage from every attack, restores 6 Stamina, and the attack bar moves 10% slower. Regigigas must rest that turn.'},
  'Diancie':{move:'Diamond Storm',type:'Rock',t:'all',fx:'diamonds',desc:'Hits all foes but is never super effective. A diamond shield protects your whole team from all damage during the enemy\'s turn.'}};
 // physical or special, matching each signature move
-const ULT_CAT={'Genetic Implosion':'S','Earthen Barricade':'P','Permafrost':'S','Corkscrew Cannon':'P','Origin Pulse':'S','Doom Desire':'S','Techno Blast':'S','Overload Surge':'S','Orbital Strike':'P','Fleur Cannon':'S','Spectral Thief':'P','Hex Nut Swarm':'P','Double Iron Bash':'P','Thunder Cage':'S','Dragon Energy':'S','Ancient Wingbeat':'P','Ion Flare':'S','Ruination Blaze':'S','Mirror Edge':'P','Ivy Cudgel':'P','Precipice Blades':'P','Display of Power':'P','Diamond Storm':'P'};
+const ULT_CAT={'Sudden Breath':'S','Genetic Implosion':'S','Earthen Barricade':'P','Permafrost':'S','Corkscrew Cannon':'P','Origin Pulse':'S','Doom Desire':'S','Techno Blast':'S','Overload Surge':'S','Orbital Strike':'P','Fleur Cannon':'S','Spectral Thief':'P','Hex Nut Swarm':'P','Double Iron Bash':'P','Thunder Cage':'S','Dragon Energy':'S','Ancient Wingbeat':'P','Ion Flare':'S','Ruination Blaze':'S','Mirror Edge':'P','Ivy Cudgel':'P','Precipice Blades':'P','Display of Power':'P','Diamond Storm':'P'};
 function ultOf(p){return p&&p.ult?ULTS[p.species]||null:null}
 function ultType(U,e){if(!U.type.startsWith('best:'))return U.type;const opts=U.type.slice(5).split(',');return opts.reduce((a,t)=>typeEff(t,e.types)>typeEff(a,e.types)?t:a,opts[0])}
 // ---- Box: show / unlock the Ultimate ----
@@ -62,6 +63,7 @@ const TC=t=>TYPE_COLOR[t]||'#cccccc';
 async function ultFx(U,slot,tis,col,allyIs){const A=fxA(slot),T=tis.map(fxF).filter(Boolean),aSel='.dg-ally[data-i="'+slot+'"]',S=dgSleep;if(!A){await S(300);return}
  const top={x:A.x,y:-40};
  switch(U.fx){
+ case 'suddenbreath':await ultSuddenBreath(slot,tis);break;
  case 'orbs':{const ring=fxEl('orbring',{left:A.x+'px',top:A.y+'px'},Object.values(TYPE_COLOR).map((c,i)=>'<i style="--c:'+c+';transform:rotate('+(i*20)+'deg) translateX(46px)"></i>').join(''));await S(800);if(ring)ring.remove();
   const MT=T.concat((allyIs||[]).map(fxA).filter(Boolean)); // every Pokémon the implosion will damage, allies included
   Object.values(TYPE_COLOR).forEach((c,i)=>{const tg=MT[i%Math.max(1,MT.length)]||top,a=i*20*Math.PI/180,st={x:A.x+46*Math.cos(a),y:A.y+46*Math.sin(a)},to={x:tg.x+(Math.random()-.5)*30,y:tg.y+(Math.random()-.5)*30};setTimeout(()=>{fxFly(st,to,'orb',260,{'--c':c});setTimeout(()=>fxBoom(to,c,36),250)},i*35)});await S(18*35+420);break}
@@ -98,6 +100,33 @@ async function ultFx(U,slot,tis,col,allyIs){const A=fxA(slot),T=tis.map(fxF).fil
   const N=190,gap=8;for(let k=0;k<N;k++){const x0=-D+Math.random()*(W+D),y0=-40-Math.random()*30,ms=420+Math.random()*180;setTimeout(()=>fxFly({x:x0,y:y0},{x:x0+D,y:y0+D},'shard',ms,{'--z':(9+Math.random()*8)+'px'},'linear'),k*gap)}
   T.forEach((t,j)=>[350,700,1050,1400].forEach(ms=>setTimeout(()=>fxBoom(t,'#ffc2e6',56),ms+j*40)));await S(N*gap+560);break}
  default:await S(400)}}
+// An owned Manaphy's Ultimate: all temporary sprite effects are restored even if the run closes.
+async function ultSuddenBreath(slot,tis){
+ const r=runOf(),b=r&&r.battle,field=fxField(),A=fxA(slot);if(!field||!A)return;
+ const live=()=>runOf()===r&&r.battle===b&&field.isConnected;
+ const sprites=[document.querySelector('.dg-ally[data-i="'+slot+'"] .dg-spr'),...tis.map(i=>document.querySelector('.dg-foe[data-i="'+i+'"] .dg-spr'))];
+ const saved=sprites.filter(Boolean).map(el=>({el,opacity:el.style.opacity})),anims=[],effects=[];
+ const animate=(el,frames,ms)=>{if(!el)return;const a=el.animate(frames,{duration:ms,easing:'ease-in-out',fill:'forwards'});anims.push(a);return a};
+ const effect=(cls,style)=>{const el=fxEl(cls,style);if(el)effects.push(el);return el};
+ const splash=p=>{for(let j=0;j<7;j++)effect('sb-drop',{left:p.x+'px',top:p.b+'px','--dx':((j-3)*12)+'px','--dy':(-22-Math.abs(j-3)*7)+'px'})};
+ const targets=tis.map(i=>({i,p:fxF(i)})).filter(x=>x.p);
+ try{
+  animate(sprites[0],[{translate:'0 0',scale:'1',opacity:1},{translate:'0 -16px',scale:'1',offset:.3},{translate:'0 0',scale:'1.25 .6',offset:.65},{translate:'0 18px',scale:'1.3 0',opacity:0}],620);
+  await dgSleep(400);if(!live())return;splash(A);await dgSleep(240);if(!live())return;
+  if(sprites[0])sprites[0].style.opacity='0';
+  const water=effect('sb-water',{});animate(water,[{opacity:0,clipPath:'inset(100% 0 0 0)'},{opacity:1,clipPath:'inset(0 0 0 0)'}],550);
+  await dgSleep(550);if(!live())return;
+  targets.forEach(({i,p})=>{splash(p);const el=document.querySelector('.dg-foe[data-i="'+i+'"] .dg-spr');animate(el,[{translate:'0 0',scale:'1',opacity:1},{translate:'0 20px',scale:'1.1 0',opacity:0}],380)});
+  await dgSleep(400);if(!live())return;
+  for(let k=0;k<5;k++){targets.forEach(({p})=>{for(let j=0;j<5;j++)effect('sb-bubble',{left:(p.x+(j-2)*7)+'px',top:p.b+'px','--dx':((j-2)*5)+'px','--dy':(-30-k*9)+'px'})});await dgSleep(160);if(!live())return}
+  targets.forEach(({i,p})=>{effect('sb-geyser',{left:p.x+'px',top:p.b+'px','--h':Math.max(90,p.h*1.6)+'px'});splash(p);
+   const el=document.querySelector('.dg-foe[data-i="'+i+'"] .dg-spr');animate(el,[{translate:'0 12px',scale:'1 0',opacity:0},{translate:'0 -72px',scale:'1',opacity:1,offset:.42},{translate:'0 -82px',scale:'1',opacity:1,offset:.6},{translate:'0 0',scale:'1',opacity:1}],850)});fxShake();
+  // Manaphy reappears in its original tile as the flood drains.
+  animate(sprites[0],[{translate:'0 18px',scale:'1 0',opacity:0},{translate:'0 -12px',scale:'1',opacity:1,offset:.5},{translate:'0 0',scale:'1',opacity:1}],700);
+  await dgSleep(850);if(!live())return;animate(water,[{opacity:1},{opacity:0}],450);await dgSleep(450);
+ }finally{anims.forEach(a=>a.cancel());saved.forEach(({el,opacity})=>{el.style.opacity=opacity});effects.forEach(el=>el.remove())}
+}
+function ultWaterMult(b,type){return b&&!b.enemyPhase&&b.suddenBreathRound===b.round&&String(type).toLowerCase()==='water'?1.1:1}
 // ---- running an Ultimate ----
 function dgBarSlow(b){return b&&(b.slowBar===b.round||b.gigas===b.round)?.9:1}
 // damage your team takes from an enemy attack this round: Diamond Storm blocks it all, Display of Power takes 2 off (to a minimum of 0)
@@ -113,7 +142,7 @@ async function dgUltimate(slot,ti,mult,res){const r=runOf(),b=r&&r.battle,m=b&&r
  let fxFoes=targets.map(([,i])=>i),fxAllies=[];if(U.move==='Genetic Implosion'&&t0){fxFoes=b.enemies.map((e,i)=>e.hp>0&&e.species===t0.species?i:-1).filter(i=>i>=0);fxAllies=r.party.map((x,j)=>x.hp>0&&partyMon(x).species===t0.species?j:-1).filter(j=>j>=0)}
  await ultFx(U,slot,fxFoes,col,fxAllies);if(!runOf()||runOf().battle!==b)return;
  const sb=s=>m.starf&&m.starf.stat===s?2:0,att={atk:c.atk+sb('atk'),spa:c.spa+sb('spa'),types:c.types},UCAT=ULT_CAT[U.move]||'S',extra=1+(b.overclock||0)+(b.teamBoost||0),hits=[],allyHits=[];let note='';
- const strike=(e,i,pw,mm,effOv)=>{const tp=ultType(U,e),mv=[tp,pw,0,'charged'];let {dmg,eff}=dgDamage(att,{def:e.def,spd:e.spd,types:e.types},mv,mm,extra,UCAT);if(effOv!=null){dmg=Math.max(1,Math.round(dmg/Math.max(.01,eff)*effOv));eff=effOv}if(e.melt>0)dmg=Math.round(dmg*1.15);e.hp=Math.max(0,e.hp-dmg);hits.push({i,dmg,eff});return dmg};
+ const strike=(e,i,pw,mm,effOv)=>{const tp=ultType(U,e),mv=[tp,pw,0,'charged'];let {dmg,eff}=dgDamage(att,{def:e.def,spd:e.spd,types:e.types},mv,mm,extra*ultWaterMult(b,tp),UCAT);if(effOv!=null){dmg=Math.max(1,Math.round(dmg/Math.max(.01,eff)*effOv));eff=effOv}if(e.melt>0)dmg=Math.round(dmg*1.15);e.hp=Math.max(0,e.hp-dmg);hits.push({i,dmg,eff});return dmg};
  const sp=U.move;
  if(sp==='Genetic Implosion'&&t0){const same=s=>s===t0.species,n=b.enemies.filter(e=>e.hp>0&&same(e.species)).length+r.party.filter(x=>x.hp>0&&same(partyMon(x).species)).length,d=strike(t0,targets[0][1],180,mult,n>=3?2:1);
   b.enemies.forEach((e,i)=>{if(i!==targets[0][1]&&e.hp>0&&same(e.species)){e.hp=Math.max(0,e.hp-d);hits.push({i,dmg:d,eff:n>=3?2:1})}});
@@ -126,6 +155,7 @@ async function dgUltimate(slot,ti,mult,res){const r=runOf(),b=r&&r.battle,m=b&&r
  else{const pw=sp==='Dragon Energy'?Math.round(90+90*Math.max(0,m.hp)/c.hp):180;
   targets.forEach(([e,i])=>{const before=e.hp;strike(e,i,pw,mult);if(sp==='Ruination Blaze'&&e.hp>0&&e.hp>Math.floor(e.maxhp/2)&&before>e.maxhp/2){const h=hits[hits.length-1],cut=e.hp-Math.floor(e.maxhp/2);e.hp-=cut;h.dmg+=cut}
    if(e.hp>0){if(sp==='Overload Surge'&&Math.random()<.3){e.para=true;note+=' '+esc(e.species)+' is paralyzed!'}if(sp==='Ion Flare')e.melt=2;if(sp==='Thunder Cage'){e.cage=3;note=' '+esc(e.species)+' is trapped in a Thunder Cage!'}}});
+  if(sp==='Sudden Breath'){b.suddenBreathRound=b.round+1;note=' Next turn, Manaphy and allies deal 10% more damage with Water-type moves.'}
   if(sp==='Earthen Barricade'){b.wall=b.round;note=' Your team braces behind earthen walls (−10% damage next enemy turn).'}
   if(sp==='Permafrost'){b.slowBar=b.round+1;note=' The cold slows everything: your next attack bar moves 10% slower.'}
   if(sp==='Corkscrew Cannon'){b.steelRegen=b.round;note=' Your team will restore 10 Stamina next turn.'}

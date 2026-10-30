@@ -59,7 +59,7 @@ function mdBattleEnd(r){const l=mdLv('breath');if(!l)return;r.party.forEach((m,i
 // stones dropped by a beaten foe
 function mdStoneDrop(r,e){const p=e.boss?1:(e.swarm?.08:.2)*(1+MD_PER.lucky*mdLvOf(r,'lucky'));const n=e.boss?2:Math.random()<p?1:0;const got=[];for(let k=0;k<n;k++){const t=prPick(['fire','water','leaf']);mdGive(r,t,1);got.push(MD_TABS[t].emoji)}return got.join('')}
 function mdGive(r,t,n){r.stones=r.stones||{fire:0,water:0,leaf:0};r.stones[t]=(r.stones[t]||0)+n}
-function mdStonesHTML(r){const s=r.stones||{};return ['fire','water','leaf'].map(t=>'<span class="mds-cur">'+icoHTML(MD_TABS[t].ico)+'<b>'+(s[t]||0)+'</b></span>').join('')}
+function mdStonesHTML(r){const s=r.stones||{};return ['fire','water','leaf'].map(t=>'<span class="mds-cur" aria-label="'+t.charAt(0).toUpperCase()+t.slice(1)+' Stones: '+(s[t]||0)+'" title="'+t.charAt(0).toUpperCase()+t.slice(1)+' Stones">'+icoHTML(MD_TABS[t].ico)+'<b>'+(s[t]||0)+'</b></span>').join('')}
 // ---------- dig spots ----------
 function mdPlaceDigs(r,fl,takeIn,rooms){const rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1)),n=rnd(1,2)+mdLvOf(r,'spots'),lo=Math.min(5,2+mdLvOf(r,'deeper'));fl.digs=[];
  for(let k=0;k<n;k++){const o=rooms[rnd(1,Math.max(1,rooms.length-1))]||rooms[0],t=takeIn(o);if(t)fl.digs.push({x:t[0],y:t[1],max:rnd(lo,5),done:0})}}

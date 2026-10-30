@@ -81,3 +81,12 @@
 @keyframes udshield{from{transform:translateX(-50%) scale(.2);opacity:0}}
 .dg-ally.rest .dg-spr{filter:grayscale(.6) brightness(.85)}.dg-ally.rest::before{content:'Zz';position:absolute;top:0;right:8px;font:900 13px/1 inherit;color:#9aa;z-index:3}
 .u-masks{animation:umasks .7s!important}@keyframes umasks{0%{filter:hue-rotate(0)}25%{filter:hue-rotate(90deg) saturate(2)}50%{filter:hue-rotate(200deg) saturate(2)}75%{filter:hue-rotate(300deg) saturate(2)}100%{filter:none}}
+
+/* Sudden Breath uses battlefield coordinates; map sprites stay on their original tiles. */
+.ufx.sb-water{inset:0;z-index:6;background:repeating-linear-gradient(175deg,#62d8f044 0 10px,#2274be99 12px 26px),linear-gradient(#42bae088,#105395dd);box-shadow:inset 0 12px 28px #b8faff77}
+.ufx.sb-drop{width:7px;height:13px;border-radius:60% 60% 50% 50%;background:#b8faff;box-shadow:0 0 5px #3ecfff;animation:sb-spray .55s ease-out both;z-index:8}
+@keyframes sb-spray{0%{transform:translate(-50%,-50%) scale(.3);opacity:1}60%{transform:translate(var(--dx),var(--dy)) scale(1);opacity:1}100%{transform:translate(var(--dx),8px) scale(.4);opacity:0}}
+.ufx.sb-bubble{width:10px;height:10px;border:2px solid #c7faff;border-radius:50%;background:#67d5fa55;animation:sb-bubble .55s ease-out both;z-index:8}
+@keyframes sb-bubble{from{transform:translate(-50%,0) scale(.4);opacity:1}to{transform:translate(var(--dx),var(--dy)) scale(1.25);opacity:0}}
+.ufx.sb-geyser{width:40px;height:var(--h);transform-origin:50% 100%;background:linear-gradient(90deg,#249be0aa,#e1ffff,#32baffaa);border-radius:55% 55% 15% 15%;box-shadow:0 0 15px #52d9ffaa;animation:sb-geyser .85s ease-out both;z-index:8}
+@keyframes sb-geyser{0%{transform:translate(-50%,-100%) scaleY(0);opacity:0}30%{transform:translate(-50%,-100%) scaleY(1.2);opacity:1}65%{transform:translate(-50%,-100%) scaleY(1);opacity:1}100%{transform:translate(-50%,-100%) scaleY(.1);opacity:0}}
