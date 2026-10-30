@@ -8,7 +8,40 @@ const UX={files:['notes.txt','report.txt','log.txt','data.csv','todo.md','server
 const uxC=s=>'`'+s+'`';
 function prCmd(id,name,kw,make){prDef(id,'Unix / command line',name,kw,make);PR[id].cmd=true}
 // one command question: answer, three wrong commands, a short explanation, other accepted forms
-function uxQ(q,a,wrong,why,alts){q='What command would you type to '+q.charAt(0).toLowerCase()+q.slice(1).replace(/[.?]\s*$/,'')+'?';const p=prMC(q,uxC(a),wrong.map(uxC),k=>uxC(a+' '+'?'.repeat(k+1)),why,[['Which command does this job? Then which option, and what comes last (the file or folder)?',why],['Put it together: command, options, then the target.','Answer: '+uxC(a)]]);p.alts=alts||[];return p}
+function uxQ(q,a,wrong,why,alts){q='What command would you type to '+q.charAt(0).toLowerCase()+q.slice(1).replace(/[.?]\s*$/,'')+'?';const p=prMC(q,uxC(a),wrong.map(uxC),k=>uxC(a+' '+'?'.repeat(k+1)),why,uxCommandSteps(a,why));p.alts=alts||[];return p}
+// Local tutoring uses the generated command, so flags, numbers and paths stay tied to this question.
+function uxTokens(s){return String(s).match(/"[^"]*"|'[^']*'|\S+/g)||[]}
+function uxCommandSteps(a,why){
+ const jobs={ls:'list directory entries',cd:'change your current directory',pwd:'print your current directory',cat:'print file contents',less:'read a file one screen at a time',wc:'count input',head:'read the beginning of a file',tail:'read the end of a file',fold:'wrap long lines',chmod:'change permissions',chown:'change ownership',find:'search for files by their properties',grep:'select matching lines inside files',sort:'put lines in order',uniq:'process adjacent repeated lines',cp:'copy a file',mv:'move or rename a file',rm:'remove a file',mkdir:'create a directory',touch:'create an empty file or update its timestamp',echo:'print text',man:'open a command’s manual',whoami:'print your username',sudo:'run the following command with administrator privileges'};
+ const flags={ls:{'-a':'include dotfiles (hidden names)','-l':'show permissions, owner, size and date'},wc:{'-l':'count lines, rather than words or bytes','-c':'count bytes'},grep:{'-v':'keep nonmatching lines','-c':'count matching lines','-i':'ignore letter case','-n':'include line numbers','-l':'print matching filenames','-r':'search subdirectories recursively','-F':'treat the pattern literally, including brackets','-H':'include the filename before each matching line'},uniq:{'-u':'keep only lines that occur once; plain uniq keeps one copy of each group'}};
+ const steps=[];const add=h=>steps.push([h,why]);
+ const stages=a.split(/\s+\|\s+/);
+ if(stages.length>1)add('This needs '+stages.length+' stages. A pipe passes the text produced on its left into the command on its right. Start with the file, then filter or transform its lines before counting.');
+ stages.forEach((stage,i)=>{const t=uxTokens(stage),cmd=t[0],lead=stages.length>1?'Stage '+(i+1)+': ':'';
+ add(lead+'Use '+uxC(cmd)+' to '+(jobs[cmd]||'run this script by its path')+'.'+(i?' It reads the previous stage’s output; do not give it the original file again.':''));
+ if(cmd==='find'){
+ add('Start the search at '+uxC(t[1])+'. This is a directory to search beneath, not the filename pattern.');
+ const meanings={'-type':v=>v==='f'?'regular files':'directories','-name':v=>'names matching '+uxC(v)+'; quote the wildcard so find, rather than the shell, expands it','-user':v=>'owner '+uxC(v),'-group':v=>'group '+uxC(v),'-perm':v=>'permissions exactly '+uxC(v),'-size':v=>(v[0]==='+'?'larger than ':v[0]==='-'?'smaller than ':'exactly ')+uxC(v.replace(/^[+-]/,''))+' (c = bytes, k = KiB, M = MiB)','-ctime':v=>'status changed '+(v[0]==='+'?'more than ':'less than ')+v.slice(1)+' days ago'};
+ for(let j=2;j<t.length;j++){if(meanings[t[j]]&&t[j+1]){add('The condition “'+meanings[t[j]](t[j+1])+'” uses '+uxC(t[j])+' followed by '+uxC(t[j+1])+'.');j++}else if(t[j]==='-exec'){add('After -exec, write the action command. '+uxC('{}')+' is replaced by each found path; '+uxC('\\;')+' ends the action without letting the shell consume the semicolon.');break}}
+ }else if(cmd==='chmod'){
+ const m=t[1].match(/^([ugoa]*)([+-])([rwx]+)$/);
+ if(m)add('For '+uxC(t[2])+', target '+({u:'the owner',g:'the group',o:'others',a:'everyone'}[m[1]]||'the selected users')+' with '+uxC(m[1])+', '+(m[2]==='+'?'add':'remove')+' with '+uxC(m[2])+', and choose '+m[3].split('').map(x=>({r:'read (r)',w:'write (w)',x:'execute (x)'}[x])).join(', ')+'. Keep those symbols together after chmod.');
+ else add('For each of owner, group and others, add r = 4, w = 2 and x = 1. Keep the three digits in that order, then put '+uxC(t.slice(2).join(' '))+' after the permission number.');
+ }else{
+ for(let j=1;j<t.length;j++){const x=t[j];if(flags[cmd]&&flags[cmd][x])add('Use '+uxC(x)+' to '+flags[cmd][x]+'.');
+ else if(x==='-n'||x==='-w'){add('Use '+uxC(x)+' followed by '+uxC(t[j+1])+' to set '+(x==='-n'?'the number of lines':'the maximum line width')+'.');j++}
+ else if(x==='>'||x==='>>'){add(uxC(x)+' '+(x==='>'?'replaces the destination’s contents':'appends without erasing existing contents')+'. The destination is '+uxC(t[j+1])+'.');j++}
+ else if(cmd==='grep'&&!x.startsWith('-')){add('Search for '+uxC(x)+'. '+(x.includes('^')?'^ anchors the start of the line. ':x.includes('$')?'$ anchors the end of the line. ':x.includes('[0-9]')?'[0-9] matches one digit. ':'')+'Give '+uxC(t.slice(j+1).join(' '))+' after the pattern as the search target.');break}
+ }
+ if(!['grep','pwd','whoami'].includes(cmd)&&t.length>1)add(cmd==='cp'||cmd==='mv'?'Keep the source '+uxC(t[1])+' before the destination '+uxC(t[2])+'.':cmd==='cd'?'Use '+uxC(t[1])+': '+(t[1]==='..'?'.. goes up one directory.':t[1]==='~'?'~ means your home directory.':t[1].startsWith('/')?'a leading / starts at the filesystem root.':'without a leading /, resolve the path from your current directory.'):'The target or argument for this stage is '+uxC(t[t.length-1])+'.');
+ }
+ });
+ return steps.length?steps:[[why,why]];
+}
+function uxAttemptHint(attempt,answer){const u=uxTokens(uxNorm(attempt)),a=uxTokens(uxNorm(answer));if(!u.length||cmdMatch(attempt,[answer]))return '';
+ const k=u.findIndex((x,i)=>x!==a[i]);if(k<0)return 'Your command is a matching prefix. Check which remaining arguments the question still needs.';
+ return k===0?'Check '+uxC(u[0])+': does it perform the requested action? The command is the first part to choose.':'Recheck '+uxC(u[k])+'. Compare its role with this hint: is it an option, a pattern, a number, or a path? Another valid command form may differ from this example.';
+}
 // typed commands: same text after tidying spaces and quotes (iPhone smart quotes and dashes too)
 function uxNorm(s){return String(s==null?'':s).replace(/`/g,'').replace(/[“”„]/g,'"').replace(/[‘’']/g,'"').replace(/[—–]/g,'--').trim().replace(/\s+/g,' ').replace(/ ?\| ?/g,' | ').replace(/"([^"\s|*?^$\[\]\\{}()&#;<>!]+)"/g,'$1')}
 function cmdMatch(user,answers){const u=uxNorm(user);return !!u&&answers.some(a=>uxNorm(a)===u)}
@@ -107,13 +140,13 @@ prCmd('unix_regex','Reading regex patterns (. .* ^ $ [0-9])',/regex|\.\*|"\^|\$"
  const pool=['cat','cart','coat','scat','act','car','cab','bat','boat','bet','abc','a1c','at','cut','cot','chat','tact','ace','a7c','art'];
  const P=prPick([['^c','starts with c'],['t$','ends with t'],['^c.t$','is c, one character, then t'],['a.c','has a, any one character, then c'],['^b.*t$','starts with b and ends with t'],['[0-9]','has a digit'],['^a','starts with a'],['^ca','starts with ca']]),re=new RegExp(P[0]);
  const yes=shuffle(pool.filter(x=>re.test(x))),no=shuffle(pool.filter(x=>!re.test(x)));if(!yes.length||no.length<3)throw 0;
- const p=prMC('Which word is matched by '+uxC('grep "'+P[0]+'"')+'?',yes[0],no.slice(0,3),j=>no[(j+3)%no.length],'The pattern '+uxC('"'+P[0]+'"')+' means the line '+P[1]+'. `.` is exactly one character, `.*` is any number, `^` is the start and `$` the end.',[['Read the pattern piece by piece: ^ = start, $ = end, . = any one character, .* = anything.','This pattern: the line '+P[1]+'.'],['Check each choice against that.','Answer: '+yes[0]]]);p.alts=[];return p});
+ const p=prMC('Which word is matched by '+uxC('grep "'+P[0]+'"')+'?',yes[0],no.slice(0,3),j=>no[(j+3)%no.length],'The pattern '+uxC('"'+P[0]+'"')+' means the line '+P[1]+'. `.` is exactly one character, `.*` is any number, `^` is the start and `$` the end.',[['The pattern '+uxC(P[0])+' requires a line that '+P[1]+'. Check the anchors first, then count any required middle characters.','This pattern: the line '+P[1]+'.'],['For this question, test whether each word '+P[1]+'. Reject a word as soon as it breaks that condition.','Answer: '+yes[0]]]);p.alts=[];return p});
 
 prCmd('unix_glob','Wildcards (* and ?) in file names',/wildcard|\*\s*(as a|matches)|"\*"|\*\.\w+|\?\s*(matches|wildcard)/i,()=>{
  const names=['report.txt','report1.txt','report.csv','notes.txt','reports.md','rep.txt','data1.csv','data22.csv','cat.sh','bat.sh','chat.sh','a.txt','ab.txt','log.old'];
  const G=prPick(['*.txt','report*','*.csv','?at.sh','data?.csv','*.sh','a?.txt','rep*.txt']),re=new RegExp('^'+G.replace(/\./g,'\\.').replace(/\*/g,'.*').replace(/\?/g,'.')+'$');
  const yes=shuffle(names.filter(x=>re.test(x))),no=shuffle(names.filter(x=>!re.test(x)));if(!yes.length||no.length<3)throw 0;
- const p=prMC('Which file does '+uxC('ls '+G)+' list?',yes[0],no.slice(0,3),j=>no[(j+3)%no.length],'`*` matches any run of characters (even none) and `?` matches exactly one.',[['Line the pattern up with each name: * can stretch, ? is exactly one character, and everything else must match exactly.','Pattern: '+uxC(G)],['Which name fits all of it?','Answer: '+yes[0]]]);p.alts=[];return p});
+ const p=prMC('Which file does '+uxC('ls '+G)+' list?',yes[0],no.slice(0,3),j=>no[(j+3)%no.length],'`*` matches any run of characters (even none) and `?` matches exactly one.',[['Line the pattern up with each name: * can stretch, ? is exactly one character, and everything else must match exactly.','Pattern: '+uxC(G)],['Test the entire filename against '+uxC(G)+': literal letters and the extension must match exactly; ? consumes one character and * consumes zero or more.','Answer: '+yes[0]]]);p.alts=[];return p});
 
 prCmd('unix_exec','Acting on what find finds (-exec … {} \\;)',/-exec\b|\{\}\s*\\;/i,()=>{
  const d=prPick(UX.dirs),pat=prPick(['"*.sh"','"*.txt"','"*.log"']),act=prPick([['chmod +r {}','make every one readable'],['chmod +x {}','make every one executable'],['cat {}','print every one'],['rm {}','delete every one']]);
@@ -164,7 +197,7 @@ prCmd('unix_paths','Paths and awkward file names (relative, absolute, quoting)',
  while(wrong.length<3)wrong.push(wrap(badRel+'/'+'x'.repeat(wrong.length)+name)[0]);
  const why=(rel.startsWith('..')?'`..` goes up one folder, so from '+uxC('/'+cwd.join('/'))+' the path is '+uxC(rel+'/')+'. ':'')+(uxNeedsQ(name)?'The name has a space, &, # or brackets, so quote it (or put \\ before each one). ':name.startsWith('-')?'A name starting with - looks like an option, so write it as ./'+name+'. ':'')+(act[0]==='run'?'A script runs by its path; in the same folder that’s ./name. ':'')+'The absolute path '+uxC(abs+'/'+name)+' works too.';
  const p=prMC(q,uxC(a),[...new Set(wrong)].filter(x=>!all.includes(x)).slice(0,3).map(uxC),k=>uxC(a+' '+'?'.repeat(k+1)),why,[
-  ['Where is the file compared to where you are? Count how many folders up (..) and then which folders down.','From /'+cwd.join('/')+' to '+abs+': '+uxC((rel||'.')+'/')],
+  ['Start at '+uxC('/'+cwd.join('/'))+'. The target folder is '+uxC(abs)+'. '+(rel.startsWith('..')?'Go up '+rel.split('/').filter(x=>x==='..').length+' folder(s), then follow the remaining folder names.':'Follow the child folders '+uxC(rel)+'.'),'From /'+cwd.join('/')+' to '+abs+': '+uxC((rel||'.')+'/')],
   [uxNeedsQ(name)||name.startsWith('-')?'Look at the file name: does anything in it mean something special to the shell?':'Which command does the job, and does it need anything after the path?',why],
   ['Put the command and the path together.','Answer: '+uxC(a)+(absForms.length?' (or '+uxC(wrap(absForms[0])[0])+')':'')]]);
  p.alts=all;return p});

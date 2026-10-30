@@ -67,7 +67,7 @@ function askQ(item,bank,opts={}){__qMissReset();return new Promise(res=>{const o
   // Questions without built-in steps ask the AI tutor to work out the steps the first time you tap.
   const hb=ov.querySelector('.mgq-hint'),ans=String((q.options.find(o=>o.ok)||{}).t||'');let H=q.steps&&q.steps.length?q.steps.map(x=>x[0]):null,hi=0,busy=false;
   const label=()=>{hb.textContent=(hi?'💡 Next hint ':'💡 Hint ')+(hi+1)+'/'+H.length};
-  const next=()=>{if(hi>=H.length){hb.remove();return}ov.querySelector('.mgq-hints').insertAdjacentHTML('beforeend','<div class="mgq-step"><b>'+(H.length>1?'Step '+(hi+1)+'.':'Hint.')+'</b> '+mathHTML(H[hi])+'</div>');hi++;if(hi<H.length)label();else hb.remove()};
+  const next=()=>{if(hi>=H.length){hb.remove();return}ov.querySelector('.mgq-hints').insertAdjacentHTML('beforeend','<div class="mgq-step"><b>'+(H.length>1?'Step '+(hi+1)+'.':'Hint.')+'</b> '+mathHTML(H[hi]+(q.cmd&&typed&&typeof uxAttemptHint==='function'?' '+uxAttemptHint((ov.querySelector('.sa-in')||{}).value||'',q.short||ans):''))+'</div>');hi++;if(hi<H.length)label();else hb.remove()};
   if(hb){if(H)label();else hb.textContent=aiAny()?'💡 Walk me through it':'💡 Hint';
    hb.onclick=async()=>{hinted=true;if(busy)return;if(!H){busy=true;if(aiAny()){hb.disabled=true;hb.textContent='💭 Working out the steps…';const st=await aiTutor(q.prompt,q.short||ans,q.options.map(o=>o.t));if(!ov.isConnected)return;hb.disabled=false;if(st){q.steps=st;H=st.map(x=>x[0])}}if(!H||!H.length)H=mgHints(q);busy=false;if(!H.length){hb.remove();return}}next()}}
   const done=r=>{ov.remove();res(r)};
