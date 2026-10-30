@@ -1,16 +1,22 @@
 // ---- Move animations: every type has a weak (power 70 or less) and a strong (over 70) version, used by Basic and Disc moves on both sides ----
 function mvSpr(sel){return document.querySelector(sel+' .dg-spr')}
 function mvZoom(el){return parseFloat(el&&el.style.zoom)||1}
+// Finite sprite motion always releases its Web Animation, including cancellation and detached nodes.
+function mvAnimate(el,frames,options){if(!el||!el.animate)return null;const opt=typeof options==='number'?{duration:options}:options,a=el.animate(frames,opt),duration=(+opt.duration||0)*(+opt.iterations||1)+(+opt.delay||0);let timer,done=false;
+ const finish=()=>{if(done)return;done=true;clearTimeout(timer);a.cancel()};if(a.finished&&typeof a.finished.then==='function')a.finished.then(finish,finish);if(Number.isFinite(duration))timer=setTimeout(finish,duration+100);return a}
 // move a battler's sprite toward a point (fraction of the way) and back; translate is divided by zoom because the sprite is zoomed
 function mvRush(sel,to,frac,ms,hold){const el=mvSpr(sel),from=fxPos(sel);if(!el||!from||!to)return Promise.resolve();const z=mvZoom(el),dx=(to.x-from.x)*frac/z,dy=(to.y-from.y)*frac/z,h=hold||0;
- el.animate([{translate:'0 0'},{translate:dx+'px '+dy+'px',offset:.35},{translate:dx+'px '+dy+'px',offset:.35+h},{translate:'0 0'}],{duration:ms,easing:'ease-in-out'});return dgSleep(ms*.35)}
-function mvMove(sel,frames,ms){const el=mvSpr(sel);if(!el)return;const z=mvZoom(el);el.animate(frames.map(f=>Object.assign({},f,f.y!=null||f.x!=null?{translate:((f.x||0)/z)+'px '+((f.y||0)/z)+'px'}:{})).map(f=>{delete f.x;delete f.y;return f}),{duration:ms,easing:'ease-in-out'})}
+ mvAnimate(el,[{translate:'0 0'},{translate:dx+'px '+dy+'px',offset:.35},{translate:dx+'px '+dy+'px',offset:.35+h},{translate:'0 0'}],{duration:ms,easing:'ease-in-out'});return dgSleep(ms*.35)}
+function mvMove(sel,frames,ms){const el=mvSpr(sel);if(!el)return;const z=mvZoom(el);mvAnimate(el,frames.map(f=>Object.assign({},f,f.y!=null||f.x!=null?{translate:((f.x||0)/z)+'px '+((f.y||0)/z)+'px'}:{})).map(f=>{delete f.x;delete f.y;return f}),{duration:ms,easing:'ease-in-out'})}
 function mvShake(sel,ms){mvMove(sel,[{x:0},{x:-6},{x:6},{x:-5},{x:5},{x:-3},{x:0}],ms||450)}
 // play the Pokémon's own Attack animation once (swaps to its Attack sheet, then back)
-async function mvAttackAnim(sel){const el=mvSpr(sel);if(!el)return;let a;try{a=await loadAnims(el.dataset.sp)}catch(e){return}const at=a&&a.Attack;if(!at)return;
- const row=+el.dataset.row,r=row<(at.rows||8)?row:0,keep=el.style.cssText,z=el.style.zoom,dur=at.d.reduce((x,y)=>x+y,0)/60,base=a.Idle||a.Walk||at,footI=-(parseFloat(el.style.marginBottom)||0),foot=footI+(at.h-base.h)/2;if(!el.isConnected)return;
- el.style.cssText='width:'+at.w+'px;height:'+at.h+'px;margin-bottom:'+(-foot)+'px;background-image:url('+at.url+');background-position:0 '+(-r*at.h)+'px;--fw:'+at.w+'px;--fn:'+at.frames+';animation:dsxonce '+dur.toFixed(2)+'s steps('+Math.max(1,at.frames-1)+') 1 forwards;zoom:'+z+';';
- await dgSleep(Math.min(850,dur*1000));if(el.isConnected)el.style.cssText=keep}
+async function mvAttackAnim(sel){const el=mvSpr(sel);if(!el)return;const token={};el._attackToken=token;el._spriteRender=(el._spriteRender||0)+1;let applied=false;
+ try{let a;try{a=await loadAnims(el.dataset.sp)}catch(e){return}const at=a&&a.Attack;if(!at||!el.isConnected||el._attackToken!==token)return;
+ const row=+el.dataset.row,r=row<(at.rows||8)?row:0,z=el.style.zoom,dur=at.d.reduce((x,y)=>x+y,0)/60,base=a.Idle||a.Walk||at,footI=-(parseFloat(el.style.marginBottom)||0),foot=footI+(at.h-base.h)/2;
+ el.style.cssText='width:'+at.w+'px;height:'+at.h+'px;margin-bottom:'+(-foot)+'px;background-image:url('+at.url+');background-position:0 '+(-r*at.h)+'px;--fw:'+at.w+'px;--fn:'+at.frames+';animation:dsxonce '+dur.toFixed(2)+'s steps('+Math.max(1,at.frames-1)+') 1 forwards;zoom:'+z+';';applied=true;
+ await dgSleep(Math.min(2500,Math.max(1,dur*1000)));
+ }finally{if(el._attackToken===token){el._attackToken=null;if(applied&&el.isConnected){el.classList.remove('ok');await dgFillSprites()}}}}
+
 function mvArc(from,to,cls,ms,lift,style){const d=fxEl(cls,Object.assign({left:from.x+'px',top:from.y+'px'},style||{}));if(!d)return;const dx=to.x-from.x,dy=to.y-from.y;
  d.animate([{transform:'translate(-50%,-50%)'},{transform:'translate(calc(-50% + '+dx/2+'px),calc(-50% + '+(dy/2-(lift||60))+'px)) rotate(180deg)'},{transform:'translate(calc(-50% + '+dx+'px),calc(-50% + '+dy+'px)) rotate(360deg)'}],{duration:ms,easing:'linear',fill:'forwards'});fxGone(d,ms+40)}
 function mvCurve(from,to,cls,ms,bend,style){const d=fxEl(cls,Object.assign({left:from.x+'px',top:from.y+'px'},style||{}));if(!d)return;const dx=to.x-from.x,dy=to.y-from.y,len=Math.hypot(dx,dy)||1,nx=-dy/len*bend,ny=dx/len*bend;

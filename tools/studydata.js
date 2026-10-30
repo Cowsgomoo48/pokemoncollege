@@ -8,11 +8,12 @@ function sdCell(t){return String(t==null?'':t).replace(/\s+/g,' ').replace(/\|/g
 function sdCut(t,n){t=sdCell(t);return t.length>n?t.slice(0,n-1)+'…':t}
 // one row per thing you study: each term, each quiz question, and each practice problem type (its 2 slots added together)
 function sdItems(s){const Q=db.qstats||{},out=[],get=k=>Q[k]||null;
- termsFor(s).forEach(t=>out.push({kind:'Term',name:t.term,detail:t.definition,st:[get(s.id+'|t|'+t.term)]}));
- (s.quiz||[]).forEach(q=>out.push({kind:'Quiz',name:q.question,detail:q.answer,st:[get(s.id+'|q|'+q.question)]}));
- prOf(s).forEach(id=>out.push({kind:'Practice',name:PR[id].name,detail:PR[id].subject||'',gid:id,st:[get(s.id+'|g|'+id+'|0'),get(s.id+'|g|'+id+'|1')]}));
+ termsFor(s).forEach(t=>out.push({kind:'Term',key:s.id+'|t|'+t.term,name:t.term,detail:t.definition,st:[get(s.id+'|t|'+t.term)]}));
+ (s.quiz||[]).forEach(q=>out.push({kind:'Quiz',key:s.id+'|q|'+q.question,name:q.question,detail:q.answer,st:[get(s.id+'|q|'+q.question)]}));
+ prOf(s).forEach(id=>out.push({kind:'Practice',name:PR[id].name,detail:PR[id].subject||'',gid:id,st:Object.keys(Q).filter(k=>k.startsWith(s.id+'|g|'+id+'|')&&/^\d+$/.test(k.slice((s.id+'|g|'+id+'|').length))).map(get)}));
  return out.map(it=>{const S=it.st.filter(Boolean),sum=k=>S.reduce((a,x)=>a+(x[k]||0),0);
   return Object.assign(it,{r:sum('r'),w:sum('w'),ft:sum('ft'),mk:sum('mk'),h:sum('h'),g:sum('g'),miss:Math.max(0,...S.map(x=>x.miss||0)),last:Math.max(0,...S.map(x=>x.last||0)),wp:S.flatMap(x=>x.wp||[]).sort((a,b)=>b.at-a.at).slice(0,3),seen:S.length>0})})}
+function sdWeak(x){return x.w>0||x.g>0||x.miss>0}
 function sdSetHasData(s){return sdItems(s).some(it=>it.seen)}
 function sdFolderOf(s){const k=sumKey(s);return k?sumKeyName(k):''}
 function sdSheet(sids){const sets=db.summaries.filter(s=>sids.includes(s.id)),now=new Date();let all={r:0,w:0};const L=[],rows=[];
@@ -27,7 +28,7 @@ function sdSheet(sids){const sets=db.summaries.filter(s=>sids.includes(s.id)),no
   if(days.length)L.push('- Recent days: '+days.map(d=>{const [y,m,dd]=d.split('-').map(Number);return sdDate(new Date(y,m-1,dd))+' '+H[d][0]+'✓ '+H[d][1]+'✗'}).join(' · ')+'.');
   L.push('');
   if(!seen.length){L.push('Not practiced yet.','');continue}
-  const weak=seen.filter(x=>x.w>0||x.g>0).sort((a,b)=>(b.w+b.g*.7-b.r*.5+b.miss)-(a.w+a.g*.7-a.r*.5+a.miss)||b.w-a.w).slice(0,15);
+  const weak=seen.filter(sdWeak).sort((a,b)=>(b.w+b.g*.7-b.r*.5+b.miss)-(a.w+a.g*.7-a.r*.5+a.miss)||b.w-a.w).slice(0,15);
   if(weak.length){L.push('### Struggling with (most missed first)','','| Item | Type | Right | Wrong | 1st try | Guessed | Make-Up | Hints | Last missed |','|---|---|---|---|---|---|---|---|---|');
    weak.forEach(x=>L.push('| '+sdCut(x.name,70)+' | '+x.kind+' | '+x.r+' | '+x.w+' | '+x.ft+' | '+x.g+' | '+x.mk+' | '+x.h+' | '+sdDate(x.wp[0]&&x.wp[0].at||x.last)+' |'));L.push('');
    const mis=weak.filter(x=>x.wp.length);

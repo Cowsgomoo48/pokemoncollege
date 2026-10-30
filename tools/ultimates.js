@@ -32,7 +32,7 @@ function ultOf(p){return p&&p.ult?ULTS[p.species]||null:null}
 function ultType(U,e){if(!U.type.startsWith('best:'))return U.type;const opts=U.type.slice(5).split(',');return opts.reduce((a,t)=>typeEff(t,e.types)>typeEff(a,e.types)?t:a,opts[0])}
 // ---- Box: show / unlock the Ultimate ----
 function ultBoxHTML(p){const U=ULTS[p.species];if(!U)return '';const tc=TYPE_COLOR[U.type]||'#d6b24a',tl=U.type.startsWith('best:')?'Adapts':U.type;
- if(p.ult)return '<div class="bx-move bx-ult"><i class="bx-mc" style="background:'+(U.type.startsWith('best:')?'conic-gradient(#ee8130,#6390f0,#7ac74c,#b6a136,#ee8130)':tc)+'"></i><div><small>ULTIMATE · '+tl.toUpperCase()+' · FULL ⚡</small><b>✦ '+esc(U.move)+'</b><p>'+esc(U.desc)+'</p></div><span>180</span></div>';
+ if(p.ult)return '<div class="bx-move bx-ult"><i class="bx-mc" style="background:'+(U.type.startsWith('best:')?'conic-gradient(#ee8130,#6390f0,#7ac74c,#b6a136,#ee8130)':tc)+'"></i><div><small>ULTIMATE · '+tl.toUpperCase()+' · FULL ⚡</small><b>✦ '+esc(U.move)+'</b><p>'+esc(U.desc)+'</p></div><span>'+(U.power||180)+'</span></div>';
  return '<div class="bx-ultlock"><div><small>LEGENDARY ULTIMATE</small><b>✦ '+esc(U.move)+'</b><p>'+esc(U.desc)+'</p></div><button class="btn red" '+(db.candies<ULT_COST?'disabled':'')+' onclick="unlockUlt(\''+p.id+'\')">UNLOCK · '+ULT_COST+' 🍬</button></div>'}
 function unlockUlt(id){const p=db.pokemon.find(x=>x.id===id),U=p&&ULTS[p.species];if(!U||p.ult)return;if(db.candies<ULT_COST){toast('You need '+ULT_COST+' Rare Candy');return}
  if(!confirm('Spend '+ULT_COST+' Rare Candy to unlock '+U.move+' for '+(p.nickname||p.species)+'?'))return;db.candies-=ULT_COST;p.ult=true;save();render();toast('✦ '+(p.nickname||p.species)+' unlocked '+U.move+'!')}
@@ -55,7 +55,10 @@ function fxFly(from,to,cls,ms,style,ease){const d=fxEl(cls,Object.assign({left:f
 function fxBoom(at,color,size){if(!at)return;fxGone(fxEl('boom',{left:at.x+'px',top:at.y+'px','--c':color,'--s':(size||64)+'px'}),620)}
 function fxRing(at,color,ms,scale){if(!at)return;fxGone(fxEl('ring',{left:at.x+'px',top:at.y+'px','--c':color,'--k':scale||8,animation:'uring '+(ms||700)+'ms ease-out forwards'}),ms||700)}
 function fxOver(cls,ms){fxGone(fxEl('ov '+cls,{'--ms':(ms||900)+'ms'}),ms||900)}
-function fxSpr(sel,cls,ms){const el=document.querySelector(sel+' .dg-spr');if(!el)return;el.classList.remove(cls);void el.offsetWidth;el.classList.add(cls);setTimeout(()=>el.classList.remove(cls),ms)}
+function fxSpr(sel,cls,ms){const el=document.querySelector(sel+' .dg-spr');if(!el)return;el._poseCleanup?.();const token={};el._poseToken=token;el.classList.remove(cls);void el.offsetWidth;el.classList.add(cls);let timer;
+ const cleanup=()=>{if(el._poseToken!==token)return;clearTimeout(timer);el.removeEventListener?.('animationend',ended);el.classList.remove(cls);el._poseToken=null;el._poseCleanup=null};
+ const ended=event=>{if(event.target===el&&event.animationName!=='dsx'&&event.animationName!=='dsxonce')cleanup()};el._poseCleanup=cleanup;el.addEventListener?.('animationend',ended);timer=setTimeout(cleanup,ms+50)}
+
 function fxBeam(from,to,color,ms,thick){if(!from||!to)return;const dx=to.x-from.x,dy=to.y-from.y,len=Math.hypot(dx,dy),ang=Math.atan2(dy,dx)*180/Math.PI;fxGone(fxEl('beam',{left:from.x+'px',top:from.y+'px',width:len+'px','--c':color,'--t':(thick||14)+'px',transform:'rotate('+ang+'deg)',animation:'ubeam '+(ms||500)+'ms ease-out forwards'}),ms||500)}
 function fxShake(){const f=fxField();if(f){f.classList.remove('shake');void f.offsetWidth;f.classList.add('shake');setTimeout(()=>f.classList.remove('shake'),450)}}
 const TC=t=>TYPE_COLOR[t]||'#cccccc';
@@ -133,6 +136,7 @@ function dgBarSlow(b){return b&&(b.slowBar===b.round||b.gigas===b.round)?.9:1}
 function ultGuardDmg(b,dmg){if(!b||!dmg)return dmg;if(b.diamond===b.round)return 0;if(b.gigas===b.round)return Math.max(0,dmg-2);return dmg}
 function ultResting(b,m){return !!(b&&m&&m.hp>0&&m.rest===b.round)}
 async function dgUltimate(slot,ti,mult,res){const r=runOf(),b=r&&r.battle,m=b&&r.party[slot],p=partyMon(m),U=ultOf(p);if(!U||!b){dgAfterAction();return}
+ if(U.custom)return legendUltimate(slot,U,mult,{});
  const c=combatant(p),who='<b style="color:'+SLOT_COLORS[slot]+'">'+esc(p.nickname||p.species)+'</b>';
  if(U.t==='none'&&res==='fail'){if(DG)DG.msg=who+' tried <b>'+esc(U.move)+'</b>… but it fizzled! (Stamina kept)';dgDrawBattle();await dgSleep(1000);dgAfterAction();return}
  m.energy=0;save();

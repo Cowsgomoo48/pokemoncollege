@@ -90,3 +90,11 @@
 @keyframes sb-bubble{from{transform:translate(-50%,0) scale(.4);opacity:1}to{transform:translate(var(--dx),var(--dy)) scale(1.25);opacity:0}}
 .ufx.sb-geyser{width:40px;height:var(--h);transform-origin:50% 100%;background:linear-gradient(90deg,#249be0aa,#e1ffff,#32baffaa);border-radius:55% 55% 15% 15%;box-shadow:0 0 15px #52d9ffaa;animation:sb-geyser .85s ease-out both;z-index:8}
 @keyframes sb-geyser{0%{transform:translate(-50%,-100%) scaleY(0);opacity:0}30%{transform:translate(-50%,-100%) scaleY(1.2);opacity:1}65%{transform:translate(-50%,-100%) scaleY(1);opacity:1}100%{transform:translate(-50%,-100%) scaleY(.1);opacity:0}}
+
+/* Core Enforcer charging, steam and Eternabeam. */
+.lg-core-idle{position:absolute;width:40px;height:40px;pointer-events:none;z-index:8}.lg-core-idle i{position:absolute;left:20px;top:20px;width:5px;height:5px;border-radius:50%;background:#9eff48;box-shadow:0 0 6px #5cff19;animation:lgSuck 1.2s var(--delay) linear infinite}@keyframes lgSuck{from{transform:rotate(var(--a)) translateX(65px) scale(1);opacity:1}to{transform:rotate(var(--a)) translateX(0) scale(.2);opacity:0}}
+.ufx.lg-steam{width:24px;height:24px;border-radius:50%;background:radial-gradient(#fff,#d6edf9aa 50%,transparent 74%);filter:blur(2px)}
+.ufx.lg-heat{inset:0;background:repeating-linear-gradient(170deg,#ff393955 0 10px,#ea2b1a88 12px 25px);z-index:8;pointer-events:none;animation:lgHeat .18s linear infinite}
+@keyframes lgHeat{0%,100%{transform:skewX(-1.5deg);filter:contrast(1.2)}50%{transform:skewX(1.5deg);filter:contrast(1.6)}}
+.ufx.lg-eternabeam{height:35px;margin-top:-17px;transform-origin:0 50%;border-radius:50% 10px 10px 50%;background:linear-gradient(#9f104a,#ff426f 20%,#ffe5f2 45%,#fff 50%,#ffb1d4 60%,#e9134d 85%,#7c092c);box-shadow:0 0 16px #e62263,0 0 35px #ff7ab2;z-index:9}
+@media(prefers-reduced-motion:reduce){.lg-core-idle i,.ufx.lg-heat{animation:none}}
