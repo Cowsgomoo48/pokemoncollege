@@ -84,13 +84,13 @@ async function mdDigSpot(sp){const r=runOf();if(!r||!DG||DG.busy)return;if(!gdFr
   const q=askQ(it,DG.bank,{title:'⛏ DIG '+tier+'/'+sp.max+' · '+tierName[tier].toUpperCase(),typed:tier>=3?undefined:false,typedChance:tier>=3?1:0,halfsies:!!r.halfsies});
   if(sp.done>0)setTimeout(()=>{const ov=[...document.querySelectorAll('.mgq')].pop(),card=ov&&ov.querySelector('.mgq-card');if(card&&!card.querySelector('.md-exitdig')){const b=document.createElement('button');b.className='btn md-exitdig';b.textContent='EXIT DIG (keep what you found)';b.onclick=()=>{ov.remove();exitRes('exit')};card.appendChild(b)}},60);
   let res=await Promise.race([q,ex]);if(res==='exit'){exit=true;break}const half=res==='half';if(half)res='makeup';
-  if(DG&&DG.P)DG.P.report(it,half?'fail':res);if(res!=='full'&&__qMiss)recapAdd(it,__qMiss);if(res==='full')r.qOk=(r.qOk||0)+1;
+  if(DG&&DG.P)DG.P.report(it,half?'fail':res);if(res!=='full'&&__qMiss)recapAdd(it,__qMiss);if(res==='full')r.qOk=(r.qOk||0)+1;mdRescueFind(r);
   if(res==='fail'){sp.done=sp.max;save();toast('💥 The dig spot caved in! You keep what you found.');break}
   sp.done++;const L=mdDigLoot(tier,res==='makeup');r.tickets=(r.tickets||0)+L.tix;r.cogs=(r.cogs||0)+L.tix;L.st.forEach(t=>mdGive(r,t,1));L.items.forEach(k=>r.bag[k]=(r.bag[k]||0)+1);if(L.soul)r.souls=(r.souls||0)+1;r.digTotal=(r.digTotal||0)+1;save();
   toast('⛏ Dig '+tier+': '+mdLootText(L)+(sp.done<sp.max?' · keep digging for better finds!':' · the spot is dug out.'))}
  DG.busy=0;save();gdDrawBattle()}
 // ---------- the shop screens ----------
-function mdShopStock(r){if(!r.mdStock||r.mdStockAt!==r.rooms){const pool=Object.keys(DITEMS).map(id=>({id,w:DITEM_TIER_W[DITEMS[id].tier||0]})),st=[];while(st.length<6&&pool.length){const x=pickWeighted(pool);st.push(x.id);pool.splice(pool.indexOf(x),1)}r.mdStock=st;r.mdSold=[];r.mdStockAt=r.rooms}return r.mdStock}
+function mdShopStock(r){if(!r.mdStock||r.mdStockAt!==r.rooms){const pool=Object.keys(DITEMS).filter(id=>!DITEMS[id].mdOnly).map(id=>({id,w:DITEM_TIER_W[DITEMS[id].tier||0]})),st=[];while(st.length<6&&pool.length){const x=pickWeighted(pool);st.push(x.id);pool.splice(pool.indexOf(x),1)}r.mdStock=st;r.mdSold=[];r.mdStockAt=r.rooms}return r.mdStock}
 function mdItemPrice(k){return Math.max(1,Math.round(DITEMS[k].cost*twShopMult()))}
 const MD_SAY={shop:['Fufu… what will it be today?','Stones and Tickets, please. I keep the change.','A little stronger for the road down?','The deeper you go, the more you’ll need.','Mind the hat. It has opinions.'],
  ghost:['Ah… you came back to me.','Souls remember. So will your next run.','Spend what you earned down there.','Nothing is lost that you can buy back.','The core is waiting. Again.']};

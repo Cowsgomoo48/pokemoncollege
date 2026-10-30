@@ -117,7 +117,7 @@ function twBattle(ch){const r=runOf(),f=r.floor,avg=partyAvgLv(),boss=f%10===0,e
  const bat=10*twC('staminasnack');if(bat)r.party.forEach(m=>{if(m.hp>0)m.energy=Math.min(100,m.energy+bat)});r.party.forEach(q=>{delete q.hurt;delete q.hurtR;delete q.koR});
  r.battle={kind,enemies:en,turn:0,round:1,overclock:0,skip:!!twC('quickball'),guard:{},done:false,challenge:ch||null,diy:f%10===0||f%3===0};twCrown(r,r.battle);if(DG)DG.msg='';save();dgDrawBattle(true)}
 // ---------- loot ----------
-function twItem(minTier){const pool=Object.keys(DITEMS).filter(id=>(DITEMS[id].tier||0)>=(minTier||0)).map(id=>({id,w:[10,7,4,1.2][DITEMS[id].tier||0]}));return pickWeighted(pool).id}
+function twItem(minTier){const pool=Object.keys(DITEMS).filter(id=>!DITEMS[id].mdOnly&&(DITEMS[id].tier||0)>=(minTier||0)).map(id=>({id,w:[10,7,4,1.2][DITEMS[id].tier||0]}));return pickWeighted(pool).id}
 function twWin(){const r=runOf(),b=r.battle,f=r.floor,boss=b.kind!=='battle'&&b.kind!=='swarm',got=[],luck=(1+.1*twC('minersdream'))*(twC('goldenticket')?1.4:1)*(boss&&twC('amuletcoin')?2:1);
  let tix=b.kind==='swarm'?5+Math.floor(f/4):boss?12+Math.floor(f/2)+(b.kind!=='boss'?5:0):3+Math.floor(f/4);tix=Math.round((tix+(twC('payday')?b.enemies.length:0))*luck);
  const items=[];if(boss){items.push(twItem(1),twItem(0))}else if(Math.random()<(b.kind==='swarm'?.45:.3))items.push(twItem(0));

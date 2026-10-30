@@ -31,3 +31,6 @@
 .recap-no{color:#b03030}
 .recap-ok{color:#1f7a45;font-weight:700}
 .recap-why{font-size:12px;color:#5b6b7d;margin-top:2px}
+
+.sum-learned{display:inline-block;vertical-align:middle;margin-left:6px;padding:1px 7px;border-radius:999px;font:800 10px/1.6 system-ui,sans-serif;letter-spacing:.02em;background:#eef2f5;color:#5b6f80;white-space:nowrap}
+.sum-learned.mid{background:#fff3cf;color:#8a6200}.sum-learned.hi{background:#d9f5e3;color:#1d7a43}

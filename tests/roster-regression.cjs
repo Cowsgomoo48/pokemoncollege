@@ -12,8 +12,8 @@ const ctx = vm.createContext({assert, Date, console});
 vm.runInContext(`${mons}\n${evo}\n${migration}\nfunction stamp(){return new Date().toISOString()}`, ctx);
 vm.runInContext(`
 const excluded=['Tirtouga','Carracosta','Wo-Chien','Chien-Pao'];
-assert.equal(MONS.length,168);
-assert.equal(new Set(MONS.map(x=>x[0])).size,168);
+assert.equal(MONS.length,169);
+assert.equal(new Set(MONS.map(x=>x[0])).size,169);
 for(const name of excluded){assert(!MONS.some(m=>m[0]===name));assert(!EVO[name]);}
 for(const targets of Object.values(EVO))for(const [target] of targets)assert(MONS.some(m=>m[0]===target));
 for(let tier=0;tier<5;tier++)assert(MONS.some(m=>m[2]===tier));
@@ -39,4 +39,4 @@ assert(script.includes('function ensureMoveData(){let changed=migrateRetiredSpec
 assert(script.includes('db=candidate;\n  migrateRetiredSpecies(db);'));
 assert(script.includes('db=payload;migrateRetiredSpecies(db);'));
 assert(script.includes('if(pcStorageReady)ensureMoveData();'));
-console.log('PASS: full-script syntax, 168-species roster, evolution targets, all rarity tiers, legacy collection archiving, companion handling, all three ticket refunds, repeat/import idempotence, unaffected saves, and migration entry points.');
+console.log('PASS: full-script syntax, 169-species roster, evolution targets, all rarity tiers, legacy collection archiving, companion handling, all three ticket refunds, repeat/import idempotence, unaffected saves, and migration entry points.');

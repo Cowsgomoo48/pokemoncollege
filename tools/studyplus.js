@@ -83,3 +83,8 @@ function askDIY(item,opts={}){return new Promise(res=>{const p=prInstance(item.g
   card.querySelector('.mgq-go').onclick=()=>{ov.remove();res(ok?'full':'fail')}}})}
 // Halfsies: how much of the right answer a typed answer has (1 = all of it), by edit distance
 function saHalf(user,q){const norm=q.cmd?uxNorm:saNorm,u=norm(user);if(!u)return 0;return Math.max(...[q.short,...(q.alts||[])].map(a=>{const t=norm(a);if(!t)return 0;return 1-saLev(u,t)/Math.max(u.length,t.length)}))}
+// Learned %: share of a set's questions you've actually got down, from your answer history.
+// An item counts as learned once you've got it right at least twice, have no recent misses, and right answers outnumber wrong ones 2 to 1.
+function sumLearned(s){let b;try{b=mgBank([s.id])}catch(e){return null}const keys=[...new Set(b.map(x=>x.key).filter(Boolean))];if(!keys.length)return null;const Q=db.qstats||{};
+ const n=keys.filter(k=>{const q=Q[k];return q&&q.r>=2&&!(q.miss>0)&&q.r>=2*(q.w||0)}).length;return Math.round(n/keys.length*100)}
+function sumLearnedHTML(s){const p=sumLearned(s);if(p==null)return '';return ' <span class="sum-learned '+(p>=80?'hi':p>=40?'mid':'lo')+'" title="Learned: '+p+'% of this set">'+p+'% learned</span>'}

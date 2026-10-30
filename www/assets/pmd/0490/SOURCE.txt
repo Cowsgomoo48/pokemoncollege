@@ -1,0 +1,2 @@
+PMDCollab/SpriteCollab: https://github.com/PMDCollab/SpriteCollab/tree/master/sprite/0490
+Original sprite sheets unchanged. Contributor attribution in credits.txt and portrait-credits.txt.
