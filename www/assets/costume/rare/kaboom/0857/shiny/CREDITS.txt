@@ -1,10 +1,2 @@
-Hattrem — Variant, shiny colors (witch costume)
-Source: https://github.com/PMDCollab/SpriteCollab/tree/f663e2331a5f83504d1e7a01573dc53a6708f4c7/sprite/0857
-
-Repository artist summary:
-baronessfaron
-
-See credits.txt for the original per-animation contribution history.
-Base artwork by the artists above; the witch-costume recolor, hat, feather and cloak pixels were added on top of it.
-Repository license: CC BY-NC 4.0; see root LICENSE.md.
-Official game assets retain their original rights holders.
+2021-10-10 23:32:35.215348	<@!544245909639397378>	CUR	PMDCollab_1	Attack,Charge,Double,Hop,Hurt,Idle,Rotate,Shoot,Sleep,Swing,Walk
+2022-02-25 04:10:38.212867	<@!544245909639397378>	CUR	PMDCollab_1	Double,Hop,Shoot,Swing

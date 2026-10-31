@@ -1,10 +1,2 @@
-Snorunt — Base
-Source: https://github.com/PMDCollab/SpriteCollab/tree/f663e2331a5f83504d1e7a01573dc53a6708f4c7/sprite/0361
-
-Repository artist summary:
-CHUNSOFT — https://www.spike-chunsoft.com/
-JFain
-
-See credits.txt for the original per-animation contribution history.
-Original artwork and pixels unchanged. Repository license: CC BY-NC 4.0; see root LICENSE.md.
-Official game assets retain their original rights holders.
+2023-05-04 17:19:07.213418	CHUNSOFT	CUR	Unspecified	Idle,Walk,Sleep,Hurt,Attack,Charge,Shoot,Strike,Twirl,Swing,Double,Rotate,Hop
+2025-09-29 05:42:43.270111	<@!702275233125630042>	CUR	CC_BY-NC_4	EventSleep,Wake,Eat,Tumble,Pose,Pull,Pain,Float,DeepBreath,Nod,Sit,LookUp,Sink,Trip,Laying,LeapForth,Head,Cringe,LostBalance,TumbleBack,HitGround,Faint

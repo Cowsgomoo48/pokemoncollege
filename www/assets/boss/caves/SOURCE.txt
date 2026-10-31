@@ -1,0 +1,4 @@
+regirock_intro.png — Generated with the built-in image-generation tool, 2026-10-30.
+Prompt:
+Use case: illustration-story. Create a transparent game boss intro asset of Pokemon Regirock, accurate recognizable design: bulky tan and grey rocky golem, orange-brown shoulders and knees, seven orange dots on its face in an H pattern, no mouth. Cutesy polished hand-drawn Pokemon Mystery Dungeon storybook illustration. Regirock roaring energetically with both massive arms raised into the air, pebbles and soft dust clouds surrounding its feet. Full body, centered, three-quarter front view, bold clean outlines and warm soft shading, readable at 220px tall. No background, no scenery, no text, no border. Transparent background.
+PMD battle sprites retain their existing manifest and contributor credits under assets/pmd/0377/.

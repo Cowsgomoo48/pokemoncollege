@@ -117,7 +117,7 @@ const MD_HZ={brine:{name:'brine pool',icon:'💧',pop:'💧 The brine stings!'},
 // ---------- where you are ----------
 function mdLayerAt(f){let s=0;for(let i=0;i<MD_LAYERS.length;i++){if(f<s+MD_LAYERS[i].floors)return {i,start:s,L:MD_LAYERS[i]};s+=MD_LAYERS[i].floors}const i=MD_LAYERS.length-1;return {i,start:MD_TOTAL-MD_LAYERS[i].floors,L:MD_LAYERS[i]}}
 function mdRun(r){r=r||runOf();return r&&!r.tower&&r.sub?r:null}
-function mdSub(r){r=mdRun(r);return r&&r.sub?MD_SUBS[r.sub.k]:null}
+function mdSub(r){if((r||runOf())?.fl?.rc==='arena')return RC_ENV;r=mdRun(r);return r&&r.sub?MD_SUBS[r.sub.k]:null}
 function mdFx(r){const s=mdSub(r);return s?s.fx:{}}
 // picks the sublayer for the floor about to be made; returns true when a new sublayer starts (the cutscene plays)
 function mdPlan(r){const f=r.floor||0,{i,start,L}=mdLayerAt(f),cur=r.sub;

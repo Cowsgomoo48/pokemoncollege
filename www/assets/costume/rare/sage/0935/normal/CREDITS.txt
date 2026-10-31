@@ -1,9 +1,1 @@
-Charcadet — Base
-Source: https://github.com/PMDCollab/SpriteCollab/tree/f663e2331a5f83504d1e7a01573dc53a6708f4c7/sprite/0935
-
-Repository artist summary:
-Emmuffin — https://twitter.com/Ernmuffin
-
-See credits.txt for the original per-animation contribution history.
-Original artwork and pixels unchanged. Repository license: CC BY-NC 4.0; see root LICENSE.md.
-Official game assets retain their original rights holders.
+2023-04-16 03:57:43.807286	<@!356635814668664832>	CUR	PMDCollab_1	Idle,Walk,Sleep,Hurt,Attack,Charge,Shoot,Strike,Twirl,Swing,Double,Rotate,Hop,EventSleep,Wake,Eat,Tumble,Pose,Pull,Pain,Float,DeepBreath,Nod,Sit,LookUp,Sink,Trip,Laying,LeapForth,Head,Cringe,LostBalance,TumbleBack,HitGround,Faint
