@@ -3178,7 +3178,7 @@ function habTabsHTML(){if(!facOwned())return '◉ COMPANION HABITAT';const s=hab
 function tapProtectionTiming(prompt){
  const text=String(prompt??'').replace(/<\/?[A-Za-z][^>]*>/g,' ').trim();
  const words=text?text.split(/\s+/u).filter(w=>/[\p{L}\p{N}]/u.test(w)).length:0;
- return {words,skim:words*40,read:words*1500,total:words*1540};
+ return {words,skim:words*40,read:words*1000/3,total:words*40+words*1000/3};
 }
 function tapProtectionPhase(timing,elapsed){return elapsed<timing.skim?'skim':elapsed<timing.total?'read':'ready'}
 function tapProtectionStart(card,prompt,selector){
@@ -5758,7 +5758,7 @@ $('navHome').style.display='none';
  if(pcStorageReady)ensureMoveData();
  if(pcStorageReady&&permRoll())save();
  render();scheduleNotifs();aiCheck();window.__pcBooted=true;setTimeout(()=>{try{mdSync()}catch(e){}},1500);setTimeout(()=>{try{facTick()}catch(e){}},2500);setInterval(()=>{try{facTick();if(currentPage==='home'&&hab.scene&&hab.scene!=='home')drawHabitat()}catch(e){}},60000);
- window.__pcVersion='0.67.0';
+ window.__pcVersion='0.67.1';
  document.addEventListener('pointerdown',function(e){try{var t=e.target.closest&&e.target.closest('[onclick],button,a,[id]');if(!t)return;var oc=t.getAttribute('onclick');window.__pcLastTap=(oc?oc.slice(0,60):(t.id?'#'+t.id:t.tagName.toLowerCase()+'.'+String(t.className).split(' ')[0])).replace(/\s+/g,' ')}catch(_){}} ,true);
  Object.keys(window).forEach(function(k){var f=window[k];if(typeof f!=='function'||/^[A-Z]/.test(k)||k==='appError'||k==='$'||k==='esc'||/\[native code\]/.test(Function.prototype.toString.call(f)))return;
   var w=function(){try{return f.apply(this,arguments)}catch(err){if(err&&typeof err==='object'&&!err.__pcLogged){try{err.__pcLogged=1}catch(_){}appError(err,k)}throw err}};try{window[k]=w}catch(_){}});

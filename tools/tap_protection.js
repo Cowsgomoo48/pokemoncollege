@@ -2,7 +2,7 @@
 function tapProtectionTiming(prompt){
  const text=String(prompt??'').replace(/<\/?[A-Za-z][^>]*>/g,' ').trim();
  const words=text?text.split(/\s+/u).filter(w=>/[\p{L}\p{N}]/u.test(w)).length:0;
- return {words,skim:words*40,read:words*1500,total:words*1540};
+ return {words,skim:words*40,read:words*1000/3,total:words*40+words*1000/3};
 }
 function tapProtectionPhase(timing,elapsed){return elapsed<timing.skim?'skim':elapsed<timing.total?'read':'ready'}
 function tapProtectionStart(card,prompt,selector){
