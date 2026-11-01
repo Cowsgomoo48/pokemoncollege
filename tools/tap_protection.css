@@ -1,0 +1,9 @@
+/* Rounded panels and restrained red/blue feedback match the existing question cards. */
+.tp-skim,.tp-read{--tp-color:#de5559;position:relative;border-radius:18px;outline:2px solid var(--tp-color);outline-offset:3px;animation:tpSkim .65s ease-in-out infinite alternate}
+.tp-read{--tp-color:#518fd8;animation:tpRead 1.8s ease-in-out infinite alternate}
+.tp-status{font:700 12px/1.4 system-ui;color:var(--tp-color,#446c67);margin:8px 0 12px}
+button.tp-locked{position:relative;opacity:.75!important;cursor:wait;padding-right:42px!important}
+button.tp-locked::after{content:'';position:absolute;right:12px;top:50%;transform:translateY(-50%);width:20px;height:23px;background:var(--tp-color);mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 28'%3E%3Crect x='2' y='11' width='20' height='16' rx='4'/%3E%3Cpath d='M6 12V8a6 6 0 0112 0v4' fill='none' stroke='black' stroke-width='3'/%3E%3C/svg%3E") center/contain no-repeat}
+@keyframes tpSkim{from{box-shadow:0 0 0 4px #de55591a,inset 0 0 28px #de55590d}to{box-shadow:0 0 0 8px #de55594d,inset 0 0 38px #de555929}}
+@keyframes tpRead{from{box-shadow:0 0 0 3px #518fd81a}to{box-shadow:0 0 0 6px #518fd84d}}
+@media(prefers-reduced-motion:reduce){.tp-skim,.tp-read{animation:none;box-shadow:0 0 0 4px #647c9426}}

@@ -89,3 +89,8 @@
 .gd-stones .mds-cur{display:inline-flex;align-items:center;justify-content:center;gap:4px;min-width:44px;padding:4px 8px;margin:0;border:1px solid rgba(255,255,255,.25);border-radius:999px;background:rgba(5,7,13,.82);color:#fff;font:700 12px/1.2 system-ui;box-sizing:border-box;white-space:nowrap}
 .gd-stones .ico{width:20px;height:20px;object-fit:contain}
 .gd-stones.gd-under{opacity:.24}
+
+/* Messages and stone counters share a flow layout, so wrapped messages cannot cover stones. */
+.gd-hud{position:absolute;left:8px;right:8px;bottom:8px;z-index:61;display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none}
+.gd-field .gd-hud .dg-ticker{position:static;width:100%;margin:0;overflow-wrap:anywhere}
+.gd-hud .gd-stones{position:static;transform:none;flex-wrap:wrap;justify-content:center}

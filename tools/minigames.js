@@ -59,10 +59,12 @@ let __qMiss=null;function __qMissReset(){__qMiss=null}function __qMissSet(m){if(
 function askQ(item,bank,opts={}){__qMissReset();return new Promise(res=>{const ov=document.createElement('div');ov.className='mgq';document.body.appendChild(ov);const v0=Math.random()<.5?0:1;
  // about 1 question in 5 asks you to type the answer instead of picking it (never a Make-Up)
  const plan=opts.typed!==false&&Math.random()<(opts.typedChance??(item.kind==='gen'&&PR[item.gid]&&PR[item.gid].cmd?.85:.2))?saPlan(item):null;
- const show=(q,isMakeUp)=>{const t0=performance.now();let hinted=false;const typed=!!q.typed;
+ let protection=null;
+ const show=(q,isMakeUp)=>{if(protection)protection.stop();const t0=performance.now();let hinted=false;const typed=!!q.typed;
   ov.innerHTML='<div class="mgq-card">'+(opts.title?'<span class="badge">'+esc(opts.title)+'</span> ':'')+(isMakeUp?'<span class="badge mk">MAKE-UP</span>':'')+(typed?'<span class="badge sa-b">✍️ TYPE IT</span>':'')+'<h3>'+mathHTML(q.prompt)+'</h3><p class="small muted">'+esc(q.sub)+'</p>'+(opts.hint!==false?'<div class="mgq-hints"></div><button class="btn smallbtn mgq-hint">💡 Hint</button>':'')
    +(typed?'<div class="sa-wrap"><input class="sa-in" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Your answer"><button class="btn red sa-go">CHECK</button></div>'+(q.cmd?saKeysHTML(true):q.math?saKeysHTML():''):q.options.map((o,i)=>'<button class="answer" data-i="'+i+'">'+mathHTML(o.t)+'</button>').join(''))
    +(!q.cmd&&(q.math||mathy(q.prompt,...q.options.map(o=>o.t)))?calcHTML():'')+'</div>';calcInit(ov);
+  protection=tapProtectionStart(ov.querySelector('.mgq-card'),q.prompt,'.answer,.sa-go');let submitted=false;
   // hints come one step at a time; they explain the problem and never remove answers.
   // Questions without built-in steps ask the AI tutor to work out the steps the first time you tap.
   const hb=ov.querySelector('.mgq-hint'),ans=String((q.options.find(o=>o.ok)||{}).t||'');let H=q.steps&&q.steps.length?q.steps.map(x=>x[0]):null,hi=0,busy=false;
@@ -70,8 +72,8 @@ function askQ(item,bank,opts={}){__qMissReset();return new Promise(res=>{const o
   const next=()=>{if(hi>=H.length){hb.remove();return}ov.querySelector('.mgq-hints').insertAdjacentHTML('beforeend','<div class="mgq-step"><b>'+(H.length>1?'Step '+(hi+1)+'.':'Hint.')+'</b> '+mathHTML(H[hi]+(q.cmd&&typed&&typeof uxAttemptHint==='function'?' '+uxAttemptHint((ov.querySelector('.sa-in')||{}).value||'',q.short||ans):''))+'</div>');hi++;if(hi<H.length)label();else hb.remove()};
   if(hb){if(H)label();else hb.textContent=aiAny()?'💡 Walk me through it':'💡 Hint';
    hb.onclick=async()=>{hinted=true;if(busy)return;if(!H){busy=true;if(aiAny()){hb.disabled=true;hb.textContent='💭 Working out the steps…';const st=await aiTutor(q.prompt,q.short||ans,q.options.map(o=>o.t));if(!ov.isConnected)return;hb.disabled=false;if(st){q.steps=st;H=st.map(x=>x[0])}}if(!H||!H.length)H=mgHints(q);busy=false;if(!H.length){hb.remove();return}}next()}}
-  const done=r=>{ov.remove();res(r)};
-  const answered=(o,b)=>{if(typeof apNote==='function')apNote({ms:performance.now()-t0,ok:!!o.ok,chars:String(q.prompt).length+q.options.reduce((a,x)=>a+String(x.t).length,0),hinted:hinted||typed});const hb2=ov.querySelector('.mgq-hint');if(hb2)hb2.remove();
+  const done=r=>{if(protection)protection.stop();ov.remove();res(r)};
+  const answered=(o,b)=>{if(submitted||!protection.allowed())return;submitted=true;protection.stop();if(typeof apNote==='function')apNote({ms:performance.now()-t0,ok:!!o.ok,chars:String(q.prompt).length+q.options.reduce((a,x)=>a+String(x.t).length,0),hinted:hinted||typed});const hb2=ov.querySelector('.mgq-hint');if(hb2)hb2.remove();
    ov.querySelectorAll('.answer').forEach(x=>{x.disabled=true;if(q.options[+x.dataset.i].ok)x.classList.add('correct')});const card=ov.querySelector('.mgq-card');
    if(typed){const inp=ov.querySelector('.sa-in');inp.disabled=true;inp.classList.add(o.ok?'ok':'no');const g=ov.querySelector('.sa-go');if(g)g.remove();const k=ov.querySelector('.sa-keys');if(k)k.remove()}
    if(o.ok){qRecord(item,true,{first:!isMakeUp,makeup:isMakeUp,hints:hi});
@@ -167,19 +169,20 @@ function matchStart(el){const S=mgState,C=S.C;S.pairs=0;S.misses=0;S.combo=0;S.b
    else{S.misses++;S.combo=0;missed.add(a.i);missed.add(c.i);[A,b].forEach(x=>{x.classList.add('bad');setTimeout(()=>x.classList.remove('bad'),420)})}})};
  deal()}
 // ---------- Speed Round: 15 s per question, 1000 points for an instant answer down to 1 at the buzzer ----------
-function speedStart(el){const S=mgState,C=S.C,LIM=15000;S.score=0;S.right=0;S.n=0;S.streak=0;let tick=0;S.stop=()=>clearInterval(tick);
+function speedStart(el){const S=mgState,C=S.C,LIM=15000;S.score=0;S.right=0;S.n=0;S.streak=0;let tick=0,protection=null;S.stop=()=>{clearInterval(tick);if(protection)protection.stop()};
  const summary=()=>['Score: <b>'+S.score.toLocaleString()+'</b> pts','Correct: '+S.right+' / '+C.asked];
  S.finishNow=()=>mgFinish(summary(),Math.floor(S.score/1000));
- const next=()=>{if(mgState!==S)return;clearInterval(tick);if(C.over()){S.finishNow();return}const it=C.next();if(!it){S.finishNow();return}
+ const next=()=>{if(mgState!==S)return;clearInterval(tick);if(protection)protection.stop();if(C.over()){S.finishNow();return}const it=C.next();if(!it){S.finishNow();return}
   const q=mgQuestion(it,S.bank,Math.random()<.5?0:1),t0=performance.now();S.n++;let answered=false;
   el.innerHTML=mgHead('')+'<div class="speed"><div class="sp-top"><span class="sp-q">Q'+S.n+(C.left()?' · '+C.left():'')+'</span><span class="sp-score">'+S.score.toLocaleString()+' pts</span></div><div class="sp-bar"><i id="spBar"></i></div><div class="sp-time" id="spTime">15</div><h3>'+mathHTML(q.prompt)+'</h3>'+q.options.map((o,i)=>'<button class="answer sp-a'+i%4+'" data-i="'+i+'">'+mathHTML(o.t)+'</button>').join('')+'<div class="sp-pts" id="spPts"></div>'+(mathy(q.prompt,...q.options.map(o=>o.t))?calcHTML():'')+'</div>';
-  const done=(o,b)=>{if(answered||mgState!==S)return;answered=true;clearInterval(tick);const ms=performance.now()-t0,ok=!!(o&&o.ok);
+  protection=tapProtectionStart(el.querySelector('.speed'),q.prompt,'.answer');const answerStart=t0+protection.duration;
+  const done=(o,b)=>{if(answered||mgState!==S||!protection.allowed())return;answered=true;protection.stop();clearInterval(tick);const ms=Math.max(0,performance.now()-answerStart),ok=!!(o&&o.ok);
    el.querySelectorAll('.answer').forEach(x=>{x.disabled=true;if(q.options[+x.dataset.i].ok)x.classList.add('correct')});qRecord(it,ok);C.report(it,ok?'full':'fail');
    const pts=ok?Math.max(1,Math.round(1000*(1-ms/LIM))):0;if(ok){S.right++;S.streak++;S.score+=pts}else{S.streak=0;if(b)b.classList.add('wrong')}
    const p=$('spPts');if(p){p.className='sp-pts '+(ok?'good':'bad');p.textContent=ok?'+'+pts+' pts':(o?'✗ Wrong':'⏰ Time’s up')}
    setTimeout(next,ok?900:1500)};
   calcInit(el);el.querySelectorAll('.answer').forEach(b=>b.onclick=()=>done(q.options[+b.dataset.i],b));
-  tick=setInterval(()=>{const left=Math.max(0,LIM-(performance.now()-t0)),bar=$('spBar'),tm=$('spTime');if(bar)bar.style.width=(left/LIM*100)+'%';if(tm)tm.textContent=Math.ceil(left/1000);if(left<=0)done(null,null)},100)};
+  tick=setInterval(()=>{const left=Math.min(LIM,Math.max(0,LIM-(performance.now()-answerStart))),bar=$('spBar'),tm=$('spTime');if(bar)bar.style.width=(left/LIM*100)+'%';if(tm)tm.textContent=Math.ceil(left/1000);if(left<=0)done(null,null)},100)};
  next()}
 // ---------- Luxor (marble chain) ----------
 const LX_COLORS=[['#ef7c3a','#ffc08a'],['#3f86e8','#9cc6ff'],['#5bbf45','#b2ec92'],['#f2cd2b','#fff1a0'],['#e2559a','#ffb3d6'],['#7b5fb3','#c5b2f0']];

@@ -1047,6 +1047,20 @@ code.cmd{font-family:ui-monospace,Menlo,monospace;font-size:.92em;background:#1d
 
 
 .bx-viability{margin:10px 0;padding:12px;border:1px solid #bdcbd0;border-radius:14px;background:#f4f8f5;color:#233650;font-size:12px}.bx-viability p{line-height:1.5;margin:7px 0}.bx-viability summary{cursor:pointer;font-weight:750;padding:5px 0}.bx-viability .row{gap:10px;margin-top:6px}.bx-viability .row b{white-space:nowrap}
+
+/* Messages and stone counters share a flow layout, so wrapped messages cannot cover stones. */
+.gd-hud{position:absolute;left:8px;right:8px;bottom:8px;z-index:61;display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none}
+.gd-field .gd-hud .dg-ticker{position:static;width:100%;margin:0;overflow-wrap:anywhere}
+.gd-hud .gd-stones{position:static;transform:none;flex-wrap:wrap;justify-content:center}
+/* Rounded panels and restrained red/blue feedback match the existing question cards. */
+.tp-skim,.tp-read{--tp-color:#de5559;position:relative;border-radius:18px;outline:2px solid var(--tp-color);outline-offset:3px;animation:tpSkim .65s ease-in-out infinite alternate}
+.tp-read{--tp-color:#518fd8;animation:tpRead 1.8s ease-in-out infinite alternate}
+.tp-status{font:700 12px/1.4 system-ui;color:var(--tp-color,#446c67);margin:8px 0 12px}
+button.tp-locked{position:relative;opacity:.75!important;cursor:wait;padding-right:42px!important}
+button.tp-locked::after{content:'';position:absolute;right:12px;top:50%;transform:translateY(-50%);width:20px;height:23px;background:var(--tp-color);mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 28'%3E%3Crect x='2' y='11' width='20' height='16' rx='4'/%3E%3Cpath d='M6 12V8a6 6 0 0112 0v4' fill='none' stroke='black' stroke-width='3'/%3E%3C/svg%3E") center/contain no-repeat}
+@keyframes tpSkim{from{box-shadow:0 0 0 4px #de55591a,inset 0 0 28px #de55590d}to{box-shadow:0 0 0 8px #de55594d,inset 0 0 38px #de555929}}
+@keyframes tpRead{from{box-shadow:0 0 0 3px #518fd81a}to{box-shadow:0 0 0 6px #518fd84d}}
+@media(prefers-reduced-motion:reduce){.tp-skim,.tp-read{animation:none;box-shadow:0 0 0 4px #647c9426}}
 </style><style id="bundled-animation-style">
 .safari-foreground{position:absolute;inset:0;z-index:10;pointer-events:auto;background:#071b0d;display:flex;align-items:center;justify-content:center;overflow:hidden}
 .safari-foreground img{width:100%;height:100%;object-fit:cover;image-rendering:pixelated}
@@ -3160,6 +3174,31 @@ function facInfo(id){const f=facs()[id],L=facLv(f),B=FAC[id].levels,next=L<10?FA
   +((f.log||[]).length?'<p class="small" style="margin-top:10px"><b>Recent boosts</b></p><div class="small muted">'+f.log.slice(0,8).map(x=>new Date(x.at).toLocaleString([],{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})+' · '+esc(facName(db.pokemon.find(q=>q.id===x.mon))||'?')+': '+esc(x.t)+' (+'+money(x.xp)+' EXP)').join('<br>')+'</div>':'')
   +'<div class="actions">'+(inv().facticket&&L<10?'<button class="btn blue" onclick="facTicketUse(\''+id+'\')">USE FACILITY TICKET</button>':'')+'<button class="btn" onclick="closeModal()">CLOSE</button></div>')}
 function habTabsHTML(){if(!facOwned())return '◉ COMPANION HABITAT';const s=hab.scene||'home';return '<span class="hab-tabs">'+[['home','◉ HABITAT']].concat(Object.keys(facs()).map(id=>[id,FAC[id].icon+' '+FAC[id].name.toUpperCase().replace('WORKOUT ','')])).map(([k,n])=>'<button class="'+(s===k?'on':'')+'" onclick="event.stopPropagation();hab.scene=\''+k+'\';hab.edit=false;drawHabitat()">'+n+'</button>').join('')+'</span>'}
+// Per-question reading protection. Use deadlines so background timer throttling cannot prolong a lock.
+function tapProtectionTiming(prompt){
+ const text=String(prompt??'').replace(/<\/?[A-Za-z][^>]*>/g,' ').trim();
+ const words=text?text.split(/\s+/u).filter(w=>/[\p{L}\p{N}]/u.test(w)).length:0;
+ return {words,skim:words*40,read:words*1500,total:words*1540};
+}
+function tapProtectionPhase(timing,elapsed){return elapsed<timing.skim?'skim':elapsed<timing.total?'read':'ready'}
+function tapProtectionStart(card,prompt,selector){
+ if(card._tapProtection)card._tapProtection.stop();
+ const timing=tapProtectionTiming(prompt),start=Date.now(),buttons=[...card.querySelectorAll(selector)],original=new Map(buttons.map(b=>[b,b.disabled]));
+ const status=document.createElement('p');status.className='tp-status';status.setAttribute('role','timer');status.setAttribute('aria-live','off');
+ const heading=card.querySelector('h3');if(heading)heading.insertAdjacentElement('afterend',status);else card.prepend(status);
+ let timer=0,stopped=false;
+ const stop=()=>{if(stopped)return;stopped=true;clearInterval(timer);card.classList.remove('tp-skim','tp-read');status.remove();buttons.forEach(b=>{b.classList.remove('tp-locked');b.removeAttribute('aria-disabled');b.disabled=original.get(b)});if(card._tapProtection===api)delete card._tapProtection};
+ const update=()=>{if(!card.isConnected){stop();return}const elapsed=Math.max(0,Date.now()-start),phase=tapProtectionPhase(timing,elapsed),locked=phase!=='ready';
+  card.classList.toggle('tp-skim',phase==='skim');card.classList.toggle('tp-read',phase==='read');
+  const remaining=Math.max(0,(phase==='skim'?timing.skim:timing.total)-elapsed);
+  status.textContent=phase==='ready'?'Ready to answer':(phase==='skim'?'Tap Protection · Skim':'Tap Protection · Read')+' · '+(remaining/1000).toFixed(1)+'s';
+  buttons.forEach(b=>{b.disabled=locked||original.get(b);b.classList.toggle('tp-locked',locked);b.setAttribute('aria-disabled',String(b.disabled))});
+  if(!locked)clearInterval(timer);
+ };
+ const api={duration:timing.total,allowed:()=>!stopped&&card.isConnected&&Date.now()-start>=timing.total,stop};card._tapProtection=api;
+ update();if(!stopped&&timing.total)timer=setInterval(update,100);return api;
+}
+
 // ===================== MINIGAMES =====================
 // Question bank from summaries: "Term: definition" lines and AI quiz questions.
 function mgBank(sids){const out=[];for(const s of db.summaries){if(!sids.includes(s.id))continue;const cmdSet=prOf(s).some(id=>PR[id].cmd);
@@ -3221,10 +3260,12 @@ let __qMiss=null;function __qMissReset(){__qMiss=null}function __qMissSet(m){if(
 function askQ(item,bank,opts={}){__qMissReset();return new Promise(res=>{const ov=document.createElement('div');ov.className='mgq';document.body.appendChild(ov);const v0=Math.random()<.5?0:1;
  // about 1 question in 5 asks you to type the answer instead of picking it (never a Make-Up)
  const plan=opts.typed!==false&&Math.random()<(opts.typedChance??(item.kind==='gen'&&PR[item.gid]&&PR[item.gid].cmd?.85:.2))?saPlan(item):null;
- const show=(q,isMakeUp)=>{const t0=performance.now();let hinted=false;const typed=!!q.typed;
+ let protection=null;
+ const show=(q,isMakeUp)=>{if(protection)protection.stop();const t0=performance.now();let hinted=false;const typed=!!q.typed;
   ov.innerHTML='<div class="mgq-card">'+(opts.title?'<span class="badge">'+esc(opts.title)+'</span> ':'')+(isMakeUp?'<span class="badge mk">MAKE-UP</span>':'')+(typed?'<span class="badge sa-b">✍️ TYPE IT</span>':'')+'<h3>'+mathHTML(q.prompt)+'</h3><p class="small muted">'+esc(q.sub)+'</p>'+(opts.hint!==false?'<div class="mgq-hints"></div><button class="btn smallbtn mgq-hint">💡 Hint</button>':'')
    +(typed?'<div class="sa-wrap"><input class="sa-in" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Your answer"><button class="btn red sa-go">CHECK</button></div>'+(q.cmd?saKeysHTML(true):q.math?saKeysHTML():''):q.options.map((o,i)=>'<button class="answer" data-i="'+i+'">'+mathHTML(o.t)+'</button>').join(''))
    +(!q.cmd&&(q.math||mathy(q.prompt,...q.options.map(o=>o.t)))?calcHTML():'')+'</div>';calcInit(ov);
+  protection=tapProtectionStart(ov.querySelector('.mgq-card'),q.prompt,'.answer,.sa-go');let submitted=false;
   // hints come one step at a time; they explain the problem and never remove answers.
   // Questions without built-in steps ask the AI tutor to work out the steps the first time you tap.
   const hb=ov.querySelector('.mgq-hint'),ans=String((q.options.find(o=>o.ok)||{}).t||'');let H=q.steps&&q.steps.length?q.steps.map(x=>x[0]):null,hi=0,busy=false;
@@ -3232,8 +3273,8 @@ function askQ(item,bank,opts={}){__qMissReset();return new Promise(res=>{const o
   const next=()=>{if(hi>=H.length){hb.remove();return}ov.querySelector('.mgq-hints').insertAdjacentHTML('beforeend','<div class="mgq-step"><b>'+(H.length>1?'Step '+(hi+1)+'.':'Hint.')+'</b> '+mathHTML(H[hi]+(q.cmd&&typed&&typeof uxAttemptHint==='function'?' '+uxAttemptHint((ov.querySelector('.sa-in')||{}).value||'',q.short||ans):''))+'</div>');hi++;if(hi<H.length)label();else hb.remove()};
   if(hb){if(H)label();else hb.textContent=aiAny()?'💡 Walk me through it':'💡 Hint';
    hb.onclick=async()=>{hinted=true;if(busy)return;if(!H){busy=true;if(aiAny()){hb.disabled=true;hb.textContent='💭 Working out the steps…';const st=await aiTutor(q.prompt,q.short||ans,q.options.map(o=>o.t));if(!ov.isConnected)return;hb.disabled=false;if(st){q.steps=st;H=st.map(x=>x[0])}}if(!H||!H.length)H=mgHints(q);busy=false;if(!H.length){hb.remove();return}}next()}}
-  const done=r=>{ov.remove();res(r)};
-  const answered=(o,b)=>{if(typeof apNote==='function')apNote({ms:performance.now()-t0,ok:!!o.ok,chars:String(q.prompt).length+q.options.reduce((a,x)=>a+String(x.t).length,0),hinted:hinted||typed});const hb2=ov.querySelector('.mgq-hint');if(hb2)hb2.remove();
+  const done=r=>{if(protection)protection.stop();ov.remove();res(r)};
+  const answered=(o,b)=>{if(submitted||!protection.allowed())return;submitted=true;protection.stop();if(typeof apNote==='function')apNote({ms:performance.now()-t0,ok:!!o.ok,chars:String(q.prompt).length+q.options.reduce((a,x)=>a+String(x.t).length,0),hinted:hinted||typed});const hb2=ov.querySelector('.mgq-hint');if(hb2)hb2.remove();
    ov.querySelectorAll('.answer').forEach(x=>{x.disabled=true;if(q.options[+x.dataset.i].ok)x.classList.add('correct')});const card=ov.querySelector('.mgq-card');
    if(typed){const inp=ov.querySelector('.sa-in');inp.disabled=true;inp.classList.add(o.ok?'ok':'no');const g=ov.querySelector('.sa-go');if(g)g.remove();const k=ov.querySelector('.sa-keys');if(k)k.remove()}
    if(o.ok){qRecord(item,true,{first:!isMakeUp,makeup:isMakeUp,hints:hi});
@@ -3329,19 +3370,20 @@ function matchStart(el){const S=mgState,C=S.C;S.pairs=0;S.misses=0;S.combo=0;S.b
    else{S.misses++;S.combo=0;missed.add(a.i);missed.add(c.i);[A,b].forEach(x=>{x.classList.add('bad');setTimeout(()=>x.classList.remove('bad'),420)})}})};
  deal()}
 // ---------- Speed Round: 15 s per question, 1000 points for an instant answer down to 1 at the buzzer ----------
-function speedStart(el){const S=mgState,C=S.C,LIM=15000;S.score=0;S.right=0;S.n=0;S.streak=0;let tick=0;S.stop=()=>clearInterval(tick);
+function speedStart(el){const S=mgState,C=S.C,LIM=15000;S.score=0;S.right=0;S.n=0;S.streak=0;let tick=0,protection=null;S.stop=()=>{clearInterval(tick);if(protection)protection.stop()};
  const summary=()=>['Score: <b>'+S.score.toLocaleString()+'</b> pts','Correct: '+S.right+' / '+C.asked];
  S.finishNow=()=>mgFinish(summary(),Math.floor(S.score/1000));
- const next=()=>{if(mgState!==S)return;clearInterval(tick);if(C.over()){S.finishNow();return}const it=C.next();if(!it){S.finishNow();return}
+ const next=()=>{if(mgState!==S)return;clearInterval(tick);if(protection)protection.stop();if(C.over()){S.finishNow();return}const it=C.next();if(!it){S.finishNow();return}
   const q=mgQuestion(it,S.bank,Math.random()<.5?0:1),t0=performance.now();S.n++;let answered=false;
   el.innerHTML=mgHead('')+'<div class="speed"><div class="sp-top"><span class="sp-q">Q'+S.n+(C.left()?' · '+C.left():'')+'</span><span class="sp-score">'+S.score.toLocaleString()+' pts</span></div><div class="sp-bar"><i id="spBar"></i></div><div class="sp-time" id="spTime">15</div><h3>'+mathHTML(q.prompt)+'</h3>'+q.options.map((o,i)=>'<button class="answer sp-a'+i%4+'" data-i="'+i+'">'+mathHTML(o.t)+'</button>').join('')+'<div class="sp-pts" id="spPts"></div>'+(mathy(q.prompt,...q.options.map(o=>o.t))?calcHTML():'')+'</div>';
-  const done=(o,b)=>{if(answered||mgState!==S)return;answered=true;clearInterval(tick);const ms=performance.now()-t0,ok=!!(o&&o.ok);
+  protection=tapProtectionStart(el.querySelector('.speed'),q.prompt,'.answer');const answerStart=t0+protection.duration;
+  const done=(o,b)=>{if(answered||mgState!==S||!protection.allowed())return;answered=true;protection.stop();clearInterval(tick);const ms=Math.max(0,performance.now()-answerStart),ok=!!(o&&o.ok);
    el.querySelectorAll('.answer').forEach(x=>{x.disabled=true;if(q.options[+x.dataset.i].ok)x.classList.add('correct')});qRecord(it,ok);C.report(it,ok?'full':'fail');
    const pts=ok?Math.max(1,Math.round(1000*(1-ms/LIM))):0;if(ok){S.right++;S.streak++;S.score+=pts}else{S.streak=0;if(b)b.classList.add('wrong')}
    const p=$('spPts');if(p){p.className='sp-pts '+(ok?'good':'bad');p.textContent=ok?'+'+pts+' pts':(o?'✗ Wrong':'⏰ Time’s up')}
    setTimeout(next,ok?900:1500)};
   calcInit(el);el.querySelectorAll('.answer').forEach(b=>b.onclick=()=>done(q.options[+b.dataset.i],b));
-  tick=setInterval(()=>{const left=Math.max(0,LIM-(performance.now()-t0)),bar=$('spBar'),tm=$('spTime');if(bar)bar.style.width=(left/LIM*100)+'%';if(tm)tm.textContent=Math.ceil(left/1000);if(left<=0)done(null,null)},100)};
+  tick=setInterval(()=>{const left=Math.min(LIM,Math.max(0,LIM-(performance.now()-answerStart))),bar=$('spBar'),tm=$('spTime');if(bar)bar.style.width=(left/LIM*100)+'%';if(tm)tm.textContent=Math.ceil(left/1000);if(left<=0)done(null,null)},100)};
  next()}
 // ---------- Luxor (marble chain) ----------
 const LX_COLORS=[['#ef7c3a','#ffc08a'],['#3f86e8','#9cc6ff'],['#5bbf45','#b2ec92'],['#f2cd2b','#fff1a0'],['#e2559a','#ffb3d6'],['#7b5fb3','#c5b2f0']];
@@ -3457,6 +3499,7 @@ function askDIY(item,opts={}){return new Promise(res=>{const p=prInstance(item.g
  const ansX=(()=>{const m=saNorm(p.a).match(/^x=(.+)$/);return m?saNum(m[1]):null})(),t0=performance.now();let active=null,hi=0;
  ov.innerHTML='<div class="mgq-card diy"><span class="badge diy-b">🛠 DO IT YOURSELF</span>'+(opts.title?' <span class="badge">'+esc(opts.title)+'</span>':'')+'<h3>'+mathHTML(p.q)+'</h3><p class="small muted">Work it out one line at a time, like on paper. The calculator’s “↳ Add” button drops its result into your line. Your last line should end with the answer.</p>'
   +'<div class="diy-lines"></div><div class="diy-row"><button type="button" class="btn smallbtn diy-add">＋ LINE</button>'+(p.steps&&p.steps.length?'<button type="button" class="btn smallbtn diy-hint">💡 Hint</button>':'')+'</div><div class="mgq-hints"></div>'+saKeysHTML()+calcHTML()+'<button class="btn red diy-go">CHECK MY WORK</button></div>';
+ const protection=tapProtectionStart(ov.querySelector('.mgq-card'),p.q,'.diy-go');let submitted=false;
  calcInit(ov);const calc=ov.querySelector('.calc');calc.open=true;calc.querySelector('.calc-in').insertAdjacentHTML('beforeend','<button type="button" class="btn smallbtn blue diy-put">↳ Add to my line</button>');
  const box=ov.querySelector('.diy-lines'),addLine=(v='')=>{const n=box.children.length+1;box.insertAdjacentHTML('beforeend','<div class="diy-line"><span>'+n+'</span><input class="diy-in" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="'+(n===1?'e.g. 6x = 30':'next step…')+'"></div>');const inp=box.lastElementChild.querySelector('input');inp.onfocus=()=>active=inp;inp.value=v;active=inp;return inp};
  addLine();addLine();
@@ -3464,8 +3507,8 @@ function askDIY(item,opts={}){return new Promise(res=>{const p=prInstance(item.g
  ov.querySelectorAll('.sa-keys button').forEach(b=>b.onclick=e=>{e.preventDefault();saInsert(active||box.querySelector('input'),b.dataset.k)});
  ov.querySelector('.diy-put').onclick=e=>{e.preventDefault();const t=saCalcText(ov);if(!t)return;const inp=active||box.querySelector('input');saInsert(inp,(inp.value&&!/[=\s]$/.test(inp.value)?' ':'')+t)};
  const hb=ov.querySelector('.diy-hint');if(hb)hb.onclick=()=>{if(hi>=p.steps.length)return;ov.querySelector('.mgq-hints').insertAdjacentHTML('beforeend','<div class="mgq-step"><b>Step '+(hi+1)+'.</b> '+mathHTML(p.steps[hi][0])+'</div>');hi++;if(hi>=p.steps.length)hb.remove()};
- ov.querySelector('.diy-go').onclick=()=>{const lines=[...box.querySelectorAll('input')].map(i=>i.value.trim()).filter(Boolean);if(!lines.length){toast('Write at least one line');return}
-  const checks=lines.map(l=>diyLineCheck(l,ansX)),last=lines[lines.length-1],lastSeg=last.split(/=|≈/).pop(),ok=saMatch(lastSeg,p.a)||saMatch(last,p.a);
+ ov.querySelector('.diy-go').onclick=()=>{if(submitted||!protection.allowed())return;const lines=[...box.querySelectorAll('input')].map(i=>i.value.trim()).filter(Boolean);if(!lines.length){toast('Write at least one line');return}
+  submitted=true;protection.stop();const checks=lines.map(l=>diyLineCheck(l,ansX)),last=lines[lines.length-1],lastSeg=last.split(/=|≈/).pop(),ok=saMatch(lastSeg,p.a)||saMatch(last,p.a);
   if(typeof apNote==='function')apNote({ms:performance.now()-t0,ok,chars:400,hinted:true});
   qRecord(item,ok,ok?{first:true,hints:hi}:{pick:last,prompt:p.q,answer:p.a,hints:hi});
   if(!ok&&typeof __qMissSet==='function')__qMissSet({prompt:p.q,pick:last,answer:p.a,why:(p.steps&&p.steps.length?p.steps[p.steps.length-1][1]||p.steps[p.steps.length-1][0]:p.ex)});
@@ -3650,7 +3693,7 @@ function dgDamage(att,def,mv,mult,extra,catOv,cs,effOv){const [type,pw,,kind]=mv
  return {dmg:Math.max(1,Math.round(base*(a/Math.max(1,d))*stab*eff*mult*(extra||1))),eff,cat}}
 function dgHit(sel,big){const el=document.querySelector(sel);if(!el)return;el.classList.remove('hit');void el.offsetWidth;el.classList.add('hit');setTimeout(()=>el.classList.remove('hit'),450);if(big){const f=document.querySelector('.dg-field');if(f){f.classList.remove('shake');void f.offsetWidth;f.classList.add('shake');setTimeout(()=>f.classList.remove('shake'),450)}}}
 function dgFaint(sel){const el=document.querySelector(sel);if(el)el.classList.add('fainting')}
-function dgSay(t){if(DG)DG.msg=t;const k=document.querySelector('.dg-ticker');if(k)k.innerHTML=t;else{const f=document.querySelector('.dg-field');if(f)f.insertAdjacentHTML('afterbegin','<div class="dg-ticker">'+t+'</div>')}}
+function dgSay(t){if(DG)DG.msg=t;const k=document.querySelector('.dg-ticker');if(k)k.innerHTML=t;else{const f=document.querySelector('.dg-field');if(f)(f.querySelector('.gd-hud')||f).insertAdjacentHTML('afterbegin','<div class="dg-ticker">'+t+'</div>')}}
 // moves that hit every opposing Pokémon at once (as in the main games, each target takes 75%)
 const MOVE_SPREAD=new Set(['Bubble','Razor Leaf','Incinerate','Powder Snow','Struggle Bug','Snarl','Surf','Blizzard','Icy Wind','Heat Wave','Rock Slide','Earthquake','Brutal Swing','Dazzling Gleam','Discharge','Sludge Wave','Swift','Muddy Water','Lava Plume','Hyper Voice','Petal Blizzard','Bulldoze','Electroweb','Air Cutter','Breaking Swipe','Make It Rain','Glacial Lance','Astral Barrage']);
 ["Burning Jealousy", "Eruption", "Shell Trap", "Sparkling Aria", "Parabolic Charge", "Electroweb", "Overdrive", "Petal Blizzard", "Matcha Gotcha", "Acid", "Mortal Spin", "Bulldoze", "Air Cutter", "Synchronoise", "Twister", "Breaking Swipe", "Clanging Scales", "Make It Rain", "Disarming Voice"].forEach(n=>MOVE_SPREAD.add(n));
@@ -3992,9 +4035,9 @@ function gdTilesCanvas(r){const fl=r.fl,th=gdTheme(r),T=GD_T;if(DG&&DG.tilesFor=
    if(+((fl.tiles[y+1]||'')[x]||0)){g.fillStyle=th.e;g.fillRect(X,Y+T-7,T,7)}}}
  mdDecorate(g,r,fl,th);if(DG){DG.tiles=c;DG.tilesFor=fl.id}return c}
 function gdDrawBattle(entering){const r=runOf(),b=r&&r.battle,st=$('dgStage');if(!b||!st||!r.fl)return;const fl=r.fl,T=GD_T,L=gdSee(r),th=gdTheme(r);
- let field=st.querySelector('.gd-field');if(!field||entering){st.innerHTML='<div class="dg-field gd-field"><div class="gd-map"><canvas class="gd-tiles"></canvas><div class="gd-objs"></div><canvas class="gd-fog"></canvas><div class="gd-hl"></div><div class="gd-units"></div></div><canvas class="gd-mini"></canvas><div class="gd-envslot"></div><div class="gd-floor"></div><div class="gd-stones" role="group" aria-label="Stones carried in this dungeon run"></div></div>';field=st.querySelector('.gd-field');field.addEventListener('click',gdTap);
+ let field=st.querySelector('.gd-field');if(!field||entering){st.innerHTML='<div class="dg-field gd-field"><div class="gd-map"><canvas class="gd-tiles"></canvas><div class="gd-objs"></div><canvas class="gd-fog"></canvas><div class="gd-hl"></div><div class="gd-units"></div></div><canvas class="gd-mini"></canvas><div class="gd-envslot"></div><div class="gd-floor"></div><div class="gd-hud"><div class="gd-stones" role="group" aria-label="Stones carried in this dungeon run"></div></div></div>';field=st.querySelector('.gd-field');field.addEventListener('click',gdTap);
   const mp=field.querySelector('.gd-map');mp.style.width=fl.w*T+'px';mp.style.height=fl.h*T+'px';const tc=field.querySelector('.gd-tiles');tc.width=fl.w*T;tc.height=fl.h*T;tc.getContext('2d').drawImage(gdTilesCanvas(r),0,0)}
- let tk=field.querySelector('.dg-ticker');if(DG&&DG.msg){if(!tk){tk=document.createElement('div');tk.className='dg-ticker';field.appendChild(tk)}tk.innerHTML=DG.msg}else if(tk)tk.remove();
+ let tk=field.querySelector('.dg-ticker');if(DG&&DG.msg){if(!tk){tk=document.createElement('div');tk.className='dg-ticker';field.querySelector('.gd-hud').prepend(tk)}tk.innerHTML=DG.msg}else if(tk)tk.remove();
  field.querySelector('.gd-floor').innerHTML='B'+(r.floor+1)+'F · '+th.name+(fl.boss?' · 👑':'');field.querySelector('.gd-envslot').innerHTML=mdEnvBtn(r);field.style.background=mdShade(th.w2,.45);field.querySelector('.gd-stones').innerHTML=mdStonesHTML(r);
  // fog: black where you've never been, dim where you can't see right now
  const fc=field.querySelector('.gd-fog');fc.width=fl.w*T;fc.height=fl.h*T;const fg=fc.getContext('2d');for(let y=0;y<fl.h;y++)for(let x=0;x<fl.w;x++){const seen=fl.seen[y*fl.w+x]==='1';if(!seen){fg.fillStyle='#05070d';fg.fillRect(x*T,y*T,T,T)}else if(!L.has(gdKey(x,y))){fg.fillStyle='rgba(5,7,13,.45)';fg.fillRect(x*T,y*T,T,T)}}
@@ -5701,8 +5744,8 @@ function storeSummary(e,id){e.preventDefault();const f=new FormData(e.target),v=
 function removeSummary(id){if(!confirm('Delete this summary?'))return;db.summaries=db.summaries.filter(s=>s.id!==id);save();closeModal();render()}
 function termsFor(s){return s.body.split(/\n/).map(line=>{line=line.replace(/^\s*[▸◦]\s*/,'');const n=line.indexOf(':');return n>0&&n<=60&&!/^\s*•/.test(line)?{term:line.slice(0,n).trim(),definition:line.slice(n+1).trim()}:null}).filter(x=>x&&x.term&&x.definition&&!GUIDE_TEMPLATE.test(x.term)&&!GUIDE_TEMPLATE.test(x.definition.replace(/ — .*/,'').trim()))}
 function shuffle(a){for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
-function drawQuestion(){const el=$('quizArea');if(!quiz)return;if(quiz.index>=quiz.questions.length){const correct=quiz.correct,total=quiz.questions.length;db.cogs=Math.round(db.cogs+5);grantXp(15);save();quiz=null;el.innerHTML='<div class="reveal"><h2>🎉 STUDY SET COMPLETE</h2><p>'+correct+' / '+total+' correct</p><h3>+5 COGS · +15 EXP</h3><button class="btn blue" onclick="render()">BACK TO GAMES</button></div>';toast('Study complete! +5 Cogs');return}const q=quiz.questions[quiz.index];if(!quiz.choices.length){const distract=q.wrong?q.wrong.map(w=>({term:w})):shuffle(quiz.pool.filter(x=>x.term!==q.term)).slice(0,3);quiz.choices=shuffle([q,...distract])}el.innerHTML='<div class="item" style="display:block"><div class="row between"><span class="badge">QUESTION '+(quiz.index+1)+' / '+quiz.questions.length+'</span><span class="small">'+quiz.correct+' CORRECT</span></div><h3>'+esc(q.definition)+'</h3><p class="small muted">'+(q.wrong?'Choose the right answer.':'Which term matches this definition?')+'</p>'+quiz.choices.map((o,i)=>'<button class="answer '+(quiz.answered?(o.term===q.term?'correct':quiz.selected===i?'wrong':''):'')+'" '+(quiz.answered?'disabled':'')+' onclick="answerQuiz('+i+')">'+esc(o.term)+'</button>').join('')+(quiz.answered?'<button class="btn red" style="width:100%" onclick="nextQuiz()">NEXT →</button>':'')+'</div>'}
-function answerQuiz(i){if(!quiz||quiz.answered)return;quiz.selected=i;quiz.answered=true;if(quiz.choices[i].term===quiz.questions[quiz.index].term)quiz.correct++;drawQuestion()}
+function drawQuestion(){const el=$('quizArea');if(el._tapProtection)el._tapProtection.stop();if(!quiz)return;if(quiz.index>=quiz.questions.length){const correct=quiz.correct,total=quiz.questions.length;db.cogs=Math.round(db.cogs+5);grantXp(15);save();quiz=null;el.innerHTML='<div class="reveal"><h2>🎉 STUDY SET COMPLETE</h2><p>'+correct+' / '+total+' correct</p><h3>+5 COGS · +15 EXP</h3><button class="btn blue" onclick="render()">BACK TO GAMES</button></div>';toast('Study complete! +5 Cogs');return}const q=quiz.questions[quiz.index];if(!quiz.choices.length){const distract=q.wrong?q.wrong.map(w=>({term:w})):shuffle(quiz.pool.filter(x=>x.term!==q.term)).slice(0,3);quiz.choices=shuffle([q,...distract])}el.innerHTML='<div class="item" style="display:block"><div class="row between"><span class="badge">QUESTION '+(quiz.index+1)+' / '+quiz.questions.length+'</span><span class="small">'+quiz.correct+' CORRECT</span></div><h3>'+esc(q.definition)+'</h3><p class="small muted">'+(q.wrong?'Choose the right answer.':'Which term matches this definition?')+'</p>'+quiz.choices.map((o,i)=>'<button class="answer '+(quiz.answered?(o.term===q.term?'correct':quiz.selected===i?'wrong':''):'')+'" '+(quiz.answered?'disabled':'')+' onclick="answerQuiz('+i+')">'+esc(o.term)+'</button>').join('')+(quiz.answered?'<button class="btn red" style="width:100%" onclick="nextQuiz()">NEXT →</button>':'')+'</div>';if(!quiz.answered)tapProtectionStart(el,q.definition,'.answer')}
+function answerQuiz(i){if(!quiz||quiz.answered||!$('quizArea')._tapProtection?.allowed())return;quiz.selected=i;quiz.answered=true;if(quiz.choices[i].term===quiz.questions[quiz.index].term)quiz.correct++;drawQuestion()}
 function nextQuiz(){if(!quiz)return;quiz.index++;quiz.answered=false;quiz.selected=-1;quiz.choices=[];drawQuestion()}
 function exportSave(){pwaExport()}
 function importSave(){pwaImport()}
@@ -5715,7 +5758,7 @@ $('navHome').style.display='none';
  if(pcStorageReady)ensureMoveData();
  if(pcStorageReady&&permRoll())save();
  render();scheduleNotifs();aiCheck();window.__pcBooted=true;setTimeout(()=>{try{mdSync()}catch(e){}},1500);setTimeout(()=>{try{facTick()}catch(e){}},2500);setInterval(()=>{try{facTick();if(currentPage==='home'&&hab.scene&&hab.scene!=='home')drawHabitat()}catch(e){}},60000);
- window.__pcVersion='0.66.4';
+ window.__pcVersion='0.67.0';
  document.addEventListener('pointerdown',function(e){try{var t=e.target.closest&&e.target.closest('[onclick],button,a,[id]');if(!t)return;var oc=t.getAttribute('onclick');window.__pcLastTap=(oc?oc.slice(0,60):(t.id?'#'+t.id:t.tagName.toLowerCase()+'.'+String(t.className).split(' ')[0])).replace(/\s+/g,' ')}catch(_){}} ,true);
  Object.keys(window).forEach(function(k){var f=window[k];if(typeof f!=='function'||/^[A-Z]/.test(k)||k==='appError'||k==='$'||k==='esc'||/\[native code\]/.test(Function.prototype.toString.call(f)))return;
   var w=function(){try{return f.apply(this,arguments)}catch(err){if(err&&typeof err==='object'&&!err.__pcLogged){try{err.__pcLogged=1}catch(_){}appError(err,k)}throw err}};try{window[k]=w}catch(_){}});
