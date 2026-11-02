@@ -131,7 +131,7 @@ function gdMini(r,L){const fl=r.fl,c=document.querySelector('.gd-mini');if(!c)re
  fl.items.forEach(it=>{if(fl.seen[it.y*fl.w+it.x]==='1'){g.fillStyle='#ffd34d';g.fillRect(it.x*s,it.y*s,s,s)}});
  r.battle.enemies.forEach(e=>{if(e.hp>0&&!e.done&&L.has(gdKey(e.x,e.y))){g.fillStyle='#ff4d4d';g.fillRect(e.x*s,e.y*s,s,s)}});
  r.party.forEach((m,i)=>{g.fillStyle=SLOT_COLORS[i];g.fillRect(m.x*s-1,m.y*s-1,s+2,s+2)})}
-function gdCamera(x,y){const r=runOf(),f=document.querySelector('.gd-field'),mp=f&&f.querySelector('.gd-map');if(!mp)return;const b=r.battle,m=r.party[b.turn]||r.party[0];let sc=1;if(x==null&&DG&&DG.bcam){[x,y,sc]=DG.bcam;sc=sc||1}x=x??m.x;y=y??m.y;
+function gdCamera(x,y){if(DG&&DG.camLock){gdOverlap();return}const r=runOf(),f=document.querySelector('.gd-field'),mp=f&&f.querySelector('.gd-map');if(!mp)return;const b=r.battle,m=r.party[b.turn]||r.party[0];let sc=1;if(x==null&&DG&&DG.bcam){[x,y,sc]=DG.bcam;sc=sc||1}x=x??m.x;y=y??m.y;
  const W=f.clientWidth,H=f.clientHeight,T=GD_T*sc,mw=r.fl.w*T,mh=r.fl.h*T;let tx=W/2-(x+.5)*T,ty=H/2-(y+.5)*T;tx=Math.min(0,Math.max(W-mw,tx));ty=Math.min(0,Math.max(H-mh,ty));if(mw<W)tx=(W-mw)/2;if(mh<H)ty=(H-mh)/2;mp.style.transform='translate('+Math.round(tx)+'px,'+Math.round(ty)+'px) scale('+sc+')';if(DG)DG.cam={tx,ty,T};gdOverlap()}
 // The floor label, info button, minimap and message bar stay solid, but turn see-through (and let taps pass) while a
 // Pokémon is underneath one. Worked out from where the camera is heading, so it's right before the slide finishes.
@@ -290,7 +290,10 @@ async function gdEnemyStrike(i,e,targets,useDisc,name,mv0){const r=runOf(),b=r.b
   tm.hp=Math.max(0,tm.hp-dmg);dgHurt(b,tm,dmg);return {ti,tm,tp,dmg,dodged,eff:typeEff(mv[0],tc.types)}});
  if(useDisc)e.energy-=disc[2];else e.energy=Math.min(100,e.energy+mv0[2]);e.acted=1;save();
  DG.msg=esc(e.species)+' used <b>'+esc(name)+'</b>'+(hits.length>1?' on '+hits.length+' of your team':' on <b style="color:'+SLOT_COLORS[hits[0].ti]+'">'+esc(hits[0].tp.nickname||hits[0].tp.species)+'</b>')+'! '+hits.map(h=>h.dodged?'💨 '+esc(h.tp.nickname||h.tp.species)+' dodged!':'−'+h.dmg+(b.guard[h.ti]?'🛡':'')).join(' · ')+(eh>1?' (hit '+Math.round(eh)+' times)':'')+(hits.some(h=>h.eff>1.2&&!h.dodged)?' <span class="t-sup">Super effective!</span>':'')+hits.filter(h=>h.tm.hp<=0).map(h=>' '+esc(h.tp.nickname||h.tp.species)+' fainted!').join('');
- dgPanelBattle(esc(e.species)+' used '+esc(name)+'!');mvAttackAnim(fsel);await Promise.all(hits.map((h,k)=>dgSleep(k*70).then(()=>moveFx(mv0[0],mv0[1]>70,fsel,'.dg-ally[data-i="'+h.ti+'"]'))));if(!runOf()||runOf().battle!==b)return;
+ dgPanelBattle(esc(e.species)+' used '+esc(name)+'!');
+ // frame the targeted allies (and the attacker) first, then hold the camera still for the whole animation
+ {const fe=document.querySelector('.gd-field'),fit=gdCamFit([e,...hits.map(h=>h.tm)],fe?fe.clientWidth:390,fe?fe.clientHeight:400);DG.bcam=[fit.cx,fit.cy,Math.max(GD_CAM.min,fit.sc)];gdCamera();await dgSleep(460);DG.camLock=true}
+ try{mvAttackAnim(fsel);await Promise.all(hits.map((h,k)=>dgSleep(k*70).then(()=>moveFx(mv0[0],mv0[1]>70,fsel,'.dg-ally[data-i="'+h.ti+'"]'))))}finally{DG.camLock=false}if(!runOf()||runOf().battle!==b)return;
  gdDrawBattle();dgPanelBattle(esc(e.species)+' used '+esc(name)+'!');hits.forEach(h=>{const a='.dg-ally[data-i="'+h.ti+'"]';if(h.dodged){mvMove(a,[{x:0},{x:-14,offset:.3},{x:-14,offset:.6},{x:0}],450);dgFloat(a,'Dodged!','heal');return}dgHit(a,useDisc||h.eff>1.2);dgFloat(a,'-'+h.dmg+(b.guard[h.ti]?' 🛡':''),h.eff>1.2?'super':h.eff<.8?'weak':'');if(h.tm.hp<=0)setTimeout(()=>dgFaint(a),380)});
  mdRough(r,i,e,hits,mv0);await dgSleep(hits.some(h=>h.tm.hp<=0)?950:750)}
 // a boss's charged blast: everyone within 3 tiles

@@ -98,3 +98,8 @@
 @keyframes lgHeat{0%,100%{transform:skewX(-1.5deg);filter:contrast(1.2)}50%{transform:skewX(1.5deg);filter:contrast(1.6)}}
 .ufx.lg-eternabeam{height:35px;margin-top:-17px;transform-origin:0 50%;border-radius:50% 10px 10px 50%;background:linear-gradient(#9f104a,#ff426f 20%,#ffe5f2 45%,#fff 50%,#ffb1d4 60%,#e9134d 85%,#7c092c);box-shadow:0 0 16px #e62263,0 0 35px #ff7ab2;z-index:9}
 @media(prefers-reduced-motion:reduce){.lg-core-idle i,.ufx.lg-heat{animation:none}}
+.dg-acts:has(#dgM1)>#dgM3.btn.ult{grid-column:1/-1;justify-self:center;width:min(100%,300px)}
+#dgM3.btn.ult{border:3px solid transparent;background:linear-gradient(#fff,#fff) padding-box,linear-gradient(90deg,#ff3b30,#ff9500,#ffcc00,#34c759,#32ade6,#5856d6,#af52de,#ff3b30,#ff9500,#ffcc00,#34c759,#32ade6,#5856d6,#af52de,#ff3b30) border-box;background-size:100% 100%,300% 100%;color:#3b2a66;box-shadow:0 0 10px #af52de44;animation:ultRainbow 3s linear infinite}
+#dgM3.btn.ult small{color:#5b4a86;opacity:1}
+#dgM3.btn.ult:disabled{color:#8a8396;opacity:.7;box-shadow:none}
+@keyframes ultRainbow{to{background-position:0 0,150% 0}}
