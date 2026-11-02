@@ -41,5 +41,5 @@ class Panel{
 }
 c.document={createElement:()=>new Panel()};let panel,bonus=0;const answers={hidden:false,before:p=>{panel=p}},card={querySelector:()=>answers};
 const question={steps:[['Use mass and acceleration.','F = m × a'],['Substitute.','10 × 3 = 30 N']]};
-const state=c.guidedMount(card,question,{onGuided:()=>bonus++});assert(answers.hidden);panel.buttons[1].onclick();assert(panel.buttons[1].disabled);assert(answers.hidden);panel.button.onclick();assert(panel.feedback.innerHTML);panel.buttons[0].onclick();assert(answers.hidden);panel.buttons[0].onclick();assert(!answers.hidden);assert(state.complete);assert.equal(bonus,1);
-console.log('PASS: actual guided UI hides final answers, handles wrong setups and hints, advances both steps, and calls completion once.');
+const state=c.guidedMount(card,question,{onGuided:()=>bonus++});assert(!answers.hidden,'guided steps are optional');panel.button.onclick();assert(answers.hidden);panel.buttons[1].onclick();assert(panel.buttons[1].disabled);assert(answers.hidden);panel.button.onclick();assert(panel.feedback.innerHTML);panel.buttons[0].onclick();assert(answers.hidden);panel.buttons[0].onclick();assert(!answers.hidden);assert(state.complete);assert.equal(bonus,1);
+console.log('PASS: actual guided UI starts only on Help me start, hides final answers, handles wrong setups and hints, advances both steps, and calls completion once.');

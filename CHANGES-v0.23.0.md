@@ -1,0 +1,16 @@
+# v0.23.0: Decor pack
+- 24 new small decor and 28 new medium decor, all detailed pixel art in the shop background's style (made by tools/decor_pack2.py + tools/make_decor_pixel.py).
+- Small decor:
+  - Common: Potted Flowers, Stack of Books, Wooden Stool, Tiny Cactus, Potted Succulent, Study Notebook, Decorative Candle, Coffee Mug
+  - Uncommon: Berry Basket, Desk Lamp, Table Clock, Decorative Lantern, Flower Vase, Seashell Collection, Poké Puff Plate, Hourglass
+  - Rare: Tiny Terrarium, Miniature Windmill, Snow Globe, Toy Train, Miniature Globe, Music Box, Ribbon Display
+  - Legendary: Miniature Bonsai
+- Medium decor:
+  - Common: Picnic Table, Flower Garden, Campfire, Mushroom Patch, Outdoor Bench
+  - Uncommon: Wooden Bookshelf, Cozy Armchair, Berry Tree, Wooden Swing, Study Desk, Telescope Stand, Hammock, Camping Tent
+  - Rare: Garden Fountain, Aquarium Tank, Arcade Cabinet, Miniature Greenhouse, Vending Machine, Pokémon Playhouse, Crystal Formation, Flower Archway, Treasure Chest, Koi Pond
+  - Legendary: Decorative Waterfall, Miniature Wind Turbine, Clockwork Machine, Grand Piano, Ancient Ruins
+- They drop from PokeBoxes / GreaterBoxes / UltraBoxes and appear in Daily Deals in their rarity's pool. Each new piece is weighted lighter (0.35) so snacks, tickets and Cogs don't get crowded out: new decor makes up roughly 20-34% of drops per tier and about 30% of Daily Deal item slots.
+- The pale/cool outline colours on all pixel decor were corrected (no more purple or green outlines on white and blue objects).
+- Not included: Miniature Poké Ball, Toy Poké Ball, Plush Substitute Doll and Golden Magikarp Statue. The Coffee Mug has a paw-print design.
+- These are static decorations for now: no sitting, music, animated water or a live clock yet.

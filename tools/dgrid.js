@@ -105,7 +105,7 @@ function gdDrawBattle(entering){const r=runOf(),b=r&&r.battle,st=$('dgStage');if
  const vis=(x,y)=>L.has(gdKey(x,y)),seenAt=(x,y)=>fl.seen[y*fl.w+x]==='1';
  field.querySelector('.gd-objs').innerHTML=(!fl.stairsHidden&&seenAt(...fl.stairs)?'<div class="gd-obj stairs" style="left:'+fl.stairs[0]*T+'px;top:'+fl.stairs[1]*T+'px">🪜</div>':'')
   +fl.items.filter(it=>seenAt(it.x,it.y)).map(it=>'<div class="gd-obj" style="left:'+it.x*T+'px;top:'+it.y*T+'px">'+(it.tickets?'🎟️':DITEMS[it.k].icon)+'</div>').join('')
-  +fl.specials.filter(s=>seenAt(s.x,s.y)).map(s=>'<div class="gd-obj sp'+(GD_LOCKED[s.k]&&!gdFree(r)?' gd-off':'')+'" style="left:'+s.x*T+'px;top:'+s.y*T+'px">'+(s.k==='shop'?'🎩':GD_SPECIAL[s.k].icon)+'</div>').join('')+mdDigHTML(r,fl,T,seenAt)+(fl.ffOn&&fl.ff?fl.ff.map(k=>{const [x,y]=k.split(',').map(Number);return '<div class="gd-obj gd-ff" style="left:'+x*T+'px;top:'+y*T+'px"></div>'}).join(''):'');
+  +fl.specials.filter(s=>seenAt(s.x,s.y)).map(s=>'<div class="gd-obj sp'+(GD_LOCKED[s.k]&&!gdFree(r)?' gd-off':'')+'" style="left:'+s.x*T+'px;top:'+s.y*T+'px">'+(s.k==='shop'?'🎩':GD_SPECIAL[s.k].icon)+'</div>').join('')+mdDigHTML(r,fl,T,seenAt)+gdBlastHTML(r,T)+(fl.ffOn&&fl.ff?fl.ff.map(k=>{const [x,y]=k.split(',').map(Number);return '<div class="gd-obj gd-ff" style="left:'+x*T+'px;top:'+y*T+'px"></div>'}).join(''):'');
  // units (sprites keep their element between redraws so animations and effects stay smooth)
  const U=field.querySelector('.gd-units'),want=new Set();
  const unit=(cls,i,x,y,sp,row,hpPct,extra,color,anim)=>{const id=cls+i;want.add(id);let el=U.querySelector('[data-u="'+id+'"]');if(!el){el=document.createElement('div');el.dataset.u=id;el.innerHTML='<div class="gd-hp"><i></i></div><div class="dg-spr" data-sp="'+esc(sp)+'" data-row="'+row+'" data-sz="'+(extra.includes('big')?1:.82)+'"></div><b class="dg-xh"></b>';U.appendChild(el)}
@@ -314,7 +314,7 @@ function dgDescend(){const r=runOf();if(!r)return;r.floor++;r.party.forEach(m=>{
 function dgFloorClear(){if(mdIsLast(runOf()))return mdFinal();const r=runOf(),D=DIFF[r.diff],seg=Math.floor(r.floor/(GD_DEPTH[r.diff]||3))+1;r.clearedFloors=Math.max(r.clearedFloors||0,seg);save();const bonus=dgFloorBonus(r),g=dgGamey(r);
  $('dgStage').innerHTML='<div class="dg-room"><span class="dg-big">🏁</span><h3>B'+(r.floor+1)+'F boss beaten!</h3><p>Leave now to collect a <b>'+bonus+' Cog</b> bonus'+(g?' ('+r.clearedFloors+' boss'+(r.clearedFloors>1?'es':'')+' × '+(D.fb||10)+')':'')+'.</p><p class="small">'+(g?'Or go deeper: the next floors are about '+((seg)*(D.step||2))+' levels stronger. Your team recovers 30% HP. If your team faints down there, you lose the bonus.':'Or keep exploring deeper. Casual floors stay the same strength, and your team recovers 30% HP on the way down.')+'</p><div class="actions"><button class="btn" onclick="dgEnd(true)">🏠 LEAVE WITH REWARDS</button><button class="btn" onclick="mdShopOpen()">🎩 HATTERENE’S SHOP</button><button class="btn red" onclick="dgDescend()">⬇ GO DEEPER</button></div></div>';$('dgPanel').innerHTML=dgPanelMap()}
 // items that hit "every enemy" hit every foe you can see
-async function dgBlastItem(k){if(gdTower())return dgcBlastItem(k);const r=runOf(),b=r.battle,slot=b.turn,I=DITEMS[k],who=partyMon(r.party[slot]);dgCrosshair('ally',slot,slot);const res=await dgQ(I.icon+' '+I.name.toUpperCase());
+async function dgBlastItem(k){if(gdTower())return dgcBlastItem(k);const r=runOf(),b=r.battle,slot=b.turn,I=DITEMS[k],who=partyMon(r.party[slot]);const res=await dgQ(I.icon+' '+I.name.toUpperCase());
  if(res==='makeup'&&Math.random()<.25){toast((who.nickname||who.species)+' fumbled the item! (kept, but no effect)');dgAfterAction();return}
  r.bag[k]--;if(res==='fail'){toast('The '+I.name+' was used up with no effect.');save();dgAfterAction();return}
  const alive=gdFoeTargets(r),n=alive.length;if(!n){toast('No foe in sight. The '+I.name+' fizzled.');save();dgAfterAction();return}
@@ -356,3 +356,6 @@ function gdBossSplash(e){const f=document.querySelector('.gd-field');if(!f)retur
 
 // shops and treasure rooms (and dig spots) shut during battle; they come back when free movement returns
 const GD_LOCKED={shop:1,chest:1};
+
+// a charged boss blast: red tiles on everything within 3 tiles of the boss (what the blast will actually hit)
+function gdBlastHTML(r,T){const b=r.battle;if(!b||!b.charge)return '';const e=b.enemies.find(e=>e.boss&&e.hp>0&&!e.done&&e.aware);if(!e)return '';let h='';for(let y=e.y-3;y<=e.y+3;y++)for(let x=e.x-3;x<=e.x+3;x++)if(gdTile(r.fl,x,y))h+='<div class="gd-obj gd-blast" style="left:'+x*T+'px;top:'+y*T+'px"></div>';return h}

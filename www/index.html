@@ -572,6 +572,7 @@ body.mg-busy .inv-handle{display:none}
 
 /* boss arena */
 .gd-obj.gd-ff{background:linear-gradient(90deg,#ff2d4a00,#ff2d4acc 30%,#ffd0d6 50%,#ff2d4acc 70%,#ff2d4a00),repeating-linear-gradient(0deg,#ff5a6e55 0 3px,#ff2d4a22 3px 6px);box-shadow:0 0 12px #ff2d4a,inset 0 0 8px #fff6;border-radius:4px;opacity:.9;animation:gdff 1.1s ease-in-out infinite;pointer-events:none;z-index:6}
+.gd-obj.gd-blast{background:rgba(255,40,40,.32);border:2px solid rgba(255,60,60,.85);box-sizing:border-box;border-radius:4px;pointer-events:none;animation:gdpulse .6s ease-in-out infinite alternate}
 @keyframes gdff{50%{opacity:.6;filter:brightness(1.3)}}
 .gd-u.gd-idle .dg-spr{filter:saturate(.75)}
 .gd-bsplash{position:absolute;inset:0;z-index:40;display:grid;place-items:center;pointer-events:none;background:radial-gradient(#3a000088,#0008 70%);animation:gdbsf 2.3s ease-out forwards}
@@ -3233,7 +3234,7 @@ function guidedMount(card,q,opts={}){
  panel.querySelector('.guided-hint').onclick=()=>{state.engaged=true;panel.querySelector('.guided-feedback').innerHTML=mathHTML(s.hint)};
  panel.querySelectorAll('.guided-choice').forEach(b=>b.onclick=()=>{if(!panel.isConnected||done)return;state.engaged=true;const choice=s.choices[+b.dataset.i];if(!choice.ok){b.disabled=true;panel.querySelector('.guided-feedback').textContent='Try matching the operation and quantities. Use Help me start if needed.';return}step++;if(step===plan.length)finish();else draw()});
  };
- if(plan){answers.hidden=true;draw()}else{
+ if(plan){panel.innerHTML='<button type="button" class="btn smallbtn guided-start">Help me start</button>';panel.querySelector('button').onclick=()=>{state.engaged=true;answers.hidden=true;draw()}}else{
   let hi=0;panel.innerHTML='<button type="button" class="btn smallbtn guided-start">Help me start</button><div class="guided-feedback" role="status"></div>';
   panel.querySelector('button').onclick=()=>{state.engaged=true;const hint=q.steps?.[hi]?.[0]||'Write down what is given and what you need to find. Use the hint button for the next step.';panel.querySelector('.guided-feedback').innerHTML=mathHTML(hint);if(hi<(q.steps?.length||0)-1)hi++;panel.querySelector('button').textContent='Help with the next step'};
  }
@@ -3547,7 +3548,7 @@ function diyLineCheck(line,ansX){const n=saNorm(line);if(!n)return null;const se
 function askDIY(item,opts={}){return new Promise(res=>{const p=prInstance(item.gid)||{q:item.front,a:item.back,steps:item.steps||[],ex:item.explain},ov=document.createElement('div');ov.className='mgq';document.body.appendChild(ov);if(typeof __qMissReset==='function')__qMissReset();
  const ansX=(()=>{const m=saNorm(p.a).match(/^x=(.+)$/);return m?saNum(m[1]):null})(),t0=performance.now();let active=null,hi=0;
  ov.innerHTML='<div class="mgq-card diy"><span class="badge diy-b">🛠 DO IT YOURSELF</span>'+(opts.title?' <span class="badge">'+esc(opts.title)+'</span>':'')+'<h3>'+mathHTML(p.q)+'</h3><p class="small muted">Work it out one line at a time, like on paper. The calculator’s “↳ Add” button drops its result into your line. Your last line should end with the answer.</p>'
-  +'<div class="diy-lines"></div><div class="diy-row"><button type="button" class="btn smallbtn diy-add">＋ LINE</button>'+(p.steps&&p.steps.length?'<button type="button" class="btn smallbtn diy-hint">💡 Hint</button>':'')+'</div><div class="mgq-hints"></div>'+saKeysHTML()+calcHTML()+'<button class="btn red diy-go">CHECK MY WORK</button></div>';
+  +'<div class="guided-final"><div class="diy-lines"></div><div class="diy-row"><button type="button" class="btn smallbtn diy-add">＋ LINE</button>'+(p.steps&&p.steps.length?'<button type="button" class="btn smallbtn diy-hint">💡 Hint</button>':'')+'</div><div class="mgq-hints"></div>'+saKeysHTML()+calcHTML()+'<button class="btn red diy-go">CHECK MY WORK</button></div></div>';if(typeof guidedMount==='function')guidedMount(ov.querySelector('.mgq-card'),p,opts);
  const protection=tapProtectionStart(ov.querySelector('.mgq-card'),p.q,'.diy-go');let submitted=false;
  calcInit(ov);const calc=ov.querySelector('.calc');calc.open=true;calc.querySelector('.calc-in').insertAdjacentHTML('beforeend','<button type="button" class="btn smallbtn blue diy-put">↳ Add to my line</button>');
  const box=ov.querySelector('.diy-lines'),addLine=(v='')=>{const n=box.children.length+1;box.insertAdjacentHTML('beforeend','<div class="diy-line"><span>'+n+'</span><input class="diy-in" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="'+(n===1?'e.g. 6x = 30':'next step…')+'"></div>');const inp=box.lastElementChild.querySelector('input');inp.onfocus=()=>active=inp;inp.value=v;active=inp;return inp};
@@ -3556,7 +3557,7 @@ function askDIY(item,opts={}){return new Promise(res=>{const p=prInstance(item.g
  ov.querySelectorAll('.sa-keys button').forEach(b=>b.onclick=e=>{e.preventDefault();saInsert(active||box.querySelector('input'),b.dataset.k)});
  ov.querySelector('.diy-put').onclick=e=>{e.preventDefault();const t=saCalcText(ov);if(!t)return;const inp=active||box.querySelector('input');saInsert(inp,(inp.value&&!/[=\s]$/.test(inp.value)?' ':'')+t)};
  const hb=ov.querySelector('.diy-hint');if(hb)hb.onclick=()=>{if(hi>=p.steps.length)return;ov.querySelector('.mgq-hints').insertAdjacentHTML('beforeend','<div class="mgq-step"><b>Step '+(hi+1)+'.</b> '+mathHTML(p.steps[hi][0])+'</div>');hi++;if(hi>=p.steps.length)hb.remove()};
- ov.querySelector('.diy-go').onclick=()=>{if(submitted||!protection.allowed())return;const lines=[...box.querySelectorAll('input')].map(i=>i.value.trim()).filter(Boolean);if(!lines.length){toast('Write at least one line');return}
+ ov.querySelector('.diy-go').onclick=()=>{if(submitted||!protection.allowed()||ov.querySelector('.guided-final')?.hidden)return;const lines=[...box.querySelectorAll('input')].map(i=>i.value.trim()).filter(Boolean);if(!lines.length){toast('Write at least one line');return}
   submitted=true;protection.stop();const checks=lines.map(l=>diyLineCheck(l,ansX)),last=lines[lines.length-1],lastSeg=last.split(/=|≈/).pop(),ok=saMatch(lastSeg,p.a)||saMatch(last,p.a);
   if(typeof apNote==='function')apNote({ms:performance.now()-t0,protectedMs:protection.duration,ok,chars:String(p.q).length,hinted:true,typed:true});
   qRecord(item,ok,ok?{first:true,hints:hi}:{pick:last,prompt:p.q,answer:p.a,hints:hi});
@@ -3717,7 +3718,7 @@ function dgQ(title,opts){const ep=dgEpoch,r0=runOf(),bt=r0&&r0.battle,tn=bt&&bt.
  if(!it)it=DG.P.next();
  if(!diy&&!policy.mcOnly&&it?.kind==='gen'&&!(PR[it.gid]&&PR[it.gid].cmd)&&Math.random()<policy.diyChance)diy=true;
  const questionOpts=Object.assign({title,halfsies:!!r0?.halfsies,typedChance:policy.typedChance,helpStart:!!DG.helpNext,onGuided:()=>{guidedComplete=true}},opts||{});if(policy.mcOnly)questionOpts.typed=false;DG.helpNext=false;
- return (diy?askDIY(it,{title}):askQ(it,DG.bank,questionOpts)).then(res=>{let half=false;if(res==='half'){half=true;res='full';toast('🍰 Halfsies! It counts in battle, and it’s saved as a weak spot.')}const r1=runOf();if(ep!==dgEpoch||!DG||!r1||(bt&&(r1.battle!==bt||bt.turn!==tn)))return new Promise(()=>{});if(guidedComplete){r1.tickets=(r1.tickets||0)+2;r1.cogs=(r1.cogs||0)+2;save();toast('Setup practice · +2 Tickets')}DG.P.report(it,half?'fail':res);if(res==='full'&&!half)r1.qOk=(r1.qOk||0)+1;if((res!=='full'||half)&&__qMiss)recapAdd(it,__qMiss);if(diy&&res==='full'){r1.tickets=(r1.tickets||0)+5;r1.cogs=(r1.cogs||0)+5;toast('🛠 Worked it out! +5 🎟️')}if(bt&&res==='full')bt.qFull=(bt.qFull||0)+1;if(bt)bt.lastRes=res;mdRescueFind(r1);apMaybePrompt();return res})}
+ return (diy?askDIY(it,{title,onGuided:()=>{guidedComplete=true}}):askQ(it,DG.bank,questionOpts)).then(res=>{let half=false;if(res==='half'){half=true;res='full';toast('🍰 Halfsies! It counts in battle, and it’s saved as a weak spot.')}const r1=runOf();if(ep!==dgEpoch||!DG||!r1||(bt&&(r1.battle!==bt||bt.turn!==tn)))return new Promise(()=>{});if(guidedComplete){r1.tickets=(r1.tickets||0)+2;r1.cogs=(r1.cogs||0)+2;save();toast('Setup practice · +2 Tickets')}DG.P.report(it,half?'fail':res);if(res==='full'&&!half)r1.qOk=(r1.qOk||0)+1;if((res!=='full'||half)&&__qMiss)recapAdd(it,__qMiss);if(diy&&res==='full'){r1.tickets=(r1.tickets||0)+5;r1.cogs=(r1.cogs||0)+5;toast('🛠 Worked it out! +5 🎟️')}if(bt&&res==='full')bt.qFull=(bt.qFull||0)+1;if(bt)bt.lastRes=res;mdRescueFind(r1);apMaybePrompt();return res})}
 // ---------- autopilot check ----------
 // Answers that come faster than the question could be read (and especially fast wrong ones) mean focus has run out.
 // After a few of those in a row, the game offers to save and take a break. It asks at most once every 12 questions.
@@ -3889,7 +3890,7 @@ function dgUseItem(k){if(k==='rescue_drill'){mdRescueDrill();return}const r=runO
  if(k==='overclock'){dgOverclock();return}if(k==='timegear'){dgTimeGear();return}if(k==='wakemint'){dgWakeMint();return}
  if(k==='salts'&&!r.party.some(q=>q.hp<=0)){toast('Nobody has fainted');DG.busy=0;dgItem();return}let dgTarget0;
  if(DITEMS[k].aoe||DITEMS[k].split){dgBlastItem(k);return}if(k==='snag'){dgChooseFoe(i=>dgSnag(i));return}
- dgTarget={side:'ally',fn:async i=>{if(k==='salts'&&r.party[i].hp>0){toast('Smelling Salts only work on a fainted teammate');dgTarget={side:'ally',fn:dgTarget0};return}dgCrosshair('ally',i,slot);const res=await dgQ(DITEMS[k].icon+' '+DITEMS[k].name.toUpperCase());let used=false,msg;
+ dgTarget={side:'ally',fn:async i=>{if(k==='salts'&&r.party[i].hp>0){toast('Smelling Salts only work on a fainted teammate');dgTarget={side:'ally',fn:dgTarget0};return}const res=await dgQ(DITEMS[k].icon+' '+DITEMS[k].name.toUpperCase());let used=false,msg;
    if(res==='full'){used=true}else if(res==='makeup'){if(Math.random()<.25){msg=(partyMon(r.party[slot]).nickname||partyMon(r.party[slot]).species)+' fumbled the item! (kept, but no effect)';toast(msg);dgAfterAction();return}used=true}
    r.bag[k]--;if(!used){toast('The '+DITEMS[k].name+' was used up with no effect.');save();dgAfterAction();return}
    const tm=r.party[i],tc=combatant(partyMon(tm));if(k==='salts'){tm.hp=Math.max(1,Math.round(tc.hp*.5));delete tm.reviveTried;dgDrawBattle();dgFloat('.dg-ally[data-i="'+i+'"]','Back up! +'+tm.hp+' HP','heal')}
@@ -3902,7 +3903,7 @@ function dgUseItem(k){if(k==='rescue_drill'){mdRescueDrill();return}const r=runO
  if(r.fl&&DG){DG.hl={cls:'ally',tiles:r.party.filter(m=>k!=='salts'||m.hp<=0).map(m=>[m.x,m.y])};gdHighlight();gdFit();gdCamera()}}
 function dgItemCancel(){const r=runOf();dgTarget=null;document.querySelectorAll('.dg-ally').forEach(x=>x.classList.remove('pickable'));if(r&&r.battle)r.battle.usedItem=false;if(DG){DG.busy=0;DG.hl=null;if(r&&r.fl)gdHighlight()}dgItem()}
 // Pocket Voltorb / Stellar Storm / Thundurus' Might: answer one question, then fixed damage to the enemies
-async function dgcBlastItem(k){const r=runOf(),b=r.battle,slot=b.turn,I=DITEMS[k],who=partyMon(r.party[slot]);dgCrosshair('ally',slot,slot);const res=await dgQ(I.icon+' '+I.name.toUpperCase());
+async function dgcBlastItem(k){const r=runOf(),b=r.battle,slot=b.turn,I=DITEMS[k],who=partyMon(r.party[slot]);const res=await dgQ(I.icon+' '+I.name.toUpperCase());
  if(res==='makeup'&&Math.random()<.25){toast((who.nickname||who.species)+' fumbled the item! (kept, but no effect)');dgAfterAction();return}
  r.bag[k]--;if(res==='fail'){toast('The '+I.name+' was used up with no effect.');save();dgAfterAction();return}
  const alive=b.enemies.map((e,i)=>[e,i]).filter(([e])=>e.hp>0),n=alive.length,hits=alive.map(([e,i],j)=>{const d=I.aoe||Math.floor(I.split/n)+(j<I.split%n?1:0);e.hp=Math.max(0,e.hp-d);e.hitR=b.round;return {e,i,d}});save();
@@ -3910,14 +3911,14 @@ async function dgcBlastItem(k){const r=runOf(),b=r.battle,slot=b.turn,I=DITEMS[k
  const f=document.querySelector('.dg-field');if(f){f.classList.add(k==='stellar'?'spreadfx':'shake');setTimeout(()=>f.classList.remove('spreadfx','shake'),700)}
  dgDrawBattle();hits.forEach(h=>{const s='.dg-foe[data-i="'+h.i+'"]';dgHit(s,true);dgFloat(s,'-'+h.d,'super');if(h.e.hp<=0)setTimeout(()=>dgFaint(s),380)});await dgSleep(1000);dgAfterAction()}
 // Snag Machine: catch the target. Make-up keeps full odds, missing both halves them; it can't be fumbled.
-async function dgSnag(i){const r=runOf(),b=r.battle,slot=b.turn,e=b.enemies[i];if(e&&(e.ocBoss||e.rcBoss)){toast('This guardian cannot be caught during its boss battle.');DG.busy=0;dgPanelBattle();return}if(!e||e.hp<=0){DG.busy=0;dgPanelBattle();return}dgCrosshair('foe',i,slot);const res=await dgQ('🧲 SNAG MACHINE');
+async function dgSnag(i){const r=runOf(),b=r.battle,slot=b.turn,e=b.enemies[i];if(e&&(e.ocBoss||e.rcBoss)){toast('This guardian cannot be caught during its boss battle.');DG.busy=0;dgPanelBattle();return}if(!e||e.hp<=0){DG.busy=0;dgPanelBattle();return}const res=await dgQ('🧲 SNAG MACHINE');
  r.bag.snag--;const ball=e.boss?1:2,p=dgCatchChance(e,ball,res==='fail'?.5:1),shakes=[0,1,2,3].filter(()=>Math.random()<Math.pow(p,.25)).length,caught=Math.random()<p,s='.dg-foe[data-i="'+i+'"]';
  if(DG)DG.msg='🧲 The Snag Machine fires a '+(ball===2?'Ultra Ball':'Poké Ball')+' at '+esc(e.species)+'!'+(res==='fail'?' (Both questions missed: lower odds.)':'');dgDrawBattle();const el=document.querySelector(s);if(el)el.classList.add('snagging');
  for(let k=0;k<(caught?3:Math.min(2,shakes));k++){await dgSleep(450);dgFloat(s,'…','eff')}await dgSleep(450);if(el)el.classList.remove('snagging');
  if(caught){e.hp=0;e.caught=true;const m=giveMon({species:e.species,tier:(INDEX[e.species]||{}).tier||0,shiny:!!e.shiny,size:rollSize()});m.pxp=expFor(e.lv);save();if(DG)DG.msg='🎉 Gotcha! '+esc(e.species)+' (Lv '+e.lv+') was caught and sent to your Box!';dgDrawBattle();dgFloat(s,'Caught!','heal');setTimeout(()=>dgFaint(s),200);toast('🧲 '+e.species+' joined your Box!')}
  else{save();if(DG)DG.msg='💨 '+esc(e.species)+' broke free! (about '+Math.round(p*100)+'% chance)';dgDrawBattle();dgFloat(s,'Broke free!','weak')}
  await dgSleep(1000);dgAfterAction()}
-async function dgOverclock(){const r=runOf(),b=r.battle;r.bag.overclock--;dgCrosshair('ally',b.turn,b.turn);let ok=0;for(let i=0;i<5;i++){const res=await dgQ('⚙️ OVERCLOCK '+(i+1)+'/5',{makeUp:false});if(res==='full')ok++}b.overclock=.15+.05*ok;save();dgDrawBattle();toast('⚙️ Overclock! +'+Math.round(b.overclock*100)+'% damage this battle');await dgSleep(600);dgAfterAction()}
+async function dgOverclock(){const r=runOf(),b=r.battle;r.bag.overclock--;let ok=0;for(let i=0;i<5;i++){const res=await dgQ('⚙️ OVERCLOCK '+(i+1)+'/5',{makeUp:false});if(res==='full')ok++}b.overclock=.15+.05*ok;save();dgDrawBattle();toast('⚙️ Overclock! +'+Math.round(b.overclock*100)+'% damage this battle');await dgSleep(600);dgAfterAction()}
 async function dgTimeGear(){const r=runOf(),b=r.battle;r.bag.timegear--;const n=1+Math.floor(Math.random()*4);let ok=0;for(let i=0;i<n;i++){const res=await dgQ('⏱️ TIME GEAR '+(i+1)+'/'+n,{makeUp:false});if(res==='full')ok++}
  if(ok/n>=.5){b.skip=true;save();dgDrawBattle();document.querySelector('.dg-field').classList.add('negative');setTimeout(()=>{const f=document.querySelector('.dg-field');if(f)f.classList.remove('negative')},1200);toast('⏱️ The Time Gear glows: every enemy skips its next turn!')}else{save();toast('The Time Gear flickers and fades…')}await dgSleep(800);dgAfterAction()}
 async function dgGuard(){const _r=runOf(),_b=_r&&_r.battle;if(!_b||_b.enemyPhase||!_r.party[_b.turn])return;if(DG.busy)return;DG.busy=1;const r=runOf(),b=r.battle,m=r.party[b.turn],p=partyMon(m),c=combatant(p);const res=await dgQ('🛡 GUARD');
@@ -3971,7 +3972,7 @@ function dgEnd(cleared,quit){if(dgMode==='tower')return twEnd(quit);const r=runO
  const souls=mdSoulsFor(r,cleared&&fl);mdSoulAdd(souls);const lines=[(cleared&&fl?'🏆 Beat '+fl+' boss'+(fl>1?'es':'')+'! +'+bonus+' Cogs bonus':quit?'Run ended early.':'Run over.'),'🎟️ Total Tickets earned: '+earned+' · 10% run payout → +'+tix+' Cogs','Cogs from this run: '+(tix+bonus),'Deepest floor: B'+(r.floor+1)+'F','Time studying: '+fmtMin(r.studyMs),'🟣 Soul Stones: +'+souls+' (you have '+mdSouls()+')'];db.run=null;save();if(mgState)mgState.stop&&mgState.stop();mgState=null;render();
  $('mgArea').innerHTML='<div class="reveal mg-end"><h2>🏰 Mystery Dungeon</h2>'+lines.map(l=>'<p>'+l+'</p>').join('')+recapHTML(r.recap)+'<div class="actions"><button class="btn" onclick="mgQuit()">MENU</button><button class="btn red" onclick="mdDeathOpen()">👻 DEATH DEALS</button></div></div>';setTimeout(mdDeathOpen,900)}
 // Wake Mint: one question, then every fainted teammate gets back up with 50% HP
-async function dgWakeMint(){const r=runOf(),b=r.battle,slot=b.turn,I=DITEMS.wakemint;if(!r.party.some(q=>q.hp<=0)){toast('Nobody has fainted');DG.busy=0;dgItem();return}dgCrosshair('ally',slot,slot);const res=await dgQ(I.icon+' '+I.name.toUpperCase());
+async function dgWakeMint(){const r=runOf(),b=r.battle,slot=b.turn,I=DITEMS.wakemint;if(!r.party.some(q=>q.hp<=0)){toast('Nobody has fainted');DG.busy=0;dgItem();return}const res=await dgQ(I.icon+' '+I.name.toUpperCase());
  if(res==='makeup'&&Math.random()<.25){toast('The Wake Mint slipped away! (kept, but no effect)');dgAfterAction();return}
  r.bag.wakemint--;if(res==='fail'){toast('The Wake Mint was used up with no effect.');save();dgAfterAction();return}
  const up=[];r.party.forEach((m,i)=>{if(m.hp>0)return;const c=combatant(partyMon(m));m.hp=Math.max(1,Math.round(c.hp*.5));delete m.reviveTried;up.push([i,m.hp])});save();dgDrawBattle();
@@ -4100,7 +4101,7 @@ function gdDrawBattle(entering){const r=runOf(),b=r&&r.battle,st=$('dgStage');if
  const vis=(x,y)=>L.has(gdKey(x,y)),seenAt=(x,y)=>fl.seen[y*fl.w+x]==='1';
  field.querySelector('.gd-objs').innerHTML=(!fl.stairsHidden&&seenAt(...fl.stairs)?'<div class="gd-obj stairs" style="left:'+fl.stairs[0]*T+'px;top:'+fl.stairs[1]*T+'px">🪜</div>':'')
   +fl.items.filter(it=>seenAt(it.x,it.y)).map(it=>'<div class="gd-obj" style="left:'+it.x*T+'px;top:'+it.y*T+'px">'+(it.tickets?'🎟️':DITEMS[it.k].icon)+'</div>').join('')
-  +fl.specials.filter(s=>seenAt(s.x,s.y)).map(s=>'<div class="gd-obj sp'+(GD_LOCKED[s.k]&&!gdFree(r)?' gd-off':'')+'" style="left:'+s.x*T+'px;top:'+s.y*T+'px">'+(s.k==='shop'?'🎩':GD_SPECIAL[s.k].icon)+'</div>').join('')+mdDigHTML(r,fl,T,seenAt)+(fl.ffOn&&fl.ff?fl.ff.map(k=>{const [x,y]=k.split(',').map(Number);return '<div class="gd-obj gd-ff" style="left:'+x*T+'px;top:'+y*T+'px"></div>'}).join(''):'');
+  +fl.specials.filter(s=>seenAt(s.x,s.y)).map(s=>'<div class="gd-obj sp'+(GD_LOCKED[s.k]&&!gdFree(r)?' gd-off':'')+'" style="left:'+s.x*T+'px;top:'+s.y*T+'px">'+(s.k==='shop'?'🎩':GD_SPECIAL[s.k].icon)+'</div>').join('')+mdDigHTML(r,fl,T,seenAt)+gdBlastHTML(r,T)+(fl.ffOn&&fl.ff?fl.ff.map(k=>{const [x,y]=k.split(',').map(Number);return '<div class="gd-obj gd-ff" style="left:'+x*T+'px;top:'+y*T+'px"></div>'}).join(''):'');
  // units (sprites keep their element between redraws so animations and effects stay smooth)
  const U=field.querySelector('.gd-units'),want=new Set();
  const unit=(cls,i,x,y,sp,row,hpPct,extra,color,anim)=>{const id=cls+i;want.add(id);let el=U.querySelector('[data-u="'+id+'"]');if(!el){el=document.createElement('div');el.dataset.u=id;el.innerHTML='<div class="gd-hp"><i></i></div><div class="dg-spr" data-sp="'+esc(sp)+'" data-row="'+row+'" data-sz="'+(extra.includes('big')?1:.82)+'"></div><b class="dg-xh"></b>';U.appendChild(el)}
@@ -4309,7 +4310,7 @@ function dgDescend(){const r=runOf();if(!r)return;r.floor++;r.party.forEach(m=>{
 function dgFloorClear(){if(mdIsLast(runOf()))return mdFinal();const r=runOf(),D=DIFF[r.diff],seg=Math.floor(r.floor/(GD_DEPTH[r.diff]||3))+1;r.clearedFloors=Math.max(r.clearedFloors||0,seg);save();const bonus=dgFloorBonus(r),g=dgGamey(r);
  $('dgStage').innerHTML='<div class="dg-room"><span class="dg-big">🏁</span><h3>B'+(r.floor+1)+'F boss beaten!</h3><p>Leave now to collect a <b>'+bonus+' Cog</b> bonus'+(g?' ('+r.clearedFloors+' boss'+(r.clearedFloors>1?'es':'')+' × '+(D.fb||10)+')':'')+'.</p><p class="small">'+(g?'Or go deeper: the next floors are about '+((seg)*(D.step||2))+' levels stronger. Your team recovers 30% HP. If your team faints down there, you lose the bonus.':'Or keep exploring deeper. Casual floors stay the same strength, and your team recovers 30% HP on the way down.')+'</p><div class="actions"><button class="btn" onclick="dgEnd(true)">🏠 LEAVE WITH REWARDS</button><button class="btn" onclick="mdShopOpen()">🎩 HATTERENE’S SHOP</button><button class="btn red" onclick="dgDescend()">⬇ GO DEEPER</button></div></div>';$('dgPanel').innerHTML=dgPanelMap()}
 // items that hit "every enemy" hit every foe you can see
-async function dgBlastItem(k){if(gdTower())return dgcBlastItem(k);const r=runOf(),b=r.battle,slot=b.turn,I=DITEMS[k],who=partyMon(r.party[slot]);dgCrosshair('ally',slot,slot);const res=await dgQ(I.icon+' '+I.name.toUpperCase());
+async function dgBlastItem(k){if(gdTower())return dgcBlastItem(k);const r=runOf(),b=r.battle,slot=b.turn,I=DITEMS[k],who=partyMon(r.party[slot]);const res=await dgQ(I.icon+' '+I.name.toUpperCase());
  if(res==='makeup'&&Math.random()<.25){toast((who.nickname||who.species)+' fumbled the item! (kept, but no effect)');dgAfterAction();return}
  r.bag[k]--;if(res==='fail'){toast('The '+I.name+' was used up with no effect.');save();dgAfterAction();return}
  const alive=gdFoeTargets(r),n=alive.length;if(!n){toast('No foe in sight. The '+I.name+' fizzled.');save();dgAfterAction();return}
@@ -4351,6 +4352,9 @@ function gdBossSplash(e){const f=document.querySelector('.gd-field');if(!f)retur
 
 // shops and treasure rooms (and dig spots) shut during battle; they come back when free movement returns
 const GD_LOCKED={shop:1,chest:1};
+
+// a charged boss blast: red tiles on everything within 3 tiles of the boss (what the blast will actually hit)
+function gdBlastHTML(r,T){const b=r.battle;if(!b||!b.charge)return '';const e=b.enemies.find(e=>e.boss&&e.hp>0&&!e.done&&e.aware);if(!e)return '';let h='';for(let y=e.y-3;y<=e.y+3;y++)for(let x=e.x-3;x<=e.x+3;x++)if(gdTile(r.fl,x,y))h+='<div class="gd-obj gd-blast" style="left:'+x*T+'px;top:'+y*T+'px"></div>';return h}
 // ===================== MYSTERY DUNGEON · cave layers =====================
 // The dungeon is dug downward through 8 layers (152 floors). Each layer is split into sublayers: a sublayer lasts 1–3
 // floors, has its own look (floor colours, props, obstacles, wall decorations) and an effect on battles. A short digging
@@ -5951,7 +5955,7 @@ $('navHome').style.display='none';
  if(pcStorageReady)ensureMoveData();
  if(pcStorageReady&&permRoll())save();
  render();scheduleNotifs();aiCheck();window.__pcBooted=true;setTimeout(()=>{try{mdSync()}catch(e){}},1500);setTimeout(()=>{try{facTick()}catch(e){}},2500);setInterval(()=>{try{facTick();if(currentPage==='home'&&hab.scene&&hab.scene!=='home')drawHabitat()}catch(e){}},60000);
- window.__pcVersion='0.70.2';
+ window.__pcVersion='0.70.6';
  document.addEventListener('pointerdown',function(e){try{var t=e.target.closest&&e.target.closest('[onclick],button,a,[id]');if(!t)return;var oc=t.getAttribute('onclick');window.__pcLastTap=(oc?oc.slice(0,60):(t.id?'#'+t.id:t.tagName.toLowerCase()+'.'+String(t.className).split(' ')[0])).replace(/\s+/g,' ')}catch(_){}} ,true);
  Object.keys(window).forEach(function(k){var f=window[k];if(typeof f!=='function'||/^[A-Z]/.test(k)||k==='appError'||k==='$'||k==='esc'||/\[native code\]/.test(Function.prototype.toString.call(f)))return;
   var w=function(){try{return f.apply(this,arguments)}catch(err){if(err&&typeof err==='object'&&!err.__pcLogged){try{err.__pcLogged=1}catch(_){}appError(err,k)}throw err}};try{window[k]=w}catch(_){}});

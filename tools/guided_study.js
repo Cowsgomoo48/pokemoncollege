@@ -24,7 +24,7 @@ function guidedMount(card,q,opts={}){
  panel.querySelector('.guided-hint').onclick=()=>{state.engaged=true;panel.querySelector('.guided-feedback').innerHTML=mathHTML(s.hint)};
  panel.querySelectorAll('.guided-choice').forEach(b=>b.onclick=()=>{if(!panel.isConnected||done)return;state.engaged=true;const choice=s.choices[+b.dataset.i];if(!choice.ok){b.disabled=true;panel.querySelector('.guided-feedback').textContent='Try matching the operation and quantities. Use Help me start if needed.';return}step++;if(step===plan.length)finish();else draw()});
  };
- if(plan){answers.hidden=true;draw()}else{
+ if(plan){panel.innerHTML='<button type="button" class="btn smallbtn guided-start">Help me start</button>';panel.querySelector('button').onclick=()=>{state.engaged=true;answers.hidden=true;draw()}}else{
   let hi=0;panel.innerHTML='<button type="button" class="btn smallbtn guided-start">Help me start</button><div class="guided-feedback" role="status"></div>';
   panel.querySelector('button').onclick=()=>{state.engaged=true;const hint=q.steps?.[hi]?.[0]||'Write down what is given and what you need to find. Use the hint button for the next step.';panel.querySelector('.guided-feedback').innerHTML=mathHTML(hint);if(hi<(q.steps?.length||0)-1)hi++;panel.querySelector('button').textContent='Help with the next step'};
  }
