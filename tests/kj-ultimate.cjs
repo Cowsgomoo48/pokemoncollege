@@ -1,0 +1,15 @@
+const fs=require('fs'),vm=require('vm'),assert=require('assert/strict');
+const source=fs.readFileSync('tools/ultimates.js','utf8'),cinema=fs.readFileSync('tools/kj_ultimate.js','utf8');let r,draws=0,hits=[],damageCalls=0;
+const c=vm.createContext({console,Math,setTimeout,clearTimeout,dgEpoch:0,TYPE_COLOR:{},SLOT_COLORS:['red'],esc:s=>s,db:{candies:100,pokemon:[]},confirm:()=>true,toast(){},save(){},render(){},runOf:()=>r,partyMon:m=>m.mon,combatant:()=>({atk:50,spa:10,types:['Dark','Steel']}),DG:{},dgAfterAction(){},dgDrawBattle(){draws++},dgHit(){},dgFloat:(s,t)=>hits.push([s,t]),dgFaint(){},dgSleep:async()=>{},dgDamage:(a,d,mv,mult,extra,cat)=>{assert.equal(cat,'P');assert.equal(mv[0],'Fighting');damageCalls++;return {dmg:180,eff:1}},typeEff:()=>1});
+vm.runInContext(source,c);vm.runInContext(cinema,c);
+(async()=>{const p={id:'kj',species:'Bisharp',costume:'masked'},normal={id:'n',species:'Bisharp',ult:true},pawn={id:'p',species:'Pawniard',costume:'masked'};c.db.pokemon=[p,normal,pawn];
+assert.equal(c.ultOf(p),null);c.unlockUlt('n');c.unlockUlt('p');assert.equal(c.db.candies,100);c.unlockUlt('kj');assert.equal(c.db.candies,75);assert.equal(c.ultOf(p).move,'KJ Series');assert(!p.ult);c.unlockUlt('kj');assert.equal(c.db.candies,75);
+p.shiny=true;assert.equal(c.ultOf(p).move,'KJ Series');p.costume='witch';assert.equal(c.ultOf(p),null);p.costume='masked';assert.equal(c.ultOf(p).move,'KJ Series');assert.equal(c.ultOf(JSON.parse(JSON.stringify(p))).move,'KJ Series');assert.equal(c.ultOf({species:'Mew',ult:true}).move,'Genetic Implosion');
+const make=()=>({party:[{energy:100,hp:100,mon:p}],battle:{enemies:[{hp:500,def:50,spd:50,types:['Normal']},{hp:500,def:50,spd:50,types:['Normal']}]}});
+c.ultSplash=async()=>{};c.ultFx=async()=>{};r=make();await c.dgUltimate(0,1,1,'full');assert.equal(r.party[0].energy,0);assert.equal(r.battle.enemies[0].hp,500);assert.equal(r.battle.enemies[1].hp,320);assert.equal(damageCalls,1);assert.equal(hits.length,1);
+r=make();r.party[0].energy=99;await c.dgUltimate(0,0,1,'full');assert.equal(damageCalls,1);assert.equal(r.party[0].energy,99);
+r=make();c.ultSplash=async()=>{c.dgEpoch++};await c.dgUltimate(0,0,1,'full');assert.equal(damageCalls,1,'interrupted run must not receive damage');
+for(const [t,name] of [[0,'eyes'],[1000,'tear'],[2000,'approach'],[3000,'uppercut'],[4000,'flurry'],[5200,'kick'],[6000,'roll'],[7000,'shoulder'],[8000,'dropkick'],[9000,'dropkick'],[9800,'shatter']])assert.equal(c.kjPhase(t),name);
+const html=fs.readFileSync('www/index.html','utf8');for(const file of ['kj_ultimate.js','kj_ultimate.css','ultimates.js'])assert(html.includes(fs.readFileSync('tools/'+file,'utf8').trim()));for(const s of html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/g))new vm.Script(s[1]);
+console.log('PASS: KJ-only unlock/use, shiny, persistence, no repeat charge, normal Ultimate compatibility, single-target physical damage, full stamina, interruption guard, timeline and bundle syntax');
+})().catch(e=>{console.error(e);process.exitCode=1});

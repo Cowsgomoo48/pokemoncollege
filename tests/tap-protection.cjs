@@ -14,6 +14,6 @@ const b=card();b.buttons[1].disabled=true;const bp=ctx.tapProtectionStart(b,'one
 const bg=card(),guard=ctx.tapProtectionStart(bg,'one','.answer');now+=400;assert(guard.allowed());guard.stop();
 const empty=ctx.tapProtectionStart(card(),'','.answer');assert(empty.allowed());assert.equal(timers.size,0);empty.stop();
 for(const name of ['tap_protection.js','minigames.js','studyplus.js','dgrid.js','dungeon.js'])assert(html.includes(fs.readFileSync(root+'/tools/'+name,'utf8')),name+' bundle parity');
-assert(html.includes('if(submitted||!protection.allowed())return;'));assert(html.includes('const answerStart=t0+protection.duration'));assert(html.includes("!$('quizArea')._tapProtection?.allowed()"));
+assert(html.includes("if(submitted||!protection.allowed()||ov.querySelector('.guided-final')?.hidden)return;"));assert(html.includes('const answerStart=t0+protection.duration'));assert(html.includes("!$('quizArea')._tapProtection?.allowed()"));
 new vm.Script(html.match(/<script>([\s\S]*?)<\/script>/)[1]);
 console.log('PASS: two-stage timing, red/blue/ready states, disabled controls, cleanup, question replacement, background deadlines, empty prompts, bundle parity, guards, Speed Round allowance and app syntax.');

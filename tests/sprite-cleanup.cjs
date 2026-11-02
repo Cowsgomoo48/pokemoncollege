@@ -3,6 +3,7 @@ const move=fs.readFileSync(__dirname+'/../tools/movefx.js','utf8'),ult=fs.readFi
 const queue=[],timers=new Map();let timerId=0;const classes=new Set(['ok']),listeners=new Map();const el={isConnected:true,dataset:{sp:'Test',row:'0',sz:'1'},style:{cssText:'idle-original',zoom:'1',marginBottom:'0'},classList:{add:x=>classes.add(x),remove:x=>classes.delete(x)},addEventListener:(n,f)=>listeners.set(n,f),removeEventListener:(n,f)=>{if(listeners.get(n)===f)listeners.delete(n)}};
 const data={Idle:{w:40,h:40,rows:8,frames:2,d:[10,10],url:'idle.png'},Attack:{w:64,h:64,rows:8,frames:2,d:[10,10],url:'attack.png'}};
 const c=vm.createContext({console,Math,document:{querySelector:()=>el},loadAnims:async()=>data,dgSleep:()=>new Promise(resolve=>queue.push(resolve)),dgFillSprites:async()=>{el.style.cssText=el.dataset.anim==='Sleep'?'sleep-current':'idle-row-'+el.dataset.row;classes.add('ok')},setTimeout:f=>{timers.set(++timerId,f);return timerId},clearTimeout:id=>timers.delete(id)});
+el.closest=()=>null;vm.runInContext(dungeon.split('\n').find(l=>l.startsWith('function dgLoadSpriteAnims(')),c);
 vm.runInContext(move.slice(0,move.indexOf('function mvArc(')),c);vm.runInContext(ult.slice(ult.indexOf('function fxSpr('),ult.indexOf('function fxBeam(')),c);
 const tick=()=>new Promise(resolve=>setImmediate(resolve));
 (async()=>{

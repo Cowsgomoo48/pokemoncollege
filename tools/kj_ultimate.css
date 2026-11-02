@@ -1,0 +1,5 @@
+/* Keep the battlefield visible through the opening tear and departing shards. */
+.ult-splash.kj-cinema{background:transparent;opacity:1;animation:none;pointer-events:auto;display:flex;align-items:center;justify-content:center;z-index:10000}
+.kj-canvas{width:min(100vw,1100px);height:auto;aspect-ratio:320/300;max-height:85dvh;object-fit:contain;image-rendering:pixelated;image-rendering:crisp-edges;box-shadow:none}
+.kj-skip{position:absolute;right:max(12px,env(safe-area-inset-right));bottom:max(16px,env(safe-area-inset-bottom));z-index:1}
+.kj-view{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-edges}

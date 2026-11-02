@@ -27,24 +27,27 @@ const ULTS={
  'Regigigas':{move:'Display of Power',type:'Normal',t:'all',fx:'mountain',desc:'Hits all foes. On your next turn your team takes 2 less damage from every attack, restores 6 Stamina, and the attack bar moves 10% slower. Regigigas must rest that turn.'},
  'Diancie':{move:'Diamond Storm',type:'Rock',t:'all',fx:'diamonds',desc:'Hits all foes but is never super effective. A diamond shield protects your whole team from all damage during the enemy\'s turn.'}};
 // physical or special, matching each signature move
-const ULT_CAT={'Sudden Breath':'S','Genetic Implosion':'S','Earthen Barricade':'P','Permafrost':'S','Corkscrew Cannon':'P','Origin Pulse':'S','Doom Desire':'S','Techno Blast':'S','Overload Surge':'S','Orbital Strike':'P','Fleur Cannon':'S','Spectral Thief':'P','Hex Nut Swarm':'P','Double Iron Bash':'P','Thunder Cage':'S','Dragon Energy':'S','Ancient Wingbeat':'P','Ion Flare':'S','Ruination Blaze':'S','Mirror Edge':'P','Ivy Cudgel':'P','Precipice Blades':'P','Display of Power':'P','Diamond Storm':'P'};
-function ultOf(p){return p&&p.ult?ULTS[p.species]||null:null}
+const ULT_CAT={'KJ Series':'P','Sudden Breath':'S','Genetic Implosion':'S','Earthen Barricade':'P','Permafrost':'S','Corkscrew Cannon':'P','Origin Pulse':'S','Doom Desire':'S','Techno Blast':'S','Overload Surge':'S','Orbital Strike':'P','Fleur Cannon':'S','Spectral Thief':'P','Hex Nut Swarm':'P','Double Iron Bash':'P','Thunder Cage':'S','Dragon Energy':'S','Ancient Wingbeat':'P','Ion Flare':'S','Ruination Blaze':'S','Mirror Edge':'P','Ivy Cudgel':'P','Precipice Blades':'P','Display of Power':'P','Diamond Storm':'P'};
+const COSTUME_ULTS={masked:{Bisharp:{move:'KJ Series',type:'Fighting',t:'one',fx:'kjseries',power:180,costume:'masked',unlockKey:'kj_bisharp',desc:'KJ costume exclusive. An uppercut and flurry end in a 20-20-20 Dropkick against one target. Physical, 180 power; uses full Stamina.'}}};
+function ultAvailable(p){return p&&(COSTUME_ULTS[p.costume]?.[p.species]||ULTS[p.species])||null}
+function ultUnlocked(p,U){return !!(p&&U&&(U.unlockKey?p.costumeUlts?.[U.unlockKey]:p.ult))}
+function ultOf(p){const U=ultAvailable(p);return ultUnlocked(p,U)?U:null}
 function ultType(U,e){if(!U.type.startsWith('best:'))return U.type;const opts=U.type.slice(5).split(',');return opts.reduce((a,t)=>typeEff(t,e.types)>typeEff(a,e.types)?t:a,opts[0])}
 // ---- Box: show / unlock the Ultimate ----
-function ultBoxHTML(p){const U=ULTS[p.species];if(!U)return '';const tc=TYPE_COLOR[U.type]||'#d6b24a',tl=U.type.startsWith('best:')?'Adapts':U.type;
- if(p.ult)return '<div class="bx-move bx-ult"><i class="bx-mc" style="background:'+(U.type.startsWith('best:')?'conic-gradient(#ee8130,#6390f0,#7ac74c,#b6a136,#ee8130)':tc)+'"></i><div><small>ULTIMATE · '+tl.toUpperCase()+' · FULL ⚡</small><b>✦ '+esc(U.move)+'</b><p>'+esc(U.desc)+'</p></div><span>'+(U.power||180)+'</span></div>';
- return '<div class="bx-ultlock"><div><small>LEGENDARY ULTIMATE</small><b>✦ '+esc(U.move)+'</b><p>'+esc(U.desc)+'</p></div><button class="btn red" '+(db.candies<ULT_COST?'disabled':'')+' onclick="unlockUlt(\''+p.id+'\')">UNLOCK · '+ULT_COST+' 🍬</button></div>'}
-function unlockUlt(id){const p=db.pokemon.find(x=>x.id===id),U=p&&ULTS[p.species];if(!U||p.ult)return;if(db.candies<ULT_COST){toast('You need '+ULT_COST+' Rare Candy');return}
- if(!confirm('Spend '+ULT_COST+' Rare Candy to unlock '+U.move+' for '+(p.nickname||p.species)+'?'))return;db.candies-=ULT_COST;p.ult=true;save();render();toast('✦ '+(p.nickname||p.species)+' unlocked '+U.move+'!')}
+function ultBoxHTML(p){const U=ultAvailable(p);if(!U)return '';const tc=TYPE_COLOR[U.type]||'#d6b24a',tl=U.type.startsWith('best:')?'Adapts':U.type;
+ if(ultUnlocked(p,U))return '<div class="bx-move bx-ult"><i class="bx-mc" style="background:'+(U.type.startsWith('best:')?'conic-gradient(#ee8130,#6390f0,#7ac74c,#b6a136,#ee8130)':tc)+'"></i><div><small>ULTIMATE · '+tl.toUpperCase()+' · FULL ⚡</small><b>✦ '+esc(U.move)+'</b><p>'+esc(U.desc)+'</p></div><span>'+(U.power||180)+'</span></div>';
+ return '<div class="bx-ultlock"><div><small>'+ (U.costume?'COSTUME ULTIMATE · KJ':'LEGENDARY ULTIMATE') +'</small><b>✦ '+esc(U.move)+'</b><p>'+esc(U.desc)+'</p></div><button class="btn red" '+(db.candies<ULT_COST?'disabled':'')+' onclick="unlockUlt(\''+p.id+'\')">UNLOCK · '+ULT_COST+' 🍬</button></div>'}
+function unlockUlt(id){const p=db.pokemon.find(x=>x.id===id),U=ultAvailable(p);if(!U||ultUnlocked(p,U))return;if(db.candies<ULT_COST){toast('You need '+ULT_COST+' Rare Candy');return}
+ if(!confirm('Spend '+ULT_COST+' Rare Candy to unlock '+U.move+' for '+(p.nickname||p.species)+'?'))return;db.candies-=ULT_COST;if(U.unlockKey){p.costumeUlts=p.costumeUlts||{};p.costumeUlts[U.unlockKey]=true}else p.ult=true;save();render();toast('✦ '+(p.nickname||p.species)+' unlocked '+U.move+'!')}
 // ---- splash screen: your torn black band, the Pokémon's head sliding down to its left edge while the move name scrawls by ----
 // the head on the splash: the top of the Pokémon's front-facing idle sprite (transparent, unlike the portraits)
 const ultBusts={};
 function ultBust(species){return ultBusts[species]||(ultBusts[species]=loadAnims(species).then(a=>new Promise(ok=>{const an=a.Idle||a.Walk,im=new Image();im.onload=()=>{try{const c=document.createElement('canvas');c.width=an.w;c.height=an.h;const g=c.getContext('2d');g.drawImage(im,0,0,an.w,an.h,0,0,an.w,an.h);
  const d=g.getImageData(0,0,an.w,an.h).data;let x0=an.w,y0=an.h,x1=0,y1=0;for(let y=0;y<an.h;y++)for(let x=0;x<an.w;x++)if(d[(y*an.w+x)*4+3]>20){x0=Math.min(x0,x);x1=Math.max(x1,x);y0=Math.min(y0,y);y1=Math.max(y1,y)}
  const h=Math.max(8,Math.round((y1-y0+1)*.72)),w=x1-x0+1,s=Math.max(w,h),o=document.createElement('canvas');o.width=s;o.height=s;o.getContext('2d').drawImage(c,x0,y0,w,h,Math.round((s-w)/2),s-h,w,h);ok(o.toDataURL())}catch(e){ok(portrait(species)||'')}};im.onerror=()=>ok(portrait(species)||'');im.src=an.url})).catch(()=>portrait(species)||''))}
-async function ultSplash(p,U){const head=await ultBust(p.species);return new Promise(res=>{const ov=document.createElement('div');ov.className='ult-splash';
+async function ultSplash(p,U,context){const head=U.fx==='kjseries'?rareDir(rareCostume(p),p)+'portrait.png':await ultBust(p.species);return new Promise(res=>{const ov=document.createElement('div');ov.className='ult-splash';
  ov.innerHTML='<div class="ult-band"><img class="ult-bandimg" src="./assets/ult/band.png" alt=""><div class="ult-clip"><img class="ult-head" src="'+head+'" alt=""><div class="ult-txt"><b>'+esc(U.move.toUpperCase())+'</b><small>'+esc((p.nickname||p.species).toUpperCase())+' · ULTIMATE</small></div></div></div>';
- document.body.appendChild(ov);setTimeout(()=>ov.classList.add('out'),1950);setTimeout(()=>{ov.remove();res()},2250)})}
+ document.body.appendChild(ov);if(U.fx==='kjseries'&&context){setTimeout(async()=>{try{await kjCinematic(p,context.slot,context.ti,ov,context)}finally{ov.remove();res()}},1950)}else{setTimeout(()=>ov.classList.add('out'),1950);setTimeout(()=>{ov.remove();res()},2250)}})}
 // ---- tiny effect toolkit (positions are relative to the battle field) ----
 function fxField(){return document.querySelector('.dg-field')}
 function fxPos(sel){const f=fxField(),el=document.querySelector(sel);if(!f||!el)return null;const a=f.getBoundingClientRect(),s=(el.querySelector('.dg-spr')||el).getBoundingClientRect();return {x:s.left-a.left+s.width/2,y:s.top-a.top+s.height/2,w:s.width,h:s.height,b:s.bottom-a.top}}
@@ -66,6 +69,7 @@ const TC=t=>TYPE_COLOR[t]||'#cccccc';
 async function ultFx(U,slot,tis,col,allyIs){const A=fxA(slot),T=tis.map(fxF).filter(Boolean),aSel='.dg-ally[data-i="'+slot+'"]',S=dgSleep;if(!A){await S(300);return}
  const top={x:A.x,y:-40};
  switch(U.fx){
+ case 'kjseries':break; // cinematic follows the normal splash; damage resolves once afterward
  case 'suddenbreath':await ultSuddenBreath(slot,tis);break;
  case 'orbs':{const ring=fxEl('orbring',{left:A.x+'px',top:A.y+'px'},Object.values(TYPE_COLOR).map((c,i)=>'<i style="--c:'+c+';transform:rotate('+(i*20)+'deg) translateX(46px)"></i>').join(''));await S(800);if(ring)ring.remove();
   const MT=T.concat((allyIs||[]).map(fxA).filter(Boolean)); // every Pokémon the implosion will damage, allies included
@@ -135,16 +139,17 @@ function dgBarSlow(b){return b&&(b.slowBar===b.round||b.gigas===b.round)?.9:1}
 // damage your team takes from an enemy attack this round: Diamond Storm blocks it all, Display of Power takes 2 off (to a minimum of 0)
 function ultGuardDmg(b,dmg){if(!b||!dmg)return dmg;if(b.diamond===b.round)return 0;if(b.gigas===b.round)return Math.max(0,dmg-2);return dmg}
 function ultResting(b,m){return !!(b&&m&&m.hp>0&&m.rest===b.round)}
-async function dgUltimate(slot,ti,mult,res){const r=runOf(),b=r&&r.battle,m=b&&r.party[slot],p=partyMon(m),U=ultOf(p);if(!U||!b){dgAfterAction();return}
+async function dgUltimate(slot,ti,mult,res){const epoch=dgEpoch,r=runOf(),b=r&&r.battle,m=b&&r.party[slot],p=m&&partyMon(m),U=ultOf(p);if(!U||!b){dgAfterAction();return}
+ if(U.costume&&(!m||m.energy<100||!b.enemies[ti]||b.enemies[ti].hp<=0))return;
  if(U.custom)return legendUltimate(slot,U,mult,{});
  const c=combatant(p),who='<b style="color:'+SLOT_COLORS[slot]+'">'+esc(p.nickname||p.species)+'</b>';
  if(U.t==='none'&&res==='fail'){if(DG)DG.msg=who+' tried <b>'+esc(U.move)+'</b>… but it fizzled! (Stamina kept)';dgDrawBattle();await dgSleep(1000);dgAfterAction();return}
  m.energy=0;save();
  const foes=b.enemies.map((e,i)=>[e,i]).filter(([e])=>e.hp>0),targets=U.t==='all'?foes:U.t==='one'?foes.filter(([,i])=>i===ti):[];
  const t0=targets[0]&&targets[0][0],col=t0?TC(ultType(U,t0)):TC(U.type);
- await ultSplash(p,U);if(!runOf()||runOf().battle!==b)return;
+ await ultSplash(p,U,{slot,ti,epoch,battle:b});if(epoch!==dgEpoch||!runOf()||runOf().battle!==b)return;
  let fxFoes=targets.map(([,i])=>i),fxAllies=[];if(U.move==='Genetic Implosion'&&t0){fxFoes=b.enemies.map((e,i)=>e.hp>0&&e.species===t0.species?i:-1).filter(i=>i>=0);fxAllies=r.party.map((x,j)=>x.hp>0&&partyMon(x).species===t0.species?j:-1).filter(j=>j>=0)}
- await ultFx(U,slot,fxFoes,col,fxAllies);if(!runOf()||runOf().battle!==b)return;
+ await ultFx(U,slot,fxFoes,col,fxAllies);if(epoch!==dgEpoch||!runOf()||runOf().battle!==b)return;
  const sb=s=>m.starf&&m.starf.stat===s?2:0,att={atk:c.atk+sb('atk'),spa:c.spa+sb('spa'),types:c.types},UCAT=ULT_CAT[U.move]||'S',extra=1+(b.overclock||0)+(b.teamBoost||0),hits=[],allyHits=[];let note='';
  const strike=(e,i,pw,mm,effOv)=>{const tp=ultType(U,e),mv=[tp,pw,0,'charged'];let {dmg,eff}=dgDamage(att,{def:e.def,spd:e.spd,types:e.types},mv,mm,extra*ultWaterMult(b,tp),UCAT);if(effOv!=null){dmg=Math.max(1,Math.round(dmg/Math.max(.01,eff)*effOv));eff=effOv}if(e.melt>0)dmg=Math.round(dmg*1.15);e.hp=Math.max(0,e.hp-dmg);hits.push({i,dmg,eff});return dmg};
  const sp=U.move;

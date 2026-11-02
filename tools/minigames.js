@@ -56,15 +56,17 @@ function mgHints(q){const a=String((q.options.find(o=>o.ok)||{}).t||'').trim();i
  return key?['The right answer mentions “'+key+'”.']:['Read each choice and rule out the ones that don’t fit the question.']}
 // the first miss of the current question, kept for the end-of-run mistake recap
 let __qMiss=null;function __qMissReset(){__qMiss=null}function __qMissSet(m){if(!__qMiss)__qMiss=m}
-function askQ(item,bank,opts={}){__qMissReset();return new Promise(res=>{const ov=document.createElement('div');ov.className='mgq';document.body.appendChild(ov);const v0=Math.random()<.5?0:1;
+function studyLog(item,ms){const sid=item&&item.sid;if(!sid||!(ms>0))return;db.sumStudyMs=db.sumStudyMs||{};db.sumStudyMs[sid]=(db.sumStudyMs[sid]||0)+Math.min(ms,300000)}
+function askQ(item,bank,opts={}){__qMissReset();let __qT0=Date.now();return new Promise(res=>{const ov=document.createElement('div');ov.className='mgq';document.body.appendChild(ov);const v0=Math.random()<.5?0:1;
  // about 1 question in 5 asks you to type the answer instead of picking it (never a Make-Up)
  const plan=opts.typed!==false&&Math.random()<(opts.typedChance??(item.kind==='gen'&&PR[item.gid]&&PR[item.gid].cmd?.85:.2))?saPlan(item):null;
  let protection=null;
  const show=(q,isMakeUp)=>{if(protection)protection.stop();const t0=performance.now();let hinted=false;const typed=!!q.typed;
   ov.innerHTML='<div class="mgq-card">'+(opts.title?'<span class="badge">'+esc(opts.title)+'</span> ':'')+(isMakeUp?'<span class="badge mk">MAKE-UP</span>':'')+(typed?'<span class="badge sa-b">✍️ TYPE IT</span>':'')+'<h3>'+mathHTML(q.prompt)+'</h3><p class="small muted">'+esc(q.sub)+'</p>'+(opts.hint!==false?'<div class="mgq-hints"></div><button class="btn smallbtn mgq-hint">💡 Hint</button>':'')
-   +(typed?'<div class="sa-wrap"><input class="sa-in" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Your answer"><button class="btn red sa-go">CHECK</button></div>'+(q.cmd?saKeysHTML(true):q.math?saKeysHTML():''):q.options.map((o,i)=>'<button class="answer" data-i="'+i+'">'+mathHTML(o.t)+'</button>').join(''))
-   +(!q.cmd&&(q.math||mathy(q.prompt,...q.options.map(o=>o.t)))?calcHTML():'')+'</div>';calcInit(ov);
+   +'<div class="guided-final">'+(typed?'<div class="sa-wrap"><input class="sa-in" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Your answer"><button class="btn red sa-go">CHECK</button></div>'+(q.cmd?saKeysHTML(true):q.math?saKeysHTML():''):q.options.map((o,i)=>'<button class="answer" data-i="'+i+'">'+mathHTML(o.t)+'</button>').join(''))
+   +'</div>'+(!q.cmd&&(q.math||mathy(q.prompt,...q.options.map(o=>o.t)))?calcHTML():'')+'</div>';calcInit(ov);
   protection=tapProtectionStart(ov.querySelector('.mgq-card'),q.prompt,'.answer,.sa-go');let submitted=false;
+  const guidance=!isMakeUp&&!q.cmd&&(item.kind==='gen'||opts.helpStart)?guidedMount(ov.querySelector('.mgq-card'),q,opts):{engaged:false,complete:false};
   // hints come one step at a time; they explain the problem and never remove answers.
   // Questions without built-in steps ask the AI tutor to work out the steps the first time you tap.
   const hb=ov.querySelector('.mgq-hint'),ans=String((q.options.find(o=>o.ok)||{}).t||'');let H=q.steps&&q.steps.length?q.steps.map(x=>x[0]):null,hi=0,busy=false;
@@ -73,7 +75,7 @@ function askQ(item,bank,opts={}){__qMissReset();return new Promise(res=>{const o
   if(hb){if(H)label();else hb.textContent=aiAny()?'💡 Walk me through it':'💡 Hint';
    hb.onclick=async()=>{hinted=true;if(busy)return;if(!H){busy=true;if(aiAny()){hb.disabled=true;hb.textContent='💭 Working out the steps…';const st=await aiTutor(q.prompt,q.short||ans,q.options.map(o=>o.t));if(!ov.isConnected)return;hb.disabled=false;if(st){q.steps=st;H=st.map(x=>x[0])}}if(!H||!H.length)H=mgHints(q);busy=false;if(!H.length){hb.remove();return}}next()}}
   const done=r=>{if(protection)protection.stop();ov.remove();res(r)};
-  const answered=(o,b)=>{if(submitted||!protection.allowed())return;submitted=true;protection.stop();if(typeof apNote==='function')apNote({ms:performance.now()-t0,ok:!!o.ok,chars:String(q.prompt).length+q.options.reduce((a,x)=>a+String(x.t).length,0),hinted:hinted||typed});const hb2=ov.querySelector('.mgq-hint');if(hb2)hb2.remove();
+  const answered=(o,b)=>{if(submitted||!protection.allowed()||ov.querySelector('.guided-final')?.hidden)return;submitted=true;studyLog(item,Date.now()-__qT0);__qT0=Date.now();protection.stop();if(typeof apNote==='function')apNote({ms:performance.now()-t0,protectedMs:protection.duration,ok:!!o.ok,chars:String(q.prompt).length+q.options.reduce((a,x)=>a+String(x.t).length,0),hinted,typed,guided:guidance.engaged,inputChars:typed?String(o.t).length:0});const hb2=ov.querySelector('.mgq-hint');if(hb2)hb2.remove();
    ov.querySelectorAll('.answer').forEach(x=>{x.disabled=true;if(q.options[+x.dataset.i].ok)x.classList.add('correct')});const card=ov.querySelector('.mgq-card');
    if(typed){const inp=ov.querySelector('.sa-in');inp.disabled=true;inp.classList.add(o.ok?'ok':'no');const g=ov.querySelector('.sa-go');if(g)g.remove();const k=ov.querySelector('.sa-keys');if(k)k.remove()}
    if(o.ok){qRecord(item,true,{first:!isMakeUp,makeup:isMakeUp,hints:hi});

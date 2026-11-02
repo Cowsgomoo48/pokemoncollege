@@ -1061,6 +1061,14 @@ button.tp-locked::after{content:'';position:absolute;right:12px;top:50%;transfor
 @keyframes tpSkim{from{box-shadow:0 0 0 4px #de55591a,inset 0 0 28px #de55590d}to{box-shadow:0 0 0 8px #de55594d,inset 0 0 38px #de555929}}
 @keyframes tpRead{from{box-shadow:0 0 0 3px #518fd81a}to{box-shadow:0 0 0 6px #518fd84d}}
 @media(prefers-reduced-motion:reduce){.tp-skim,.tp-read{animation:none;box-shadow:0 0 0 4px #647c9426}}
+
+.guided-panel{padding:12px;margin:12px 0;border:1px solid #b8d3d9;border-radius:14px;background:#edf7f5;color:#233650}.guided-panel p{line-height:1.5}.guided-choice{display:block;width:100%;text-align:left;margin:7px 0;background:#fff;color:#233650;border:1px solid #a9c5d0;border-radius:10px}.guided-feedback{font-size:13px;line-height:1.5}.guided-final[hidden]{display:none!important}
+/* Keep the battlefield visible through the opening tear and departing shards. */
+.ult-splash.kj-cinema{background:transparent;opacity:1;animation:none;pointer-events:auto;display:flex;align-items:center;justify-content:center;z-index:10000}
+.kj-canvas{width:min(100vw,1100px);height:auto;aspect-ratio:320/300;max-height:85dvh;object-fit:contain;image-rendering:pixelated;image-rendering:crisp-edges;box-shadow:none}
+.kj-skip{position:absolute;right:max(12px,env(safe-area-inset-right));bottom:max(16px,env(safe-area-inset-bottom));z-index:1}
+.kj-view{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-edges}
+
 </style><style id="bundled-animation-style">
 .safari-foreground{position:absolute;inset:0;z-index:10;pointer-events:auto;background:#071b0d;display:flex;align-items:center;justify-content:center;overflow:hidden}
 .safari-foreground img{width:100%;height:100%;object-fit:cover;image-rendering:pixelated}
@@ -1881,7 +1889,7 @@ const ITEMS={
  t_shiny:{name:'Shiny Safari Ticket',kind:'ticket',ticket:'shiny',tier:1,icon:'ticket',desc:'A free Shiny Safari pull (double shiny odds).'},
  t_deluxe:{name:'Deluxe Safari Ticket',kind:'ticket',ticket:'deluxe',tier:2,icon:'ticket',desc:'A free Deluxe Safari pull.'},
  shinyticket:{name:'Shiny Lure',kind:'shinyticket',tier:2,w:.05,desc:'Use it to triple shiny chances for your next 3 Safaris. Stacks with other boosts.'},
- costumeticket:{name:'Costume Ticket',kind:'monticket',act:'costume',tier:3,w:.025,desc:'Puts a Pokémon that has a costume variant into its costume (Ralts, Gardevoir, Charcadet, Armarouge, Ceruledge, Snorunt, Froslass).'},
+ costumeticket:{name:'Costume Ticket',kind:'monticket',act:'costume',tier:3,w:.025,desc:'Puts an eligible Pokémon into its special costume, including Pawniard and Bisharp. Choose a Pokémon to see eligible costumes.'},
  rerollticket:{name:'Reroll Ticket',kind:'reroll',tier:1,w:.9,desc:'One free reroll of the Daily Deals or the TM Counter. Keeps until you use it.'},
  shinyconv:{name:'Shiny Ticket',kind:'monticket',act:'shiny',tier:3,w:.01,desc:'Turns one of your non-shiny Pokémon shiny.'},
  cap_copper:{name:'Copper Bottlecap',kind:'cap',cap:'one',tier:1,w:.6,desc:'Pick a stat, then a Pokémon: that stat’s growth rate goes up 1 grade.'},
@@ -3199,6 +3207,45 @@ function tapProtectionStart(card,prompt,selector){
  update();if(!stopped&&timing.total)timer=setInterval(update,100);return api;
 }
 
+// Build guided steps only from this question's bundled, verified solution. Never regenerate its numbers.
+function guidedChoices(correct,alternatives){
+ const wrong=[...new Set(alternatives.filter(x=>x!==correct&&!saMatch(x,correct)))].slice(0,3);
+ return wrong.length>=2?shuffle([{t:correct,ok:true},...wrong.map(t=>({t,ok:false}))]):null;
+}
+function guidedPlan(q){
+ if(q.cmd||!q.steps?.length)return null;
+ const formulas=['F = m × a','a = F ÷ m','m = F ÷ a','V = I × R','I = V ÷ R','R = V ÷ I','d = m ÷ V','m = d × V','W = m × g','P = W ÷ t','KE = ½mv²','PE = mgh','W = Fd cos θ','v = u + at','s = ut + ½at²','M = n ÷ V','M₁V₁ = M₂V₂'];
+ // A symbolic equation must contain no ordinary prose. Numerical setups must contain an operation.
+ const symbolic=q.steps.flatMap(s=>String(s[1]||'').split(/;|,| and /)).map(x=>x.trim()).find(x=>x.includes('=')&&!/\d/.test(x)&&/^[A-Za-zΑ-ω₀-₉²³½Δθμωπ√×÷+−\-*/^=().\s]+$/u.test(x)&&!/[A-Za-z]{5}/.test(x));
+ const setups=q.steps.flatMap(s=>String(s[1]||'').split('=').slice(0,-1)).map(x=>x.trim()).filter(x=>/\d/.test(x)&&/[×÷+*/−\-]/.test(x)&&/^[\d\s.()+−\-×÷*/^²³½π√]+$/u.test(x));
+ const setup=setups.at(-1);if(!symbolic||!setup)return null;
+ const alternatives=[setup.replace('×','+'),setup.replace('÷','×'),setup.replace('+','−'),setup.replace('−','+'),setup.replace('*','+'),setup.replace('/','*'),'('+setup+') × 2','('+setup+') ÷ 2'];
+ const symbols=x=>[...new Set((x.toLowerCase().match(/[a-zα-ω]/gu)||[]))].sort().join('');
+ const method=guidedChoices(symbolic,formulas.filter(f=>symbols(f)!==symbols(symbolic))),substitution=guidedChoices(setup,alternatives);
+ return method&&substitution?[{label:'1 · Choose the equation',choices:method,hint:q.steps[0][0]}, {label:'2 · Substitute the numbers',choices:substitution,hint:'Match each value in the problem to its place in the equation: '+symbolic}]:null;
+}
+function guidedMount(card,q,opts={}){
+ const answers=card.querySelector('.guided-final'),plan=guidedPlan(q);if(!answers)return {engaged:false,complete:false};
+ const state={engaged:false,complete:false},panel=document.createElement('div');panel.className='guided-panel';answers.before(panel);
+ let step=0,done=false;
+ const finish=()=>{if(done)return;done=true;state.complete=true;state.engaged=true;answers.hidden=false;panel.innerHTML='<b>Setup complete</b><p>Now work out your answer.'+(opts.onGuided?' Finish the question for +2 Tickets.':'')+'</p>';if(opts.onGuided)opts.onGuided()};
+ const draw=()=>{const s=plan[step];panel.innerHTML='<b>'+esc(s.label)+'</b><p class="small muted">Choose a setup before calculating.</p>'+s.choices.map((c,i)=>'<button type="button" class="btn guided-choice" data-i="'+i+'">'+mathHTML(c.t)+'</button>').join('')+'<button type="button" class="btn smallbtn guided-hint">Help me start</button><p class="guided-feedback" role="status"></p>';
+ panel.querySelector('.guided-hint').onclick=()=>{state.engaged=true;panel.querySelector('.guided-feedback').innerHTML=mathHTML(s.hint)};
+ panel.querySelectorAll('.guided-choice').forEach(b=>b.onclick=()=>{if(!panel.isConnected||done)return;state.engaged=true;const choice=s.choices[+b.dataset.i];if(!choice.ok){b.disabled=true;panel.querySelector('.guided-feedback').textContent='Try matching the operation and quantities. Use Help me start if needed.';return}step++;if(step===plan.length)finish();else draw()});
+ };
+ if(plan){answers.hidden=true;draw()}else{
+  let hi=0;panel.innerHTML='<button type="button" class="btn smallbtn guided-start">Help me start</button><div class="guided-feedback" role="status"></div>';
+  panel.querySelector('button').onclick=()=>{state.engaged=true;const hint=q.steps?.[hi]?.[0]||'Write down what is given and what you need to find. Use the hint button for the next step.';panel.querySelector('.guided-feedback').innerHTML=mathHTML(hint);if(hi<(q.steps?.length||0)-1)hi++;panel.querySelector('button').textContent='Help with the next step'};
+ }
+ return state;
+}
+// Rates apply to the acting party member, using the same max HP as combat.
+function dgAnswerPolicy(r){
+ const member=r?.battle&&r.party?.[r.battle.turn];if(!member)return {typedChance:.2,diyChance:0,mcOnly:false};
+ const max=combatant(partyMon(member)).hp,ratio=member.hp/Math.max(1,max);
+ return ratio<=.25?{typedChance:0,diyChance:0,mcOnly:true}:ratio<=.5?{typedChance:.15,diyChance:.03,mcOnly:false}:{typedChance:.4,diyChance:.12,mcOnly:false};
+}
+
 // ===================== MINIGAMES =====================
 // Question bank from summaries: "Term: definition" lines and AI quiz questions.
 function mgBank(sids){const out=[];for(const s of db.summaries){if(!sids.includes(s.id))continue;const cmdSet=prOf(s).some(id=>PR[id].cmd);
@@ -3257,15 +3304,17 @@ function mgHints(q){const a=String((q.options.find(o=>o.ok)||{}).t||'').trim();i
  return key?['The right answer mentions “'+key+'”.']:['Read each choice and rule out the ones that don’t fit the question.']}
 // the first miss of the current question, kept for the end-of-run mistake recap
 let __qMiss=null;function __qMissReset(){__qMiss=null}function __qMissSet(m){if(!__qMiss)__qMiss=m}
-function askQ(item,bank,opts={}){__qMissReset();return new Promise(res=>{const ov=document.createElement('div');ov.className='mgq';document.body.appendChild(ov);const v0=Math.random()<.5?0:1;
+function studyLog(item,ms){const sid=item&&item.sid;if(!sid||!(ms>0))return;db.sumStudyMs=db.sumStudyMs||{};db.sumStudyMs[sid]=(db.sumStudyMs[sid]||0)+Math.min(ms,300000)}
+function askQ(item,bank,opts={}){__qMissReset();let __qT0=Date.now();return new Promise(res=>{const ov=document.createElement('div');ov.className='mgq';document.body.appendChild(ov);const v0=Math.random()<.5?0:1;
  // about 1 question in 5 asks you to type the answer instead of picking it (never a Make-Up)
  const plan=opts.typed!==false&&Math.random()<(opts.typedChance??(item.kind==='gen'&&PR[item.gid]&&PR[item.gid].cmd?.85:.2))?saPlan(item):null;
  let protection=null;
  const show=(q,isMakeUp)=>{if(protection)protection.stop();const t0=performance.now();let hinted=false;const typed=!!q.typed;
   ov.innerHTML='<div class="mgq-card">'+(opts.title?'<span class="badge">'+esc(opts.title)+'</span> ':'')+(isMakeUp?'<span class="badge mk">MAKE-UP</span>':'')+(typed?'<span class="badge sa-b">✍️ TYPE IT</span>':'')+'<h3>'+mathHTML(q.prompt)+'</h3><p class="small muted">'+esc(q.sub)+'</p>'+(opts.hint!==false?'<div class="mgq-hints"></div><button class="btn smallbtn mgq-hint">💡 Hint</button>':'')
-   +(typed?'<div class="sa-wrap"><input class="sa-in" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Your answer"><button class="btn red sa-go">CHECK</button></div>'+(q.cmd?saKeysHTML(true):q.math?saKeysHTML():''):q.options.map((o,i)=>'<button class="answer" data-i="'+i+'">'+mathHTML(o.t)+'</button>').join(''))
-   +(!q.cmd&&(q.math||mathy(q.prompt,...q.options.map(o=>o.t)))?calcHTML():'')+'</div>';calcInit(ov);
+   +'<div class="guided-final">'+(typed?'<div class="sa-wrap"><input class="sa-in" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Your answer"><button class="btn red sa-go">CHECK</button></div>'+(q.cmd?saKeysHTML(true):q.math?saKeysHTML():''):q.options.map((o,i)=>'<button class="answer" data-i="'+i+'">'+mathHTML(o.t)+'</button>').join(''))
+   +'</div>'+(!q.cmd&&(q.math||mathy(q.prompt,...q.options.map(o=>o.t)))?calcHTML():'')+'</div>';calcInit(ov);
   protection=tapProtectionStart(ov.querySelector('.mgq-card'),q.prompt,'.answer,.sa-go');let submitted=false;
+  const guidance=!isMakeUp&&!q.cmd&&(item.kind==='gen'||opts.helpStart)?guidedMount(ov.querySelector('.mgq-card'),q,opts):{engaged:false,complete:false};
   // hints come one step at a time; they explain the problem and never remove answers.
   // Questions without built-in steps ask the AI tutor to work out the steps the first time you tap.
   const hb=ov.querySelector('.mgq-hint'),ans=String((q.options.find(o=>o.ok)||{}).t||'');let H=q.steps&&q.steps.length?q.steps.map(x=>x[0]):null,hi=0,busy=false;
@@ -3274,7 +3323,7 @@ function askQ(item,bank,opts={}){__qMissReset();return new Promise(res=>{const o
   if(hb){if(H)label();else hb.textContent=aiAny()?'💡 Walk me through it':'💡 Hint';
    hb.onclick=async()=>{hinted=true;if(busy)return;if(!H){busy=true;if(aiAny()){hb.disabled=true;hb.textContent='💭 Working out the steps…';const st=await aiTutor(q.prompt,q.short||ans,q.options.map(o=>o.t));if(!ov.isConnected)return;hb.disabled=false;if(st){q.steps=st;H=st.map(x=>x[0])}}if(!H||!H.length)H=mgHints(q);busy=false;if(!H.length){hb.remove();return}}next()}}
   const done=r=>{if(protection)protection.stop();ov.remove();res(r)};
-  const answered=(o,b)=>{if(submitted||!protection.allowed())return;submitted=true;protection.stop();if(typeof apNote==='function')apNote({ms:performance.now()-t0,ok:!!o.ok,chars:String(q.prompt).length+q.options.reduce((a,x)=>a+String(x.t).length,0),hinted:hinted||typed});const hb2=ov.querySelector('.mgq-hint');if(hb2)hb2.remove();
+  const answered=(o,b)=>{if(submitted||!protection.allowed()||ov.querySelector('.guided-final')?.hidden)return;submitted=true;studyLog(item,Date.now()-__qT0);__qT0=Date.now();protection.stop();if(typeof apNote==='function')apNote({ms:performance.now()-t0,protectedMs:protection.duration,ok:!!o.ok,chars:String(q.prompt).length+q.options.reduce((a,x)=>a+String(x.t).length,0),hinted,typed,guided:guidance.engaged,inputChars:typed?String(o.t).length:0});const hb2=ov.querySelector('.mgq-hint');if(hb2)hb2.remove();
    ov.querySelectorAll('.answer').forEach(x=>{x.disabled=true;if(q.options[+x.dataset.i].ok)x.classList.add('correct')});const card=ov.querySelector('.mgq-card');
    if(typed){const inp=ov.querySelector('.sa-in');inp.disabled=true;inp.classList.add(o.ok?'ok':'no');const g=ov.querySelector('.sa-go');if(g)g.remove();const k=ov.querySelector('.sa-keys');if(k)k.remove()}
    if(o.ok){qRecord(item,true,{first:!isMakeUp,makeup:isMakeUp,hints:hi});
@@ -3509,7 +3558,7 @@ function askDIY(item,opts={}){return new Promise(res=>{const p=prInstance(item.g
  const hb=ov.querySelector('.diy-hint');if(hb)hb.onclick=()=>{if(hi>=p.steps.length)return;ov.querySelector('.mgq-hints').insertAdjacentHTML('beforeend','<div class="mgq-step"><b>Step '+(hi+1)+'.</b> '+mathHTML(p.steps[hi][0])+'</div>');hi++;if(hi>=p.steps.length)hb.remove()};
  ov.querySelector('.diy-go').onclick=()=>{if(submitted||!protection.allowed())return;const lines=[...box.querySelectorAll('input')].map(i=>i.value.trim()).filter(Boolean);if(!lines.length){toast('Write at least one line');return}
   submitted=true;protection.stop();const checks=lines.map(l=>diyLineCheck(l,ansX)),last=lines[lines.length-1],lastSeg=last.split(/=|≈/).pop(),ok=saMatch(lastSeg,p.a)||saMatch(last,p.a);
-  if(typeof apNote==='function')apNote({ms:performance.now()-t0,ok,chars:400,hinted:true});
+  if(typeof apNote==='function')apNote({ms:performance.now()-t0,protectedMs:protection.duration,ok,chars:String(p.q).length,hinted:true,typed:true});
   qRecord(item,ok,ok?{first:true,hints:hi}:{pick:last,prompt:p.q,answer:p.a,hints:hi});
   if(!ok&&typeof __qMissSet==='function')__qMissSet({prompt:p.q,pick:last,answer:p.a,why:(p.steps&&p.steps.length?p.steps[p.steps.length-1][1]||p.steps[p.steps.length-1][0]:p.ex)});
   const card=ov.querySelector('.mgq-card');
@@ -3642,7 +3691,8 @@ function dgBattle(kind){const r=runOf(),bump=dgGamey(r)?(r.floor||0)*(DIFF[r.dif
  r.party.forEach(q=>{delete q.hurt;delete q.hurtR;delete q.koR});dgFoeScale(r,en);r.battle={kind,enemies:en,turn:0,round:1,overclock:0,skip:false,guard:{},done:false};save();dgDrawBattle(true)}
 function dgSpriteHTML(species,row,cls,costumeP,size){return '<div class="dg-spr '+cls+'" data-sp="'+esc(species)+'" data-row="'+row+'" data-sz="'+(+size||1)+'"></div>'}
 const DG_SPRITE_SCALE=1.3; // every Pokémon is drawn at the same scale, so real size differences show
-async function dgFillSprites(){const els=document.querySelectorAll('.dg-spr:not(.ok)');for(const el of els){const ticket=(el._spriteRender||0)+1;el._spriteRender=ticket;el._attackToken=null;const sp=el.dataset.sp,row=+el.dataset.row,anim=el.dataset.anim||'',sz=el.dataset.sz;const current=()=>el.isConnected&&el._spriteRender===ticket&&el.dataset.sp===sp&&+el.dataset.row===row&&(el.dataset.anim||'')===anim&&el.dataset.sz===sz;let a;try{a=await loadAnims(sp)}catch(e){a=null}if(!current())continue;if(!a){el.innerHTML=portraitHTML(sp,'dg-port');el.classList.add('ok');continue}
+function dgLoadSpriteAnims(el){const ally=el.closest('.dg-ally'),r=ally&&runOf(),m=r&&r.party[+ally.dataset.i],p=m&&partyMon(m),costume=p&&p.species===el.dataset.sp&&rareCostume(p);return costume&&costume.sheets?loadRareAnims({...costume,variant:p.shiny?'shiny':'normal'}):loadAnims(el.dataset.sp)}
+async function dgFillSprites(){const els=document.querySelectorAll('.dg-spr:not(.ok)');for(const el of els){const ticket=(el._spriteRender||0)+1;el._spriteRender=ticket;el._attackToken=null;const sp=el.dataset.sp,row=+el.dataset.row,anim=el.dataset.anim||'',sz=el.dataset.sz;const current=()=>el.isConnected&&el._spriteRender===ticket&&el.dataset.sp===sp&&+el.dataset.row===row&&(el.dataset.anim||'')===anim&&el.dataset.sz===sz;let a;try{a=await dgLoadSpriteAnims(el)}catch(e){a=null}if(!current())continue;if(!a){el.innerHTML=portraitHTML(sp,'dg-port');el.classList.add('ok');continue}
   const an=(el.dataset.anim&&a[el.dataset.anim])||a.Idle||a.Walk,r=row<(an.rows||8)?row:0,k=DG_SPRITE_SCALE*(+el.dataset.sz||1)*(el.closest('.dg-foe.big')?1.2:1),bb=await sprBounds(an,r),foot=Math.max(0,an.h-bb[3]-1);if(!current())continue;
   // stand the Pokémon on its feet: drop the empty strip under the body (tall frames like Gyarados have a lot of it)
   el.style.cssText='width:'+an.w+'px;height:'+an.h+'px;margin-bottom:'+(-foot)+'px;background-image:url('+an.url+');background-position:0 '+(-r*an.h)+'px;--fw:'+an.w+'px;--fn:'+an.frames+';animation:dsx '+(an.d.reduce((x,y)=>x+y,0)/60).toFixed(2)+'s steps('+an.frames+') infinite;zoom:'+k.toFixed(2)+';';el.classList.add('ok')}}
@@ -3661,18 +3711,24 @@ function dgTargetPick(i){if(dgTarget&&dgTarget.side==='foe'){const e=runOf().bat
 function dgAllyPick(i){if(dgTarget&&dgTarget.side==='ally'){const f=dgTarget.fn;dgTarget=null;document.querySelectorAll('.dg-ally').forEach(x=>x.classList.remove('pickable'));f(i)}}
 function dgcChooseFoe(fn){if(!runOf()||!runOf().battle)return;const b=runOf().battle,alive=b.enemies.map((e,i)=>e.hp>0?i:-1).filter(i=>i>=0);if(alive.length===1){fn(alive[0]);return}dgTarget={side:'foe',fn};document.querySelectorAll('.dg-foe:not(.ko)').forEach(x=>x.classList.add('pickable'));$('dgPanel').innerHTML='<div class="dg-msg">🎯 Tap an enemy to target.</div>'}
 function dgCrosshair(side,i,slot){document.querySelectorAll('.dg-xh').forEach(x=>x.innerHTML='');const el=document.querySelector((side==='foe'?'.dg-foe':'.dg-ally')+'[data-i="'+i+'"] .dg-xh');if(el)el.innerHTML='<i style="border-color:'+SLOT_COLORS[slot]+'"></i>'}
-function dgQ(title,opts){const ep=dgEpoch,r0=runOf(),bt=r0&&r0.battle,tn=bt&&bt.turn;
+function dgQ(title,opts){const ep=dgEpoch,r0=runOf(),bt=r0&&r0.battle,tn=bt&&bt.turn,policy=dgAnswerPolicy(r0);let guidedComplete=false;
  // Do It Yourself: on some floors the first attack question is a practice problem you work out line by line
- let it=null,diy=false;if(bt&&bt.diy&&/FIGHT/.test(title)){bt.diy=false;const gens=DG.bank.filter(b=>b.kind==='gen'&&!(PR[b.gid]&&PR[b.gid].cmd)),weak=gens.filter(isWeak);if(gens.length){it=weak.length&&Math.random()<.5?weak[Math.floor(Math.random()*weak.length)]:gens[Math.floor(Math.random()*gens.length)];diy=true}}
+ let it=null,diy=false;if(!policy.mcOnly&&bt&&bt.diy&&/FIGHT/.test(title)){bt.diy=false;const gens=DG.bank.filter(b=>b.kind==='gen'&&!(PR[b.gid]&&PR[b.gid].cmd)),weak=gens.filter(isWeak);if(gens.length){it=weak.length&&Math.random()<.5?weak[Math.floor(Math.random()*weak.length)]:gens[Math.floor(Math.random()*gens.length)];diy=true}}
  if(!it)it=DG.P.next();
- return (diy?askDIY(it,{title}):askQ(it,DG.bank,Object.assign({title,halfsies:!!(r0&&r0.halfsies)},opts||{}))).then(res=>{let half=false;if(res==='half'){half=true;res='full';toast('🍰 Halfsies! It counts in battle, and it’s saved as a weak spot.')}const r1=runOf();if(ep!==dgEpoch||!DG||!r1||(bt&&(r1.battle!==bt||bt.turn!==tn)))return new Promise(()=>{});DG.P.report(it,half?'fail':res);if(res==='full'&&!half)r1.qOk=(r1.qOk||0)+1;if((res!=='full'||half)&&__qMiss)recapAdd(it,__qMiss);if(diy&&res==='full'){r1.tickets=(r1.tickets||0)+5;r1.cogs=(r1.cogs||0)+5;toast('🛠 Worked it out! +5 🎟️')}if(bt&&res==='full')bt.qFull=(bt.qFull||0)+1;if(bt)bt.lastRes=res;mdRescueFind(r1);apMaybePrompt();return res})}
+ if(!diy&&!policy.mcOnly&&it?.kind==='gen'&&!(PR[it.gid]&&PR[it.gid].cmd)&&Math.random()<policy.diyChance)diy=true;
+ const questionOpts=Object.assign({title,halfsies:!!r0?.halfsies,typedChance:policy.typedChance,helpStart:!!DG.helpNext,onGuided:()=>{guidedComplete=true}},opts||{});if(policy.mcOnly)questionOpts.typed=false;DG.helpNext=false;
+ return (diy?askDIY(it,{title}):askQ(it,DG.bank,questionOpts)).then(res=>{let half=false;if(res==='half'){half=true;res='full';toast('🍰 Halfsies! It counts in battle, and it’s saved as a weak spot.')}const r1=runOf();if(ep!==dgEpoch||!DG||!r1||(bt&&(r1.battle!==bt||bt.turn!==tn)))return new Promise(()=>{});if(guidedComplete){r1.tickets=(r1.tickets||0)+2;r1.cogs=(r1.cogs||0)+2;save();toast('Setup practice · +2 Tickets')}DG.P.report(it,half?'fail':res);if(res==='full'&&!half)r1.qOk=(r1.qOk||0)+1;if((res!=='full'||half)&&__qMiss)recapAdd(it,__qMiss);if(diy&&res==='full'){r1.tickets=(r1.tickets||0)+5;r1.cogs=(r1.cogs||0)+5;toast('🛠 Worked it out! +5 🎟️')}if(bt&&res==='full')bt.qFull=(bt.qFull||0)+1;if(bt)bt.lastRes=res;mdRescueFind(r1);apMaybePrompt();return res})}
 // ---------- autopilot check ----------
 // Answers that come faster than the question could be read (and especially fast wrong ones) mean focus has run out.
 // After a few of those in a row, the game offers to save and take a break. It asks at most once every 12 questions.
-function apNote(a){if(!DG)return;const L=DG.ap||(DG.ap=[]);const need=Math.max(1500,a.chars*25);L.push({fast:!a.hinted&&a.ms<need,ok:a.ok});if(L.length>6)L.shift();DG.apSince=(DG.apSince||0)+1;
- const fast=L.filter(x=>x.fast),wrongFast=fast.filter(x=>!x.ok).length;if(L.length>=5&&DG.apSince>=12&&(fast.length>=5||(fast.length>=4&&wrongFast>=2)))DG.apWant=1}
+function apNote(a){if(!DG)return;const L=DG.ap||(DG.ap=[]),active=Math.max(0,a.ms-(a.protectedMs||0));
+ // Protection is required waiting, not evidence of working. Repeated immediate wrong taps matter more than mastery.
+ const threshold=a.typed?350:Math.min(3000,Math.max(900,(a.chars||0)*8));
+ L.push({fast:!a.hinted&&!a.guided&&active<threshold,ok:!!a.ok});if(L.length>6)L.shift();DG.apSince=(DG.apSince||0)+1;
+ const fast=L.filter(x=>x.fast),wrongFast=fast.filter(x=>!x.ok).length;
+ if(L.length>=5&&DG.apSince>=12&&(wrongFast>=3||(fast.length>=5&&wrongFast>=1)))DG.apWant=1}
 function apMaybePrompt(){if(!DG||!DG.apWant)return;DG.apWant=0;DG.apSince=0;DG.ap=[];db.apStats=db.apStats||{shown:0,rested:0};db.apStats.shown++;save();
- setTimeout(()=>modal('🧠 AUTOPILOT CHECK','<p>Your last few answers came in faster than the questions could really be read.</p><p class="small">That usually means your focus has run out for now, and clicking through won’t stick. Your run saves exactly where it is, so you can come back fresh.</p><div class="actions"><button class="btn" onclick="closeModal()">KEEP GOING</button><button class="btn red" onclick="closeModal();db.apStats.rested++;dgSaveExit()">SAVE & TAKE A BREAK</button></div>'),900)}
+ setTimeout(()=>modal('🧠 AUTOPILOT CHECK','<p>Several recent answers were submitted quickly after the reading lock ended, including some misses.</p><p class="small">Would a starting hint or a short break help? Your run will stay saved, and there is no penalty for taking a break.</p><div class="actions"><button class="btn" onclick="closeModal()">KEEP GOING</button><button class="btn blue" onclick="if(DG)DG.helpNext=true;closeModal()">HELP ME START NEXT TIME</button><button class="btn red" onclick="closeModal();db.apStats.rested++;dgSaveExit()">SAVE & TAKE A BREAK</button></div>'),900)}
 async function dgcFight(){const _r=runOf(),_b=_r&&_r.battle;if(!_b||_b.enemyPhase||!_r.party[_b.turn])return;if(DG.busy)return;DG.busy=1;const r=runOf(),b=r.battle,m=r.party[b.turn],p=partyMon(m);const res=await dgQ('⚔️ FIGHT',{hint:true});
  const fast=MOVE_STATS[p.fastMove]||['Normal',8,8,'fast'],disc=MOVE_STATS[p.discMove]||['Normal',80,50,'charged'],X=dgCtx(b.turn);
  $('dgPanel').innerHTML='<div class="dg-msg">'+({full:'✅ Perfect! The timing will be easy.',makeup:'🟡 Got the Make-Up. Timing is a bit harder.',fail:'❌ Missed both. Timing is tough, but the attack still lands.'})[res]+' Choose a move:</div><div class="dg-acts">'+dgMoveBtn('dgM1','red',p.fastMove,fast,X,true)+dgMoveBtn('dgM2','blue',p.discMove,disc,X,m.energy>=disc[2])+''+(ultOf(p)?'<button class="btn ult" id="dgM3" '+(m.energy<100?'disabled':'')+'>✦ '+esc(ultOf(p).move)+'<small>ULTIMATE · 180 pw · '+(m.energy<100?m.energy+'/100⚡':'FULL ⚡')+'</small></button>':'')+'</div>';
@@ -5141,6 +5197,129 @@ function icoize(root){if(!root)return;if(root.nodeType===3){icoNode(root);return
 function icoStart(){icoize(document.body);new MutationObserver(ms=>{for(const m of ms){if(m.type==='characterData')icoNode(m.target);else m.addedNodes.forEach(icoize)}}).observe(document.body,{childList:true,subtree:true,characterData:true})}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',icoStart);else icoStart();
 
+// KJ cinematic: integer-pixel canvas, original costume sheets, no interpolated art.
+const KJ_LENGTH=10200;
+function kjPhase(t){return t<900?'eyes':t<1700?'tear':t<2900?'approach':t<3500?'uppercut':t<4900?'flurry':t<5600?'kick':t<6500?'roll':t<7600?'shoulder':t<9400?'dropkick':'shatter'}
+async function kjSprite(p,row=2){try{const r=rareCostume(p),a=r?await loadRareAnims({...r,variant:p.shiny?'shiny':'normal'}):await loadAnims(p.species),an=a.Idle||a.Walk;
+ return await new Promise(resolve=>{const im=new Image(),timer=setTimeout(()=>resolve(null),1600);im.onload=()=>{clearTimeout(timer);const c=document.createElement('canvas');c.width=an.w;c.height=an.h;const g=c.getContext('2d');g.imageSmoothingEnabled=false;g.drawImage(im,0,Math.min(row,an.rows-1)*an.h,an.w,an.h,0,0,an.w,an.h);const data=g.getImageData(0,0,c.width,c.height).data;let x0=c.width,y0=c.height,x1=-1,y1=-1;for(let y=0;y<c.height;y++)for(let x=0;x<c.width;x++)if(data[(y*c.width+x)*4+3]){x0=Math.min(x0,x);x1=Math.max(x1,x);y0=Math.min(y0,y);y1=Math.max(y1,y)}if(x1<0)return resolve(null);const crop=document.createElement('canvas');crop.width=x1-x0+1;crop.height=y1-y0+1;crop.getContext('2d').drawImage(c,x0,y0,crop.width,crop.height,0,0,crop.width,crop.height);resolve(crop)};im.onerror=()=>{clearTimeout(timer);resolve(null)};im.src=an.url});}catch{return null}}
+function kjTint(im,c){if(!im)return null;const k='_t'+c;if(im[k])return im[k];const cv=document.createElement('canvas');cv.width=im.width;cv.height=im.height;const x=cv.getContext('2d');x.drawImage(im,0,0);x.globalCompositeOperation='source-in';x.fillStyle=c;x.fillRect(0,0,cv.width,cv.height);return im[k]=cv}
+function kjDraw(g,t,actor,target,reduced=false){const W=320,H=180,FL=140,FH=g.canvas.height||H,oy=(FH-H)/2,base=()=>g.setTransform(1,0,0,1,0,oy),TX=172,phase=kjPhase(t),clamp=x=>Math.max(0,Math.min(1,x)),R=Math.PI/180;g.imageSmoothingEnabled=false;base();g.clearRect(0,0,W,FH);base();
+ const border=()=>{rect(1,1-oy,318,2,'#111');rect(1,FH-oy-3,318,2,'#111');rect(1,1-oy,2,FH-2,'#111');rect(317,1-oy,2,FH-2,'#111')},rect=(x,y,w,h,c)=>{g.fillStyle=c;g.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h))};
+ const line=(x,y,X,Y,c='#000',th=2)=>{x=Math.round(x);y=Math.round(y);X=Math.round(X);Y=Math.round(Y);const dx=Math.abs(X-x),sx=x<X?1:-1,dy=-Math.abs(Y-y),sy=y<Y?1:-1;let e=dx+dy;for(let n=0;n<1000;n++){rect(x-th/2,y-th/2,th,th,c);if(x===X&&y===Y)break;const e2=2*e;if(e2>=dy){e+=dy;x+=sx}if(e2<=dx){e+=dx;y+=sy}}};
+ const disk=(x,y,r,c)=>{r=Math.max(0,Math.round(r));{const m=g.getTransform();if(m.b||m.a!==1){g.fillStyle=c;g.beginPath();g.arc(x,y,r+.5,0,7);g.fill();return}}if(0){g.fillStyle=c;g.beginPath();g.arc(x,y,r+.5,0,7);g.fill();return}for(let j=-r;j<=r;j++){const w=Math.floor(Math.sqrt(r*r-j*j));rect(x-w,y+j,w*2+1,1,c)}};
+ const hash=n=>{const v=Math.sin(n*127.1)*43758.5453;return v-Math.floor(v)};
+ const text=(s,x,y,size,c,k=1,out='#000')=>{g.save();g.translate(Math.round(x),Math.round(y));g.scale(k,k);g.font='bold '+size+'px "Pixelify Sans", monospace';g.textAlign='center';g.textBaseline='middle';g.lineJoin='round';g.lineWidth=5;g.strokeStyle=out;g.strokeText(s,0,0);g.fillStyle=c;g.fillText(s,0,0);g.restore()};
+ // stickman: angles in degrees from straight down, + = toward the facing side (right); t = torso lean from upright
+ const fig=(x,y,P,c,s=1,out,crest)=>{P=Object.assign({t:0,hip:17,l1:[-10,-3],l2:[10,3],a1:[-25,-10],a2:[25,15]},P);const d=(a,L)=>[Math.sin(a*R)*L*s,Math.cos(a*R)*L*s],segs=[],ends=[];
+  const hx=x,hy=y-P.hip*s,nx=hx+Math.sin(P.t*R)*14*s,ny=hy-Math.cos(P.t*R)*14*s,limb=(ox,oy,[a,b],L)=>{const [ax,ay]=d(a,L),[bx,by]=d(b,L);segs.push([ox,oy,ox+ax,oy+ay],[ox+ax,oy+ay,ox+ax+bx,oy+ay+by]);ends.push([ox+ax+bx,oy+ay+by])};
+  limb(hx,hy,P.l1,9);limb(hx,hy,P.l2,9);segs.push([hx,hy,nx,ny]);const sx=hx+(nx-hx)*.85,sy=hy+(ny-hy)*.85;limb(sx,sy,P.a1,7.5);limb(sx,sy,P.a2,7.5);
+  const hr=Math.round(5*s),cx=nx+Math.sin(P.t*R)*(hr+1),cy=ny-Math.cos(P.t*R)*(hr+1),th=Math.max(2,Math.round(3*s)),cr=[cx+Math.sin(P.t*R)*hr,cy-Math.cos(P.t*R)*hr,cx+Math.sin((P.t+25)*R)*(hr+6*s),cy-Math.cos((P.t+25)*R)*(hr+6*s)];
+  if(out){segs.forEach(q=>line(...q,out,th+2));disk(cx,cy,hr+1,out);if(crest)line(...cr,out,th+1)}segs.forEach(q=>line(...q,c,th));disk(cx,cy,hr,c);if(crest)line(...cr,c,Math.max(1,th-1));return {head:[cx,cy],hand:ends[3],hand2:ends[2],foot:ends[0],sh:[sx,sy]}};
+ const sprite=(im,x,y,s=1,c='#fff')=>{const tim=kjTint(im,c);if(tim){s=s*42/tim.height;g.drawImage(tim,Math.round(x-tim.width*s/2),Math.round(y-tim.height*s),Math.round(tim.width*s),Math.round(tim.height*s))}else fig(x,y,{},c,s)};
+ const bg=(lit=0)=>{rect(-300,-300,W+600,H+600,'#000');for(let y=-120;y<H+150;y+=6){const k=y<FL?clamp((y-50)/(FL-50)):1-clamp((y-FL)/60)*.4,r=Math.round((y<FL?60:95)*k+lit*70*k),gg=Math.round((y<FL?8:14)*k+lit*18*k);rect(-300,y,W+600,7,'rgb('+r+','+gg+','+Math.round(gg*.8)+')')}line(-300,FL,W+300,FL,'#000',3)};
+ const cam=(z,fx,fy,rot=0,sh=0)=>{base();g.translate(160+sh,90+sh*.6);g.rotate(rot*R);g.scale(z,z);g.translate(-fx,-fy)};
+ const speed=(n,dir=1,off=0,c='#ddd')=>{for(let i=0;i<n;i++){const y=12+hash(i+1)*150,len=20+hash(i+7)*60,x=((hash(i+3)*W-off*dir*(1+hash(i)))%(W+120)+W+120)%(W+120)-60;line(x,y,x+len,y,i%3?'#777':c,1)}};
+ const kj=(x,P,s=1.35,y=FL)=>fig(x,y,P,'#fff',s,'#a71e30',true),tw=(()=>{const m=kjTint(target,'#fff');return m?m.width*42/m.height:24})(),TH=TX-tw*.28;
+ if(reduced){rect(0,-oy,W,FH,'#101014');text('KJ SERIES',160,65,24,'#fff');text('20-20-20 DROPKICK',160,112,18,'#e8394f');return}
+ if(phase==='eyes'||phase==='tear'){
+  rect(0,-oy,W,FH,'#000');const eye=clamp((t-240)/300);
+  if(eye){g.save();g.translate(0,90*(1-eye));g.scale(1,eye);for(const c of ['#ae1e32','#fff']){const th=c==='#fff'?2:5;line(119,71,119,99,c,th);line(119,85,136,71,c,th);line(119,85,136,99,c,th);line(181,72,201,72,c,th);line(196,72,196,95,c,th);line(196,95,185,100,c,th);line(185,100,178,92,c,th)}g.restore()}
+  if(t>680&&t<900){line(128,74,128,88,'#fff',1);line(121,81,135,81,'#fff',1);line(192,74,192,86,'#fff',1);line(186,80,198,80,'#fff',1)}
+  return;
+ }
+ if(phase==='shatter'){const last=g.canvas._kjLast,u=clamp((t-9400)/800),cx=200,cy=96;
+  if(u<.25){if(last)g.drawImage(last,0,-oy);const c=u/.25;for(let i=0;i<9;i++){let a=i*40*R+hash(i)*.4,x=cx,y=cy;const L=(40+hash(i+9)*160)*c;for(let k=1;k<=5;k++){const nx=cx+Math.cos(a)*L*k/5+(hash(i*7+k)-.5)*12,ny=cy+Math.sin(a)*L*k/5+(hash(i*5+k)-.5)*12;line(x,y,nx,ny,'#000',3);line(x,y,nx,ny,'#fff',1);x=nx;y=ny}}return}
+  const v=(u-.25)/.75;for(let i=0;i<18;i++){const a0=i*20*R,a1=(i+1)*20*R,rad=400,dx=Math.cos((a0+a1)/2),dy=Math.sin((a0+a1)/2),m=v*v*(120+hash(i)*160);g.save();g.globalAlpha=1-v;g.translate(dx*m,dy*m+v*v*60);g.translate(cx,cy);g.rotate((hash(i+3)-.5)*v*2.4);g.translate(-cx,-cy);g.beginPath();g.moveTo(cx,cy);g.lineTo(cx+Math.cos(a0)*rad,cy+Math.sin(a0)*rad);g.lineTo(cx+Math.cos(a1)*rad,cy+Math.sin(a1)*rad);g.closePath();g.clip();if(last)g.drawImage(last,0,-oy);else rect(0,-oy,W,FH,'#111');g.strokeStyle='#fff';g.lineWidth=2;g.stroke();g.restore()}return}
+ if(phase==='approach'){const u=clamp((t-1700)/1200),sl=clamp((u-.5)/.5),bx=u<.5?56+40*(u/.5):96+(TX-tw/2-34-96)*(1-(1-sl)*(1-sl));cam(1.15+.3*u,(bx+TX)/2+10*u,FL-28-6*u,-7*sl);bg();sprite(target,TX,FL);
+  if(u<.5){const ph=Math.sin(t/70);kj(bx,{l1:[-22*ph,-6],l2:[22*ph,6],a1:[18*ph,10],a2:[-18*ph,-10],hip:17+Math.abs(ph)})}
+  else{kj(bx,{t:22,hip:13,l1:[60,45],l2:[-40,-15],a1:[-75,-40],a2:[-55,-25]});for(let i=0;i<9;i++)rect(bx-8-i*5-hash(i)*6,FL-2-hash(i+4)*7*(1-sl),2,2,i%2?'#bbb':'#777')}}
+ if(phase==='uppercut'){const v=clamp((t-2900)/600),hit=clamp((v-.3)/.55),lift=Math.sin(Math.PI*Math.min(1,hit*1.2))*30,inv=v>.85&&v<.93,ux=TX-tw/2-30,shk=v>=.3&&v<.5?(Math.floor(t/30)%2?3:-3):0;
+  if(v<.3)cam(1.6,ux+18,FL-24,5);else if(v<.55)cam(2-(v-.3)*1.6,TH,FL-40-lift*.6,-6,shk);else cam(1.25,TX-14,FL-48,2);bg();
+  if(v<.3)kj(ux,{t:38,hip:12,l1:[60,-5],l2:[-35,8],a1:[70,150],a2:[-40,30]});else if(v<.85)kj(ux+6,{t:-12,hip:19+Math.min(6,lift*.3),l1:[15,0],l2:[-28,-6],a1:[-40,-10],a2:[165,178]});else kj(ux+4,{t:-14,hip:18,l1:[20,0],l2:[-28,-6],a1:[-125,-95],a2:[-115,-85]});
+  sprite(target,TX,FL-lift);if(v>=.3&&v<.42){for(let i=0;i<8;i++){const a=i*45*R;line(TH,FL-36-lift,TH+Math.cos(a)*16,FL-36-lift+Math.sin(a)*16,'#fff',2)}}
+  base();if(v>=.3&&v<.36)rect(0,-oy,W,FH,'#fff');
+  if(inv){rect(0,-oy,W,FH,'#fff');cam(1.25,TX-14,FL-48,2);fig(ux+4,FL,{t:-14,hip:18,l1:[20,0],l2:[-28,-6],a1:[-125,-95],a2:[-115,-85]},'#000',1.35,null,true);sprite(target,TX,FL-lift,1,'#000');line(-300,FL,W+300,FL,'#000',3)}}
+ const mir=(x,fn)=>{g.save();g.translate(x,0);g.scale(-1,1);g.translate(-x,0);const r=fn();g.restore();return r};
+ const curve=(x0,y0,x1,y1,bend,th,c)=>{const mx=(x0+x1)/2,my=(y0+y1)/2,L=Math.hypot(x1-x0,y1-y0)||1,cx=mx-(y1-y0)/L*bend,cy=my+(x1-x0)/L*bend;let px=x0,py=y0;for(let k=1;k<=10;k++){const q=k/10,nx=(1-q)*(1-q)*x0+2*(1-q)*q*cx+q*q*x1,ny=(1-q)*(1-q)*y0+2*(1-q)*q*cy+q*q*y1;line(px,py,nx,ny,c,Math.max(1,th*q));px=nx;py=ny}};
+ const burst=(x,y,r,c='#fff',o='#e8394f')=>{g.save();g.beginPath();for(let k=0;k<16;k++){const a=k*22.5*R,rr=k%2?r*.45:r*(.85+hash(k+x)*.3);g.lineTo(x+Math.cos(a)*rr,y+Math.sin(a)*rr)}g.closePath();g.fillStyle=o;g.fill();g.translate(x,y);g.scale(.72,.72);g.translate(-x,-y);g.fillStyle=c;g.fill();g.restore()};
+ if(phase==='flurry'){const w=(t-3500)/1400,n=Math.min(9,Math.floor(w*10)),p=(w*10)%1,types=['hookR','up','hookL','over','straight','hookR','hookL','up','over','straight'],ty=types[n],hitT=p>=.35&&p<.6,
+  knock=n*1.6+(p>=.35?6*Math.max(0,1-(p-.35)/.5):0),tx=TX+knock,bx=tx-tw/2-24+(p<.35?p/.35*4:4),head=[tx-tw*.28,FL-34],body=[tx-tw*.3,FL-20],imp=ty==='up'||ty==='straight'&&n<9?body:head,
+  sh=[[1.7,-8],[1.4,7],[2,0],[1.5,-11],[1.9,9]][Math.floor(n/2)],shk=hitT?(Math.floor(t/25)%2?4:-4):0;
+  cam(sh[0]+(hitT?.15:0),(bx+tx)/2+6,FL-30,sh[1],shk);bg();
+  const tilt={hookR:-12,hookL:10,up:-16,over:14,straight:-8}[ty]*(p>=.35?Math.max(0,1-(p-.35)/.5):0);g.save();g.translate(tx,FL);g.rotate(tilt*R);sprite(target,0,0);g.restore();
+  const arm=p<.35?'wind':p<.7?'hit':'back',side=n%2,ext=[90+({up:-35,over:35,hookR:15,hookL:-15,straight:0})[ty],95+({up:-40,over:40,hookR:20,hookL:-20,straight:0})[ty]],pose={t:arm==='hit'?44:28,hip:14,l1:[48,18],l2:[-38,-12]};
+  pose[side?'a1':'a2']=arm==='hit'?ext:arm==='wind'?[-60-p*60,-20]:[30,150];pose[side?'a2':'a1']=[20,150];const me=kj(bx,pose);
+  if(p>=.2&&p<.75){const st={hookR:[me.sh[0]-26,me.sh[1]-30,34],hookL:[me.sh[0]-24,me.sh[1]+26,-34],up:[me.sh[0]-6,me.sh[1]+34,-30],over:[me.sh[0]-10,me.sh[1]-40,30],straight:[me.sh[0]-34,me.sh[1],0]}[ty],a=clamp((p-.2)/.15),ex=st[0]+(imp[0]-st[0])*a,ey=st[1]+(imp[1]-st[1])*a;curve(st[0],st[1],ex,ey,st[2],n===9?13:9,'#a71e30');curve(st[0],st[1],ex,ey,st[2],n===9?10:6,'#ddd');curve(st[0],st[1],ex,ey,st[2],n===9?6:3,'#fff')}
+  if(hitT){const q=(p-.35)/.25;burst(imp[0],imp[1],(n===9?26:18)*(1+q*.3));for(let k=0;k<10;k++){const a=k*36*R+n,L=18+q*30;line(imp[0]+Math.cos(a)*L*.5,imp[1]+Math.sin(a)*L*.5,imp[0]+Math.cos(a)*L,imp[1]+Math.sin(a)*L,'#fff',1)}if(q<.25){base();rect(0,-oy,W,FH,'rgba(255,255,255,.45)')}}}
+ if(phase==='kick'){const k=(t-4900)/700,ab=[TX-tw*.3,FL-18];
+  if(k<.62){const q=k/.62,a=Math.PI+q*2*Math.PI,dep=Math.sin(a),x=TX+Math.cos(a)*40,yb=FL-dep*5,sc=1.35*(1-dep*.14),left=Math.sin(a)<0?false:true;cam(1.45,TX,FL-26,Math.sin(q*6.28)*7);bg();
+   for(let i=1;i<14;i++){const aa=a-i*.16,xx=TX+Math.cos(aa)*40,yy=FL-Math.sin(aa)*5;rect(xx-2,yy-1-hash(i)*3,3,2,i<5?'#ccc':'#666')}g.globalAlpha=.5;line(TX-40,FL-1,TX+40,FL-1,'#2a0505',2);g.globalAlpha=1;
+   const pose={t:-28,hip:13,l1:[55,35],l2:[-55,-25],a1:[-95,-60],a2:[70,40]},drawB=()=>{const mv=-Math.sin(a);if(mv<0)mir(x,()=>kj(x,pose,sc,yb));else kj(x,pose,sc,yb)};
+   if(dep>0)drawB();g.save();g.translate(TX,FL);g.rotate(Math.sin(t/60)*3*R);sprite(target,0,0);g.restore();if(dep<=0)drawB();for(let i=0;i<3;i++)rect(TX+(hash(i+t%7)-.5)*10,FL-38-hash(i)*8,2,2,'#ffd36b')}
+  else{const q=(k-.62)/.38,hit=q>=.1&&q<.35,slide=q>.45?Math.pow((q-.45)/.55,1.6)*90:0,shk=hit?(Math.floor(t/25)%2?5:-5):0;cam(q<.45?2.1-q*.8:1.3,q<.45?ab[0]-8:TX+slide*.6,q<.45?ab[1]:FL-26,q<.45?-6:3,shk);bg();
+   const bx=TX-tw/2-22;kj(bx,{t:48,hip:11,l1:[65,12],l2:[-55,-15],a1:[-50,-20],a2:[88,92]});
+   g.save();g.translate(TX+slide,FL);g.rotate((q>=.1?-14:0)*R);sprite(target,0,0);g.restore();
+   if(slide){for(let i=0;i<12;i++){const dx=TX+slide-tw/2-hash(i)*slide*.8;rect(dx,FL-2-hash(i+3)*10,3,3,i%3?'#888':'#ccc')}line(TX,FL-1,TX+slide,FL-1,'#2a0505',2)}
+   if(q>=.1&&q<.55){const r=(q-.1)*90;burst(ab[0],ab[1],24);g.globalAlpha=Math.max(0,1-(q-.1)*2.2);g.strokeStyle='#fff';g.lineWidth=3;g.beginPath();g.ellipse(ab[0],ab[1],r,r*.55,0,0,7);g.stroke();g.globalAlpha=1}
+   if(hit&&q<.16){base();rect(0,-oy,W,FH,'#fff')}}}
+ if(phase==='roll'){const u=(t-5600)/900,x=150+130*(1-(1-u)*(1-u));cam(1.3-u*.12,x-10,FL-24,3-u*6);bg();speed(18,1,u*900,'#fff');for(let i=0;i<14;i++){const gx=((i*40-u*500)%560+560)%560-120;rect(gx,FL+4+(i%3)*5,10,2,'#5a1010')}
+  line(x-120*(1-u*.5),FL-1,x,FL-1,'#2a0505',2);for(let i=0;i<16;i++){const dx=x-6-hash(i)*40*(1-u*.6),dy=FL-2-hash(i+5)*14*(1-u);rect(dx,dy,3,3,i%3?'#999':'#ddd')}for(let i=0;i<5;i++)rect(x+4+hash(i+u)*6,FL-3-hash(i*3)*5,2,2,'#ffd36b');
+  g.save();g.translate(x,FL);g.rotate(-14*R*(1-u*.7));sprite(target,0,0);g.restore()}
+ if(phase==='shoulder'){const u=(t-6500)/1100,dx=246-u*14,dy=46+u*10;cam(1+u*.18,160+u*20,90-u*8,-3+u*3);for(let y=-oy-60;y<FH;y+=6){const k=clamp(y/H);rect(-40,y,W+80,7,'rgb('+Math.round(150+k*60)+','+Math.round(40+k*30)+','+Math.round(30+k*20)+')')}for(let i=0;i<12;i++){const a=i*30*R,L=30+u*u*220;line(dx+Math.cos(a)*8,dy+Math.sin(a)*8,dx+Math.cos(a)*L,dy+Math.sin(a)*L,'#7a1a14',1)}
+  sprite(target,70,222-u*24,4,'#000');disk(dx,dy,1.5+Math.pow(u,4)*34,'#000');base();if(u>.93)rect(0,-oy,W,FH,'#fff')}
+ if(phase==='dropkick'){const d=(t-7600)/1800,raw=(x,y,h,sx=1)=>{if(!target){disk(x,y-h/2,h/2,'#8e9cc4');return}const w=target.width*h/target.height;g.save();g.translate(Math.round(x),Math.round(y));g.scale(sx,1);g.drawImage(target,Math.round(-w/2),Math.round(-h),Math.round(w),Math.round(h));g.restore()},RED='#c3302a',TGT='#8e9cc4',poly=(pts,c)=>{g.fillStyle=c;g.beginPath();pts.forEach(([x,y],k)=>k?g.lineTo(x,y):g.moveTo(x,y));g.closePath();g.fill()},th=(pts,c,wd)=>{g.strokeStyle=c;g.lineWidth=wd;g.lineCap='round';g.lineJoin='round';g.beginPath();pts.forEach(([x,y],k)=>k?g.lineTo(x,y):g.moveTo(x,y));g.stroke()},
+  eyes=(x,y,r)=>{poly([[x-r*.55,y-r*.75],[x+r*.05,y-r*.05],[x+r*.25,y-r*.6],[x+r*.1,y+r*.05],[x+r*.55,y+r*.55],[x-r*.05,y+r*.12],[x-r*.6,y+r*.35],[x-r*.15,y-r*.08]],'#111')},
+  head=(x,y,r,warm)=>{disk(x,y,r+3,'#7a1410');disk(x,y,r,warm?'#fff6dc':'#fff');disk(x+r*.12,y+r*.05,r*.82,warm?'#ffe7a8':'#d8d8d8');eyes(x+r*.12,y,r*.8)};
+  if(d<.36){const q=d/.36,bx=64+q*46,by=70+q*10;cam(1.05+q*.08,160,90,-2+q*3);rect(-60,-oy-60,W+120,FH+120,'#000');for(let y=60;y<FH;y+=7)rect(-60,y,W+120,7,'rgb('+Math.round(30+(y-60)*.6)+',6,6)');
+   for(let i=0;i<5;i++){const o=i*6;poly([[-60,40+o],[-60,70+o],[178+o,200],[200+o,200]],['#fff','#e6e6e6','#c8c8c8','#999','#666'][i])}g.fillStyle='rgba(255,255,255,.7)';for(let i=0;i<10;i++)rect(bx-40-i*9,by+18+i*7+hash(i)*6,10,3,'#fff');
+   th([[bx+18,by+16],[bx+30,by-16],[bx-8,by-30]],RED,11);th([[bx+18,by+16],[bx-20,by+8],[bx-26,by-12]],RED,11);th([[bx+18,by+16],[bx+36,by+30]],RED,12);th([[bx+36,by+30],[bx+56,by+20],[bx+52,by+40]],RED,11);th([[bx+36,by+30],[bx+30,by+48],[bx+48,by+54]],RED,11);
+   head(bx,by,18);th([[bx+4,by-18],[bx+14,by-34]],RED,4);
+   raw(246,236,190)}
+  else{const m=d<.56,q=m?(d-.36)/.2:(d-.56)/.44,hx=92,hy=96,hr=58,reach=m?100+q*50:150,shk=!m&&q<.15?(Math.floor(t/25)%2?4:-4):0;cam(m?1.12-q*.08:1+(q<.12?.12-q:0),160,90,0,shk);
+   rect(-60,-oy-60,W+120,FH+120,m?'#fff':'#fbf3e4');if(!m){for(let i=0;i<26;i++){const a=(-60+hash(i)*120)*R,L=80+hash(i+2)*120;th([[hx-hr*.4,hy],[hx-hr*.4-Math.cos(a)*L,hy+Math.sin(a)*L]],['#ff7a1a','#ffd36b','#c3302a','#ffb03b'][i%4],3+hash(i)*7)}}
+   poly([[hx+hr*.6,hy-hr*.55],[hx+reach,hy-24],[hx+reach+6,hy-10],[hx+hr*.7,hy+hr*.35]],RED);th([[hx+hr*.6,hy-hr*.4],[hx+reach,hy-18]],'#7a1410',2);
+   const fx=hx+reach,fy=hy-14,sq=m?1-q*.12:.86+Math.sin(t/40)*.03,th0=target?target.height:1,tw0=target?target.width*170/th0:90;raw(Math.min(262,fx+tw0*sq*.3)+(m?0:Math.sin(t/25)*2),fy+120,170,sq);for(let k=0;k<8;k++)th([[fx+4+k*5,fy-24+hash(k)*30],[fx+16+k*6,fy-8+hash(k+3)*30]],'rgba(40,20,20,.55)',2);
+   disk(hx,hy,hr+5,RED);head(hx,hy,hr,!m);th([[hx-hr*.9,hy-hr*.2],[hx-hr*1.5,hy-hr*.9]],RED,14);
+   if(m){base();rect(0,-oy,W,FH,'rgba(255,255,255,'+(.55-q*.2)+')')}
+   else if(q>=.08){const k=1+2.2*Math.pow(1-clamp((q-.08)/.14),2);text('20-20-20',160,26,30,'#e0261c',k,'#000');const k2=1+2.2*Math.pow(1-clamp((q-.16)/.14),2);if(q>=.16)for(let r=0;r<3;r++)text('DROPKICK',160+(r-1)*1.5,150+(r%2?1:-1),40,r===1?'#e0261c':'#7a0d08',k2,'#000')}}
+  base();border();
+  const c=g.canvas;if(!c._kjLast){c._kjLast=document.createElement('canvas');c._kjLast.width=W;c._kjLast.height=FH}const lg=c._kjLast.getContext('2d');lg.clearRect(0,0,W,FH);lg.drawImage(c,0,0);return}
+ base();border();
+}
+// the splash band's torn edges, taken from the band art: per-column inner edge lines plus top/bottom rim pieces
+let KJ_BAND=null;
+function kjBand(){if(KJ_BAND)return KJ_BAND;if(typeof Image==='undefined')return Promise.resolve(null);
+ KJ_BAND=Promise.all(['band.png','band_mask.png'].map(f=>new Promise(ok=>{const im=new Image();im.onload=()=>ok(im);im.onerror=()=>ok(null);im.src='./assets/ult/'+f}))).then(([band,mask])=>{try{if(!band||!mask)return null;const W=band.width,H=band.height,mk=document.createElement('canvas');mk.width=W;mk.height=H;const mg=mk.getContext('2d');mg.drawImage(mask,0,0,W,H);const md=mg.getImageData(0,0,W,H).data,top=new Float32Array(W),bot=new Float32Array(W);
+  for(let x=0;x<W;x++){let a=-1,b=-1;for(let y=0;y<H;y++)if(md[(y*W+x)*4+3]>128){if(a<0)a=y;b=y}top[x]=a<0?H/2:a;bot[x]=b<0?H/2:b}
+  const half=up=>{const c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');x.drawImage(band,0,0,W,H);const d=x.getImageData(0,0,W,H);for(let i=0;i<W;i++)for(let y=0;y<H;y++)if(up?y>=top[i]+3:y<=bot[i]-3)d.data[(y*W+i)*4+3]=0;x.putImageData(d,0,0);return c};
+  return {W,H,top,bot,upper:half(true),lower:half(false)}}catch{return null}});return KJ_BAND}
+async function kjCinematic(p,slot,ti,overlay,context){const r=runOf(),b=r&&r.battle,epoch=dgEpoch,field=fxField();if(!b||!field||(context&&(context.epoch!==epoch||context.battle!==b)))return;
+ const valid=()=>runOf()===r&&r.battle===b&&dgEpoch===epoch&&field.isConnected;
+ const reduced=!!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+ const [actor,target,band]=await Promise.all([kjSprite(p),kjSprite({species:b.enemies[ti]?.species||'Bisharp'},6),kjBand()]);if(!valid())return;
+ // the splash band opens up (top edge rises, bottom edge drops) and the cutscene plays between its torn edges
+ const vw=window.innerWidth||393,vh=window.innerHeight||852,dpr=Math.min(2,window.devicePixelRatio||1),bw=Math.min(vw*.98,580),bh=bw*436/1200,bx=(vw-bw)/2,by=(vh-bh)/2,DM=Math.min(vh*.22,210),sc=bw/1200;
+ const canvas=document.createElement('canvas');canvas.width=Math.round(vw*dpr);canvas.height=Math.round(vh*dpr);canvas.className='kj-view';const v=canvas.getContext('2d');
+ const scene=document.createElement('canvas');scene.width=320;scene.height=Math.round(320*(bh+2*DM)/bw);const g=scene.getContext('2d');if(!g||!v)return;
+ const skip=document.createElement('button');skip.className='btn smallbtn kj-skip';skip.textContent='SKIP ANIMATION';skip.setAttribute('aria-label','Skip KJ cutscene and resolve attack');
+ overlay.classList.add('kj-cinema');overlay.replaceChildren(canvas,skip);const oldFilter=field.style.filter,saved=[];field.style.filter='grayscale(1) contrast(1.4)';
+ field.querySelectorAll('.dg-spr').forEach(el=>{saved.push([el,el.style.filter]);el.style.filter=el.closest('.dg-ally')?.dataset.i===String(slot)||el.closest('.dg-foe')?.dataset.i===String(ti)?'brightness(0) invert(1)':'brightness(0)'});
+ const last=document.createElement('canvas');last.width=canvas.width;last.height=canvas.height;const lg=last.getContext('2d'),k=bw/320,IX=bx+242*k,IY=by-DM+(82+(scene.height-180)/2)*k,hash=n=>{const q=Math.sin(n*127.1)*43758.5453;return q-Math.floor(q)};
+ // shatter: the last dropkick frame (band edges included) cracks from the kick's impact point and flies apart
+ const shatter=t=>{const u=Math.min(1,(t-9400)/800);v.setTransform(1,0,0,1,0,0);v.clearRect(0,0,canvas.width,canvas.height);v.setTransform(dpr,0,0,dpr,0,0);const R=Math.hypot(vw,vh);
+  if(u<.22){v.drawImage(last,0,0,vw,vh);const c=u/.22;if(u<.05){v.fillStyle='rgba(255,255,255,.8)';v.fillRect(0,0,vw,vh)}v.lineCap='round';for(let i=0;i<14;i++){let a=i*25.7*Math.PI/180+hash(i)*.3,x=IX,y=IY;const L=(60+hash(i+9)*R*.6)*c;for(let q=1;q<=6;q++){const nx=IX+Math.cos(a)*L*q/6+(hash(i*7+q)-.5)*16,ny=IY+Math.sin(a)*L*q/6+(hash(i*5+q)-.5)*16;v.strokeStyle='#000';v.lineWidth=4;v.beginPath();v.moveTo(x,y);v.lineTo(nx,ny);v.stroke();v.strokeStyle='#fff';v.lineWidth=1.5;v.stroke();x=nx;y=ny}}return}
+  const w=(u-.22)/.78;for(let i=0;i<22;i++){const a0=i*(360/22)*Math.PI/180,a1=(i+1)*(360/22)*Math.PI/180,dx=Math.cos((a0+a1)/2),dy=Math.sin((a0+a1)/2),m=w*w*(140+hash(i)*220);v.save();v.globalAlpha=Math.max(0,1-w*1.1);v.translate(dx*m,dy*m+w*w*90);v.translate(IX,IY);v.rotate((hash(i+3)-.5)*w*2.6);v.translate(-IX,-IY);v.beginPath();v.moveTo(IX,IY);v.lineTo(IX+Math.cos(a0)*R,IY+Math.sin(a0)*R);v.lineTo(IX+Math.cos(a1)*R,IY+Math.sin(a1)*R);v.closePath();v.clip();v.drawImage(last,0,0,vw,vh);v.strokeStyle='#fff';v.lineWidth=2;v.stroke();v.restore()}};
+ const paint=t=>{if(!v.setTransform)return kjDraw(g,t,actor,target,reduced);if(t>=9400&&!reduced)return shatter(t);kjDraw(g,t,actor,target,reduced);const D=DM*(1-Math.pow(1-Math.min(1,t/450),3)),fade=1;v.setTransform(dpr,0,0,dpr,0,0);v.clearRect(0,0,vw,vh);v.save();v.beginPath();
+  if(band){for(let x=0;x<band.W;x+=8)v.lineTo(bx+x*sc,by+band.top[x]*sc-D);v.lineTo(bx+bw,by+band.top[band.W-1]*sc-D);v.lineTo(bx+bw,by+band.bot[band.W-1]*sc+D);for(let x=band.W-1;x>=0;x-=8)v.lineTo(bx+x*sc,by+band.bot[x]*sc+D)}else v.rect(bx,by-D,bw,bh+2*D);
+  v.closePath();v.clip();v.imageSmoothingEnabled=false;v.drawImage(scene,bx,by-DM,bw,bh+2*DM);
+  // the tear: the black splash rips open along the band's own centre line, out to its torn edges
+  if(t>=900&&t<1700&&band){const u=Math.min(1,(t-900)/800),e=1-Math.pow(1-u,3);v.globalCompositeOperation='destination-out';v.beginPath();for(let x=0;x<band.W;x+=12){const yc=by+(band.top[x]+band.bot[x])/2*sc,hh=e*((band.bot[x]-band.top[x])/2*sc+D+30);v.lineTo(bx+x*sc,yc-hh+((x/12)%2?6:-6)*(1-e*.5))}for(let x=band.W-1;x>=0;x-=12){const yc=by+(band.top[x]+band.bot[x])/2*sc,hh=e*((band.bot[x]-band.top[x])/2*sc+D+30);v.lineTo(bx+x*sc,yc+hh+((x/12)%2?-6:6)*(1-e*.5))}v.closePath();v.fill();v.globalCompositeOperation='source-over'}
+  v.restore();if(band&&fade>0){v.globalAlpha=fade;v.drawImage(band.upper,bx,by-D,bw,bh);v.drawImage(band.lower,bx,by+D,bw,bh);v.globalAlpha=1}if(t>=7600){lg.clearRect(0,0,last.width,last.height);lg.drawImage(canvas,0,0)}};
+ try{await new Promise(resolve=>{let frame,timer,done=false;const start=performance.now(),duration=reduced?1500:KJ_LENGTH,finish=()=>{if(done)return;done=true;cancelAnimationFrame(frame);clearTimeout(timer);document.removeEventListener('visibilitychange',hidden);resolve()},hidden=()=>{if(document.hidden)finish()};skip.onclick=finish;document.addEventListener('visibilitychange',hidden);timer=setTimeout(finish,duration+300);
+ const draw=()=>{if(done)return;if(!valid())return finish();const elapsed=performance.now()-start;if(elapsed>=duration)return finish();try{paint(elapsed);if(elapsed>=9400){field.style.filter=oldFilter;saved.forEach(([el,filter])=>el.style.filter=filter)}frame=requestAnimationFrame(draw)}catch{finish()}};draw()});
+ }finally{field.style.filter=oldFilter;saved.forEach(([el,filter])=>el.style.filter=filter);canvas.remove();skip.remove()}
+}
+
 // ---- Legendary Ultimates: a third ability (Power 180, costs the full Stamina Bar), unlocked for 25 Rare Candy in the Box ----
 const ULT_COST=25;
 const ULTS={
@@ -5170,24 +5349,27 @@ const ULTS={
  'Regigigas':{move:'Display of Power',type:'Normal',t:'all',fx:'mountain',desc:'Hits all foes. On your next turn your team takes 2 less damage from every attack, restores 6 Stamina, and the attack bar moves 10% slower. Regigigas must rest that turn.'},
  'Diancie':{move:'Diamond Storm',type:'Rock',t:'all',fx:'diamonds',desc:'Hits all foes but is never super effective. A diamond shield protects your whole team from all damage during the enemy\'s turn.'}};
 // physical or special, matching each signature move
-const ULT_CAT={'Sudden Breath':'S','Genetic Implosion':'S','Earthen Barricade':'P','Permafrost':'S','Corkscrew Cannon':'P','Origin Pulse':'S','Doom Desire':'S','Techno Blast':'S','Overload Surge':'S','Orbital Strike':'P','Fleur Cannon':'S','Spectral Thief':'P','Hex Nut Swarm':'P','Double Iron Bash':'P','Thunder Cage':'S','Dragon Energy':'S','Ancient Wingbeat':'P','Ion Flare':'S','Ruination Blaze':'S','Mirror Edge':'P','Ivy Cudgel':'P','Precipice Blades':'P','Display of Power':'P','Diamond Storm':'P'};
-function ultOf(p){return p&&p.ult?ULTS[p.species]||null:null}
+const ULT_CAT={'KJ Series':'P','Sudden Breath':'S','Genetic Implosion':'S','Earthen Barricade':'P','Permafrost':'S','Corkscrew Cannon':'P','Origin Pulse':'S','Doom Desire':'S','Techno Blast':'S','Overload Surge':'S','Orbital Strike':'P','Fleur Cannon':'S','Spectral Thief':'P','Hex Nut Swarm':'P','Double Iron Bash':'P','Thunder Cage':'S','Dragon Energy':'S','Ancient Wingbeat':'P','Ion Flare':'S','Ruination Blaze':'S','Mirror Edge':'P','Ivy Cudgel':'P','Precipice Blades':'P','Display of Power':'P','Diamond Storm':'P'};
+const COSTUME_ULTS={masked:{Bisharp:{move:'KJ Series',type:'Fighting',t:'one',fx:'kjseries',power:180,costume:'masked',unlockKey:'kj_bisharp',desc:'KJ costume exclusive. An uppercut and flurry end in a 20-20-20 Dropkick against one target. Physical, 180 power; uses full Stamina.'}}};
+function ultAvailable(p){return p&&(COSTUME_ULTS[p.costume]?.[p.species]||ULTS[p.species])||null}
+function ultUnlocked(p,U){return !!(p&&U&&(U.unlockKey?p.costumeUlts?.[U.unlockKey]:p.ult))}
+function ultOf(p){const U=ultAvailable(p);return ultUnlocked(p,U)?U:null}
 function ultType(U,e){if(!U.type.startsWith('best:'))return U.type;const opts=U.type.slice(5).split(',');return opts.reduce((a,t)=>typeEff(t,e.types)>typeEff(a,e.types)?t:a,opts[0])}
 // ---- Box: show / unlock the Ultimate ----
-function ultBoxHTML(p){const U=ULTS[p.species];if(!U)return '';const tc=TYPE_COLOR[U.type]||'#d6b24a',tl=U.type.startsWith('best:')?'Adapts':U.type;
- if(p.ult)return '<div class="bx-move bx-ult"><i class="bx-mc" style="background:'+(U.type.startsWith('best:')?'conic-gradient(#ee8130,#6390f0,#7ac74c,#b6a136,#ee8130)':tc)+'"></i><div><small>ULTIMATE · '+tl.toUpperCase()+' · FULL ⚡</small><b>✦ '+esc(U.move)+'</b><p>'+esc(U.desc)+'</p></div><span>'+(U.power||180)+'</span></div>';
- return '<div class="bx-ultlock"><div><small>LEGENDARY ULTIMATE</small><b>✦ '+esc(U.move)+'</b><p>'+esc(U.desc)+'</p></div><button class="btn red" '+(db.candies<ULT_COST?'disabled':'')+' onclick="unlockUlt(\''+p.id+'\')">UNLOCK · '+ULT_COST+' 🍬</button></div>'}
-function unlockUlt(id){const p=db.pokemon.find(x=>x.id===id),U=p&&ULTS[p.species];if(!U||p.ult)return;if(db.candies<ULT_COST){toast('You need '+ULT_COST+' Rare Candy');return}
- if(!confirm('Spend '+ULT_COST+' Rare Candy to unlock '+U.move+' for '+(p.nickname||p.species)+'?'))return;db.candies-=ULT_COST;p.ult=true;save();render();toast('✦ '+(p.nickname||p.species)+' unlocked '+U.move+'!')}
+function ultBoxHTML(p){const U=ultAvailable(p);if(!U)return '';const tc=TYPE_COLOR[U.type]||'#d6b24a',tl=U.type.startsWith('best:')?'Adapts':U.type;
+ if(ultUnlocked(p,U))return '<div class="bx-move bx-ult"><i class="bx-mc" style="background:'+(U.type.startsWith('best:')?'conic-gradient(#ee8130,#6390f0,#7ac74c,#b6a136,#ee8130)':tc)+'"></i><div><small>ULTIMATE · '+tl.toUpperCase()+' · FULL ⚡</small><b>✦ '+esc(U.move)+'</b><p>'+esc(U.desc)+'</p></div><span>'+(U.power||180)+'</span></div>';
+ return '<div class="bx-ultlock"><div><small>'+ (U.costume?'COSTUME ULTIMATE · KJ':'LEGENDARY ULTIMATE') +'</small><b>✦ '+esc(U.move)+'</b><p>'+esc(U.desc)+'</p></div><button class="btn red" '+(db.candies<ULT_COST?'disabled':'')+' onclick="unlockUlt(\''+p.id+'\')">UNLOCK · '+ULT_COST+' 🍬</button></div>'}
+function unlockUlt(id){const p=db.pokemon.find(x=>x.id===id),U=ultAvailable(p);if(!U||ultUnlocked(p,U))return;if(db.candies<ULT_COST){toast('You need '+ULT_COST+' Rare Candy');return}
+ if(!confirm('Spend '+ULT_COST+' Rare Candy to unlock '+U.move+' for '+(p.nickname||p.species)+'?'))return;db.candies-=ULT_COST;if(U.unlockKey){p.costumeUlts=p.costumeUlts||{};p.costumeUlts[U.unlockKey]=true}else p.ult=true;save();render();toast('✦ '+(p.nickname||p.species)+' unlocked '+U.move+'!')}
 // ---- splash screen: your torn black band, the Pokémon's head sliding down to its left edge while the move name scrawls by ----
 // the head on the splash: the top of the Pokémon's front-facing idle sprite (transparent, unlike the portraits)
 const ultBusts={};
 function ultBust(species){return ultBusts[species]||(ultBusts[species]=loadAnims(species).then(a=>new Promise(ok=>{const an=a.Idle||a.Walk,im=new Image();im.onload=()=>{try{const c=document.createElement('canvas');c.width=an.w;c.height=an.h;const g=c.getContext('2d');g.drawImage(im,0,0,an.w,an.h,0,0,an.w,an.h);
  const d=g.getImageData(0,0,an.w,an.h).data;let x0=an.w,y0=an.h,x1=0,y1=0;for(let y=0;y<an.h;y++)for(let x=0;x<an.w;x++)if(d[(y*an.w+x)*4+3]>20){x0=Math.min(x0,x);x1=Math.max(x1,x);y0=Math.min(y0,y);y1=Math.max(y1,y)}
  const h=Math.max(8,Math.round((y1-y0+1)*.72)),w=x1-x0+1,s=Math.max(w,h),o=document.createElement('canvas');o.width=s;o.height=s;o.getContext('2d').drawImage(c,x0,y0,w,h,Math.round((s-w)/2),s-h,w,h);ok(o.toDataURL())}catch(e){ok(portrait(species)||'')}};im.onerror=()=>ok(portrait(species)||'');im.src=an.url})).catch(()=>portrait(species)||''))}
-async function ultSplash(p,U){const head=await ultBust(p.species);return new Promise(res=>{const ov=document.createElement('div');ov.className='ult-splash';
+async function ultSplash(p,U,context){const head=U.fx==='kjseries'?rareDir(rareCostume(p),p)+'portrait.png':await ultBust(p.species);return new Promise(res=>{const ov=document.createElement('div');ov.className='ult-splash';
  ov.innerHTML='<div class="ult-band"><img class="ult-bandimg" src="./assets/ult/band.png" alt=""><div class="ult-clip"><img class="ult-head" src="'+head+'" alt=""><div class="ult-txt"><b>'+esc(U.move.toUpperCase())+'</b><small>'+esc((p.nickname||p.species).toUpperCase())+' · ULTIMATE</small></div></div></div>';
- document.body.appendChild(ov);setTimeout(()=>ov.classList.add('out'),1950);setTimeout(()=>{ov.remove();res()},2250)})}
+ document.body.appendChild(ov);if(U.fx==='kjseries'&&context){setTimeout(async()=>{try{await kjCinematic(p,context.slot,context.ti,ov,context)}finally{ov.remove();res()}},1950)}else{setTimeout(()=>ov.classList.add('out'),1950);setTimeout(()=>{ov.remove();res()},2250)}})}
 // ---- tiny effect toolkit (positions are relative to the battle field) ----
 function fxField(){return document.querySelector('.dg-field')}
 function fxPos(sel){const f=fxField(),el=document.querySelector(sel);if(!f||!el)return null;const a=f.getBoundingClientRect(),s=(el.querySelector('.dg-spr')||el).getBoundingClientRect();return {x:s.left-a.left+s.width/2,y:s.top-a.top+s.height/2,w:s.width,h:s.height,b:s.bottom-a.top}}
@@ -5209,6 +5391,7 @@ const TC=t=>TYPE_COLOR[t]||'#cccccc';
 async function ultFx(U,slot,tis,col,allyIs){const A=fxA(slot),T=tis.map(fxF).filter(Boolean),aSel='.dg-ally[data-i="'+slot+'"]',S=dgSleep;if(!A){await S(300);return}
  const top={x:A.x,y:-40};
  switch(U.fx){
+ case 'kjseries':break; // cinematic follows the normal splash; damage resolves once afterward
  case 'suddenbreath':await ultSuddenBreath(slot,tis);break;
  case 'orbs':{const ring=fxEl('orbring',{left:A.x+'px',top:A.y+'px'},Object.values(TYPE_COLOR).map((c,i)=>'<i style="--c:'+c+';transform:rotate('+(i*20)+'deg) translateX(46px)"></i>').join(''));await S(800);if(ring)ring.remove();
   const MT=T.concat((allyIs||[]).map(fxA).filter(Boolean)); // every Pokémon the implosion will damage, allies included
@@ -5278,16 +5461,17 @@ function dgBarSlow(b){return b&&(b.slowBar===b.round||b.gigas===b.round)?.9:1}
 // damage your team takes from an enemy attack this round: Diamond Storm blocks it all, Display of Power takes 2 off (to a minimum of 0)
 function ultGuardDmg(b,dmg){if(!b||!dmg)return dmg;if(b.diamond===b.round)return 0;if(b.gigas===b.round)return Math.max(0,dmg-2);return dmg}
 function ultResting(b,m){return !!(b&&m&&m.hp>0&&m.rest===b.round)}
-async function dgUltimate(slot,ti,mult,res){const r=runOf(),b=r&&r.battle,m=b&&r.party[slot],p=partyMon(m),U=ultOf(p);if(!U||!b){dgAfterAction();return}
+async function dgUltimate(slot,ti,mult,res){const epoch=dgEpoch,r=runOf(),b=r&&r.battle,m=b&&r.party[slot],p=m&&partyMon(m),U=ultOf(p);if(!U||!b){dgAfterAction();return}
+ if(U.costume&&(!m||m.energy<100||!b.enemies[ti]||b.enemies[ti].hp<=0))return;
  if(U.custom)return legendUltimate(slot,U,mult,{});
  const c=combatant(p),who='<b style="color:'+SLOT_COLORS[slot]+'">'+esc(p.nickname||p.species)+'</b>';
  if(U.t==='none'&&res==='fail'){if(DG)DG.msg=who+' tried <b>'+esc(U.move)+'</b>… but it fizzled! (Stamina kept)';dgDrawBattle();await dgSleep(1000);dgAfterAction();return}
  m.energy=0;save();
  const foes=b.enemies.map((e,i)=>[e,i]).filter(([e])=>e.hp>0),targets=U.t==='all'?foes:U.t==='one'?foes.filter(([,i])=>i===ti):[];
  const t0=targets[0]&&targets[0][0],col=t0?TC(ultType(U,t0)):TC(U.type);
- await ultSplash(p,U);if(!runOf()||runOf().battle!==b)return;
+ await ultSplash(p,U,{slot,ti,epoch,battle:b});if(epoch!==dgEpoch||!runOf()||runOf().battle!==b)return;
  let fxFoes=targets.map(([,i])=>i),fxAllies=[];if(U.move==='Genetic Implosion'&&t0){fxFoes=b.enemies.map((e,i)=>e.hp>0&&e.species===t0.species?i:-1).filter(i=>i>=0);fxAllies=r.party.map((x,j)=>x.hp>0&&partyMon(x).species===t0.species?j:-1).filter(j=>j>=0)}
- await ultFx(U,slot,fxFoes,col,fxAllies);if(!runOf()||runOf().battle!==b)return;
+ await ultFx(U,slot,fxFoes,col,fxAllies);if(epoch!==dgEpoch||!runOf()||runOf().battle!==b)return;
  const sb=s=>m.starf&&m.starf.stat===s?2:0,att={atk:c.atk+sb('atk'),spa:c.spa+sb('spa'),types:c.types},UCAT=ULT_CAT[U.move]||'S',extra=1+(b.overclock||0)+(b.teamBoost||0),hits=[],allyHits=[];let note='';
  const strike=(e,i,pw,mm,effOv)=>{const tp=ultType(U,e),mv=[tp,pw,0,'charged'];let {dmg,eff}=dgDamage(att,{def:e.def,spd:e.spd,types:e.types},mv,mm,extra*ultWaterMult(b,tp),UCAT);if(effOv!=null){dmg=Math.max(1,Math.round(dmg/Math.max(.01,eff)*effOv));eff=effOv}if(e.melt>0)dmg=Math.round(dmg*1.15);e.hp=Math.max(0,e.hp-dmg);hits.push({i,dmg,eff});return dmg};
  const sp=U.move;
@@ -5411,7 +5595,7 @@ function mvMove(sel,frames,ms){const el=mvSpr(sel);if(!el)return;const z=mvZoom(
 function mvShake(sel,ms){mvMove(sel,[{x:0},{x:-6},{x:6},{x:-5},{x:5},{x:-3},{x:0}],ms||450)}
 // play the Pokémon's own Attack animation once (swaps to its Attack sheet, then back)
 async function mvAttackAnim(sel){const el=mvSpr(sel);if(!el)return;const token={};el._attackToken=token;el._spriteRender=(el._spriteRender||0)+1;let applied=false;
- try{let a;try{a=await loadAnims(el.dataset.sp)}catch(e){return}const at=a&&a.Attack;if(!at||!el.isConnected||el._attackToken!==token)return;
+ try{let a;try{a=await dgLoadSpriteAnims(el)}catch(e){return}const at=a&&a.Attack;if(!at||!el.isConnected||el._attackToken!==token)return;
  const row=+el.dataset.row,r=row<(at.rows||8)?row:0,z=el.style.zoom,dur=at.d.reduce((x,y)=>x+y,0)/60,base=a.Idle||a.Walk||at,footI=-(parseFloat(el.style.marginBottom)||0),foot=footI+(at.h-base.h)/2;
  el.style.cssText='width:'+at.w+'px;height:'+at.h+'px;margin-bottom:'+(-foot)+'px;background-image:url('+at.url+');background-position:0 '+(-r*at.h)+'px;--fw:'+at.w+'px;--fn:'+at.frames+';animation:dsxonce '+dur.toFixed(2)+'s steps('+Math.max(1,at.frames-1)+') 1 forwards;zoom:'+z+';';applied=true;
  await dgSleep(Math.min(2500,Math.max(1,dur*1000)));
@@ -5506,7 +5690,7 @@ function completePermeate(t,el){if(el)burst(el);const mult=permMult(t),coins=Mat
  db.cogs=Math.round(db.cogs+coins);grantXp(xp);
  const mm=db.pokemon.find(p=>p.id===db.mainId);if(mm){const lb=monLv(mm);mm.pxp=(mm.pxp||0)+4537.5*mult;if(monLv(mm)>lb)setTimeout(()=>toast('⬆ '+(mm.nickname||mm.species)+' grew to Lv '+monLv(mm)+'!'),900)}facTaskXp(4537.5*mult);
  db.puffs+=1;db.completedTasks=(db.completedTasks||0)+1;if(db.completedTasks%6===0)db.candies++;save();render();toast('🔁 +'+money(coins)+' Cogs · +'+xp+' EXP · ×'+mult.toFixed(2)+' streak')}
-function taskReward(t){if(t.permeate)return {coins:Math.round(10*permMult(t)),early:0};const coins=t.due?Math.round(Math.min(Math.max(5,t.rewardCap||0),taskCogs(daysFrom(t.due,Date.now())))):5;const dueEnd=t.due?dueAt(t).getTime():0;const early=t.assignment&&t.due&&dueEnd-Date.now()>=86400000?20:0;return {coins,early}}
+function taskReward(t){if(t.permeate)return {coins:Math.round(10*permMult(t)),early:0};const mult=taskBoost(t),coins=taskType(t)==='general'?5:Math.round(mult*(t.due?Math.round(Math.min(Math.max(5,t.rewardCap||0),taskCogs(daysFrom(t.due,Date.now())))):5));const dueEnd=t.due?dueAt(t).getTime():0;const early=t.assignment&&t.due&&dueEnd-Date.now()>=86400000?20:0;return {coins,early}}
 function skyAt(a){const S=[[0,[196,234,255]],[700,[142,208,245]],[1500,[74,150,221]],[2400,[36,63,143]],[3400,[9,13,45]]];if(a<=0)return S[0][1];for(let i=1;i<S.length;i++){if(a<=S[i][0]){const c0=S[i-1][1],c1=S[i][1],f=(a-S[i-1][0])/(S[i][0]-S[i-1][0]);return c0.map((v,j)=>Math.round(v+(c1[j]-v)*f))}}return S[S.length-1][1]}
 function drawTasks(){
  const k=SD_K,W=Math.min(window.innerWidth||390,610),headH=365*k,loopH=228*k,feetH=273*k,P0=18,groundH=215;
@@ -5564,13 +5748,22 @@ function burst(el){
   p.animate([{transform:'translate(-50%,-50%) scale(.4)',opacity:1},{transform:'translate(calc(-50% + '+ex+'px),calc(-50% + '+ey+'px)) scale(1.1)',opacity:1,offset:.35},{transform:'translate(calc(-50% + '+(tx-sx)+'px),calc(-50% + '+(ty-sy)+'px)) scale(.3)',opacity:.9}],{duration:1050+Math.random()*250,easing:'cubic-bezier(.3,.1,.4,1)',fill:'forwards'}).onfinish=()=>{p.remove();box.classList.add('bump');setTimeout(()=>box.classList.remove('bump'),120)}}
  setTimeout(()=>{box.classList.remove('up');box.classList.add('shut')},1650);setTimeout(()=>box.remove(),2150)}
 function toggleDone(){showDone=!showDone;drawTasks()}
-function taskForm(id=''){const t=db.tasks.find(x=>x.id===id)||{title:'',description:'',due:'',priority:false,assignment:true};modal(id?'EDIT TASK':'ADD TASK','<form onsubmit="storeTask(event,\''+id+'\')"><div class="field"><label>Task name</label><input name="title" maxlength="140" required placeholder="e.g. Chemistry homework" value="'+esc(t.title)+'"></div><div class="field"><label>Description / notes</label><textarea name="description" placeholder="Pages, instructions, reminders...">'+esc(t.description)+'</textarea></div><div class="row" style="gap:8px"><div class="field" style="flex:1.4"><label>Due date</label><input name="due" type="date" value="'+esc(t.due)+'"></div><div class="field" style="flex:1"><label>Due time</label><input name="dueTime" type="time" value="'+esc(t.dueTime||'')+'"></div></div><div class="field"><label>Reminders</label><select name="remind"><option value="default" '+((t.remind||'default')==='default'?'selected':'')+'>Default · at 75%, 50%, 25% time left + the day before</option><option value="pester" '+(t.remind==='pester'?'selected':'')+'>Pester · next day, every 20% of time left, the day before + the day of</option><option value="urgent" '+(t.remind==='urgent'?'selected':'')+'>Urgent · every day until it’s due</option></select></div><label class="small pm-toggle"><input name="permeate" type="checkbox" '+(t.permeate?'checked':'')+'> 🔁 <b>Permeate</b>: repeat this task every week on these days</label><div class="pm-days">'+['S','M','T','W','T','F','S'].map((l,i)=>'<label><input type="checkbox" name="pd" value="'+i+'" '+(!t.permeate||t.permeate.includes(i)?'checked':'')+'><span>'+l+'</span></label>').join('')+'</div><div class="field"><label>Task type</label><select name="assignment"><option value="1" '+(t.assignment?'selected':'')+'>Assignment (eligible for early bonus)</option><option value="0" '+(!t.assignment?'selected':'')+'>General task / responsibility</option></select></div><label class="small"><input name="priority" type="checkbox" '+(t.priority?'checked':'')+'> High priority</label><div class="notice">Task Cogs = 1.5 × days remaining, capped at the original value. Assignments finished at least 24 hours early also receive +20 Cogs. Permeating tasks skip the days-left bonus: they give 10 Cogs and 20 EXP × a streak multiplier that starts at ×1 and rises by 0.25 for every week in a row you finish every day.</div><div class="actions">'+(id?'<button class="btn" type="button" onclick="deleteTask(\''+id+'\')">DELETE</button>':'')+'<button class="btn red" type="submit">SAVE TASK</button></div></form>')}
-function storeTask(e,id){e.preventDefault();const f=new FormData(e.target);const due=String(f.get('due')||'');let pd=f.getAll('pd').map(Number);if(!pd.length)pd=[0,1,2,3,4,5,6];const n={title:String(f.get('title')||'').trim(),description:String(f.get('description')||'').trim(),due,dueTime:String(f.get('dueTime')||''),remind:String(f.get('remind')||'default'),priority:f.has('priority'),assignment:f.get('assignment')==='1',permeate:f.has('permeate')?pd:null};if(!n.title)return;if(n.permeate){const today=ymd(new Date());n.due=permNext(n,due&&due>today?due:today)}let t=db.tasks.find(x=>x.id===id);if(t){const dueChanged=t.due!==due;Object.assign(t,n);if(dueChanged){t.rewardCap=taskCogs(due?daysFrom(due,Date.now()):0);t.cap5=true;t.rewardSetAt=stamp()}}else{const nt={...n,id:uid(),createdAt:stamp(),rewardSetAt:stamp(),rewardCap:taskCogs(due?daysFrom(due,Date.now()):0),cap5:true,done:false};db.tasks.push(nt);window.__newTask=nt.id}save();closeModal();render();toast('Task saved to your iPhone ✓')}
+function taskForm(id=''){const t=db.tasks.find(x=>x.id===id)||{title:'',description:'',due:'',priority:false,assignment:true};modal(id?'EDIT TASK':'ADD TASK','<form onsubmit="storeTask(event,\''+id+'\')"><div class="field"><label>Task name</label><input name="title" maxlength="140" required placeholder="e.g. Chemistry homework" value="'+esc(t.title)+'"></div><div class="field"><label>Description / notes</label><textarea name="description" placeholder="Pages, instructions, reminders...">'+esc(t.description)+'</textarea></div><div class="row" style="gap:8px"><div class="field" style="flex:1.4"><label>Due date</label><input name="due" type="date" value="'+esc(t.due)+'"></div><div class="field" style="flex:1"><label>Due time</label><input name="dueTime" type="time" value="'+esc(t.dueTime||'')+'"></div></div><div class="field"><label>Reminders</label><select name="remind"><option value="default" '+((t.remind||'default')==='default'?'selected':'')+'>Default · at 75%, 50%, 25% time left + the day before</option><option value="pester" '+(t.remind==='pester'?'selected':'')+'>Pester · next day, every 20% of time left, the day before + the day of</option><option value="urgent" '+(t.remind==='urgent'?'selected':'')+'>Urgent · every day until it’s due</option></select></div><label class="small pm-toggle"><input name="permeate" type="checkbox" '+(t.permeate?'checked':'')+'> 🔁 <b>Permeate</b>: repeat this task every week on these days</label><div class="pm-days">'+['S','M','T','W','T','F','S'].map((l,i)=>'<label><input type="checkbox" name="pd" value="'+i+'" '+(!t.permeate||t.permeate.includes(i)?'checked':'')+'><span>'+l+'</span></label>').join('')+'</div><div class="field"><label>Task type</label><select name="ttype" onchange="this.form.querySelector(\'.tt-sums\').hidden=this.value!==\'test\'">'+[['assignment','Assignment (eligible for early bonus)'],['general','General task / responsibility · 5 Cogs'],['test','Test · study boosts its rewards']].map(([v,l])=>'<option value="'+v+'" '+(taskType(t)===v?'selected':'')+'>'+l+'</option>').join('')+'</select></div><div class="field tt-sums" '+(taskType(t)==='test'?'':'hidden')+'><label>Choose Summaries</label><div class="mg-sets">'+(db.summaries.length?db.summaries.map(s=>'<label><input type="checkbox" name="tsum" value="'+s.id+'" '+((t.sumIds||[]).includes(s.id)?'checked':'')+'> <span>'+esc(s.title)+'</span></label>').join(''):'<p class="small muted">No summaries yet.</p>')+'</div><p class="small muted">Every minute you spend answering questions from these summaries after the test is added gives +1.7% EXP and Cogs when you complete it.</p></div><label class="small"><input name="auto" type="checkbox" '+(t.auto?'checked':'')+'> ⏰ <b>Auto-Complete</b>: completes itself the next time you open the app after it’s due (1 hour after the due time, or the end of the due day)</label><label class="small"><input name="priority" type="checkbox" '+(t.priority?'checked':'')+'> High priority</label><div class="notice">Task Cogs = 1.5 × days remaining, capped at the original value. Assignments finished at least 24 hours early also receive +20 Cogs. Permeating tasks skip the days-left bonus: they give 10 Cogs and 20 EXP × a streak multiplier that starts at ×1 and rises by 0.25 for every week in a row you finish every day.</div><div class="actions">'+(id?'<button class="btn" type="button" onclick="deleteTask(\''+id+'\')">DELETE</button>':'')+'<button class="btn red" type="submit">SAVE TASK</button></div></form>')}
+function storeTask(e,id){e.preventDefault();const f=new FormData(e.target);const due=String(f.get('due')||'');let pd=f.getAll('pd').map(Number);if(!pd.length)pd=[0,1,2,3,4,5,6];const n={title:String(f.get('title')||'').trim(),description:String(f.get('description')||'').trim(),due,dueTime:String(f.get('dueTime')||''),remind:String(f.get('remind')||'default'),priority:f.has('priority'),ttype:String(f.get('ttype')||'assignment'),assignment:f.get('ttype')==='assignment',sumIds:f.get('ttype')==='test'?f.getAll('tsum').map(String):[],auto:f.has('auto'),permeate:f.has('permeate')?pd:null};if(!n.title)return;if(n.permeate){const today=ymd(new Date());n.due=permNext(n,due&&due>today?due:today)}let t=db.tasks.find(x=>x.id===id);if(t){const dueChanged=t.due!==due;Object.assign(t,n);taskStudyBase(t);if(dueChanged){t.rewardCap=taskCogs(due?daysFrom(due,Date.now()):0);t.cap5=true;t.rewardSetAt=stamp()}}else{const nt={...n,id:uid(),createdAt:stamp(),rewardSetAt:stamp(),rewardCap:taskCogs(due?daysFrom(due,Date.now()):0),cap5:true,done:false};taskStudyBase(nt);db.tasks.push(nt);window.__newTask=nt.id}save();closeModal();render();toast('Task saved to your iPhone ✓')}
 function deleteTask(id){if(!confirm(db.tasks.find(t=>t.id===id)?.permeate?'Delete this permeating task and all its future repeats?':'Delete this task?'))return;db.tasks=db.tasks.filter(t=>t.id!==id);save();closeModal();render();toast('Task deleted')}
-function completeTask(id,el){let t=db.tasks.find(x=>x.id===id);if(!t||t.done)return;if(t.permeate)return completePermeate(t,el);if(el)burst(el);const remaining=daysFrom(t.due,Date.now());const coins=t.due?Math.round(Math.min(Math.max(5,t.rewardCap||0),taskCogs(remaining))):5;const dueEnd=t.due?dueAt(t).getTime():0;const early=t.assignment&&dueEnd-Date.now()>=86400000?20:0;t.done=true;t.completedAt=stamp();t.cogsEarned=coins+early;db.cogs=Math.round(db.cogs+coins+early);const xp0=db.xp||0;grantXp(20);
+function completeTask(id,el){let t=db.tasks.find(x=>x.id===id);if(!t||t.done)return;if(t.permeate)return completePermeate(t,el);if(el)burst(el);const remaining=daysFrom(t.due,Date.now()),mult=taskBoost(t);const coins=taskType(t)==='general'?5:Math.round(mult*(t.due?Math.round(Math.min(Math.max(5,t.rewardCap||0),taskCogs(remaining))):5));const dueEnd=t.due?dueAt(t).getTime():0;const early=t.assignment&&dueEnd-Date.now()>=86400000?20:0;t.done=true;t.completedAt=stamp();t.boost=mult;t.cogsEarned=coins+early;db.cogs=Math.round(db.cogs+coins+early);const xp0=db.xp||0;grantXp(Math.round(20*mult));
 // Main Pokémon: 4,537.5 EXP (half an hour of companion time), +10% for each full day left before the due date
-const mm=db.pokemon.find(p=>p.id===db.mainId);if(mm){const lb=monLv(mm);mm.pxp=(mm.pxp||0)+4537.5*(1+.1*(t.due?Math.max(0,Math.floor(remaining)):0));if(monLv(mm)>lb)setTimeout(()=>toast('⬆ '+(mm.nickname||mm.species)+' grew to Lv '+monLv(mm)+'!'),900)}
-db.puffs+=1;db.completedTasks=(db.completedTasks||0)+1;t.candyEarned=db.completedTasks%6===0?1:0;if(t.candyEarned)db.candies++;t.puffEarned=1;t.xpEarned=db.xp-xp0;if(mm)t.monXp={id:mm.id,xp:4537.5*(1+.1*(t.due?Math.max(0,Math.floor(remaining)):0))};t.facXp=facTaskXp(4537.5*(1+.1*(t.due?Math.max(0,Math.floor(remaining)):0)));save();render();toast('🎉 +'+money(coins+early)+' Cogs · +20 EXP'+(early?' · Early bonus!':''))}
+const mm=db.pokemon.find(p=>p.id===db.mainId);if(mm){const lb=monLv(mm);mm.pxp=(mm.pxp||0)+4537.5*mult*(1+.1*(t.due?Math.max(0,Math.floor(remaining)):0));if(monLv(mm)>lb)setTimeout(()=>toast('⬆ '+(mm.nickname||mm.species)+' grew to Lv '+monLv(mm)+'!'),900)}
+db.puffs+=1;db.completedTasks=(db.completedTasks||0)+1;t.candyEarned=db.completedTasks%6===0?1:0;if(t.candyEarned)db.candies++;t.puffEarned=1;t.xpEarned=db.xp-xp0;if(mm)t.monXp={id:mm.id,xp:4537.5*mult*(1+.1*(t.due?Math.max(0,Math.floor(remaining)):0))};t.facXp=facTaskXp(4537.5*mult*(1+.1*(t.due?Math.max(0,Math.floor(remaining)):0)));save();render();toast((t.autoDone?'⏰ Auto-completed “'+t.title+'”: ':'🎉 ')+'+'+money(coins+early)+' Cogs · +'+Math.round(20*mult)+' EXP'+(early?' · Early bonus!':'')+(mult>1?' · 📚 Study boost +'+Math.round((mult-1)*100)+'%':''))}
+// task types: Assignment / General (flat 5 Cogs) / Test (study on its summaries boosts rewards +1.7% per minute)
+function taskType(t){return t.ttype||(t.assignment===false?'general':'assignment')}
+function taskStudyBase(t){if(taskType(t)!=='test')return;const S=db.sumStudyMs||{},b=t.studyBase||{};(t.sumIds||[]).forEach(id=>{if(b[id]==null)b[id]=S[id]||0});t.studyBase=b}
+function taskStudyMin(t){if(taskType(t)!=='test')return 0;const S=db.sumStudyMs||{},b=t.studyBase||{};return (t.sumIds||[]).reduce((a,id)=>a+Math.max(0,(S[id]||0)-(b[id]||0)),0)/60000}
+function taskBoost(t){return 1+.017*Math.floor(taskStudyMin(t))}
+// Auto-Complete: a task set to auto-complete finishes itself on the next app open after it's due
+function taskAutoAt(t){if(t.due){const d=dueAt(t).getTime();return t.dueTime?d+3600000:d}const c=new Date(t.createdAt||Date.now());c.setHours(23,59,0,0);return c.getTime()}
+function taskAutoRun(){if(!db||!db.tasks)return;db.tasks.filter(t=>t.auto&&!t.done&&Date.now()>=taskAutoAt(t)).forEach(t=>{t.autoDone=true;completeTask(t.id)})}
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)setTimeout(taskAutoRun,600)});setTimeout(taskAutoRun,1500);
 // undo a completed task: it goes back on the list and everything it paid out is taken back
 function uncompleteTask(id){const t=db.tasks.find(x=>x.id===id);if(!t||!t.done)return;const c=t.cogsEarned||0;if(!confirm('Mark “'+t.title+'” as not done? This takes back the '+c+' Cogs, Poképuff and EXP it gave you.'))return;
  db.cogs=Math.max(0,Math.round(db.cogs-c));db.puffs=Math.max(0,(db.puffs||0)-(t.puffEarned??1));db.candies=Math.max(0,(db.candies||0)-(t.candyEarned||0));db.completedTasks=Math.max(0,(db.completedTasks||0)-1);db.xp=Math.max(0,(db.xp||0)-(t.xpEarned??20));
@@ -5586,7 +5779,7 @@ function rollMon(deluxe=false){const weights=[47,29,15,7,2];let r=Math.random()*
 let safariRevealId=null,safariRevealUntil=0;
 // Rare Costumes: species -> costume. Full PMD sheets live in assets/costume/rare/<id>/<dex>/<normal|shiny>/ (see tools/add_rare_costume.py).
 // The same id on an evolution keeps the costume when the Pokémon evolves.
-const RARE_COSTUMES={Ralts:{id:'battle_machine',name:'Battle Machine',num:'0280',sheets:true},Gardevoir:{id:'battle_machine',name:'Battle Machine',num:'0282',sheets:true},
+const RARE_COSTUMES={Pawniard:{id:'masked',name:'KJ',num:'0624',sheets:true},Bisharp:{id:'masked',name:'KJ',num:'0625',sheets:true},Ralts:{id:'battle_machine',name:'Battle Machine',num:'0280',sheets:true},Gardevoir:{id:'battle_machine',name:'Battle Machine',num:'0282',sheets:true},
  Charcadet:{id:'sage',name:'Sage',num:'0935',sheets:true},Armarouge:{id:'sage',name:'Sage',num:'0936',sheets:true},Ceruledge:{id:'sage',name:'Sage',num:'0937',sheets:true},
  Snorunt:{id:'miku',name:'Miku',num:'0361',sheets:true},Froslass:{id:'miku',name:'Miku',num:'0478',sheets:true},
  Hatenna:{id:'kaboom',name:'Kaboom',num:'0856',sheets:true},Hattrem:{id:'kaboom',name:'Kaboom',num:'0857',sheets:true},Hatterene:{id:'kaboom',name:'Kaboom',num:'0858',sheets:true},
@@ -5758,7 +5951,7 @@ $('navHome').style.display='none';
  if(pcStorageReady)ensureMoveData();
  if(pcStorageReady&&permRoll())save();
  render();scheduleNotifs();aiCheck();window.__pcBooted=true;setTimeout(()=>{try{mdSync()}catch(e){}},1500);setTimeout(()=>{try{facTick()}catch(e){}},2500);setInterval(()=>{try{facTick();if(currentPage==='home'&&hab.scene&&hab.scene!=='home')drawHabitat()}catch(e){}},60000);
- window.__pcVersion='0.67.1';
+ window.__pcVersion='0.70.2';
  document.addEventListener('pointerdown',function(e){try{var t=e.target.closest&&e.target.closest('[onclick],button,a,[id]');if(!t)return;var oc=t.getAttribute('onclick');window.__pcLastTap=(oc?oc.slice(0,60):(t.id?'#'+t.id:t.tagName.toLowerCase()+'.'+String(t.className).split(' ')[0])).replace(/\s+/g,' ')}catch(_){}} ,true);
  Object.keys(window).forEach(function(k){var f=window[k];if(typeof f!=='function'||/^[A-Z]/.test(k)||k==='appError'||k==='$'||k==='esc'||/\[native code\]/.test(Function.prototype.toString.call(f)))return;
   var w=function(){try{return f.apply(this,arguments)}catch(err){if(err&&typeof err==='object'&&!err.__pcLogged){try{err.__pcLogged=1}catch(_){}appError(err,k)}throw err}};try{window[k]=w}catch(_){}});
