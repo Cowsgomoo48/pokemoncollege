@@ -126,7 +126,7 @@ function gdFit(){const dg=document.querySelector('.dg.gd');if(!dg)return;const d
 addEventListener('resize',()=>{if(document.querySelector('.dg.gd')){gdFit();gdCamera()}});
 function gdMini(r,L){const fl=r.fl,c=document.querySelector('.gd-mini');if(!c)return;const s=4;c.width=fl.w*s;c.height=fl.h*s;const g=c.getContext('2d');g.clearRect(0,0,c.width,c.height);
  for(let y=0;y<fl.h;y++)for(let x=0;x<fl.w;x++)if(fl.seen[y*fl.w+x]==='1'&&gdTile(fl,x,y)){g.fillStyle=L.has(gdKey(x,y))?'#ffffffcc':'#ffffff66';g.fillRect(x*s,y*s,s,s)}
- const sc=mdLvOf(r,'scout');if(sc>=2)(fl.digs||[]).forEach(d=>{if(d.done<d.max){g.fillStyle='#ffe066';g.fillRect(d.x*s,d.y*s,s,s)}});if(sc>=3)fl.items.forEach(it=>{g.fillStyle='#ffd34d';g.fillRect(it.x*s,it.y*s,s,s)});
+ const sc=mdLvOf(r,'scout');if(sc>=1&&fl.stairsHidden&&fl.boss){const bx=fl.stairs[0]*s+s/2,by=fl.stairs[1]*s+s/2;['.###.','#####','#.#.#','#####','.#.#.'].forEach((row,j)=>[...row].forEach((ch,k)=>{if(ch==='#'){g.fillStyle='#ff4d4d';g.fillRect(bx-5+k*2,by-5+j*2,2,2)}}))}
  if(!fl.stairsHidden&&(sc>=1||fl.seen[fl.stairs[1]*fl.w+fl.stairs[0]]==='1')){g.fillStyle='#4aa3ff';g.fillRect(fl.stairs[0]*s-1,fl.stairs[1]*s-1,s+2,s+2)}
  fl.items.forEach(it=>{if(fl.seen[it.y*fl.w+it.x]==='1'){g.fillStyle='#ffd34d';g.fillRect(it.x*s,it.y*s,s,s)}});
  r.battle.enemies.forEach(e=>{if(e.hp>0&&!e.done&&L.has(gdKey(e.x,e.y))){g.fillStyle='#ff4d4d';g.fillRect(e.x*s,e.y*s,s,s)}});
@@ -236,7 +236,9 @@ async function gdFight(){const r=runOf(),b=r&&r.battle;if(!b||b.enemyPhase||DG.b
   if(U.t==='one'){DG.gmode='target';DG.opts=uScope.map(([,j])=>({key:j,hits:[j]}));DG.hl={cls:'tg',tiles:uScope.map(([e])=>[e.x,e.y])};gdHighlight();DG.pick=o=>{DG.gmode='select';DG.hl=null;gdHighlight();run(o.key)};$('dgPanel').innerHTML='<div class="dg-msg">🎯 Tap a highlighted foe.</div>'}else run(null)}}
 // several targets (spread moves, beams): like the all-foes attack above, but only the foes hit
 async function gdAttackMulti(slot,name,mv,mult,idx){const r=runOf(),b=r&&r.battle,m=b&&r.party[slot],p=partyMon(m);if(!p)return;const x=dgCtx(slot),who=esc(p.nickname||p.species),asel='.dg-ally[data-i="'+slot+'"]',sc=idx.length>1?.75:1;
- const hits=idx.map(i=>[b.enemies[i],i]).filter(([e])=>e&&e.hp>0).map(([e,i])=>Object.assign(dgStrike(x,name,mv,e,mult,sc),{e,i})),out=dgFinish(x,name,mv,hits);save();
+ const hits=idx.map(i=>[b.enemies[i],i]).filter(([e])=>e&&e.hp>0).map(([e,i])=>Object.assign(dgStrike(x,name,mv,e,mult,sc),{e,i})),out=dgFinish(x,name,mv,hits);
+ // Stamina drain: stat-lowering moves 10%, plus Demotivate; drains half the damage dealt
+ hits.forEach(h=>{if(h.fail||!(h.dmg>0)||h.e.hp<=0)return;const ch=(GD_DROP[name]?.1:0)+mdLvOf(r,'demot')*MD_PER.demot;if(ch&&Math.random()<ch){const k=Math.round(h.dmg/2);h.e.energy=Math.max(0,(h.e.energy||0)-k);(h.tags=h.tags||[]).push('😩 '+esc(h.e.species)+' −'+k+' Stamina')}});save();
  const ok=hits.filter(h=>!h.fail),best=Math.max(1,...ok.map(h=>h.eff)),tot=ok.reduce((a,h)=>a+h.dmg,0),ko=ok.filter(h=>h.e.hp<=0).map(h=>esc(h.e.species)),crit=ok.some(h=>h.crit),tags=[...new Set(ok.flatMap(h=>h.tags))];
  if(DG)DG.msg='<b style="color:'+SLOT_COLORS[slot]+'">'+who+'</b> used <b>'+esc(name)+'</b>! '+(ok.length?'It hits '+ok.length+' foe'+(ok.length>1?'s':'')+' for <b>'+tot+'</b>.':'But it failed! '+((hits[0]||{}).fail||''))+(crit&&ok.length?' <span class="t-crit">Critical hit!</span>':'')+(best>1.2?' <span class="t-sup">Super effective!</span>':'')+(tags.length?' '+tags.join(' '):'')+(ko.length?' '+ko.join(', ')+' fainted!':'')+dgOutMsg(out);
  if(mv[3]!=='fast'||1)mvAttackAnim(asel);await Promise.all(ok.map((h,k)=>dgSleep(k*70).then(()=>moveFx(mv[0],movePow(name)>70,asel,'.dg-foe[data-i="'+h.i+'"]'))));if(!runOf()||runOf().battle!==b)return;
@@ -288,8 +290,9 @@ async function gdEnemyStrike(i,e,targets,useDisc,name,mv0){const r=runOf(),b=r.b
  const t0=r.party[targets[0]];e.dir=gdDirOf(t0.x-e.x,t0.y-e.y);const s=document.querySelector(fsel+' .dg-spr');if(s){s.dataset.row=e.dir;s.classList.remove('ok');await dgFillSprites()}
  const hits=targets.map(ti=>{const tm=r.party[ti],tp=partyMon(tm),tc=combatant(tp),{dmg:raw0}=dgDamage({atk:e.atk,spa:e.spa,types:e.types},{def:tc.def+(tm.starf&&tm.starf.stat==='def'?2:0),spd:tc.spd+(tm.starf&&tm.starf.stat==='spd'?2:0),types:tc.types},mv,(.85+Math.random()*.3)*sc*mdFoeMult(mv[0],tc.types)),capF=(e.boss?(useDisc?.75:.55):(useDisc?.6:.45))*(DIFF[r.diff].dm||1)*sc,raw=Math.max(1,Math.round(Math.min(raw0,Math.ceil(tc.hp*capF*(.9+Math.random()*.2)))*mdHideMult())),dodged=Math.random()<dgDodge(tc.spe+(tm.starf&&tm.starf.stat==='spe'?2:0),e.spe),dmg=dodged?0:ultGuardDmg(b,Math.max(1,Math.round(raw*(1-Math.min(.9,(b.guard[ti]||0)+(b.wall===b.round?.1:0))))));
   tm.hp=Math.max(0,tm.hp-dmg);dgHurt(b,tm,dmg);return {ti,tm,tp,dmg,dodged,eff:typeEff(mv[0],tc.types)}});
- if(useDisc)e.energy-=disc[2];else e.energy=Math.min(100,e.energy+mv0[2]);e.acted=1;save();
- DG.msg=esc(e.species)+' used <b>'+esc(name)+'</b>'+(hits.length>1?' on '+hits.length+' of your team':' on <b style="color:'+SLOT_COLORS[hits[0].ti]+'">'+esc(hits[0].tp.nickname||hits[0].tp.species)+'</b>')+'! '+hits.map(h=>h.dodged?'💨 '+esc(h.tp.nickname||h.tp.species)+' dodged!':'−'+h.dmg+(b.guard[h.ti]?'🛡':'')).join(' · ')+(eh>1?' (hit '+Math.round(eh)+' times)':'')+(hits.some(h=>h.eff>1.2&&!h.dodged)?' <span class="t-sup">Super effective!</span>':'')+hits.filter(h=>h.tm.hp<=0).map(h=>' '+esc(h.tp.nickname||h.tp.species)+' fainted!').join('');
+ if(useDisc)e.energy-=disc[2];else e.energy=Math.min(100,e.energy+mv0[2]);e.acted=1;
+ hits.forEach(h=>{if(!h.dodged&&h.dmg>0&&GD_DROP[name]&&Math.random()<.1){const k=Math.round(h.dmg/2);h.tm.energy=Math.max(0,(h.tm.energy||0)-k);h.drain=k}});save();
+ DG.msg=esc(e.species)+' used <b>'+esc(name)+'</b>'+(hits.length>1?' on '+hits.length+' of your team':' on <b style="color:'+SLOT_COLORS[hits[0].ti]+'">'+esc(hits[0].tp.nickname||hits[0].tp.species)+'</b>')+'! '+hits.map(h=>h.dodged?'💨 '+esc(h.tp.nickname||h.tp.species)+' dodged!':'−'+h.dmg+(b.guard[h.ti]?'🛡':'')).join(' · ')+(eh>1?' (hit '+Math.round(eh)+' times)':'')+hits.filter(h=>h.drain).map(h=>' 😩 '+esc(h.tp.nickname||h.tp.species)+' lost '+h.drain+' Stamina!').join('')+(hits.some(h=>h.eff>1.2&&!h.dodged)?' <span class="t-sup">Super effective!</span>':'')+hits.filter(h=>h.tm.hp<=0).map(h=>' '+esc(h.tp.nickname||h.tp.species)+' fainted!').join('');
  dgPanelBattle(esc(e.species)+' used '+esc(name)+'!');
  // frame the targeted allies (and the attacker) first, then hold the camera still for the whole animation
  {const fe=document.querySelector('.gd-field'),fit=gdCamFit([e,...hits.map(h=>h.tm)],fe?fe.clientWidth:390,fe?fe.clientHeight:400);DG.bcam=[fit.cx,fit.cy,Math.max(GD_CAM.min,fit.sc)];gdCamera();await dgSleep(460);DG.camLock=true}
@@ -362,3 +365,13 @@ const GD_LOCKED={shop:1,chest:1};
 
 // a charged boss blast: red tiles on everything within 3 tiles of the boss (what the blast will actually hit)
 function gdBlastHTML(r,T){const b=r.battle;if(!b||!b.charge)return '';const e=b.enemies.find(e=>e.boss&&e.hp>0&&!e.done&&e.aware);if(!e)return '';let h='';for(let y=e.y-3;y<=e.y+3;y++)for(let x=e.x-3;x<=e.x+3;x++)if(gdTile(r.fl,x,y))h+='<div class="gd-obj gd-blast" style="left:'+x*T+'px;top:'+y*T+'px"></div>';return h}
+
+// moves that always lower a stat: 10% chance to also drain the target's Stamina (stacks with Demotivate)
+const GD_DROP=Object.fromEntries(['Snarl','Spirit Break','Struggle Bug','Icy Wind','Mud Shot','Mud-Slap','Mystical Fire','Lunge','Trop Kick','Breaking Swipe','Fire Lash','Bulldoze','Rock Tomb','Electroweb','Low Sweep','Bitter Malice','Skitter Smack','Chilling Water','Pounce','Thunderous Kick','Apple Acid','Grav Apple','Lumina Crash','Glaciate'].map(n=>[n,1]));
+// Scout's Compass Lv2+: blue sparkles trace the quickest path from the team to the stairs / boss room
+function gdCompassGoal(fl){return fl.bossRoom&&fl.stairsHidden?[fl.bossRoom[0]+(fl.bossRoom[2]>>1),fl.bossRoom[1]+(fl.bossRoom[3]>>1)]:fl.stairs}
+function gdCompassTick(){try{const r=runOf();if(!r||!r.fl||!r.battle||r.tower||!DG||DG.busy||document.hidden)return;const lv=mdLvOf(r,'scout');if(lv<2||!gdFree(r))return;const mp=document.querySelector('.gd-field .gd-map');if(!mp)return;
+ const m=r.party[r.battle.turn]||r.party[0],goal=gdCompassGoal(r.fl);if(!m||!goal)return;const reach=gdBFS(r.fl,[m.x,m.y],()=>false,999),key=gdKey(goal[0],goal[1]);if(!reach.has(key))return;const path=gdPath(reach,key);if(!path||path.length<2)return;
+ if(!(lv>=3&&DG.gmode==='move')&&path.length>13)return;
+ const T=GD_T,el=document.createElement('div');el.className='gd-csp';mp.appendChild(el);const dur=Math.min(4200,path.length*110);el.animate(path.map(([x,y],k)=>({left:(x*T+T/2)+'px',top:(y*T+T/2)+'px',opacity:k===0?0:k===path.length-1?0:1,offset:k/(path.length-1)})),{duration:dur,easing:'linear',fill:'forwards'});setTimeout(()=>el.remove(),dur+60)}catch(e){}}
+setInterval(gdCompassTick,6500);

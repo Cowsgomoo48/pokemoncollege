@@ -573,6 +573,7 @@ body.mg-busy .inv-handle{display:none}
 /* boss arena */
 .gd-obj.gd-ff{background:linear-gradient(90deg,#ff2d4a00,#ff2d4acc 30%,#ffd0d6 50%,#ff2d4acc 70%,#ff2d4a00),repeating-linear-gradient(0deg,#ff5a6e55 0 3px,#ff2d4a22 3px 6px);box-shadow:0 0 12px #ff2d4a,inset 0 0 8px #fff6;border-radius:4px;opacity:.9;animation:gdff 1.1s ease-in-out infinite;pointer-events:none;z-index:6}
 .gd-obj.gd-blast{background:rgba(255,40,40,.32);border:2px solid rgba(255,60,60,.85);box-sizing:border-box;border-radius:4px;pointer-events:none;animation:gdpulse .6s ease-in-out infinite alternate}
+.gd-csp{position:absolute;width:10px;height:10px;margin:-5px 0 0 -5px;border-radius:50%;background:radial-gradient(#fff,#7cc8ff 45%,#2f8dff00 70%);box-shadow:0 0 10px 4px #4aa3ffaa,-6px 0 8px 2px #4aa3ff55;z-index:8;pointer-events:none}
 @keyframes gdff{50%{opacity:.6;filter:brightness(1.3)}}
 .gd-u.gd-idle .dg-spr{filter:saturate(.75)}
 .gd-bsplash{position:absolute;inset:0;z-index:40;display:grid;place-items:center;pointer-events:none;background:radial-gradient(#3a000088,#0008 70%);animation:gdbsf 2.3s ease-out forwards}
@@ -4127,7 +4128,7 @@ function gdFit(){const dg=document.querySelector('.dg.gd');if(!dg)return;const d
 addEventListener('resize',()=>{if(document.querySelector('.dg.gd')){gdFit();gdCamera()}});
 function gdMini(r,L){const fl=r.fl,c=document.querySelector('.gd-mini');if(!c)return;const s=4;c.width=fl.w*s;c.height=fl.h*s;const g=c.getContext('2d');g.clearRect(0,0,c.width,c.height);
  for(let y=0;y<fl.h;y++)for(let x=0;x<fl.w;x++)if(fl.seen[y*fl.w+x]==='1'&&gdTile(fl,x,y)){g.fillStyle=L.has(gdKey(x,y))?'#ffffffcc':'#ffffff66';g.fillRect(x*s,y*s,s,s)}
- const sc=mdLvOf(r,'scout');if(sc>=2)(fl.digs||[]).forEach(d=>{if(d.done<d.max){g.fillStyle='#ffe066';g.fillRect(d.x*s,d.y*s,s,s)}});if(sc>=3)fl.items.forEach(it=>{g.fillStyle='#ffd34d';g.fillRect(it.x*s,it.y*s,s,s)});
+ const sc=mdLvOf(r,'scout');if(sc>=1&&fl.stairsHidden&&fl.boss){const bx=fl.stairs[0]*s+s/2,by=fl.stairs[1]*s+s/2;['.###.','#####','#.#.#','#####','.#.#.'].forEach((row,j)=>[...row].forEach((ch,k)=>{if(ch==='#'){g.fillStyle='#ff4d4d';g.fillRect(bx-5+k*2,by-5+j*2,2,2)}}))}
  if(!fl.stairsHidden&&(sc>=1||fl.seen[fl.stairs[1]*fl.w+fl.stairs[0]]==='1')){g.fillStyle='#4aa3ff';g.fillRect(fl.stairs[0]*s-1,fl.stairs[1]*s-1,s+2,s+2)}
  fl.items.forEach(it=>{if(fl.seen[it.y*fl.w+it.x]==='1'){g.fillStyle='#ffd34d';g.fillRect(it.x*s,it.y*s,s,s)}});
  r.battle.enemies.forEach(e=>{if(e.hp>0&&!e.done&&L.has(gdKey(e.x,e.y))){g.fillStyle='#ff4d4d';g.fillRect(e.x*s,e.y*s,s,s)}});
@@ -4237,7 +4238,9 @@ async function gdFight(){const r=runOf(),b=r&&r.battle;if(!b||b.enemyPhase||DG.b
   if(U.t==='one'){DG.gmode='target';DG.opts=uScope.map(([,j])=>({key:j,hits:[j]}));DG.hl={cls:'tg',tiles:uScope.map(([e])=>[e.x,e.y])};gdHighlight();DG.pick=o=>{DG.gmode='select';DG.hl=null;gdHighlight();run(o.key)};$('dgPanel').innerHTML='<div class="dg-msg">🎯 Tap a highlighted foe.</div>'}else run(null)}}
 // several targets (spread moves, beams): like the all-foes attack above, but only the foes hit
 async function gdAttackMulti(slot,name,mv,mult,idx){const r=runOf(),b=r&&r.battle,m=b&&r.party[slot],p=partyMon(m);if(!p)return;const x=dgCtx(slot),who=esc(p.nickname||p.species),asel='.dg-ally[data-i="'+slot+'"]',sc=idx.length>1?.75:1;
- const hits=idx.map(i=>[b.enemies[i],i]).filter(([e])=>e&&e.hp>0).map(([e,i])=>Object.assign(dgStrike(x,name,mv,e,mult,sc),{e,i})),out=dgFinish(x,name,mv,hits);save();
+ const hits=idx.map(i=>[b.enemies[i],i]).filter(([e])=>e&&e.hp>0).map(([e,i])=>Object.assign(dgStrike(x,name,mv,e,mult,sc),{e,i})),out=dgFinish(x,name,mv,hits);
+ // Stamina drain: stat-lowering moves 10%, plus Demotivate; drains half the damage dealt
+ hits.forEach(h=>{if(h.fail||!(h.dmg>0)||h.e.hp<=0)return;const ch=(GD_DROP[name]?.1:0)+mdLvOf(r,'demot')*MD_PER.demot;if(ch&&Math.random()<ch){const k=Math.round(h.dmg/2);h.e.energy=Math.max(0,(h.e.energy||0)-k);(h.tags=h.tags||[]).push('😩 '+esc(h.e.species)+' −'+k+' Stamina')}});save();
  const ok=hits.filter(h=>!h.fail),best=Math.max(1,...ok.map(h=>h.eff)),tot=ok.reduce((a,h)=>a+h.dmg,0),ko=ok.filter(h=>h.e.hp<=0).map(h=>esc(h.e.species)),crit=ok.some(h=>h.crit),tags=[...new Set(ok.flatMap(h=>h.tags))];
  if(DG)DG.msg='<b style="color:'+SLOT_COLORS[slot]+'">'+who+'</b> used <b>'+esc(name)+'</b>! '+(ok.length?'It hits '+ok.length+' foe'+(ok.length>1?'s':'')+' for <b>'+tot+'</b>.':'But it failed! '+((hits[0]||{}).fail||''))+(crit&&ok.length?' <span class="t-crit">Critical hit!</span>':'')+(best>1.2?' <span class="t-sup">Super effective!</span>':'')+(tags.length?' '+tags.join(' '):'')+(ko.length?' '+ko.join(', ')+' fainted!':'')+dgOutMsg(out);
  if(mv[3]!=='fast'||1)mvAttackAnim(asel);await Promise.all(ok.map((h,k)=>dgSleep(k*70).then(()=>moveFx(mv[0],movePow(name)>70,asel,'.dg-foe[data-i="'+h.i+'"]'))));if(!runOf()||runOf().battle!==b)return;
@@ -4289,8 +4292,9 @@ async function gdEnemyStrike(i,e,targets,useDisc,name,mv0){const r=runOf(),b=r.b
  const t0=r.party[targets[0]];e.dir=gdDirOf(t0.x-e.x,t0.y-e.y);const s=document.querySelector(fsel+' .dg-spr');if(s){s.dataset.row=e.dir;s.classList.remove('ok');await dgFillSprites()}
  const hits=targets.map(ti=>{const tm=r.party[ti],tp=partyMon(tm),tc=combatant(tp),{dmg:raw0}=dgDamage({atk:e.atk,spa:e.spa,types:e.types},{def:tc.def+(tm.starf&&tm.starf.stat==='def'?2:0),spd:tc.spd+(tm.starf&&tm.starf.stat==='spd'?2:0),types:tc.types},mv,(.85+Math.random()*.3)*sc*mdFoeMult(mv[0],tc.types)),capF=(e.boss?(useDisc?.75:.55):(useDisc?.6:.45))*(DIFF[r.diff].dm||1)*sc,raw=Math.max(1,Math.round(Math.min(raw0,Math.ceil(tc.hp*capF*(.9+Math.random()*.2)))*mdHideMult())),dodged=Math.random()<dgDodge(tc.spe+(tm.starf&&tm.starf.stat==='spe'?2:0),e.spe),dmg=dodged?0:ultGuardDmg(b,Math.max(1,Math.round(raw*(1-Math.min(.9,(b.guard[ti]||0)+(b.wall===b.round?.1:0))))));
   tm.hp=Math.max(0,tm.hp-dmg);dgHurt(b,tm,dmg);return {ti,tm,tp,dmg,dodged,eff:typeEff(mv[0],tc.types)}});
- if(useDisc)e.energy-=disc[2];else e.energy=Math.min(100,e.energy+mv0[2]);e.acted=1;save();
- DG.msg=esc(e.species)+' used <b>'+esc(name)+'</b>'+(hits.length>1?' on '+hits.length+' of your team':' on <b style="color:'+SLOT_COLORS[hits[0].ti]+'">'+esc(hits[0].tp.nickname||hits[0].tp.species)+'</b>')+'! '+hits.map(h=>h.dodged?'💨 '+esc(h.tp.nickname||h.tp.species)+' dodged!':'−'+h.dmg+(b.guard[h.ti]?'🛡':'')).join(' · ')+(eh>1?' (hit '+Math.round(eh)+' times)':'')+(hits.some(h=>h.eff>1.2&&!h.dodged)?' <span class="t-sup">Super effective!</span>':'')+hits.filter(h=>h.tm.hp<=0).map(h=>' '+esc(h.tp.nickname||h.tp.species)+' fainted!').join('');
+ if(useDisc)e.energy-=disc[2];else e.energy=Math.min(100,e.energy+mv0[2]);e.acted=1;
+ hits.forEach(h=>{if(!h.dodged&&h.dmg>0&&GD_DROP[name]&&Math.random()<.1){const k=Math.round(h.dmg/2);h.tm.energy=Math.max(0,(h.tm.energy||0)-k);h.drain=k}});save();
+ DG.msg=esc(e.species)+' used <b>'+esc(name)+'</b>'+(hits.length>1?' on '+hits.length+' of your team':' on <b style="color:'+SLOT_COLORS[hits[0].ti]+'">'+esc(hits[0].tp.nickname||hits[0].tp.species)+'</b>')+'! '+hits.map(h=>h.dodged?'💨 '+esc(h.tp.nickname||h.tp.species)+' dodged!':'−'+h.dmg+(b.guard[h.ti]?'🛡':'')).join(' · ')+(eh>1?' (hit '+Math.round(eh)+' times)':'')+hits.filter(h=>h.drain).map(h=>' 😩 '+esc(h.tp.nickname||h.tp.species)+' lost '+h.drain+' Stamina!').join('')+(hits.some(h=>h.eff>1.2&&!h.dodged)?' <span class="t-sup">Super effective!</span>':'')+hits.filter(h=>h.tm.hp<=0).map(h=>' '+esc(h.tp.nickname||h.tp.species)+' fainted!').join('');
  dgPanelBattle(esc(e.species)+' used '+esc(name)+'!');
  // frame the targeted allies (and the attacker) first, then hold the camera still for the whole animation
  {const fe=document.querySelector('.gd-field'),fit=gdCamFit([e,...hits.map(h=>h.tm)],fe?fe.clientWidth:390,fe?fe.clientHeight:400);DG.bcam=[fit.cx,fit.cy,Math.max(GD_CAM.min,fit.sc)];gdCamera();await dgSleep(460);DG.camLock=true}
@@ -4363,6 +4367,16 @@ const GD_LOCKED={shop:1,chest:1};
 
 // a charged boss blast: red tiles on everything within 3 tiles of the boss (what the blast will actually hit)
 function gdBlastHTML(r,T){const b=r.battle;if(!b||!b.charge)return '';const e=b.enemies.find(e=>e.boss&&e.hp>0&&!e.done&&e.aware);if(!e)return '';let h='';for(let y=e.y-3;y<=e.y+3;y++)for(let x=e.x-3;x<=e.x+3;x++)if(gdTile(r.fl,x,y))h+='<div class="gd-obj gd-blast" style="left:'+x*T+'px;top:'+y*T+'px"></div>';return h}
+
+// moves that always lower a stat: 10% chance to also drain the target's Stamina (stacks with Demotivate)
+const GD_DROP=Object.fromEntries(['Snarl','Spirit Break','Struggle Bug','Icy Wind','Mud Shot','Mud-Slap','Mystical Fire','Lunge','Trop Kick','Breaking Swipe','Fire Lash','Bulldoze','Rock Tomb','Electroweb','Low Sweep','Bitter Malice','Skitter Smack','Chilling Water','Pounce','Thunderous Kick','Apple Acid','Grav Apple','Lumina Crash','Glaciate'].map(n=>[n,1]));
+// Scout's Compass Lv2+: blue sparkles trace the quickest path from the team to the stairs / boss room
+function gdCompassGoal(fl){return fl.bossRoom&&fl.stairsHidden?[fl.bossRoom[0]+(fl.bossRoom[2]>>1),fl.bossRoom[1]+(fl.bossRoom[3]>>1)]:fl.stairs}
+function gdCompassTick(){try{const r=runOf();if(!r||!r.fl||!r.battle||r.tower||!DG||DG.busy||document.hidden)return;const lv=mdLvOf(r,'scout');if(lv<2||!gdFree(r))return;const mp=document.querySelector('.gd-field .gd-map');if(!mp)return;
+ const m=r.party[r.battle.turn]||r.party[0],goal=gdCompassGoal(r.fl);if(!m||!goal)return;const reach=gdBFS(r.fl,[m.x,m.y],()=>false,999),key=gdKey(goal[0],goal[1]);if(!reach.has(key))return;const path=gdPath(reach,key);if(!path||path.length<2)return;
+ if(!(lv>=3&&DG.gmode==='move')&&path.length>13)return;
+ const T=GD_T,el=document.createElement('div');el.className='gd-csp';mp.appendChild(el);const dur=Math.min(4200,path.length*110);el.animate(path.map(([x,y],k)=>({left:(x*T+T/2)+'px',top:(y*T+T/2)+'px',opacity:k===0?0:k===path.length-1?0:1,offset:k/(path.length-1)})),{duration:dur,easing:'linear',fill:'forwards'});setTimeout(()=>el.remove(),dur+60)}catch(e){}}
+setInterval(gdCompassTick,6500);
 // ===================== MYSTERY DUNGEON · cave layers =====================
 // The dungeon is dug downward through 8 layers (152 floors). Each layer is split into sublayers: a sublayer lasts 1–3
 // floors, has its own look (floor colours, props, obstacles, wall decorations) and an effect on battles. A short digging
@@ -4738,7 +4752,7 @@ function mdFinal(){const r=runOf();r.clearedFloors=(r.clearedFloors||0)+1;save()
 // Soul Stones 🟣: earned at the end of a run, spent at the ghostly Hatterene's Death Deals on permanent levels, which
 // every later run starts with. Levels bought during a run go on top of those and are lost when the run ends.
 // how much each level adds (change these to tune the upgrades)
-const MD_PER={expert:.015,fists:.01,focus:.01,opening:.03,sharp:.02,charge:3,finisher:.02,bossbreak:.015,hide:.01,guard:.01,breath:.01,evasion:.005,footing:.15,stairrest:.03,lucky:.04,magnet:.03,bargain:.03,forager:.05};
+const MD_PER={demot:.01,expert:.015,fists:.01,focus:.01,opening:.03,sharp:.02,charge:3,finisher:.02,bossbreak:.015,hide:.01,guard:.01,breath:.01,evasion:.005,footing:.15,stairrest:.03,lucky:.04,magnet:.03,bargain:.03,forager:.05};
 const mdPct=(id,l)=>String(+(MD_PER[id]*l*100).toFixed(1));
 const MDU={
  expert:{tab:'fire',name:'Expert Schooling',ico:'books',max:20,t:10,d:l=>'Super-effective hits deal '+mdPct('expert',l)+'% more damage.'},
@@ -4748,6 +4762,7 @@ const MDU={
  sharp:{tab:'fire',name:'Sharp Eye',ico:'target',max:10,t:10,d:l=>'The critical-hit zone on the timing bar is '+mdPct('sharp',l)+'% wider.'},
  charge:{tab:'fire',name:'Charge Up',ico:'battery',max:10,t:7,d:l=>'When a battle starts, your team gains '+MD_PER.charge*l+' Stamina.'},
  finisher:{tab:'fire',name:'Finisher',ico:'swords',max:10,t:9,d:l=>'Attacks on foes below 30% HP deal '+mdPct('finisher',l)+'% more damage.'},
+ demot:{tab:'fire',name:'Demotivate',ico:'dizzy',max:10,t:9,d:l=>'Your attacks have a '+mdPct('demot',l)+'% chance to drain the target’s Stamina by half the damage dealt.'},
  bossbreak:{tab:'fire',name:'Boss Breaker',ico:'crown',max:10,t:12,d:l=>'Attacks on bosses, Totems and Alphas deal '+mdPct('bossbreak',l)+'% more damage.'},
  weathered:{tab:'water',name:'Weathered Warriors',ico:'storm',max:10,t:6,d:l=>'Environment damage and hazards can’t bring your Pokémon below '+(1+l)+' HP.'},
  rough:{tab:'water',name:'Rough Skin',ico:'rock',max:5,t:9,d:l=>'When a foe next to you hits you with a physical move, it takes '+l+' damage back.'},
@@ -4764,7 +4779,7 @@ const MDU={
  magnet:{tab:'leaf',name:'Ticket Magnet',ico:'magnet',max:10,t:7,d:l=>'+'+mdPct('magnet',l)+'% Tickets from foes and Ticket piles.'},
  bargain:{tab:'leaf',name:'Bargain Hunter',ico:'tag',max:10,t:8,d:l=>'Items in Hatterene’s shop cost '+mdPct('bargain',l)+'% less.'},
  light:{tab:'leaf',name:'Light Bearer',ico:'lantern',max:3,t:9,d:l=>'In dark sublayers you see '+(2+l)+' tiles around your team instead of 2.'},
- scout:{tab:'leaf',name:'Scout’s Map',ico:'compass',max:3,t:10,d:l=>['The minimap shows only what you’ve seen.','The minimap shows the stairs.','The minimap shows the stairs and dig spots.','The minimap shows the stairs, dig spots and items.'][l]},
+ scout:{tab:'leaf',name:'Scout’s Compass',ico:'compass',max:3,t:10,d:l=>['The minimap shows only what you’ve seen.','The minimap shows the stairs, or a skull where the boss waits.','Near the stairs or boss room, blue sparkles trace the quickest path there every 6.5 seconds (plus the stairs/skull on the minimap).','Whenever you’re moving freely with no foes around, blue sparkles trace the quickest path to the stairs or boss room (plus everything below).'][l]},
  forager:{tab:'leaf',name:'Forager',ico:'backpack',max:5,t:8,d:l=>mdPct('forager',l)+'% chance to find an item on each new floor.'}};
 const MD_TABS={fire:{name:'Offense',emoji:'🟠',ico:'fire_stone'},water:{name:'Defense',emoji:'🔵',ico:'water_stone'},leaf:{name:'Utility',emoji:'🟢',ico:'leaf_stone'}};
 // ---------- levels and prices ----------
@@ -5963,7 +5978,7 @@ $('navHome').style.display='none';
  if(pcStorageReady)ensureMoveData();
  if(pcStorageReady&&permRoll())save();
  render();scheduleNotifs();aiCheck();window.__pcBooted=true;setTimeout(()=>{try{mdSync()}catch(e){}},1500);setTimeout(()=>{try{facTick()}catch(e){}},2500);setInterval(()=>{try{facTick();if(currentPage==='home'&&hab.scene&&hab.scene!=='home')drawHabitat()}catch(e){}},60000);
- window.__pcVersion='0.70.9';
+ window.__pcVersion='0.71.0';
  document.addEventListener('pointerdown',function(e){try{var t=e.target.closest&&e.target.closest('[onclick],button,a,[id]');if(!t)return;var oc=t.getAttribute('onclick');window.__pcLastTap=(oc?oc.slice(0,60):(t.id?'#'+t.id:t.tagName.toLowerCase()+'.'+String(t.className).split(' ')[0])).replace(/\s+/g,' ')}catch(_){}} ,true);
  Object.keys(window).forEach(function(k){var f=window[k];if(typeof f!=='function'||/^[A-Z]/.test(k)||k==='appError'||k==='$'||k==='esc'||/\[native code\]/.test(Function.prototype.toString.call(f)))return;
   var w=function(){try{return f.apply(this,arguments)}catch(err){if(err&&typeof err==='object'&&!err.__pcLogged){try{err.__pcLogged=1}catch(_){}appError(err,k)}throw err}};try{window[k]=w}catch(_){}});

@@ -6,7 +6,7 @@
 // Soul Stones 🟣: earned at the end of a run, spent at the ghostly Hatterene's Death Deals on permanent levels, which
 // every later run starts with. Levels bought during a run go on top of those and are lost when the run ends.
 // how much each level adds (change these to tune the upgrades)
-const MD_PER={expert:.015,fists:.01,focus:.01,opening:.03,sharp:.02,charge:3,finisher:.02,bossbreak:.015,hide:.01,guard:.01,breath:.01,evasion:.005,footing:.15,stairrest:.03,lucky:.04,magnet:.03,bargain:.03,forager:.05};
+const MD_PER={demot:.01,expert:.015,fists:.01,focus:.01,opening:.03,sharp:.02,charge:3,finisher:.02,bossbreak:.015,hide:.01,guard:.01,breath:.01,evasion:.005,footing:.15,stairrest:.03,lucky:.04,magnet:.03,bargain:.03,forager:.05};
 const mdPct=(id,l)=>String(+(MD_PER[id]*l*100).toFixed(1));
 const MDU={
  expert:{tab:'fire',name:'Expert Schooling',ico:'books',max:20,t:10,d:l=>'Super-effective hits deal '+mdPct('expert',l)+'% more damage.'},
@@ -16,6 +16,7 @@ const MDU={
  sharp:{tab:'fire',name:'Sharp Eye',ico:'target',max:10,t:10,d:l=>'The critical-hit zone on the timing bar is '+mdPct('sharp',l)+'% wider.'},
  charge:{tab:'fire',name:'Charge Up',ico:'battery',max:10,t:7,d:l=>'When a battle starts, your team gains '+MD_PER.charge*l+' Stamina.'},
  finisher:{tab:'fire',name:'Finisher',ico:'swords',max:10,t:9,d:l=>'Attacks on foes below 30% HP deal '+mdPct('finisher',l)+'% more damage.'},
+ demot:{tab:'fire',name:'Demotivate',ico:'dizzy',max:10,t:9,d:l=>'Your attacks have a '+mdPct('demot',l)+'% chance to drain the target’s Stamina by half the damage dealt.'},
  bossbreak:{tab:'fire',name:'Boss Breaker',ico:'crown',max:10,t:12,d:l=>'Attacks on bosses, Totems and Alphas deal '+mdPct('bossbreak',l)+'% more damage.'},
  weathered:{tab:'water',name:'Weathered Warriors',ico:'storm',max:10,t:6,d:l=>'Environment damage and hazards can’t bring your Pokémon below '+(1+l)+' HP.'},
  rough:{tab:'water',name:'Rough Skin',ico:'rock',max:5,t:9,d:l=>'When a foe next to you hits you with a physical move, it takes '+l+' damage back.'},
@@ -32,7 +33,7 @@ const MDU={
  magnet:{tab:'leaf',name:'Ticket Magnet',ico:'magnet',max:10,t:7,d:l=>'+'+mdPct('magnet',l)+'% Tickets from foes and Ticket piles.'},
  bargain:{tab:'leaf',name:'Bargain Hunter',ico:'tag',max:10,t:8,d:l=>'Items in Hatterene’s shop cost '+mdPct('bargain',l)+'% less.'},
  light:{tab:'leaf',name:'Light Bearer',ico:'lantern',max:3,t:9,d:l=>'In dark sublayers you see '+(2+l)+' tiles around your team instead of 2.'},
- scout:{tab:'leaf',name:'Scout’s Map',ico:'compass',max:3,t:10,d:l=>['The minimap shows only what you’ve seen.','The minimap shows the stairs.','The minimap shows the stairs and dig spots.','The minimap shows the stairs, dig spots and items.'][l]},
+ scout:{tab:'leaf',name:'Scout’s Compass',ico:'compass',max:3,t:10,d:l=>['The minimap shows only what you’ve seen.','The minimap shows the stairs, or a skull where the boss waits.','Near the stairs or boss room, blue sparkles trace the quickest path there every 6.5 seconds (plus the stairs/skull on the minimap).','Whenever you’re moving freely with no foes around, blue sparkles trace the quickest path to the stairs or boss room (plus everything below).'][l]},
  forager:{tab:'leaf',name:'Forager',ico:'backpack',max:5,t:8,d:l=>mdPct('forager',l)+'% chance to find an item on each new floor.'}};
 const MD_TABS={fire:{name:'Offense',emoji:'🟠',ico:'fire_stone'},water:{name:'Defense',emoji:'🔵',ico:'water_stone'},leaf:{name:'Utility',emoji:'🟢',ico:'leaf_stone'}};
 // ---------- levels and prices ----------

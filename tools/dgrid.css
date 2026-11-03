@@ -95,3 +95,4 @@
 .gd-field .gd-hud .dg-ticker{position:static;width:100%;margin:0;overflow-wrap:anywhere}
 .gd-hud .gd-stones{position:static;transform:none;flex-wrap:wrap;justify-content:center}
 .gd-obj.gd-blast{background:rgba(255,40,40,.32);border:2px solid rgba(255,60,60,.85);box-sizing:border-box;border-radius:4px;pointer-events:none;animation:gdpulse .6s ease-in-out infinite alternate}
+.gd-csp{position:absolute;width:10px;height:10px;margin:-5px 0 0 -5px;border-radius:50%;background:radial-gradient(#fff,#7cc8ff 45%,#2f8dff00 70%);box-shadow:0 0 10px 4px #4aa3ffaa,-6px 0 8px 2px #4aa3ff55;z-index:8;pointer-events:none}
