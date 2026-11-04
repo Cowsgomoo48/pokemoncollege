@@ -145,13 +145,28 @@ prDef('func_eval','Algebra','Evaluating functions',/evaluat(e|ing) (a |the )?fun
  ['Do the exponent first: ('+x+')² = '+(x*x)+'. Then multiply.',a+' × '+(x*x)+' = '+(a*x*x)+' and '+b+' × '+x+' = '+(b*x)],
  ['Add everything up.',(a*x*x)+' + '+(b*x)+' + '+c+' = '+f]])});
 prDef('logs','Algebra','Evaluating logarithms',/logarithm|\blog\s*[_₂₃₅(]|\blog\b|\bln\b/i,()=>{
+ const lt=prR(0,2);
+ if(lt===1){const rules=[['ln(a) + ln(b)','ln(ab)','product'],['ln(a) − ln(b)','ln(a/b)','quotient'],['3·ln(a)','ln(a³)','power'],['ln(a) − 2ln(b)','ln(a/b²)','quotient and power']],R0=prPick(rules),all=['ln(ab)','ln(a/b)','ln(a³)','ln(a/b²)','ln(a + b)','ln(a − b)','ln(3a)','ln(a)/ln(b)'];
+  return prMC('Which expression equals '+R0[0]+'?',R0[1],all.filter(x=>x!==R0[1]).sort(()=>Math.random()-.5),k=>all[k%all.length],'Use the '+R0[2]+' rule: '+R0[0]+' = '+R0[1]+'.',[
+   ['Match it to a log rule. Product: ln a + ln b = ln(ab). Quotient: ln a − ln b = ln(a/b). Power: n·ln a = ln(aⁿ).','Rule: '+R0[2]],
+   ['Apply the rule to combine everything into one log.',R0[0]+' = '+R0[1]]])}
+ if(lt===2){const k=prR(2,6),ans='x = '+k;
+  return prMC('Solve: ln('+k+'x − '+k+') − ln(x − 1) = ln x',ans,['x = 1','x = '+(k+1),'x = '+prFrac(1,k)],j=>'x = '+(k+(j%2?1:-1)*(2+j)),'ln(('+k+'x − '+k+')/(x − 1)) = ln x; the fraction is '+k+'(x − 1)/(x − 1) = '+k+', so '+ans+' (and x − 1 > 0 ✓).',[
+   ['Combine the left side with the quotient rule: ln A − ln B = ln(A/B).','ln(('+k+'x − '+k+')/(x − 1)) = ln x'],
+   ['Factor the top: '+k+'x − '+k+' = '+k+'(x − 1). Then cancel (x − 1).','ln('+k+') = ln x'],
+   ['If ln of two things are equal, the things are equal. Check that every log argument stays positive.',ans]])}
  const b=prPick([2,3,4,5,10]),n=prR(-2,4),val=n>=0?String(b**n):'1/'+(b**-n),base=b===10?'log':'log'+prSub(b),ans=String(n);
  return prMC('Evaluate: '+base+'('+val+')',ans,[String(n+1),String(-n),n>=0?String(b**n/b):String(n-1),String(b*n)],k=>prNear(n,k),b+' raised to '+n+' is '+val+', so the log is '+n+'.',[
  ['A log asks “what power do I raise the base to?”. Rewrite '+base+'('+val+') = ? as '+b+'^? = '+val+'.',b+'^? = '+val],
  [n<0?'A fraction 1/'+(b**-n)+' means a negative exponent: 1/'+b+'ⁿ = '+b+'⁻ⁿ. Write '+(b**-n)+' as a power of '+b+' first.':n===0?'Any number to the power 0 is 1.':'Write '+val+' as a power of '+b+' (multiply '+b+' by itself until you reach '+val+').',b+prSup(n)+' = '+val],
  ['That exponent is the answer.',base+'('+val+') = '+n]])});
 prDef('exp_eq','Algebra','Exponential equations (use logs)',/exponential equations?|solv\w*[^.\n]{0,30}exponent|logs? (of )?both sides|e\^|eˣ|exponential (growth|decay)/i,()=>{
- const t=prR(0,2);
+ const t=prR(0,3);
+ if(t===3){const bs=[1.1,1.2,1.3,1.4,1.5,2],i=prR(0,bs.length-2),p0=bs[i],q0=bs[prR(i+1,bs.length-1)],a0=prR(3,7),c0=prR(2,a0-1),x=Math.log(a0/c0)/Math.log(q0/p0),ans='x ≈ '+prNum(x,2);
+  return prMC('Solve: '+a0+'('+p0+')ˣ = '+c0+'('+q0+')ˣ',ans,['x ≈ '+prNum(Math.log(c0/a0)/Math.log(q0/p0),2),'x ≈ '+prNum(Math.log(a0/c0)/Math.log(q0*p0),2),'x ≈ '+prNum((a0/c0)/(q0/p0),2)],j=>'x ≈ '+prNum(x+(j%2?.3:-.3)*(1+(j>>1)),2),'Divide: '+a0+'/'+c0+' = ('+q0+'/'+p0+')ˣ, take ln: x = ln('+prFrac(a0,c0)+') ÷ ln('+q0+'/'+p0+') ≈ '+prNum(x,2),[
+   ['Get the numbers on one side and the powers on the other: divide both sides by '+c0+'('+p0+')ˣ.',prFrac(a0,c0)+' = ('+q0+'/'+p0+')ˣ'],
+   ['The x is in the exponent, so take ln of both sides to bring it down.','ln('+prFrac(a0,c0)+') = x·ln('+q0+'/'+p0+')'],
+   ['Divide to isolate x.','x = ln('+prFrac(a0,c0)+') ÷ ln('+q0+'/'+p0+') ≈ '+prNum(x,2)]])}
  if(t===0){const b=prPick([2,3,4,5]),m=prR(2,b===2?6:4),k=prR(1,m-1),N=b**m,ans='x = '+(m-k);
   return prMC('Solve: '+b+'^{x + '+k+'} = '+N,ans,['x = '+m,'x = '+(m+k),'x = '+prFrac(N,b)],j=>'x = '+(m-k+(j%2?1:-1)*(1+(j>>1))),N+' = '+b+prSup(m)+', so x + '+k+' = '+m+' and '+ans,[
    ['Write both sides with the same base: '+N+' is a power of '+b+'.',N+' = '+b+prSup(m)],
@@ -167,6 +182,83 @@ prDef('exp_eq','Algebra','Exponential equations (use logs)',/exponential equatio
   ['The variable is in the exponent, so use a log to undo it: take the log of both sides.','log('+b+'ˣ) = log('+N+')'],
   ['A log lets you bring the exponent down in front: log('+b+'ˣ) = x · log '+b+'. Then divide by log '+b+'.','x = log '+N+' ÷ log '+b],
   ['Use the calculator (log button) for each and divide.',prNum(Math.log10(N),4)+' ÷ '+prNum(Math.log10(b),4)+' ≈ '+prNum(x,3)]])});
+// ---------------- Precalculus (transformations, symmetry, trig, sinusoids, radians) ----------------
+const prPi=(n,d)=>{const f=prFrac(n,d);if(f==='0')return '0';const [a,b]=f.split('/'),c=a==='1'?'':a==='-1'?'-':a;return c+'π'+(b?'/'+b:'')};
+const prSgnFrac=(n,d)=>prFrac(n,d);
+prDef('func_transform','Precalculus','Function transformations (moving points)',/transformation|shift(ed|s|ing)? (left|right|up|down)|reflect(ed|ion|s)?( across| over| in)? the [xy][- ]axis|(horizontal|vertical)(ly)? (compress|stretch|shrink|scale)|translat(e|ion) of (a |the )?graph/i,()=>{
+ const k=prPick([1,2,2,3,-1]),m=prR(-4,4),v=prR(-5,5),sc=prPick([1,1,-1,2,-2,3]),x0=prR(-3,3),a=k*x0+m,b=prR(-4,6),y=sc*b+v;
+ const outer=(sc===1?'':sc===-1?'-':String(sc))+'f('+prLin(k,m)+')'+(v?(v>0?' + '+v:' − '+(-v)):''),ans=prPt(x0,y);
+ return prMC('The point '+prPt(a,b)+' is on the graph of y = f(x). Which point must be on y = '+outer+'?',ans,[prPt(k*a+m,y),prPt(prFrac(a+m,k),y),prPt(x0,sc*b-v),prPt(x0,b+v),prPt(-x0,y)],j=>prPt(x0+(j%2?1:-1)*(1+(j>>1)),y),'Set the inside equal to the old x: '+prLin(k,m)+' = '+a+' gives x = '+x0+'. Then y = '+sc+'·'+b+(v?(v>0?' + '+v:' − '+(-v)):'')+' = '+y+'.',[
+  ['Inside the parentheses works on x, backwards: find the new x that makes the inside equal the old x-value '+a+'.',prLin(k,m)+' = '+a+'  →  x = '+x0],
+  ['Outside the parentheses works on y, forwards: multiply the old y by '+sc+(v?', then '+(v>0?'add '+v:'subtract '+(-v)):'')+'.','y = '+sc+'·('+b+')'+(v?(v>0?' + '+v:' − '+(-v)):'')+' = '+y],
+  ['Put the new x and y together.',ans]])});
+prDef('func_notation','Precalculus','Function notation in context (f(x+2) vs f(x)+2)',/function notation|f\(\s*[a-z]\s*\+\s*\d\s*\)|f\(\s*\d\s*[a-z]\s*\)|input (or|vs\.?|versus) (the )?output|in (the )?context of/i,()=>{
+ const n=prR(2,5),C=prPick([
+  {f:'f',x:'A',def:'f(A) is the gallons of paint needed to cover a wall of area A square feet',ph:['the paint for a wall '+n+' square feet bigger','the paint for the wall plus '+n+' extra gallons',n+' times as much paint as the wall needs','the paint for a wall '+n+' times as big']},
+  {f:'T',x:'t',def:'T(t) is the temperature (°F) t hours after midnight',ph:['the temperature '+n+' hours later','a temperature '+n+' degrees warmer than at time t',n+' times the temperature at time t','the temperature at '+n+' times as many hours after midnight']},
+  {f:'C',x:'k',def:'C(k) is the cost in dollars of k tickets',ph:['the cost of '+n+' more tickets than k','the cost of k tickets plus a $'+n+' fee',n+' times the cost of k tickets','the cost of '+n+' times as many tickets']}]);
+ const ex=[C.f+'('+C.x+' + '+n+')',C.f+'('+C.x+') + '+n,n+C.f+'('+C.x+')',C.f+'('+n+C.x+')'],i=prR(0,3);
+ return prMC(C.def+'. Which expression means '+C.ph[i]+'?',ex[i],ex.filter((_,j)=>j!==i),j=>ex[(i+1+j)%4],(i===0||i===3?'The change is to the input, so it goes inside the parentheses: ':'The change is to the output, so it goes outside: ')+ex[i]+'.',[
+  ['Decide what changes: the input ('+C.x+', inside the parentheses) or the output (the value '+C.f+' gives back, outside).',i===0||i===3?'The input changes':'The output changes'],
+  ['Adding/multiplying inside changes the input; adding/multiplying outside changes the result.',ex[i]]])});
+prDef('even_odd','Precalculus','Even and odd functions (symmetry)',/even (and|or|\/) odd|odd (and|or|\/) even|even function|odd function|symmetr(y|ic) (about|across|with respect to) the (y-axis|origin)/i,()=>{
+ const t=prR(0,2);
+ if(t===0){const kind=prPick(['Even','Odd','Neither']),cs=()=>prNZ(-5,5);let terms;if(kind==='Even')terms=[[cs(),4],[cs(),2],[cs(),0]];else if(kind==='Odd')terms=[[cs(),5],[cs(),3],[cs(),1]];else terms=[[cs(),3],[cs(),2],[cs(),0]];terms=terms.filter(()=>Math.random()<.85);if(terms.length<2)terms=kind==='Even'?[[1,2],[3,0]]:kind==='Odd'?[[1,3],[2,1]]:[[1,2],[1,1]];
+  const fx=prPoly(terms);return prMC('Is f(x) = '+fx+' even, odd, or neither?',kind,['Even','Odd','Neither','Both even and odd'].filter(x=>x!==kind),j=>'Both even and odd','Replace x with −x: '+(kind==='Even'?'every power is even, so f(−x) = f(x): even.':kind==='Odd'?'every power is odd, so f(−x) = −f(x): odd.':'there are both even and odd powers, so it is neither.'),[
+   ['Test it: replace x with −x. Even powers don’t change sign; odd powers do. (A constant counts as an even power.)','f(−x) = '+prPoly(terms.map(([c,p])=>[p%2?-c:c,p]))],
+   ['f(−x) = f(x) → even. f(−x) = −f(x) → odd. Otherwise neither.',kind]])}
+ if(t===1){const a=prNZ(-6,6),b=prNZ(-6,6),ev=Math.random()<.5,ans=ev?prPt(-a,b):prPt(-a,-b);
+  return prMC('The point '+prPt(a,b)+' is on the graph of an '+(ev?'even':'odd')+' function. Which point must also be on the graph?',ans,[ev?prPt(-a,-b):prPt(-a,b),prPt(a,-b),prPt(b,a)],j=>prPt(-a,(ev?b:-b)+(j%2?1:-1)*(1+(j>>1))),ev?'Even functions mirror across the y-axis: (x, y) → (−x, y).':'Odd functions rotate 180° about the origin: (x, y) → (−x, −y).',[
+   ['Even = mirror image across the y-axis. Odd = 180° turn around the origin.',ev?'(x, y) → (−x, y)':'(x, y) → (−x, −y)'],['Apply it to '+prPt(a,b)+'.',ans]])}
+ const C=prPick([['an even function minus an even function','Even'],['an odd function minus an odd function','Odd'],['an even function times an even function','Even'],['an odd function times an odd function','Even'],['an even function times an odd function','Odd'],['an even function plus an odd function','Neither (in general)']]);
+ return prMC('What kind of function is '+C[0]+'?',C[1],['Even','Odd','Neither (in general)','Always zero'].filter(x=>x!==C[1]),j=>'Always zero','Check with f(−x): '+C[0]+' is '+C[1].toLowerCase()+'.',[
+  ['Sums/differences keep the type when both match (even ± even = even, odd ± odd = odd). Products work like signs: odd·odd = even, even·odd = odd.',C[1]]])});
+const PR_TRIPLES=[[3,4,5],[5,12,13],[8,15,17],[7,24,25],[20,21,29]];
+prDef('unit_circle','Precalculus','Unit circle: finding sin or cos (Pythagorean identity)',/unit circle|sin\^?2\s*θ?\s*\+\s*cos|sin²|pythagorean identit|quadrant (I|II|III|IV|[1-4])|find (sin|cos)\s*θ/i,()=>{
+ const [p,q,h]=prPick(PR_TRIPLES),Q=prR(1,4),sS=Q<=2?1:-1,cS=Q===1||Q===4?1:-1,givenCos=Math.random()<.5,[gv,ov]=givenCos?[p,q]:[q,p],gs=givenCos?cS:sS,os=givenCos?sS:cS,gName=givenCos?'cos':'sin',oName=givenCos?'sin':'cos',ans=prFrac(os*ov,h);
+ const qd=['I','II','III','IV'][Q-1];
+ return prMC('If '+gName+' θ = '+prFrac(gs*gv,h)+' and θ is in Quadrant '+qd+', what is '+oName+' θ?',ans,[prFrac(-os*ov,h),prFrac(gs*gv,h),prFrac(os*h,ov)],j=>prFrac(os*ov+(j%2?1:-1)*(1+(j>>1)),h),'sin²θ + cos²θ = 1 gives '+oName+' θ = ±'+prFrac(ov,h)+'; in Quadrant '+qd+' '+oName+' is '+(os>0?'positive':'negative')+'.',[
+  ['Use sin²θ + cos²θ = 1 and solve for the one you need.',oName+'²θ = 1 − ('+prFrac(gv,h)+')² = '+prFrac(h*h-gv*gv,h*h)],
+  ['Take the square root (this is a '+p+'–'+q+'–'+h+' triangle).','|'+oName+' θ| = '+prFrac(ov,h)],
+  ['Choose the sign from the quadrant: QI all +, QII sin +, QIII tan + (sin and cos −), QIV cos +.',oName+' θ = '+ans]])});
+prDef('trig_ident','Precalculus','Angle identities (180° ± θ, 360° − θ, −θ, 90° − θ)',/angle identit|180\s*(°|\^\\?circ)?\s*[+−-]\s*(θ|\\theta)|360\s*(°|\^\\?circ)\s*[−-]\s*(θ|\\theta)|180\s*°?\s*[+−-]\s*θ|360\s*°?\s*−?-?\s*θ|90\s*°?\s*[−-]\s*θ|π\s*[+−-]\s*θ|reference angle|co-?function|sin\(\s*−?-?θ\)|cos\(\s*−?-?θ\)/i,()=>{
+ const [p,q,h]=prPick(PR_TRIPLES),rad=Math.random()<.4,F=[['sin(180° + θ)','sin(π + θ)',-1,'s'],['sin(180° − θ)','sin(π − θ)',1,'s'],['cos(180° + θ)','cos(π + θ)',-1,'c'],['cos(180° − θ)','cos(π − θ)',-1,'c'],['sin(360° − θ)','sin(2π − θ)',-1,'s'],['cos(360° − θ)','cos(2π − θ)',1,'c'],['sin(−θ)','sin(−θ)',1*-1,'s'],['cos(−θ)','cos(−θ)',1,'c'],['sin(90° − θ)','sin(π/2 − θ)',1,'c'],['cos(90° − θ)','cos(π/2 − θ)',1,'s']],f=prPick(F),val=f[3]==='s'?p:q,ans=prFrac(f[2]*val,h),ex=rad?f[1]:f[0];
+ return prMC('If sin θ = '+prFrac(p,h)+' and cos θ = '+prFrac(q,h)+' (θ in Quadrant I), find '+ex+'.',ans,[prFrac(-f[2]*val,h),prFrac(f[2]*(f[3]==='s'?q:p),h),prFrac(-f[2]*(f[3]==='s'?q:p),h)],j=>prFrac(f[2]*val+(j%2?1:-1)*(1+(j>>1)),h),ex+' = '+(f[2]<0?'−':'')+(f[3]==='s'?'sin θ':'cos θ')+' = '+ans+'.',[
+  ['Picture where the new angle lands. 180° + θ is in QIII, 180° − θ in QII, 360° − θ and −θ in QIV; 90° − θ swaps sin and cos.',ex+' = '+(f[2]<0?'−':'')+(f[3]==='s'?'sin θ':'cos θ')],
+  ['Use that quadrant’s sign and the matching value.',ans]])});
+const prTrigB=(n,d)=>n===d?'x':d===1?n+'x':n===1?'x/'+d:n+'x/'+d;
+prDef('sinusoid','Precalculus','Sine and cosine graphs: amplitude, period, midline',/amplitude|period(ic)?\b|midline|sinusoid|y\s*=\s*-?\d*\s*(sin|cos)|graph(s|ing)? of (sine|cosine)/i,()=>{
+ const A=prNZ(-6,6),[n,d]=prPick([[1,1],[2,1],[3,1],[4,1],[1,2],[1,3],[1,4],[2,3],[3,2]]),D=prR(-5,5),fn=prPick(['sin','cos']),eq='y = '+(A===1?'':A===-1?'-':A)+fn+'('+prTrigB(n,d)+')'+(D?(D>0?' + '+D:' − '+(-D)):''),ask=prPick(['amplitude','period','midline']);
+ if(ask==='amplitude'){const ans=String(Math.abs(A));return prMC('What is the amplitude of '+eq+'?',ans,[String(A),String(2*Math.abs(A)),String(Math.abs(A)+D)],j=>String(Math.abs(A)+(j%2?1:-1)*(1+(j>>1))),'Amplitude = |A| = '+ans+'.',[['The amplitude is the number in front of '+fn+', without its sign.','|A| = |'+A+'| = '+ans]])}
+ if(ask==='period'){const ans=prPi(2*d,n);return prMC('What is the period of '+eq+'?',ans,[prPi(2*n,d),prPi(d,n),prPi(n,d*2)],j=>prPi(2*d+(j+1),n),'Period = 2π ÷ B = 2π ÷ '+prFrac(n,d)+' = '+ans+'.',[['Find B, the number multiplying x inside '+fn+'.','B = '+prFrac(n,d)],['Period = 2π ÷ B.','2π ÷ '+prFrac(n,d)+' = '+ans]])}
+ const ans='y = '+D;return prMC('What is the midline of '+eq+'?',ans,['y = '+(-D),'y = '+A,'y = '+(D+A)],j=>'y = '+(D+(j%2?1:-1)*(1+(j>>1))),'The midline is y = D, the number added at the end: '+ans+'.',[['The midline is the up/down shift: the constant added after '+fn+'(...).',ans]])});
+prDef('ferris','Precalculus','Ferris wheels and sinusoidal models',/ferris wheel|sinusoidal (model|function)|rotations? per|height (above|of) the ground[^.\n]{0,40}(time|minute)|periodic motion/i,()=>{
+ const m=prPick([2,5,10,20,30]),dia=prPick([40,60,80,100,160,200]),M=m+dia,P=prPick([4,5,6,8,10,12,20]),A=dia/2,D=m+A,B=prPi(2,P).replace('π','πt'),ask=prR(0,3);
+ const intro='A Ferris wheel’s lowest point is '+m+' m and its highest is '+M+' m. One rotation takes '+P+' minutes, and the ride starts at the bottom.';
+ if(ask===0)return prMC(intro+' What is the amplitude of h(t)?',A+' m',[dia+' m',M+' m',D+' m'],j=>(A+(j%2?5:-5)*(1+(j>>1)))+' m','Amplitude = (max − min) ÷ 2 = ('+M+' − '+m+') ÷ 2 = '+A+' m.',[['Amplitude is half the distance from lowest to highest.','('+M+' − '+m+') ÷ 2 = '+A]]);
+ if(ask===1)return prMC(intro+' What is the midline of h(t)?','h = '+D+' m',['h = '+A+' m','h = '+M+' m','h = '+(M-m)+' m'],j=>'h = '+(D+(j%2?5:-5)*(1+(j>>1)))+' m','Midline = (max + min) ÷ 2 = ('+M+' + '+m+') ÷ 2 = '+D+' m.',[['The midline is halfway between the lowest and highest heights.','('+M+' + '+m+') ÷ 2 = '+D]]);
+ const eq='h(t) = '+D+' − '+A+'cos('+B+')';
+ if(ask===2)return prMC(intro+' Which equation models the height h(t) after t minutes?',eq,['h(t) = '+D+' + '+A+'cos('+B+')','h(t) = '+D+' − '+A+'sin('+B+')','h(t) = '+D+' − '+dia+'cos('+B+')','h(t) = '+D+' − '+A+'cos('+P+'t)'],j=>'h(t) = '+A+' − '+D+'cos('+B+')','Amplitude '+A+', midline '+D+', B = 2π ÷ '+P+'; starting at the bottom means a negative cosine: '+eq+'.',[
+  ['Find the amplitude and midline from the lowest and highest points.','A = '+A+', midline = '+D],['B = 2π ÷ period.','B = 2π ÷ '+P+' = '+prPi(2,P)],['Starting at the lowest point → use −cos (cos starts at its max, so flip it).',eq]]);
+ const t=prPick([P/4,P/2,P/3,1,2].filter(x=>x>0&&x<=P)),h=D-A*Math.cos(2*Math.PI*t/P),ans=prNum(h,1)+' m';
+ return prMC(intro+' How high is the rider after '+prNum(t,2)+' minutes? (h(t) = '+D+' − '+A+'cos('+B+'))',ans,[prNum(D+A*Math.cos(2*Math.PI*t/P),1)+' m',prNum(D-A*Math.cos(2*Math.PI*t),1)+' m',prNum(D-A*Math.sin(2*Math.PI*t/P),1)+' m'],j=>prNum(h+(j%2?3:-3)*(1+(j>>1)),1)+' m','h('+prNum(t,2)+') = '+D+' − '+A+'cos(2π·'+prNum(t,2)+'/'+P+') ≈ '+ans+'.',[['Substitute t into the model (calculator in radians).','h = '+D+' − '+A+'cos(2π·'+prNum(t,2)+' ÷ '+P+')'],['Work out the cosine, multiply, then subtract.',ans]])});
+prDef('arc_length','Precalculus','Radians and arc length (s = rθ)',/arc length|s\s*=\s*r\s*θ|radian|central angle|degrees? (to|into) radians|minute hand|orbit/i,()=>{
+ const t=prR(0,3);
+ if(t===0){const [R,u]=prPick([[3960,'miles'],[6371,'km']]),alt=prPick([200,300,400,500,800,1000]),sArc=prPick([400,600,800,1000,1500]),r=R+alt,th=sArc/r,ans=prNum(th,4)+' radians';
+  return prMC('Earth’s radius is '+R+' '+u+'. A satellite orbits '+alt+' '+u+' above the surface and travels '+sArc+' '+u+' along its orbit. Through what angle (in radians) does it move?',ans,[prNum(sArc/R,4)+' radians',prNum(th*180/Math.PI,2)+' radians',prNum(sArc/alt,4)+' radians'],j=>prNum(th+(j%2?.01:-.01)*(1+(j>>1)),4)+' radians','r = '+R+' + '+alt+' = '+r+'; θ = s ÷ r = '+sArc+' ÷ '+r+' ≈ '+ans+'.',[
+   ['The orbit’s radius is measured from Earth’s center: add the altitude to Earth’s radius.','r = '+R+' + '+alt+' = '+r],['Use s = rθ and solve for θ.','θ = '+sArc+' ÷ '+r+' ≈ '+prNum(th,4)]])}
+ if(t===1){const L=prR(4,12),mins=prPick([10,12,15,20,25,35,40,42,45,50]),ans=prPi(L*mins,30)+' cm';
+  return prMC('A clock’s minute hand is '+L+' cm long. How far does its tip travel in '+mins+' minutes? (exact, in terms of π)',ans,[prPi(L*mins,60)+' cm',prPi(mins,30)+' cm',prPi(L*mins*2,30)+' cm'],j=>prPi(L*mins+(j+1)*3,30)+' cm','θ = '+mins+'/60 · 2π = '+prPi(mins,30)+'; s = rθ = '+L+' · '+prPi(mins,30)+' = '+ans+'.',[
+   ['One full turn (60 minutes) is 2π radians. Find the fraction of a turn.','θ = ('+mins+'/60)·2π = '+prPi(mins,30)],['Arc length s = rθ.','s = '+L+' · '+prPi(mins,30)+' = '+ans]])}
+ if(t===2){const dg=prPick([30,45,60,90,120,135,150,210,225,240,270,300,315,330]),ans=prPi(dg,180);
+  return prMC('Convert '+dg+'° to radians.',ans,[prPi(dg,360),prPi(180,dg),prPi(dg,90)],j=>prPi(dg+15*(j+1),180),dg+'° × π/180 = '+ans+'.',[['Multiply degrees by π/180.',dg+' × π/180'],['Simplify the fraction.',ans]])}
+ const r=prR(2,15),th=prPick([0.5,1,1.2,1.5,2,2.5,3]),ans=prNum(r*th,2);
+ return prMC('A circle has radius '+r+' m. Find the arc length cut off by a central angle of '+th+' radians.',ans+' m',[prNum(r*th*180/Math.PI,2)+' m',prNum(r/th,2)+' m',prNum(2*r*th,2)+' m'],j=>prNum(r*th+(j%2?.5:-.5)*(1+(j>>1)),2)+' m','s = rθ = '+r+' × '+th+' = '+ans+' m.',[['With θ in radians, arc length is s = rθ.','s = '+r+' × '+th],['Multiply.',ans+' m']])});
+prDef('trig_tf','Precalculus','True or false: trig, log and symmetry rules',/true or false|true\/false|\bT\/F\b|which (of the following )?(statement|is true)/i,()=>{
+ const T=[['sin²θ + cos²θ = 1 for every θ','It’s the Pythagorean identity on the unit circle.'],['y = 3sin(2x) has period π','Period = 2π ÷ 2 = π.'],['Even − Even is even','f(−x) − g(−x) = f(x) − g(x).'],['cos(−θ) = cos θ','Cosine is an even function.'],['ln(a) − ln(b) = ln(a/b)','That’s the quotient rule.'],['The range of y = sin x is −1 ≤ y ≤ 1','Sine is a y-coordinate on the unit circle.'],['An odd function is symmetric about the origin','Odd: f(−x) = −f(x), a 180° turn.'],['Odd · Odd is even','(−f)(−g) = fg.'],['The midline of y = 2cos x + 5 is y = 5','The midline is the constant added on.']];
+ const F=['Even − Even is odd','y = 3sin(2x) has amplitude 6','sin θ can equal 1.5','cos(−θ) = −cos θ','ln(a) − ln(b) = ln(a − b)','y = sin(3x) is zero only at x = 0 and x = 3','An even function is symmetric about the x-axis','The period of y = sin(Bx) is 2πB','Odd − Odd is even','ln(a + b) = ln a + ln b','The amplitude of y = −4cos x is −4'];
+ const t=prPick(T),fs=F.slice().sort(()=>Math.random()-.5);
+ return prMC('Which statement is true?',t[0],fs.slice(0,3),j=>fs[3+j%(fs.length-3)],t[0]+': '+t[1],[['Check each statement against the rule it’s about (identity, period/amplitude, symmetry, log rule).',t[0]+' — '+t[1]]])});
 prDef('dist_mid','Geometry','Distance & midpoint',/distance formula|midpoint|distance between (two )?points/i,()=>{
  const x1=prR(-6,6),y1=prR(-6,6);if(Math.random()<.5){const [p,q,h]=prPick([[3,4,5],[5,12,13],[6,8,10],[8,15,17],[9,12,15]]),sw=Math.random()<.5,dx=(sw?q:p)*(Math.random()<.5?-1:1),dy=(sw?p:q)*(Math.random()<.5?-1:1);
   return prMC('Find the distance between '+prPt(x1,y1)+' and '+prPt(x1+dx,y1+dy)+'.',String(h),[String(p+q),String(Math.abs(dx+dy)||h+2),String(h*h)],k=>prNear(h,k),'d = √(('+dx+')² + ('+dy+')²) = √'+(h*h)+' = '+h,[
