@@ -1094,6 +1094,40 @@ button.tp-locked::after{content:'';position:absolute;right:12px;top:50%;transfor
 .kj-canvas{width:min(100vw,1100px);height:auto;aspect-ratio:320/300;max-height:85dvh;object-fit:contain;image-rendering:pixelated;image-rendering:crisp-edges;box-shadow:none}
 .kj-skip{position:absolute;right:max(12px,env(safe-area-inset-right));bottom:max(16px,env(safe-area-inset-bottom));z-index:1}
 .kj-view{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-edges}
+.g-m{color:#3b8bf0;font-weight:900}.g-f{color:#ef5f9a;font-weight:900}
+.nur{display:flex;flex-direction:column;align-items:center;gap:4px}
+.nur-row{display:flex;gap:14px;width:100%;justify-content:center}
+.nur-slot{flex:1;max-width:150px;min-height:120px;border:2px dashed #b9c9d6;border-radius:16px;background:#f5f8fa;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:#4c6377;padding:8px}
+.nur-slot.full{border-style:solid;border-color:#7ee8dc;background:#fff}.nur-slot b{font-size:12px}.nur-plus{font-size:28px;color:#9fb3c2}
+.nur-lines{width:62%;height:44px;overflow:visible}.nur-lines path{fill:none;stroke:#c5d2dc;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:140;stroke-dashoffset:140}
+.nur.paired .nur-lines .ln{animation:nurLn .35s ease-out forwards}.nur.paired .nur-lines .ar{animation:nurLn .3s .3s ease-out forwards}.nur.ok .nur-lines path{stroke:#ef5f9a}
+@keyframes nurLn{to{stroke-dashoffset:0}}
+.nur-egg{width:74px;height:74px;border-radius:18px;border:2px solid #d6e0e8;background:#eef2f5;display:grid;place-items:center;filter:grayscale(1) opacity(.45);transition:filter .3s,background .3s}
+.nur-egg img.ico.ico{width:48px!important;height:48px!important}.nur.ok .nur-egg{filter:none;background:#fff6fb;border-color:#ef9fc0;animation:nurPop .35s .6s both}
+@keyframes nurPop{0%{transform:scale(.8)}70%{transform:scale(1.08)}100%{transform:none}}
+.nur-stats{width:100%;display:grid;gap:4px;margin-top:4px;font-size:12px}.nur-stats div{display:flex;justify-content:space-between;gap:10px;background:#f6f8fa;border-radius:10px;padding:6px 10px}.nur-stats span{color:#6a7f90}.nur-stats b{color:#1f3550;text-align:right}
+.nur-hint{text-align:center;margin:4px 0}
+.nur-now{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.nur-now p{margin:0;font-size:13px;flex:1}.nur-now .fac-xp{flex-basis:100%}.nur-pair{display:flex}
+.fac-mon.nur-scene{display:flex;align-items:flex-end;gap:6px}.nur-heart{font-size:22px;animation:nurBeat 1.2s ease-in-out infinite}.nur-egg-in img.ico.ico{width:42px!important;height:42px!important;animation:nurWob 2.4s ease-in-out infinite}
+@keyframes nurBeat{50%{transform:scale(1.25)}}@keyframes nurWob{0%,70%,100%{transform:rotate(0)}78%{transform:rotate(-12deg)}86%{transform:rotate(10deg)}93%{transform:rotate(-5deg)}}
+/* Landfill press */
+.lf-press{position:relative;height:150px;margin:8px auto;width:min(260px,90%);border-radius:14px;background:linear-gradient(#5b6470,#3b424b);border:3px solid #2a2f36;overflow:hidden;transition:box-shadow .15s}
+.lf-press.hot{box-shadow:0 0 0 4px #ffd166,0 0 18px #ffd166}
+.lf-ram{position:absolute;left:18%;right:18%;top:0;height:46px;background:repeating-linear-gradient(45deg,#f2c14e 0 10px,#2a2f36 10px 20px);border:3px solid #2a2f36;border-top:0;border-radius:0 0 8px 8px}
+.lf-press.on .lf-ram{animation:lfRam 1.6s ease-in-out infinite}
+@keyframes lfRam{0%,100%{transform:translateY(0)}55%{transform:translateY(48px)}62%{transform:translateY(44px)}}
+.lf-bed{position:absolute;left:12%;right:12%;bottom:22px;height:44px;display:flex;align-items:center;justify-content:center;background:#2a2f36;border-radius:8px}
+.lf-bed .it-ico{width:40px;height:40px;object-fit:contain}
+.lf-press.on .lf-bed .it-ico{animation:lfSquish 1.6s ease-in-out infinite}
+@keyframes lfSquish{0%,45%,100%{transform:scaleY(1)}58%{transform:scale(1.25,.55)}}
+.lf-prog{position:absolute;left:10px;right:10px;bottom:8px;height:6px;border-radius:3px;background:#1d2126}.lf-prog span{display:block;height:100%;width:0;border-radius:3px;background:#8bd17c;transition:width 1s linear}
+.lf-gauge{position:relative;height:20px;border-radius:10px;background:#e8ecf1;overflow:hidden;margin:6px 0}.lf-gauge span{display:block;height:100%;background:linear-gradient(90deg,#ffd166,#ef476f);transition:width .4s}.lf-gauge b{position:absolute;inset:0;text-align:center;font-size:12px;line-height:20px}
+.lf-pile,.lf-bag{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px}
+.lf-it{position:relative;width:52px;height:52px;border-radius:10px;background:#f2f4f7;border:2px solid #dde3ea;display:flex;align-items:center;justify-content:center;padding:0;touch-action:none;user-select:none;-webkit-user-select:none}
+.lf-it .it-ico,.lf-it .it-bg{width:38px;height:38px;object-fit:contain;pointer-events:none}.lf-it b{position:absolute;right:2px;bottom:0;font-size:11px}
+.lf-it.t1{border-color:#7cc4f2}.lf-it.t2{border-color:#b18cf2}.lf-it.t3{border-color:#f2b84e}
+.lf-ghost{position:fixed;z-index:20000;pointer-events:none;transform:translate(-50%,-50%) scale(1.2)}.lf-ghost .it-ico,.lf-ghost .it-bg{width:46px;height:46px}
+
 
 </style><style id="bundled-animation-style">
 .safari-foreground{position:absolute;inset:0;z-index:10;pointer-events:auto;background:#071b0d;display:flex;align-items:center;justify-content:center;overflow:hidden}
@@ -1946,7 +1980,7 @@ function giveMon(m){const entry={id:uid(),species:m.species,nickname:'',shiny:!!
 function rollGrowth(){if(Math.random()<1/4096)return [14,14,14,14,14,14];return [0,1,2,3,4,5].map(()=>1+Math.min(13,Math.floor((Math.random()+Math.random())/2*14)))}
 function monOfTier(minTier,maxTier){let m;for(let i=0;i<40;i++){m=rollMon(false);if(m.tier>=minTier&&m.tier<=maxTier)break}return {...m,growth:rollGrowth()}}
 // ---- Box opening ----
-Object.assign(ITEMS,{fac_gym:{name:'Workout Gym',kind:'facility',fac:'gym',tier:3,w:.15,desc:'Unlocks the Workout Gym, a new tab in your habitat. A Pokémon training there gets an hourly chance at a workout that earns EXP and sometimes raises a growth rate. After 3 boosts it sleeps for 6 hours. Already have it? Boxes give a Facility Ticket instead.'},facticket:{name:'Facility Ticket',kind:'facticket',tier:2,w:.12,desc:'Raises one of your Facilities by 1 level (up to Lv 10).'}});
+Object.assign(ITEMS,{fac_study:{name:'Study Hall',kind:'facility',fac:'study',tier:3,w:.15,desc:'Unlocks the Study Hall, a new tab in your habitat. The Pokémon inside earns EXP every time you answer a question fully correctly.'},fac_landfill:{name:'Landfill',kind:'facility',fac:'landfill',tier:3,w:.15,desc:'Unlocks the Landfill, a new tab in your habitat. A Pokémon runs a big press: drag bag items onto it and they are crushed one by one, filling a gauge that makes tickets and boxes.'},fac_nursery:{name:'Nursery',kind:'facility',fac:'nursery',tier:3,w:.15,desc:'Unlocks the Nursery, a new tab in your habitat. Two Pokémon that share a type breed an egg; correct answers speed it up.'},fac_gym:{name:'Workout Gym',kind:'facility',fac:'gym',tier:3,w:.15,desc:'Unlocks the Workout Gym, a new tab in your habitat. A Pokémon training there gets an hourly chance at a workout that earns EXP and sometimes raises a growth rate. After 3 boosts it sleeps for 6 hours. Already have it? Boxes give a Facility Ticket instead.'},hasten:{name:'Hastening Ticket',kind:'hasten',hrs:1,tier:2,w:.12,desc:'Speeds up the next check of a Workout Gym session, or the Nursery’s breeding or hatching time, by 1 hour.'},hasten3:{name:'Deluxe Hastening Ticket',kind:'hasten',hrs:3,tier:3,w:.08,desc:'Speeds up the next check of a Workout Gym session, or the Nursery’s breeding or hatching time, by 3 hours.'},facticket:{name:'Facility Ticket',kind:'facticket',tier:2,w:.12,desc:'Raises one of your Facilities by 1 level (up to Lv 10).'}});
 const BOXES={poke:{name:'PokeBox',item:'box_poke',puffs:5,odds:[40,35,20,5]},greater:{name:'GreaterBox',item:'box_greater',puffs:10,odds:[30,35,25,10]},ultra:{name:'UltraBox',item:'box_ultra',puffs:15,odds:[25,25,30,20]}};
 // what can come out of a box, by tier; w = weight inside its tier
 // Box loot by rarity tier; inside a tier, the weight (w) sets how often each prize comes up, so valuable prizes are rarer.
@@ -1958,7 +1992,7 @@ const LOOT=[
  ...['goldapple'].map(id=>({id,tier:3,w:LOOT_W[id]})),{cogs:300,tier:3,w:1},{candy:8,tier:3,w:.6},{mon:'rare',tier:3,w:.6},{mon:'shiny',tier:3,w:.015},{mon:'costume',tier:3,w:.02},
  ...['shinyticket','costumeticket','rerollticket','shinyconv','cap_copper','cap_silver','cap_gold','cap_stellar','exp_t1','exp_t2','exp_t3'].map(id=>({id,tier:ITEMS[id].tier,w:ITEMS[id].w})),
  ...Object.keys(ITEMS).filter(id=>/^[dm]_/.test(id)).map(id=>({id,tier:ITEMS[id].tier,w:ITEMS[id].w})),
- ...BGS.map(b=>({id:b.id,tier:Math.min(3,b.tier),w:b.tier===1?.25:.35})),{id:'fac_gym',tier:3,w:.15},{id:'facticket',tier:2,w:.12,need:'fac'}];
+ ...BGS.map(b=>({id:b.id,tier:Math.min(3,b.tier),w:b.tier===1?.25:.35})),{id:'fac_gym',tier:3,w:.15},{id:'fac_study',tier:3,w:.15},{id:'fac_nursery',tier:3,w:.15},{id:'fac_landfill',tier:3,w:.15},{id:'facticket',tier:2,w:.12,need:'fac'},{id:'hasten',tier:2,w:.12,need:'fac'},{id:'hasten3',tier:3,w:.08,need:'fac'}];
 function pickWeighted(list,rnd=Math.random){const tot=list.reduce((a,x)=>a+(x.w??1),0);let r=rnd()*tot;for(const x of list){r-=(x.w??1);if(r<0)return x}return list[list.length-1]}
 function rollTier(odds,rnd=Math.random){let r=rnd()*100;for(let i=0;i<odds.length;i++){r-=odds[i];if(r<0)return i}return odds.length-1}
 function boxCount(kind){const roll=()=>1+Math.floor(Math.random()*5);let n=roll();if(kind==='greater'&&n===1)n=roll();if(kind==='ultra'){if(n<2)n=roll();if(n<2)n=roll()}return n}
@@ -1986,7 +2020,7 @@ function dealsList(){const rnd=seededRand('deals|'+dealKey()),out=[],used=new Se
   if(r<.12){const slot=rnd()<.4?'fast':'charged',all=Object.entries(MOVE_STATS).filter(x=>x[1][3]===slot),mv=all[Math.floor(rnd()*all.length)][0];d={type:'tm',slot,move:mv,cost:slot==='fast'?30:50,key:'tm'+mv}}
   else if(r<.22){const k=['poke','greater','ultra'][rollTier([55,32,13],rnd)];d={type:'box',box:k,cost:{poke:50,greater:100,ultra:150}[k],key:'box'+k}}
   else if(r<.26){const tier=rollTier([45,30,17,7,1],rnd),ch=MONS.filter(m=>m[2]===tier),m=ch[Math.floor(rnd()*ch.length)];d={type:'mon',species:m[0],tier,cost:[90,150,240,380,600][tier],key:'mon'+m[0]}}
-  else{const tier=rollTier([40,32,20,8],rnd),pool=Object.keys(ITEMS).filter(id=>ITEMS[id].tier===tier&&!['box','facility','facticket'].includes(ITEMS[id].kind)&&id!=='bg_default').map(id=>({id,w:ITEMS[id].w??1}));const id=pool.length?pickWeighted(pool,rnd).id:null;if(!id)continue;d={type:'item',id,cost:Math.round(price[tier]*Math.min(4,Math.max(1,1/Math.sqrt(ITEMS[id].w??1)))*(.85+rnd()*.3)),key:'it'+id}}
+  else{const tier=rollTier([40,32,20,8],rnd),pool=Object.keys(ITEMS).filter(id=>ITEMS[id].tier===tier&&!['box','facility','facticket','hasten'].includes(ITEMS[id].kind)&&id!=='bg_default').map(id=>({id,w:ITEMS[id].w??1}));const id=pool.length?pickWeighted(pool,rnd).id:null;if(!id)continue;d={type:'item',id,cost:Math.round(price[tier]*Math.min(4,Math.max(1,1/Math.sqrt(ITEMS[id].w??1)))*(.85+rnd()*.3)),key:'it'+id}}
   if(used.has(d.key))continue;used.add(d.key);out.push(d)}return out}
 function dealBought(){const k=dealKey();if(!db.dealBought||db.dealBought.key!==k)db.dealBought={key:k,list:[]};return db.dealBought.list}
 function buyDeal(i){const d=dealsList()[i],b=dealBought();if(!d||b.includes(i))return;if(db.cogs<d.cost){toast('Not enough Cogs');magBroke();return}db.cogs=Math.round(db.cogs-d.cost);b.push(i);
@@ -2049,7 +2083,7 @@ function invItem(id){const it=ITEMS[id];if(!it)return;let act='';
  else if(it.kind==='monticket'||it.kind==='cap')act='<button class="btn red" onclick="useMonItem(\''+id+'\')">CHOOSE A POKÉMON</button>';
  else if(it.kind==='expticket')act='<button class="btn red" onclick="useExpTicket(\''+id+'\')">USE</button>';
  else if(it.kind==='facility')act='<button class="btn red" onclick="facUnlock(\''+id+'\')">'+(facs()[it.fac]?'ALREADY UNLOCKED':'UNLOCK')+'</button>';
- else if(it.kind==='facticket')act='<button class="btn red" onclick="facTicketPick()">USE ON A FACILITY</button>';
+ else if(it.kind==='facticket')act='<button class="btn red" onclick="facTicketPick()">USE ON A FACILITY</button>';else if(it.kind==='hasten')act='<button class="btn red" onclick="hastenPick(\''+id+'\')">USE</button>';
  else if(it.kind==='reroll')act='<button class="btn red" onclick="closeModal();closeInv();shopReroll(true);go(\'shop\')">REROLL THE DAILY DEALS</button><button class="btn blue" onclick="tmReroll(true);go(\'shop\')">REROLL THE TM COUNTER</button>';
  else act='<button class="btn blue" onclick="closeModal();closeInv();go(\'home\');openHabitat(true)">PLACE IN HABITAT</button>';
  modal(it.name.toUpperCase(),'<div class="inv-detail">'+itemIcon(id,'big')+'<div><span class="badge">'+TIER_NAMES[it.tier]+'</span> <span class="badge">×'+(inv()[id]||0)+'</span><p>'+esc(it.desc)+'</p></div></div><div class="actions">'+act+'</div>')}
@@ -2085,7 +2119,7 @@ const hab={queue:[],sleeping:false,wokeAt:Date.now(),big:false,edit:false,tab:'s
 function decor(){if(hab.scene&&hab.scene!=='home'){const f=facs()[hab.scene];if(f){f.decor=f.decor||{small:[],medium:[null,null,null,null]};f.decor.bg='__fac';return f.decor}}return homeDecor()}
 function homeDecor(){const d=db.decor||(db.decor={small:[],medium:[null,null,null,null],bg:'bg_default'});if(!Array.isArray(d.medium))d.medium=[null,null,null,null];if(!d.bg)d.bg='bg_default';return d}
 function isNight(){const h=new Date().getHours();return h>=22||h<7}
-function drawHabitat(){const box=$('pasture');if(!box)return;if(hab.scene&&hab.scene!=='home'&&!facs()[hab.scene])hab.scene='home';const fs=hab.scene&&hab.scene!=='home'?hab.scene:null,ff=fs&&facs()[fs];if(ff)gymTick();const d=decor(),bg=ITEMS[d.bg];
+function drawHabitat(){const box=$('pasture');if(!box)return;if(hab.scene&&hab.scene!=='home'&&!facs()[hab.scene])hab.scene='home';const fs=hab.scene&&hab.scene!=='home'?hab.scene:null,ff=fs&&facs()[fs];if(ff){gymTick();nurTick();lfTick()}const d=decor(),bg=ITEMS[d.bg];
  const art=box.querySelector('.pasture-art'),hb=$('habBg');if(art)art.style.display=d.bg==='bg_default'?'':'none';if(hb){hb.style.backgroundImage=fs?'url('+FAC[fs].bg+')':d.bg!=='bg_default'&&bg&&bg.url?'url('+bg.url+')':'none'}
  $('habDecor').innerHTML=d.small.map((s,i)=>'<img class="hab-small" data-i="'+i+'" src="./assets/items/'+s.item+'.png" style="left:'+s.x+'%;top:'+s.y+'%" alt="">').join('')+d.medium.map((m,i)=>m?'<img class="hab-med hab-'+m+'" data-slot="'+i+'" src="./assets/items/'+m+'.png" style="left:'+MED_SLOTS[i][0]+'%;top:'+MED_SLOTS[i][1]+'%" alt="">':(hab.edit?'<span class="hab-slot" style="left:'+MED_SLOTS[i][0]+'%;top:'+MED_SLOTS[i][1]+'%"></span>':'')).join('');
  $('habNight').classList.toggle('on',ff?ff.sleepUntil>Date.now():hab.sleeping);document.querySelector('.habitat').classList.toggle('fac',!!fs);$('habTitle').innerHTML=habTabsHTML();
@@ -2094,7 +2128,8 @@ document.querySelector('.habitat').classList.toggle('big',hab.big);document.quer
  drawTray()}
 function drawTray(){const tray=$('habTray'),ed=$('habEdit');if(!tray)return;if(!hab.big){tray.innerHTML='';ed.innerHTML='';return}const v=inv();
  const snacks=Object.keys(v).filter(id=>ITEMS[id]&&ITEMS[id].kind==='snack'),toys=Object.keys(v).filter(id=>ITEMS[id]&&ITEMS[id].kind==='toy');
- if(hab.scene&&hab.scene!=='home'&&facs()[hab.scene]){const id=hab.scene,f=facs()[id];tray.innerHTML='<div class="tray-actions fac-actions"><button class="btn smallbtn red" onclick="facChooser(\''+id+'\')">'+(f.mon?'↔ SWAP POKÉMON':'＋ CHOOSE POKÉMON')+'</button>'+(f.mon?'<button class="btn smallbtn" onclick="facRemove(\''+id+'\')">REMOVE</button>':'')+'<button class="btn smallbtn" onclick="facInfo(\''+id+'\')">LV '+facLv(f)+' · INFO</button><button class="btn smallbtn" onclick="hab.edit=!hab.edit;drawHabitat()">'+(hab.edit?'✓ DONE':'✎ DECOR')+'</button><button class="btn smallbtn" onclick="closeHabitat()">✕</button></div>'}
+ if(!hab.big||hab.scene!=='nursery')hab.nurShown=false;if(hab.scene&&hab.scene!=='home'&&facs()[hab.scene]&&FAC[hab.scene].tray){const id=hab.scene;tray.innerHTML=FAC[id].tray(id);if(id==='nursery'&&nur().phase==='idle'&&!hab.nurShown&&!document.querySelector('#modal.open')){hab.nurShown=true;setTimeout(nurOpen,60)}}
+ else if(hab.scene&&hab.scene!=='home'&&facs()[hab.scene]){const id=hab.scene,f=facs()[id];tray.innerHTML='<div class="tray-actions fac-actions"><button class="btn smallbtn red" onclick="facChooser(\''+id+'\')">'+(f.mon?'↔ SWAP POKÉMON':'＋ CHOOSE POKÉMON')+'</button>'+(f.mon?'<button class="btn smallbtn" onclick="facRemove(\''+id+'\')">REMOVE</button>':'')+'<button class="btn smallbtn" onclick="facInfo(\''+id+'\')">LV '+facLv(f)+' · INFO</button><button class="btn smallbtn" onclick="hab.edit=!hab.edit;drawHabitat()">'+(hab.edit?'✓ DONE':'✎ DECOR')+'</button><button class="btn smallbtn" onclick="closeHabitat()">✕</button></div>'}
  else{tray.innerHTML='<div class="tray-row">'+(snacks.length||toys.length?snacks.map(id=>'<button class="tray-it" onclick="habFeed(\''+id+'\')" aria-label="Feed '+esc(ITEMS[id].name)+'">'+itemIcon(id)+'<b>'+v[id]+'</b></button>').join('')+toys.map(id=>'<button class="tray-it toy" onclick="habToy(\''+id+'\')" aria-label="Play with '+esc(ITEMS[id].name)+'">'+itemIcon(id)+'</button>').join(''):'<span class="small" style="color:#cfe6f7">No snacks or toys yet. Find them in boxes and Daily Deals.</span>')+'</div><div class="tray-actions"><button class="btn smallbtn" onclick="hab.edit=!hab.edit;drawHabitat()">'+(hab.edit?'✓ DONE':'✎ EDIT')+'</button><button class="btn smallbtn" onclick="closeHabitat()">✕</button></div>';}
  if(!hab.edit){ed.innerHTML='';return}
  const inFac=hab.scene&&hab.scene!=='home';if(inFac&&hab.tab==='bg')hab.tab='small';const tabs=inFac?{small:'Small Decor',medium:'Medium Decor'}:{small:'Small Decor',medium:'Medium Decor',bg:'Backgrounds'},ids=Object.keys(v).filter(id=>ITEMS[id]&&ITEMS[id].kind===hab.tab);
@@ -3250,12 +3285,19 @@ function facUnlock(item){const it=ITEMS[item];if(!it||!inv()[item])return;const 
  invAdd(item,-1);facs()[id]={xp:0,mon:null,decor:{small:[],medium:[null,null,null,null]},last:0,since:0,chance:FAC[id].levels[1].start,wins:0,sleepUntil:0,log:[]};save();closeModal();closeInv();go('home');hab.scene=id;drawHabitat();toast(FAC[id].icon+' '+FAC[id].name+' unlocked! It’s a new tab in your habitat.')}
 function facTicketUse(id){const f=facs()[id];if(!f||!inv().facticket)return;const L=facLv(f);if(L>=10){toast(FAC[id].name+' is already Lv 10');return}
  invAdd('facticket',-1);f.xp=Math.max(f.xp||0,FAC_XP[L+1]);save();closeModal();closeInv();render();toast('🎫 '+FAC[id].name+' is now Lv '+facLv(f)+'!')}
+// Hastening Tickets: pull the Gym's next check (or the Nursery's breeding) forward
+function hastenTargets(){const t=[],g=facs().gym,n=facs().nursery;if(g&&g.mon)t.push('gym');if(n&&(n.phase==='breeding'||n.phase==='egg'))t.push('nursery');return t}
+function hastenPick(item){if(!inv()[item])return;const t=hastenTargets();if(!t.length){toast('Nothing to speed up: put a Pokémon in the Gym or start the Nursery first');return}if(t.length===1)return hastenUse(item,t[0]);
+ modal(ITEMS[item].name.toUpperCase(),'<p class="small">What should go '+ITEMS[item].hrs+'h faster?</p><div class="actions">'+t.map(id=>'<button class="btn" onclick="hastenUse(\''+item+'\',\''+id+'\')">'+FAC[id].icon+' '+(id==='gym'?'Gym · next check':facs().nursery.phase==='egg'?'Nursery · hatching':'Nursery · breeding')+'</button>').join('')+'</div>')}
+function hastenUse(item,id){if(!inv()[item]||!hastenTargets().includes(id))return;const h=ITEMS[item].hrs*36e5,now=Date.now(),f=facs()[id];
+ if(id==='gym'){if(f.sleepUntil)f.sleepUntil=Math.max(now,f.sleepUntil-h);else f.last=Math.max(now-36e5,f.last-h)}else f.prog=Math.min(f.dur||nurDur(),(f.prog||0)+h);
+ invAdd(item,-1);save();closeModal();closeInv();toast('⏳ '+FAC[id].name+' sped up by '+ITEMS[item].hrs+'h');facTick();render()}
 function facTicketPick(){const ids=Object.keys(facs());if(!ids.length){toast('Unlock a Facility first (they come from Boxes)');return}if(ids.length===1)return facTicketUse(ids[0]);
  modal('FACILITY TICKET','<p class="small">Which Facility should go up a level?</p><div class="actions">'+ids.map(id=>'<button class="btn" onclick="facTicketUse(\''+id+'\')">'+FAC[id].icon+' '+FAC[id].name+' · Lv '+facLv(facs()[id])+'</button>').join('')+'</div>')}
 // put a Pokémon in (your main companion stays home; a Pokémon can only be in one Facility)
-function facPlace(id,monId){const f=facs()[id];if(!f)return;if(monId===db.mainId){toast('Your companion stays in the habitat. Pick another Pokémon.');return}
+function facPlace(id,monId){const f=facs()[id];if(!f)return;if(typeof nurBusy==='function'&&nurBusy(monId)){toast('🥚 That Pokémon is breeding in the Nursery');return}if(monId===db.mainId){toast('Your companion stays in the habitat. Pick another Pokémon.');return}
  const other=facOf(monId);if(other&&other!==id){facs()[other].mon=null}const now=Date.now();f.mon=monId;f.last=now;f.since=now;f.wins=0;f.chance=facBonus(id).start;
- save();closeModal();drawHabitat();const p=facMon(f);toast(FAC[id].icon+' '+facName(p)+' started training!')}
+ save();closeModal();drawHabitat();const p=facMon(f);toast(FAC[id].icon+' '+facName(p)+' '+(FAC[id].verb||'started training!'))}
 function facRemove(id){const f=facs()[id];if(!f||!f.mon)return;const p=facMon(f);f.mon=null;save();drawHabitat();toast(facName(p)+' left the '+FAC[id].name)}
 function facChooser(id){const list=db.pokemon.filter(p=>p.id!==db.mainId);if(!list.length){toast('Catch another Pokémon first: your companion stays home');return}
  monChooser(FAC[id].icon+' '+FAC[id].name.toUpperCase(),list,'facPick_'+id,'<p class="small muted">Pick who trains here. Your main companion stays in the habitat.</p>')}
@@ -3279,20 +3321,20 @@ function gymTick(now){const f=facs().gym;if(!f)return [];now=now||Date.now();con
  return ev}
 function facPct(c){return (c<10?+c.toFixed(2):Math.round(c))+'%'}
 function fmtHM(ms){const t=Math.max(0,Math.round(ms/6e4)),h=Math.floor(t/60),m=t%60;return (h?h+'h ':'')+m+'m'}
-function facTick(){if(!db||!facOwned())return;const ev=gymTick();if(!ev.length)return;save();
+function facTick(){if(!db||!facOwned())return;const ev=[...gymTick(),...nurTick(),...lfTick()];if(!ev.length)return;save();
  gmNotice(ev.length<=2?ev.join(' · '):'🏋️ While you were away: '+ev.filter(x=>x.startsWith('💪')).length+' training boosts · '+ev.slice(-1)[0],'',2500);try{if(currentPage==='home')drawHabitat()}catch(e){}}
 // EXP from completed tasks also reaches Pokémon inside Facilities (and so the Facilities)
 function facTaskXp(xp){const out=[];for(const id of Object.keys(facs())){const f=facs()[id],p=facMon(f);if(!p||p.id===db.mainId)continue;facGain(id,p,xp,null);out.push({fac:id,id:p.id,xp})}return out}
 function facTaskXpUndo(list){for(const x of list||[]){const p=db.pokemon.find(q=>q.id===x.id),f=facs()[x.fac];if(p)p.pxp=Math.max(0,(p.pxp||0)-x.xp);if(f)f.xp=Math.max(0,(f.xp||0)-x.xp)}}
 // ---- drawing it inside the habitat ----
-function facStatus(id){const f=facs()[id],p=facMon(f),now=Date.now();if(!p)return 'Empty: tap, then “Choose Pokémon”';if(f.sleepUntil>now)return '💤 Lights out · wakes in '+fmtHM(f.sleepUntil-now);
+function facStatus(id){if(FAC[id].status)return FAC[id].status(id);const f=facs()[id],p=facMon(f),now=Date.now();if(!p)return 'Empty: tap, then “Choose Pokémon”';if(f.sleepUntil>now)return '💤 Lights out · wakes in '+fmtHM(f.sleepUntil-now);
  return '💪 '+facName(p)+' · next check in '+fmtHM(f.last+36e5-now)+' · '+facPct(f.chance)+' · boosts '+(f.wins||0)+'/3'}
-async function facDrawMon(id){const box=$('pasture');if(!box)return;let el=$('facMon');const f=facs()[id],p=facMon(f);
+async function facDrawMon(id){if(FAC[id].draw)return FAC[id].draw(id);const box=$('pasture');if(!box)return;let el=$('facMon');const f=facs()[id],p=facMon(f);
  if(!p){if(el)el.remove();return}const key=f.sleepUntil>Date.now()?'Sleep':'Attack',sig=p.species+'|'+key;if(el&&el.dataset.sig===sig)return;
  if(!el){el=document.createElement('div');el.id='facMon';el.className='fac-mon';box.appendChild(el)}el.dataset.sig=sig;let a=null;try{a=await loadAnims(p.species)}catch(e){}
  const an=a&&(a[key]||(key==='Sleep'?a.Idle:a.Walk)||a.Idle);if(!an){el.innerHTML=portraitHTML(p.species,'dg-port');return}
  const base=a.Idle||a.Walk||an;el.innerHTML='';el.style.cssText='width:'+an.w+'px;height:'+an.h+'px;margin-bottom:'+(-(an.h-base.h)/2)+'px;background-image:url('+an.url+');background-position:0 0;--fw:'+an.w+'px;--fn:'+an.frames+';animation:dsx '+(an.d.reduce((x,y)=>x+y,0)/60).toFixed(2)+'s steps('+an.frames+') infinite;zoom:'+Math.min(2.4,64/((a.Idle||an).h||an.h)).toFixed(2)}
-function facInfo(id){const f=facs()[id],L=facLv(f),B=FAC[id].levels,next=L<10?FAC_XP[L+1]:null,p=facMon(f);
+function facInfo(id){if(FAC[id].info)return FAC[id].info(id);const f=facs()[id],L=facLv(f),B=FAC[id].levels,next=L<10?FAC_XP[L+1]:null,p=facMon(f);
  const rows=B.slice(1).map((b,i)=>'<tr'+(i+1===L?' class="on"':'')+'><td>Lv '+(i+1)+'</td><td>'+b.start+'%</td><td>'+(b.exp?'+'+b.exp+'%':'—')+'</td><td>'+(b.wake?'−'+b.wake+'%':'—')+'</td></tr>').join('');
  modal(FAC[id].icon+' '+FAC[id].name.toUpperCase()+' · LV '+L,'<p class="small">'+(p?esc(facName(p))+' is training here. ':'Nobody is training here yet. ')+'Every hour it’s awake, the gym rolls a check. A hit pays EXP for the hours trained (half the rate of companion time), and works on one random growth rate. It may be a breakthrough that raises that rate a grade: likely for low grades (75% at F), rare for high ones (12% at A). A miss doubles the chance for next time. After 3 hits the lights go out for '+GYM_SLEEP_H+' hours (less at higher levels).</p>'
   +'<div class="fac-xp"><span style="width:'+(next?Math.min(100,((f.xp||0)-FAC_XP[L])/(next-FAC_XP[L])*100):100)+'%"></span></div><p class="small muted">'+(next?money(Math.round((f.xp||0)-FAC_XP[L]))+' / '+money(next-FAC_XP[L])+' Facility EXP to Lv '+(L+1)+' · Facility Tickets add a level':'Max level')+'</p>'
@@ -3300,6 +3342,132 @@ function facInfo(id){const f=facs()[id],L=facLv(f),B=FAC[id].levels,next=L<10?FA
   +((f.log||[]).length?'<p class="small" style="margin-top:10px"><b>Recent boosts</b></p><div class="small muted">'+f.log.slice(0,8).map(x=>new Date(x.at).toLocaleString([],{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})+' · '+esc(facName(db.pokemon.find(q=>q.id===x.mon))||'?')+': '+esc(x.t)+' (+'+money(x.xp)+' EXP)').join('<br>')+'</div>':'')
   +'<div class="actions">'+(inv().facticket&&L<10?'<button class="btn blue" onclick="facTicketUse(\''+id+'\')">USE FACILITY TICKET</button>':'')+'<button class="btn" onclick="closeModal()">CLOSE</button></div>')}
 function habTabsHTML(){if(!facOwned())return '◉ COMPANION HABITAT';const s=hab.scene||'home';return '<span class="hab-tabs">'+[['home','◉ HABITAT']].concat(Object.keys(facs()).map(id=>[id,FAC[id].icon+' '+FAC[id].name.toUpperCase().replace('WORKOUT ','')])).map(([k,n])=>'<button class="'+(s===k?'on':'')+'" onclick="event.stopPropagation();hab.scene=\''+k+'\';hab.edit=false;drawHabitat()">'+n+'</button>').join('')+'</span>'}
+// ===================== GENDERS · STUDY HALL · NURSERY =====================
+// Genders: assigned once per Pokémon (legendaries and genderless species have none)
+const GENDERLESS=new Set(['Magnemite','Magneton','Magnezone','Voltorb','Electrode','Staryu','Starmie','Porygon','Porygon2','Porygon-Z','Beldum','Metang','Metagross','Bronzor','Bronzong','Klink','Klang','Klinklang','Golett','Golurk','Rotom','Carbink','Minior','Dhelmise','Sinistea','Polteageist','Baltoy','Claydol','Lunatone','Solrock','Shedinja','Cryogonal','Ditto','Unown']);
+const FEMALE_ONLY=new Set(['Hatenna','Hattrem','Hatterene','Froslass','Salazzle','Vespiquen','Combee','Kangaskhan','Miltank','Chansey','Blissey','Happiny','Jynx','Smoochum','Nidoran♀','Nidorina','Nidoqueen','Petilil','Lilligant','Vullaby','Mandibuzz','Flabébé','Floette','Florges','Bounsweet','Steenee','Tsareena']);
+const MALE_ONLY=new Set(['Gallade','Tyrogue','Hitmonlee','Hitmonchan','Hitmontop','Throh','Sawk','Rufflet','Braviary','Tauros','Nidoran♂','Nidorino','Nidoking','Impidimp','Morgrem','Grimmsnarl','Mothim','Tinkatink']);
+function monGender(p){if(!p)return null;if(p.gender!==undefined)return p.gender;const sp=p.species,t=INDEX[sp]?INDEX[sp].tier:0;p.gender=t>=4||GENDERLESS.has(sp)?null:FEMALE_ONLY.has(sp)?'F':MALE_ONLY.has(sp)?'M':Math.random()<.5?'M':'F';return p.gender}
+function monGenderHTML(p){const g=monGender(p);return g==='M'?'<span class="g-m">♂</span>':g==='F'?'<span class="g-f">♀</span>':''}
+// ---------- shared answer hook: called for every study answer ----------
+function facAnswer(ok,full){try{if(!db||!db.facilities)return;if(full){studyAnswer();nurseryAnswer()}}catch(e){}}
+// ---------- Study Hall: the Pokémon inside earns EXP for every fully correct answer you give ----------
+Object.assign(FAC,{study:{name:'Study Hall',icon:'📚',item:'fac_study',bg:'./assets/fac/study.jpg',verb:'opened its books!',
+ levels:[null,...Array.from({length:10},(_,i)=>({xp:Math.round(400*(1+.1*i)),cogs:i>=8?3:i>=5?2:i>=2?1:0}))],
+ status:id=>{const f=facs()[id],p=facMon(f),B=facBonus(id);return p?'📖 '+facName(p)+' · +'+money(B.xp)+' EXP per correct answer · '+(f.today||0)+' today':'Empty: tap, then “Choose Pokémon”'},
+ info:id=>studyInfo(id)}});
+function studyAnswer(){const f=facs().study;if(!f)return;const p=facMon(f);if(!p)return;const B=facBonus('study'),ev=[],day=new Date().toDateString();if(f.day!==day){f.day=day;f.today=0}
+ f.today=(f.today||0)+1;f.n=(f.n||0)+1;facGain('study',p,B.xp,ev);if(B.cogs&&f.n%10===0){db.cogs=Math.round((db.cogs||0)+B.cogs);ev.push('📚 Study Hall: +'+B.cogs+' Cogs for 10 correct answers')}if(ev.length)setTimeout(()=>toast(ev.join(' · ')),400)}
+function studyInfo(id){const f=facs()[id],L=facLv(f),next=L<10?FAC_XP[L+1]:null,p=facMon(f);
+ modal('📚 STUDY HALL · LV '+L,'<p class="small">'+(p?esc(facName(p))+' is studying here. ':'Nobody is studying here yet. ')+'Every question you answer fully correctly (first try, no Make-Up or Halfsies) gives the Pokémon here EXP, and the Study Hall earns the same. From Lv 3 it also pays Cogs for every 10 correct answers.</p>'
+  +'<div class="fac-xp"><span style="width:'+(next?Math.min(100,((f.xp||0)-FAC_XP[L])/(next-FAC_XP[L])*100):100)+'%"></span></div><p class="small muted">'+(next?money(Math.round((f.xp||0)-FAC_XP[L]))+' / '+money(next-FAC_XP[L])+' Facility EXP to Lv '+(L+1)+' · Facility Tickets add a level':'Max level')+'</p>'
+  +'<table class="fac-tbl"><tr><th>Level</th><th>EXP per answer</th><th>Cogs per 10</th></tr>'+FAC.study.levels.slice(1).map((b,i)=>'<tr'+(i+1===L?' class="on"':'')+'><td>Lv '+(i+1)+'</td><td>+'+money(b.xp)+'</td><td>'+(b.cogs||'—')+'</td></tr>').join('')+'</table>'
+  +'<p class="small muted">Answers so far: '+money(f.n||0)+' · today: '+(f.today||0)+'</p><div class="actions">'+(inv().facticket&&L<10?'<button class="btn blue" onclick="facTicketUse(\''+id+'\')">USE FACILITY TICKET</button>':'')+'<button class="btn" onclick="closeModal()">CLOSE</button></div>')}
+window.facPick_study=pid=>facPlace('study',pid);
+// ---------- Nursery: two parents (♀ + ♂, sharing a type, no legendaries) breed an egg, then the egg hatches ----------
+// Each phase takes 6 hours at Lv 1 (5% less per level). Every fully correct answer makes the current phase run 1% faster (more per level), stacking.
+Object.assign(FAC,{nursery:{name:'Nursery',icon:'🥚',item:'fac_nursery',bg:'./assets/fac/nursery.jpg',verb:'',
+ levels:[null,...Array.from({length:10},(_,i)=>({hrs:+(6*(1-.05*i)).toFixed(2),per:+(1+.1*i).toFixed(1)}))],
+ status:id=>nurStatus(),info:id=>nurInfo(),draw:id=>nurDraw(),tray:id=>nurTray()}});
+function nur(){const f=facs().nursery;if(f){f.phase=f.phase||'idle';f.speed=f.speed||1}return f}
+const NUR_SHINY=1/4096;
+function nurRoot(sp){let s=sp,g=0;while(PRE_EVO[s]&&PRE_EVO[s]!==s&&g++<5)s=PRE_EVO[s];return s}
+function nurTypes(p){return (SPECIES_DATA[p.species]||{types:[]}).types.map(t=>String(t).toLowerCase())}
+const NUR_BABY=new Set(['Pichu','Cleffa','Igglybuff','Togepi','Tyrogue','Smoochum','Elekid','Magby','Azurill','Wynaut','Budew','Chingling','Bonsly','Mime Jr.','Happiny','Munchlax','Riolu','Mantyke','Toxel']);
+const nurDitto=p=>p&&p.species==='Ditto';
+function nurCan(p){return p&&(INDEX[p.species]?INDEX[p.species].tier:0)<4&&!NUR_BABY.has(p.species)&&(monGender(p)!==null||nurDitto(p))&&!inRun(p.id)}
+// a Pokémon that is breeding can't be changed (like one on a dungeon run)
+function nurBusy(id){const f=db&&db.facilities&&db.facilities.nursery;return !!f&&f.phase==='breeding'&&(f.mother===id||f.father===id)}
+function nurPair(f){const m=f&&db.pokemon.find(p=>p.id===f.mother),d=f&&db.pokemon.find(p=>p.id===f.father);return {m,d}}
+function nurOdds(m,d){if(!m||!d)return null;const dm=nurDitto(m),dd=nurDitto(d);if(dm&&dd)return {bad:'Two Ditto can’t breed with each other.'};const shared=dm||dd||nurTypes(m).some(t=>nurTypes(d).includes(t));if(!shared)return {bad:'These two don’t share a type, so they can’t breed.'};
+ const rm=nurRoot(m.species),rd=nurRoot(d.species),same=rm===rd,sh=NUR_SHINY*(m.shiny&&d.shiny?8:m.shiny||d.shiny?4:1)*(dm||dd?1.5:1)*(1+.1*(facLv(facs().nursery)-1)),opts=dm?[{sp:rd,p:1}]:dd?[{sp:rm,p:1}]:same?[{sp:rm,p:1}]:[{sp:rm,p:.7},{sp:rd,p:.3}];
+ return {shiny:sh,opts,fast:dd?null:d.fastMove,disc:dd?null:d.discMove,moveP:dd?0:.3,costume:!!(m.costume||d.costume),ditto:dm||dd}}
+function nurDur(){return facBonus('nursery').hrs*36e5}
+function nurTick(now){const f=nur();if(!f)return [];now=now||Date.now();const ev=[];if(f.phase==='idle'){f.last=now;return ev}
+ const {m,d}=nurPair(f);if(f.phase==='breeding'&&(!m||!d)){f.phase='idle';return ev}
+ f.prog=(f.prog||0)+Math.max(0,now-(f.last||now))*(f.speed||1);f.last=now;
+ if(f.phase==='breeding'&&f.prog>=f.dur){const o=nurOdds(m,d);if(!o||o.bad){f.phase='idle';return ev}let r=Math.random(),sp=o.opts[0].sp;for(const x of o.opts){if(r<x.p){sp=x.sp;break}r-=x.p}
+  f.egg={sp,costume:rollCostume(sp)||(o.costume?rollCostume(sp)||rollCostume(sp):null),shiny:Math.random()<o.shiny,fast:Math.random()<o.moveP?o.fast:null,disc:Math.random()<o.moveP?o.disc:null,growth:[0,1,2,3,4,5].map(i=>Math.random()<.5?monGrowth(Math.random()<.5?m:d)[i]:null),at:now};
+  f.phase='egg';f.prog=0;f.dur=nurDur();f.speed=1;ev.push('🥚 Nursery: '+facName(m)+' and '+facName(d)+' left an egg! It hatches in '+fmtHM(f.dur)+'.')}
+ if(f.phase==='egg'&&f.prog>=f.dur){const e=f.egg,tier=INDEX[e.sp]?INDEX[e.sp].tier:0,g=rollGrowth().map((v,i)=>e.growth&&e.growth[i]!=null?e.growth[i]:v);
+  const mm=giveMon({species:e.sp,tier,shiny:e.shiny,costume:e.costume||null,size:rollSize(),growth:g});if(e.fast)mm.fastMove=e.fast;if(e.disc)mm.discMove=e.disc;monGender(mm);
+  facs().nursery.xp=(facs().nursery.xp||0)+150000;f.hatched=(f.hatched||0)+1;f.lastHatch={id:mm.id,sp:e.sp,shiny:e.shiny};f.egg=null;ev.push('🐣 The egg hatched: '+(e.shiny?'✨ Shiny ':'')+(e.costume?'costumed ':'')+e.sp+' '+monGenderHTML(mm).replace(/<[^>]+>/g,'')+' joined your Box!'+(e.fast||e.disc?' It learned '+(e.fast&&e.disc?e.fast+' and '+e.disc:e.fast||e.disc)+' from its father.':''));
+  if(m&&d){f.phase='breeding';f.prog=0;f.dur=nurDur();f.speed=1}else f.phase='idle'}
+ return ev}
+function nurseryAnswer(){const f=nur();if(!f||f.phase==='idle')return;nurTick();f.speed=+((f.speed||1)+facBonus('nursery').per/100).toFixed(4);save()}
+function nurLeft(f){return Math.max(0,(f.dur-(f.prog||0))/(f.speed||1))}
+function nurStatus(){const f=nur();if(!f)return '';if(f.phase==='breeding')return '💞 Breeding · egg in ~'+fmtHM(nurLeft(f))+' · speed ×'+(f.speed||1).toFixed(2);if(f.phase==='egg')return '🥚 Egg · hatches in ~'+fmtHM(nurLeft(f))+' · speed ×'+(f.speed||1).toFixed(2);return 'Empty: tap to choose two parents'}
+let nurSel={mother:null,father:null};
+function nurOpen(){const f=nur();if(!f)return;if(f.phase!=='idle'){nurInfo();return}nurSel={mother:f.mother||null,father:f.father||null};nurMenu()}
+function nurMenu(){const m=db.pokemon.find(p=>p.id===nurSel.mother),d=db.pokemon.find(p=>p.id===nurSel.father),o=nurOdds(m,d),ok=o&&!o.bad;
+ const slot=(p,role,label)=>'<button class="nur-slot '+(p?'full':'')+'" onclick="nurPick(\''+role+'\')">'+(p?monSprite(p,'',64)+'<b>'+esc(facName(p))+' '+monGenderHTML(p)+'</b>':'<span class="nur-plus">＋</span><b>'+label+'</b>')+'</button>';
+ const stats=ok?'<div class="nur-stats"><div><span>Shiny chance</span><b>1 in '+money(Math.round(1/o.shiny))+'</b></div><div><span>Rarity bucket</span><b>'+o.opts.map(x=>RARITIES[INDEX[x.sp]?INDEX[x.sp].tier:0]).filter((v,i,a)=>a.indexOf(v)===i).join(' / ')+'</b></div><div><span>Species chance</span><b>'+o.opts.map(x=>esc(x.sp)+' '+Math.round(x.p*100)+'%').join(' · ')+'</b></div>'+(o.moveP?'<div><span>From father</span><b>'+Math.round(o.moveP*100)+'% '+esc(o.fast)+' · '+Math.round(o.moveP*100)+'% '+esc(o.disc)+'</b></div>':'')+(o.costume?'<div><span>Costume chance</span><b>Boosted (costumed parent)</b></div>':'')+(o.ditto?'<div><span>Ditto</span><b>Takes after the partner · shiny ×1.5</b></div>':'')+'<div><span>Time</span><b>'+fmtHM(nurDur())+' to breed + '+fmtHM(nurDur())+' to hatch</b></div></div>':'<p class="small muted nur-hint">'+(o&&o.bad?o.bad:'Choose a ♀ mother and a ♂ father that share a type (no legendaries or babies). Ditto can stand in for either.')+'</p>';
+ modal('🥚 NURSERY','<div class="nur '+(m&&d?'paired':'')+' '+(ok?'ok':'')+'"><div class="nur-row">'+slot(m,'mother','♀ Mother')+slot(d,'father','♂ Father')+'</div>'
+  +'<svg class="nur-lines" viewBox="0 0 200 60" preserveAspectRatio="none"><path class="ln" d="M40 0 V24 H100"/><path class="ln" d="M160 0 V24 H100"/><path class="ar" d="M100 24 V52 M92 44 L100 54 L108 44"/></svg>'
+  +'<div class="nur-egg">'+(typeof icoHTML==='function'?icoHTML('egg'):'🥚')+'</div>'+stats
+  +'<div class="actions"><button class="btn" onclick="closeModal()">CLOSE</button><button class="btn red" '+(ok?'':'disabled')+' onclick="nurStart()">START BREEDING</button></div></div>')}
+function nurPick(role){const want=role==='mother'?'F':'M',other=role==='mother'?nurSel.father:nurSel.mother,op=db.pokemon.find(p=>p.id===other);
+ const list=db.pokemon.filter(p=>p.id!==db.mainId&&p.id!==other&&nurCan(p)&&(nurDitto(p)?!nurDitto(op):monGender(p)===want)&&!facOf(p.id)&&(!op||nurDitto(p)||nurDitto(op)||nurTypes(p).some(t=>nurTypes(op).includes(t))));
+ if(!list.length){toast('No '+(want==='F'?'♀':'♂')+' Pokémon that can breed'+(op?' with '+facName(op):'')+' (not legendary or a baby, not your companion, not on a run or in a Facility'+(op?', sharing a type':'')+'). Ditto can breed with anything.');return}
+ monChooser('CHOOSE '+(role==='mother'?'♀ MOTHER':'♂ FATHER'),list,'nurSet_'+role,'<p class="small muted">'+(op?'Showing Pokémon that share a type with '+esc(facName(op))+'.':'Pick a '+(want==='F'?'female':'male')+' Pokémon.')+'</p>')}
+window.nurSet_mother=id=>{nurSel.mother=id;nurMenu()};window.nurSet_father=id=>{nurSel.father=id;nurMenu()};
+function nurStart(){const f=nur(),m=db.pokemon.find(p=>p.id===nurSel.mother),d=db.pokemon.find(p=>p.id===nurSel.father),o=nurOdds(m,d);if(!f||!o||o.bad)return;
+ f.mother=m.id;f.father=d.id;f.phase='breeding';f.prog=0;f.dur=nurDur();f.speed=1;f.last=Date.now();save();closeModal();drawHabitat();toast('💞 '+facName(m)+' and '+facName(d)+' are in the Nursery. An egg in about '+fmtHM(f.dur)+'.')}
+function nurRemove(){const f=nur();if(!f)return;if(f.phase==='egg'){toast('Wait for the egg to hatch first');return}f.mother=f.father=null;f.phase='idle';f.prog=0;save();drawHabitat();toast('The parents left the Nursery')}
+function nurTray(){const f=nur();return '<div class="tray-actions fac-actions">'+(f.phase==='idle'?'<button class="btn smallbtn red" onclick="nurOpen()">＋ CHOOSE PARENTS</button>':'<button class="btn smallbtn red" onclick="nurInfo()">'+(f.phase==='egg'?'🥚 EGG':'💞 BREEDING')+'</button>'+(f.phase==='breeding'?'<button class="btn smallbtn" onclick="nurRemove()">REMOVE PARENTS</button>':''))+'<button class="btn smallbtn" onclick="nurInfo()">LV '+facLv(f)+' · INFO</button><button class="btn smallbtn" onclick="hab.edit=!hab.edit;drawHabitat()">'+(hab.edit?'✓ DONE':'✎ DECOR')+'</button><button class="btn smallbtn" onclick="closeHabitat()">✕</button></div>'}
+function nurInfo(){const f=nur(),L=facLv(f),next=L<10?FAC_XP[L+1]:null,{m,d}=nurPair(f),B=facBonus('nursery');
+ const cur=f.phase==='idle'?'<p class="small">Nobody is breeding right now.</p>':'<div class="nur-now"><div class="nur-pair">'+(m?monSprite(m,'',48):'')+(d?monSprite(d,'',48):'')+'</div><p><b>'+(f.phase==='egg'?'🥚 An egg is warming up':'💞 '+esc(facName(m))+' and '+esc(facName(d))+' are breeding')+'</b><br>'+(f.phase==='egg'?'Hatches':'Egg')+' in about '+fmtHM(nurLeft(f))+' · speed ×'+(f.speed||1).toFixed(2)+'</p><div class="fac-xp"><span style="width:'+Math.min(100,(f.prog||0)/f.dur*100)+'%"></span></div></div>';
+ modal('🥚 NURSERY · LV '+L,cur+'<p class="small">Put a ♀ and a ♂ that share a type (no legendaries or babies) in the Nursery; Ditto can pair with anything and gives a small shiny boost. Shiny parents raise shiny odds, and a costumed parent raises costume odds. Parents are locked while they breed. After the breeding time they leave an egg; after the hatching time it hatches into the first stage of the mother’s line (70%) or the father’s (30%), sometimes knowing the father’s moves. Each fully correct answer makes the current timer run '+B.per+'% faster, stacking until the phase ends. Each hatch gives the Nursery Facility EXP.</p>'
+  +'<div class="fac-xp"><span style="width:'+(next?Math.min(100,((f.xp||0)-FAC_XP[L])/(next-FAC_XP[L])*100):100)+'%"></span></div><p class="small muted">'+(next?money(Math.round((f.xp||0)-FAC_XP[L]))+' / '+money(next-FAC_XP[L])+' Facility EXP to Lv '+(L+1):'Max level')+'</p>'
+  +'<table class="fac-tbl"><tr><th>Level</th><th>Breed / hatch</th><th>Speed per answer</th></tr>'+FAC.nursery.levels.slice(1).map((b,i)=>'<tr'+(i+1===L?' class="on"':'')+'><td>Lv '+(i+1)+'</td><td>'+fmtHM(b.hrs*36e5)+' each</td><td>+'+b.per+'%</td></tr>').join('')+'</table>'
+  +'<p class="small muted">Eggs hatched: '+(f.hatched||0)+'</p><div class="actions">'+(f.phase==='idle'?'<button class="btn red" onclick="nurOpen()">CHOOSE PARENTS</button>':'')+(inv().facticket&&L<10?'<button class="btn blue" onclick="facTicketUse(\'nursery\')">USE FACILITY TICKET</button>':'')+'<button class="btn" onclick="closeModal()">CLOSE</button></div>')}
+async function nurDraw(){const box=$('pasture');if(!box)return;let el=$('facMon');const f=nur(),{m,d}=nurPair(f),sig=f.phase+'|'+(m?m.id:'')+'|'+(d?d.id:'');if(el&&el.dataset.sig===sig)return;
+ if(!el){el=document.createElement('div');el.id='facMon';box.appendChild(el)}el.className='fac-mon nur-scene';el.dataset.sig=sig;el.style.cssText='';
+ el.innerHTML=(f.phase!=='idle'&&m&&d?'<span class="nur-p">'+monSprite(m,'',60)+'</span><span class="nur-heart">'+(f.phase==='breeding'?'💞':'')+'</span><span class="nur-p">'+monSprite(d,'',60)+'</span>':'')+(f.phase==='egg'?'<span class="nur-egg-in">'+(typeof icoHTML==='function'?icoHTML('egg'):'🥚')+'</span>':'')}
+window.facPick_nursery=()=>nurOpen();
+// ---------- Landfill: a Pokémon runs the press; bag items go on the pile and are crushed one by one ----------
+// Each crushed item fills the gauge by its rarity; a full gauge produces a ticket or box.
+const LF_PTS=[8,15,30,60],LF_ODDS=[45,33,17,5],LF_XP_ITEM=600,LF_XP_MAKE=15000,LF_OUT=['ticket','expticket','shinyticket','reroll','hasten','facticket','box','monticket'];
+Object.assign(FAC,{landfill:{name:'Landfill',icon:'🗜️',item:'fac_landfill',bg:'./assets/fac/landfill.jpg',verb:'took control of the press!',
+ levels:[null,...Array.from({length:10},(_,i)=>({min:+(10*(1-.05*i)).toFixed(1),fill:+(1+.1*i).toFixed(1)}))],
+ status:id=>lfStatus(),info:id=>lfInfo(),tray:id=>lfTray()}});
+function lf(){const f=facs().landfill;if(f){f.pile=f.pile||[];f.gauge=f.gauge||0}return f}
+const lfDur=()=>facBonus('landfill').min*6e4,lfOk=id=>ITEMS[id]&&ITEMS[id].kind!=='facility'&&id!=='bg_default';
+function lfReward(){const tier=rollTier(LF_ODDS),pool=Object.keys(ITEMS).filter(id=>LF_OUT.includes(ITEMS[id].kind)&&ITEMS[id].tier===tier).map(id=>({id,w:ITEMS[id].w??1}));
+ const id=(pool.length?pickWeighted(pool):{id:'box_poke'}).id;invAdd(id,1);return id}
+function lfTick(now){const f=lf();if(!f)return [];now=now||Date.now();const ev=[],p=facMon(f);
+ if(!p||!f.pile.length){f.last=now;return ev}const B=facBonus('landfill'),d=lfDur();
+ for(let g=0;g<5000&&f.pile.length&&f.last+d<=now;g++){f.last+=d;const id=f.pile.shift(),t=ITEMS[id]?ITEMS[id].tier||0:0;
+  f.gauge+=LF_PTS[Math.min(3,t)]*B.fill;f.crushed=(f.crushed||0)+1;facGain('landfill',p,LF_XP_ITEM*(t+1),ev);
+  while(f.gauge>=100){f.gauge-=100;const r=lfReward();f.made=(f.made||0)+1;facGain('landfill',p,LF_XP_MAKE,ev);ev.push('🗜️ The press made a '+ITEMS[r].name+'! ('+facName(p)+' +'+money(LF_XP_MAKE)+' EXP)')}}
+ if(!f.pile.length)f.last=now;return ev}
+function lfStatus(){const f=lf(),p=facMon(f);return (p?'🗜️ '+facName(p)+' · ':'Needs a Pokémon to run the press · ')+f.pile.length+' in the pile · gauge '+Math.floor(f.gauge)+'%'}
+function lfTray(){const f=lf();return '<div class="tray-actions fac-actions"><button class="btn smallbtn red" onclick="lfOpen()">🗜️ PRESS</button><button class="btn smallbtn" onclick="facChooser(\'landfill\')">'+(f.mon?'↔ SWAP':'＋ CHOOSE POKÉMON')+'</button>'+(f.mon?'<button class="btn smallbtn" onclick="facRemove(\'landfill\')">REMOVE</button>':'')+'<button class="btn smallbtn" onclick="lfInfo()">LV '+facLv(f)+' · INFO</button><button class="btn smallbtn" onclick="hab.edit=!hab.edit;drawHabitat()">'+(hab.edit?'✓ DONE':'✎ DECOR')+'</button><button class="btn smallbtn" onclick="closeHabitat()">✕</button></div>'}
+let lfTimer=0;
+function lfOpen(){const f=lf();if(!f)return;lfTick();const p=facMon(f),v=inv(),ids=Object.keys(v).filter(id=>lfOk(id)&&v[id]>0).sort((a,b)=>(ITEMS[a].tier||0)-(ITEMS[b].tier||0));
+ modal('🗜️ LANDFILL','<div id="lfMenu" class="lf"><p class="small muted">'+(p?esc(facName(p))+' is running the press.':'⚠️ Put a Pokémon in the Landfill to run the press.')+' Drag items from your bag onto the press (or tap them). Rarer items fill the gauge faster; a full gauge makes a ticket or box.</p>'
+  +'<div class="lf-press'+(p&&f.pile.length?' on':'')+'" id="lfPress"><div class="lf-ram"></div><div class="lf-bed">'+(f.pile[0]?itemIcon(f.pile[0]):'<span class="small muted">empty</span>')+'</div><div class="lf-prog"><span id="lfProg"></span></div></div>'
+  +'<div class="lf-gauge"><span id="lfGauge" style="width:'+Math.min(100,f.gauge)+'%"></span><b id="lfGt">'+Math.floor(f.gauge)+'%</b></div>'
+  +'<p class="small"><b>Pile ('+f.pile.length+')</b> · '+lfDur()/6e4+' min per item'+(f.pile.length>1?' · tap to take back':'')+'</p><div class="lf-pile">'+f.pile.map((id,i)=>i?'<button class="lf-it" onclick="lfBack('+i+')" title="'+esc(ITEMS[id].name)+'">'+itemIcon(id)+'</button>':'').join('')+'</div>'
+  +'<p class="small"><b>Bag</b></p><div class="lf-bag">'+(ids.length?ids.map(id=>'<div class="lf-it lf-src t'+(ITEMS[id].tier||0)+'" data-id="'+id+'" title="'+esc(ITEMS[id].name)+'">'+itemIcon(id)+'<b>'+v[id]+'</b></div>').join(''):'<span class="small muted">Your bag is empty.</span>')+'</div>'
+  +'<div class="actions"><button class="btn" onclick="closeModal()">CLOSE</button></div></div>');
+ document.querySelectorAll('#lfMenu .lf-src').forEach(el=>el.addEventListener('pointerdown',e=>lfDrag(e,el)));lfLive();clearInterval(lfTimer);lfTimer=setInterval(lfLive,1000)}
+function lfLive(){const el=$('lfProg');if(!el){clearInterval(lfTimer);return}const f=lf(),n=f.pile.length,ev=lfTick();if(ev.length){save();gmNotice(ev.join(' · '),'',2500)}
+ if(f.pile.length!==n&&!document.querySelector('.lf-ghost')){lfOpen();return}
+ el.style.width=(facMon(f)&&f.pile.length?Math.min(100,(Date.now()-f.last)/lfDur()*100):0)+'%';$('lfGauge').style.width=Math.min(100,f.gauge)+'%';$('lfGt').textContent=Math.floor(f.gauge)+'%'}
+function lfAdd(id){if(!inv()[id]||!lfOk(id))return;const f=lf();invAdd(id,-1);if(!f.pile.length)f.last=Date.now();f.pile.push(id);save();lfOpen()}
+function lfBack(i){const f=lf();if(!f.pile[i]||!i)return;invAdd(f.pile.splice(i,1)[0],1);save();lfOpen()}
+function lfDrag(e,el){e.preventDefault();const id=el.dataset.id,x0=e.clientX,y0=e.clientY;let g=null;
+ const mv=ev=>{if(!g&&Math.hypot(ev.clientX-x0,ev.clientY-y0)>6){g=document.createElement('div');g.className='lf-ghost';g.innerHTML=itemIcon(id);document.body.appendChild(g)}if(g){g.style.left=ev.clientX+'px';g.style.top=ev.clientY+'px';const pr=$('lfPress');if(pr){const r=pr.getBoundingClientRect();pr.classList.toggle('hot',ev.clientX>r.left&&ev.clientX<r.right&&ev.clientY>r.top&&ev.clientY<r.bottom)}}};
+ const up=ev=>{removeEventListener('pointermove',mv);removeEventListener('pointerup',up);removeEventListener('pointercancel',up);const pr=$('lfPress');
+  if(!g){lfAdd(id);return}g.remove();if(pr){const r=pr.getBoundingClientRect();pr.classList.remove('hot');if(ev.type==='pointerup'&&ev.clientX>r.left&&ev.clientX<r.right&&ev.clientY>r.top&&ev.clientY<r.bottom)lfAdd(id)}};
+ addEventListener('pointermove',mv);addEventListener('pointerup',up);addEventListener('pointercancel',up)}
+function lfInfo(){const f=lf(),L=facLv(f),next=L<10?FAC_XP[L+1]:null,p=facMon(f);
+ modal('🗜️ LANDFILL · LV '+L,'<p class="small">'+(p?esc(facName(p))+' runs the press. ':'Nobody is running the press. ')+'Items on the pile are crushed one at a time. Each one fills the gauge by its rarity (Common '+LF_PTS[0]+'% · Uncommon '+LF_PTS[1]+'% · Rare '+LF_PTS[2]+'% · Epic '+LF_PTS[3]+'%, × the level bonus). A full gauge makes a random ticket or box. The Pokémon gets +'+money(LF_XP_ITEM)+' EXP × rarity per item and +'+money(LF_XP_MAKE)+' EXP per thing made.</p>'
+  +'<div class="fac-xp"><span style="width:'+(next?Math.min(100,((f.xp||0)-FAC_XP[L])/(next-FAC_XP[L])*100):100)+'%"></span></div><p class="small muted">'+(next?money(Math.round((f.xp||0)-FAC_XP[L]))+' / '+money(next-FAC_XP[L])+' Facility EXP to Lv '+(L+1):'Max level')+'</p>'
+  +'<table class="fac-tbl"><tr><th>Level</th><th>Per item</th><th>Gauge fill</th></tr>'+FAC.landfill.levels.slice(1).map((b,i)=>'<tr'+(i+1===L?' class="on"':'')+'><td>Lv '+(i+1)+'</td><td>'+b.min+' min</td><td>×'+b.fill+'</td></tr>').join('')+'</table>'
+  +'<p class="small muted">Crushed: '+money(f.crushed||0)+' · made: '+money(f.made||0)+'</p><div class="actions"><button class="btn red" onclick="lfOpen()">OPEN PRESS</button>'+(inv().facticket&&L<10?'<button class="btn blue" onclick="facTicketUse(\'landfill\')">USE FACILITY TICKET</button>':'')+'<button class="btn" onclick="closeModal()">CLOSE</button></div>')}
+window.facPick_landfill=pid=>facPlace('landfill',pid);
 // Per-question reading protection. Use deadlines so background timer throttling cannot prolong a lock.
 function tapProtectionTiming(prompt){
  const text=String(prompt??'').replace(/<\/?[A-Za-z][^>]*>/g,' ').trim();
@@ -3375,7 +3543,7 @@ function mgBank(sids){const out=[];for(const s of db.summaries){if(!sids.include
 function qstat(key){const q=db.qstats||(db.qstats={});return q[key]||(q[key]={r:0,w:0,last:0,miss:0})}
 // Every answer is recorded per item (r = right, w = wrong). The extra details (first try or Make-Up, hints used, which wrong
 // answer was picked, a day-by-day tally per study set) feed the Export Study Data sheet.
-function qRecord(item,ok,info){const s=qstat(item.key),I=info||{};if(ok){s.r++;s.miss=Math.max(0,s.miss-1);if(I.makeup)s.mk=(s.mk||0)+1;else if(I.first)s.ft=(s.ft||0)+1}else{s.w++;s.miss=Math.min(5,s.miss+2)}s.last=Date.now();if(!s.first)s.first=s.last;if(I.hints)s.h=(s.h||0)+1;
+function qRecord(item,ok,info){const s=qstat(item.key),I=info||{};if(typeof facAnswer==='function')facAnswer(ok,ok&&!I.makeup);if(ok){s.r++;s.miss=Math.max(0,s.miss-1);if(I.makeup)s.mk=(s.mk||0)+1;else if(I.first)s.ft=(s.ft||0)+1}else{s.w++;s.miss=Math.min(5,s.miss+2)}s.last=Date.now();if(!s.first)s.first=s.last;if(I.hints)s.h=(s.h||0)+1;
  if(!ok&&I.pick!=null){s.wp=(s.wp||[]);s.wp.unshift({q:String(I.prompt||'').slice(0,240),p:String(I.pick).slice(0,160),a:String(I.answer||'').slice(0,160),at:s.last});s.wp.length=Math.min(s.wp.length,3)}
  if(item.sid){const H=db.qhist||(db.qhist={}),d=localDay(),hs=H[item.sid]||(H[item.sid]={}),t=hs[d]||(hs[d]=[0,0]);t[ok?0:1]++;const days=Object.keys(hs).sort();while(days.length>90)delete hs[days.shift()]}}
 function isWeak(item){const set=(db.summaries||[]).find(s=>s.id===item.sid);if(set&&typeof sdItems==='function'){const row=sdItems(set).find(x=>item.kind==='gen'?x.gid===item.gid:x.key===item.key);return !!row&&sdWeak(row)}const s=(db.qstats||{})[item.key];return !!s&&(s.w>0||s.g>0||s.miss>0)}
@@ -3730,7 +3898,7 @@ const PRE_EVO={};Object.entries(EVO).forEach(([from,list])=>list.forEach(([to])=
 // ---------- run state ----------
 function runOf(){return dgMode==='tower'?(db.tower||null):(db.run||null)}
 function inRun(id){return [db.run,db.tower].some(r=>r&&r.party.some(m=>m.id===id))}
-function runLock(id,what){if(inRun(id)){toast('🎒 This Pokémon is on a Mystery Dungeon or Battle Tower run. Finish or end the run to '+what+'.');return true}return false}
+function runLock(id,what){if(typeof nurBusy==='function'&&nurBusy(id)){toast('🥚 This Pokémon is breeding in the Nursery. Remove it from the Nursery to '+what+'.');return true}if(inRun(id)){toast('🎒 This Pokémon is on a Mystery Dungeon or Battle Tower run. Finish or end the run to '+what+'.');return true}return false}
 function partyMon(m){return m?db.pokemon.find(p=>p.id===m.id):null}
 function partyAvgLv(){const r=runOf();const ls=r.party.map(m=>monLv(partyMon(m)||{}));return Math.round(ls.reduce((a,b)=>a+b,0)/ls.length)}
 function genMap(diff,depth){const D=DIFF[diff],floors=[],R=D.rows+Math.min(5,depth||0);for(let f=0;f<1;f++){const rows=[];for(let r=0;r<R;r++){
@@ -3746,7 +3914,7 @@ function dungeonEntry(){dgMode='dungeon';dgPickFor='dungeon';const r=runOf();if(
 let dgPick=[];
 function dgPickParty(){const other=(dgPickFor==='tower'?db.run:db.tower),mons=db.pokemon.filter(p=>!(other&&other.party.some(m=>m.id===p.id)));if(!mons.length){toast(db.pokemon.length?'All your Pokémon are on your other run':'Catch a Pokémon in the Safari first');return}dgPick=dgPick.filter(id=>mons.some(p=>p.id===id));
  modal('CHOOSE YOUR TEAM','<p class="small">Pick 1–4 Pokémon. Your ★ companion can come too if you choose a new companion for while it’s away.</p><div class="dg-pick">'+mons.map(p=>'<button class="dg-pk'+(dgPick.includes(p.id)?' on':'')+'" onclick="dgToggle(\''+p.id+'\')">'+monSprite(p,'',48)+'<b>'+esc(p.nickname||p.species)+'</b><small>Lv '+monLv(p)+(db.mainId===p.id?' · ★':'')+'</small>'+(dgPick.includes(p.id)?'<i style="background:'+SLOT_COLORS[dgPick.indexOf(p.id)]+'">'+(dgPick.indexOf(p.id)+1)+'</i>':'')+'</button>').join('')+'</div><div class="actions"><button class="btn red" '+(dgPick.length?'':'disabled')+' onclick="dgConfirmParty()">CONFIRM ('+dgPick.length+'/4)</button></div>')}
-function dgToggle(id){const i=dgPick.indexOf(id);if(i>=0)dgPick.splice(i,1);else if(dgPick.length<4)dgPick.push(id);else toast('Up to 4 Pokémon');dgPickParty()}
+function dgToggle(id){const i=dgPick.indexOf(id);if(i<0&&typeof nurBusy==='function'&&nurBusy(id)){toast('🥚 That Pokémon is breeding in the Nursery');return}if(i>=0)dgPick.splice(i,1);else if(dgPick.length<4)dgPick.push(id);else toast('Up to 4 Pokémon');dgPickParty()}
 function dgConfirmParty(){if(!dgPick.length)return;if(dgPick.includes(db.mainId)){const others=db.pokemon.filter(p=>!dgPick.includes(p.id));if(!others.length){toast('Your companion needs someone to stay home. Leave one Pokémon out, or catch another.');return}
   modal('NEW COMPANION','<p class="small">Your ★ companion is joining the run. Who keeps you company at home?</p><div class="dg-pick">'+others.map(p=>'<button class="dg-pk" onclick="dgSwapMain(\''+p.id+'\')">'+monSprite(p,'',48)+'<b>'+esc(p.nickname||p.species)+'</b><small>Lv '+monLv(p)+'</small></button>').join('')+'</div>');return}dgSetupSets()}
 function dgSwapMain(id){{const fo=facOf(id);if(fo)facs()[fo].mon=null}for(const p of db.pokemon){if(p.id===db.mainId&&p.mainSince){buffBake(p);p.mainSeconds=mainSeconds(p);p.mainSince=null}}const p=db.pokemon.find(x=>x.id===id);db.mainId=id;p.mainSince=stamp();save();dgSetupSets()}
@@ -6084,7 +6252,7 @@ function drawCollection(){
  const per=15,pages=Math.max(1,Math.ceil(mons.length/per));boxPageNum=Math.max(0,Math.min(pages-1,boxPageNum));
  $('boxPageLabel').textContent='BOX '+(boxPageNum+1)+' / '+pages;
  const slice=mons.slice(boxPageNum*per,boxPageNum*per+per);
- let html=slice.map(p=>'<button class="bx-slot r'+Math.max(0,RARITIES.indexOf(p.rarity))+(monSheetOpen&&selectedMonId===p.id?' sel':'')+'" onclick="viewMon(\''+p.id+'\')" aria-label="'+esc(p.nickname||p.species)+'">'+(variantOf(p)?'<i class="bx-shiny v-'+variantOf(p)+'">✦</i>':'')+(db.mainId===p.id?'<i class="bx-main">★</i>':'')+'<span class="bx-orb'+(buffOn(p)?' buffed':'')+'">'+(inRun(p.id)?'<i class="bx-bag" title="On a dungeon run">🎒</i>':'')+monSprite(p)+'<i class="bx-lv">Lv '+monLv(p)+'</i></span><small>'+esc(p.nickname||p.species)+'</small></button>').join('');
+ let html=slice.map(p=>'<button class="bx-slot r'+Math.max(0,RARITIES.indexOf(p.rarity))+(monSheetOpen&&selectedMonId===p.id?' sel':'')+'" onclick="viewMon(\''+p.id+'\')" aria-label="'+esc(p.nickname||p.species)+'">'+(variantOf(p)?'<i class="bx-shiny v-'+variantOf(p)+'">✦</i>':'')+(db.mainId===p.id?'<i class="bx-main">★</i>':'')+'<span class="bx-orb'+(buffOn(p)?' buffed':'')+'">'+(inRun(p.id)?'<i class="bx-bag" title="On a dungeon run">🎒</i>':'')+(typeof nurBusy==='function'&&nurBusy(p.id)?'<i class="bx-bag bx-egg" title="Breeding in the Nursery">🥚</i>':'')+monSprite(p)+'<i class="bx-lv">Lv '+monLv(p)+'</i></span><small>'+esc(p.nickname||p.species)+(typeof monGenderHTML==='function'?' '+monGenderHTML(p):'')+'</small></button>').join('');
  for(let i=slice.length;i<per;i++)html+='<div class="bx-slot empty"><span class="bx-orb"></span></div>';
  $('boxGrid').innerHTML=html;fillMonSprites($('boxGrid'));
  $('pokeDetail').innerHTML=mons.length?'':'<div class="empty">Your Box is empty.<br>Visit PokéSafari to find your first Pokémon!</div>';
@@ -6094,7 +6262,7 @@ function drawMonSheet(){
  const w=$('monSheetWrap'),box=$('monSheet');if(!w||!monSheetOpen)return;
  const p=db.pokemon.find(x=>x.id===selectedMonId);if(!p){closeMon();return}
  const lv=monLv(p),pg=monProg(p),ex=Math.min(100,pg.cur/pg.need*100),sz=p.size,tag=sizeTag(sz),secs=Math.floor(mainSeconds(p)),evolves=EVO[p.species]||[];
- box.innerHTML='<button class="bx-x" onclick="closeMon()" aria-label="Back to Box">✕</button><div class="bx-hero'+(p.shiny?' shiny':'')+'">'+monSprite(p,'hero')+'</div><div class="bx-scroll"><h2 class="bx-name">'+esc(p.nickname||p.species)+' <button class="bx-pen" onclick="renameMon(\''+p.id+'\')" aria-label="Rename">✎</button></h2><div class="bx-sub">'+esc(p.species)+' · '+esc(p.rarity)+(db.mainId===p.id?' · ★ MAIN':'')+(buffOn(p)?' · 😋 '+buffText(p):'')+'</div><div class="bx-hp"><span><i></i></span><b id="bxHp">HP — / —</b></div><div class="bx-trio"><div><b id="bxType">—</b><small>Type</small></div><div><b id="bxWeight">—</b><small>Weight</small></div><div><b id="bxHeight">—</b><small>Height</small><span class="bx-var v-'+variantOf(p)+'" aria-label="'+({on:'Shiny',cos:'Costume',both:'Shiny costume'}[variantOf(p)]||'Normal')+'">'+(variantOf(p)?'✦✦':'')+'</span></div></div><div class="bx-facts"><div><small>SIZE</small><b>'+(sz*100).toFixed(1)+'%'+(tag?' · '+tag:'')+'</b></div><div><small>OBTAINED</small><b>'+esc(new Date(p.obtainedAt).toLocaleDateString())+'</b></div><div><small>COMPANION TIME</small><b>'+Math.floor(secs/3600)+'h '+Math.floor((secs%3600)/60)+'m</b><span class="bx-lvbar"><i style="width:'+ex+'%"></i></span><em class="bx-lvn">Lv '+lv+'</em></div></div><div class="bx-statrow"><div id="bxHex" class="bx-hexwrap"><p class="small">Loading stats…</p></div><div class="bx-moves">'+moveRow(p,p.fastMove,'BASIC')+moveRow(p,p.discMove,'DISC MOVE')+ultBoxHTML(p)+boxViabilityHTML(p)+'<div class="bx-actions"><button class="btn blue" onclick="setMain(\''+p.id+'\')">★ SET MAIN</button>'+(evolves.length?'<button class="btn" onclick="evolveMenu(\''+p.id+'\')">🍬 EVOLVE</button>':'')+'<button class="btn" '+(db.candies<1||lv>=100?'disabled':'')+' onclick="candyLevel(\''+p.id+'\')">🍬 LEVEL UP</button><button class="btn" onclick="releaseMon(\''+p.id+'\')">RELEASE</button></div></div></div><button class="bx-discbtn" onclick="closeMon();showTmLab(\''+p.id+'\')" aria-label="Open TM Disc move lab"><span class="bx-disc" aria-hidden="true"></span><span>💿 '+esc(p.discMove)+' · TM MOVE LAB</span></button></div>';
+ box.innerHTML='<button class="bx-x" onclick="closeMon()" aria-label="Back to Box">✕</button><div class="bx-hero'+(p.shiny?' shiny':'')+'">'+monSprite(p,'hero')+'</div><div class="bx-scroll"><h2 class="bx-name">'+esc(p.nickname||p.species)+' '+(typeof monGenderHTML==='function'?monGenderHTML(p):'')+' <button class="bx-pen" onclick="renameMon(\''+p.id+'\')" aria-label="Rename">✎</button></h2><div class="bx-sub">'+esc(p.species)+' · '+esc(p.rarity)+(db.mainId===p.id?' · ★ MAIN':'')+(buffOn(p)?' · 😋 '+buffText(p):'')+'</div><div class="bx-hp"><span><i></i></span><b id="bxHp">HP — / —</b></div><div class="bx-trio"><div><b id="bxType">—</b><small>Type</small></div><div><b id="bxWeight">—</b><small>Weight</small></div><div><b id="bxHeight">—</b><small>Height</small><span class="bx-var v-'+variantOf(p)+'" aria-label="'+({on:'Shiny',cos:'Costume',both:'Shiny costume'}[variantOf(p)]||'Normal')+'">'+(variantOf(p)?'✦✦':'')+'</span></div></div><div class="bx-facts"><div><small>SIZE</small><b>'+(sz*100).toFixed(1)+'%'+(tag?' · '+tag:'')+'</b></div><div><small>OBTAINED</small><b>'+esc(new Date(p.obtainedAt).toLocaleDateString())+'</b></div><div><small>COMPANION TIME</small><b>'+Math.floor(secs/3600)+'h '+Math.floor((secs%3600)/60)+'m</b><span class="bx-lvbar"><i style="width:'+ex+'%"></i></span><em class="bx-lvn">Lv '+lv+'</em></div></div><div class="bx-statrow"><div id="bxHex" class="bx-hexwrap"><p class="small">Loading stats…</p></div><div class="bx-moves">'+moveRow(p,p.fastMove,'BASIC')+moveRow(p,p.discMove,'DISC MOVE')+ultBoxHTML(p)+boxViabilityHTML(p)+'<div class="bx-actions"><button class="btn blue" onclick="setMain(\''+p.id+'\')">★ SET MAIN</button>'+(evolves.length?'<button class="btn" onclick="evolveMenu(\''+p.id+'\')">🍬 EVOLVE</button>':'')+'<button class="btn" '+(db.candies<1||lv>=100?'disabled':'')+' onclick="candyLevel(\''+p.id+'\')">🍬 LEVEL UP</button><button class="btn" onclick="releaseMon(\''+p.id+'\')">RELEASE</button></div></div></div><button class="bx-discbtn" onclick="closeMon();showTmLab(\''+p.id+'\')" aria-label="Open TM Disc move lab"><span class="bx-disc" aria-hidden="true"></span><span>💿 '+esc(p.discMove)+' · TM MOVE LAB</span></button></div>';
  fillMonSprites(box);speciesInfo(p.species).then(info=>{if(!info||!monSheetOpen||selectedMonId!==p.id)return;const cap=s=>s.charAt(0).toUpperCase()+s.slice(1);const t=$('bxType'),wt=$('bxWeight'),ht=$('bxHeight');if(!t)return;t.innerHTML=info.types.map(cap).join('<br>');const st=monStats(p,info.stats||[50,50,50,50,50,50]);$('bxHp').textContent='HP '+st[0]+' / '+st[0];$('bxHex').innerHTML=hexSVG(p,info.stats||[50,50,50,50,50,50]);document.querySelectorAll('.bx-stab').forEach(e=>e.hidden=!isStab(p.species,e.dataset.mv,info.types));wt.textContent=(info.weight*sz*sz).toFixed(1)+' kg';ht.textContent=(info.height*sz).toFixed(2)+' m'});
 }
 function viewMon(id){selectedMonId=id;monSheetOpen=true;drawCollection();requestAnimationFrame(()=>requestAnimationFrame(()=>$('monSheetWrap').classList.add('open')))}
@@ -6141,7 +6309,7 @@ $('navHome').style.display='none';
  if(pcStorageReady)ensureMoveData();
  if(pcStorageReady&&permRoll())save();
  render();scheduleNotifs();aiCheck();window.__pcBooted=true;setTimeout(()=>{try{mdSync()}catch(e){}},1500);setTimeout(()=>{try{facTick()}catch(e){}},2500);setInterval(()=>{try{facTick();if(currentPage==='home'&&hab.scene&&hab.scene!=='home')drawHabitat()}catch(e){}},60000);
- window.__pcVersion='0.72.0';
+ window.__pcVersion='0.74.0';
  document.addEventListener('pointerdown',function(e){try{var t=e.target.closest&&e.target.closest('[onclick],button,a,[id]');if(!t)return;var oc=t.getAttribute('onclick');window.__pcLastTap=(oc?oc.slice(0,60):(t.id?'#'+t.id:t.tagName.toLowerCase()+'.'+String(t.className).split(' ')[0])).replace(/\s+/g,' ')}catch(_){}} ,true);
  Object.keys(window).forEach(function(k){var f=window[k];if(typeof f!=='function'||/^[A-Z]/.test(k)||k==='appError'||k==='$'||k==='esc'||/\[native code\]/.test(Function.prototype.toString.call(f)))return;
   var w=function(){try{return f.apply(this,arguments)}catch(err){if(err&&typeof err==='object'&&!err.__pcLogged){try{err.__pcLogged=1}catch(_){}appError(err,k)}throw err}};try{window[k]=w}catch(_){}});
