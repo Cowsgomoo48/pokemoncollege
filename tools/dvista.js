@@ -35,7 +35,7 @@ function dvPlan(fl,r){if(fl._dv&&fl._dv.id===fl.id)return fl._dv;const li=dvLi(r
   if(!cells.some(([x,y])=>[...voids.keys()].some(k=>{const [a,b]=k.split(',').map(Number);return Math.abs(a-x)+Math.abs(b-y)<5})))open(cells,'mine')}
  Object.defineProperty(fl,'_dv',{value:{id:fl.id,voids,bridges,scenes},enumerable:false,configurable:true,writable:true});return fl._dv}
 // Cut the opened tiles out of the tile canvas, draw cliff lips, and lay the bridges.
-function dvApply(g,r,fl,th){const P=dvPlan(fl),T=GD_T;if(!P.voids.size)return;const isV=(x,y)=>P.voids.has(x+','+y);
+function dvApply(g,r,fl,th){if(fl.rc)return;const P=dvPlan(fl),T=GD_T;if(!P.voids.size)return;const isV=(x,y)=>P.voids.has(x+','+y);
  P.voids.forEach((k,key)=>{const [x,y]=key.split(',').map(Number),X=x*T,Y=y*T;g.clearRect(X,Y,T,T);
   if(!isV(x,y-1)){g.fillStyle=th.e;g.fillRect(X,Y,T,9);g.fillStyle='rgba(0,0,0,.35)';g.fillRect(X,Y+9,T,5);g.fillStyle=th.g;for(let i=4;i<T;i+=11)g.fillRect(X+i,Y+2,4,2)}
   if(!isV(x-1,y)){g.fillStyle='rgba(0,0,0,.45)';g.fillRect(X,Y,3,T)}if(!isV(x+1,y)){g.fillStyle='rgba(0,0,0,.45)';g.fillRect(X+T-3,Y,3,T)}

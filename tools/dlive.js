@@ -25,7 +25,7 @@ function dlPlan(r,fl){if(fl._dl&&fl._dl.id===fl.id)return fl._dl;const R=dvRng('
  const P={id:fl.id,room,torches:torches.slice(0,10),drips:drips.slice(0,8),crystals:crystals.slice(0,6),free};Object.defineProperty(fl,'_dl',{value:P,enumerable:false,configurable:true,writable:true});return P}
 const dlR=(g,c,x,y,w,h)=>{g.fillStyle=c;g.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h))};
 // ---------- static paint (into the cached tile canvas, under the existing props) ----------
-function dlPaint(g,r,fl,th){const T=GD_T,S=dlStyle(r),P=dlPlan(r,fl),R=dvRng('dlp'+fl.id),isF=(x,y)=>x>=0&&y>=0&&x<fl.w&&y<fl.h&&+fl.tiles[y][x]>0;P.lights=[];P.puddles=new Set();delete P.fire;delete P.seal;
+function dlPaint(g,r,fl,th){if(fl.rc)return;const T=GD_T,S=dlStyle(r),P=dlPlan(r,fl),R=dvRng('dlp'+fl.id),isF=(x,y)=>x>=0&&y>=0&&x<fl.w&&y<fl.h&&+fl.tiles[y][x]>0;P.lights=[];P.puddles=new Set();delete P.fire;delete P.seal;
  if(typeof dpFloor==='function')dpFloor(g,r,fl,th,dvRng('dpf'+fl.id));
  // walls: texture on top, a taller raised face where a wall meets the floor below it
  for(let y=0;y<fl.h;y++)for(let x=0;x<fl.w;x++){if(isF(x,y))continue;const X=x*T,Y=y*T;
@@ -52,7 +52,7 @@ function dlPaint(g,r,fl,th){const T=GD_T,S=dlStyle(r),P=dlPlan(r,fl),R=dvRng('dl
  (fl.houses||[]).forEach(o=>o[4]&&o[4]!=='house'&&typeof dpLandmark==='function'?dpLandmark(g,fl,o,th,R,P):dlHouse(g,fl,o,th,R));
  // special rooms (ponds are painted after the props, so nothing stands in the water)
  dlRooms(g,P,S,false)}
-function dlPaintPost(g,r,fl){const P=dlPlan(r,fl);dlRooms(g,P,dlStyle(r),true)}
+function dlPaintPost(g,r,fl){if(fl.rc)return;const P=dlPlan(r,fl);dlRooms(g,P,dlStyle(r),true)}
 function dlRooms(g,P,S,post){const T=GD_T,R=dvRng('dlr'+P.id);P.room.forEach(({o,kind,cracks})=>{if((kind==='pond')!==post)return;const X0=o[0]*T,Y0=o[1]*T,W=o[2]*T,H=o[3]*T,cx=X0+W/2,cy=Y0+H/2;
   if(kind==='pond'){const rx=W/2-T*1.1,ry=H/2-T*1.1,water=S.mote==='steam'?['#7fae4a','#9cc95a']:['#3f8fc4','#5fb0dc'];
    g.fillStyle='#8c8778';g.beginPath();g.ellipse(cx,cy,rx+6,ry+6,0,0,7);g.fill();g.fillStyle=water[0];g.beginPath();g.ellipse(cx,cy,rx,ry,0,0,7);g.fill();

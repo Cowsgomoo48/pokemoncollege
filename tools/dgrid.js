@@ -396,10 +396,22 @@ function gdBlastHTML(r,T){const b=r.battle;if(!b||!b.charge)return '';const e=b.
 
 // moves that always lower a stat: 10% chance to also drain the target's Stamina (stacks with Demotivate)
 const GD_DROP=Object.fromEntries(['Snarl','Spirit Break','Struggle Bug','Icy Wind','Mud Shot','Mud-Slap','Mystical Fire','Lunge','Trop Kick','Breaking Swipe','Fire Lash','Bulldoze','Rock Tomb','Electroweb','Low Sweep','Bitter Malice','Skitter Smack','Chilling Water','Pounce','Thunderous Kick','Apple Acid','Grav Apple','Lumina Crash','Glaciate'].map(n=>[n,1]));
-// Scout's Compass Lv2+: blue sparkles trace the quickest path from the team to the stairs / boss room
+// Scout's Compass Lv2+: a trail of footprints walks the best route from the team to the stairs / boss room.
+// The route avoids foes (and the tiles next to them) and hazards where it can; prints fade newest-first over 4.5 s.
 function gdCompassGoal(fl){return fl.bossRoom&&fl.stairsHidden?[fl.bossRoom[0]+(fl.bossRoom[2]>>1),fl.bossRoom[1]+(fl.bossRoom[3]>>1)]:fl.stairs}
-function gdCompassTick(){try{const r=runOf();if(!r||!r.fl||!r.battle||r.tower||!DG||DG.busy||document.hidden)return;const lv=mdLvOf(r,'scout');if(lv<2||!gdFree(r))return;const mp=document.querySelector('.gd-field .gd-map');if(!mp)return;
- const m=r.party[r.battle.turn]||r.party[0],goal=gdCompassGoal(r.fl);if(!m||!goal)return;const reach=gdBFS(r.fl,[m.x,m.y],()=>false,999),key=gdKey(goal[0],goal[1]);if(!reach.has(key))return;const path=gdPath(reach,key);if(!path||path.length<2)return;
+function gdCompassRoute(r,from,goal){const fl=r.fl,foes=(r.battle&&r.battle.enemies||[]).filter(e=>e.hp>0&&!e.done),gk=gdKey(goal[0],goal[1]);
+ const cost=(x,y)=>{let c=fl.hz&&fl.hz[gdKey(x,y)]?6:0;for(const e of foes){const d=Math.max(Math.abs(e.x-x),Math.abs(e.y-y));if(d===0)return Infinity;if(d===1)c+=8;else if(d===2)c+=2}return c};
+ const dist=new Map([[gdKey(...from),0]]),prev=new Map(),open=[[0,from[0],from[1]]];
+ while(open.length){let bi=0;for(let i=1;i<open.length;i++)if(open[i][0]<open[bi][0])bi=i;const [d,x,y]=open.splice(bi,1)[0],k=gdKey(x,y);if(d>dist.get(k))continue;if(k===gk)break;
+  for(const [dx,dy] of GD_DIRS){const nx=x+dx,ny=y+dy;if(!gdTile(fl,nx,ny))continue;if(dx&&dy&&(!gdTile(fl,x+dx,y)||!gdTile(fl,x,y+dy)))continue;const nk=gdKey(nx,ny),extra=nk===gk?0:cost(nx,ny);if(extra===Infinity)continue;
+   const nd=d+(dx&&dy?1.42:1)+extra;if(nd<(dist.get(nk)??Infinity)){dist.set(nk,nd);prev.set(nk,k);open.push([nd,nx,ny])}}}
+ if(!dist.has(gk))return null;const out=[];let k=gk;while(k){out.unshift(k.split(',').map(Number));k=prev.get(k)}return out}
+function gdCompassTick(){try{const r=runOf();if(!r||!r.fl||!r.battle||r.tower||!DG||DG.busy||document.hidden||DG.trailBusy)return;const lv=mdLvOf(r,'scout');if(lv<2||!gdFree(r))return;const mp=document.querySelector('.gd-field .gd-map');if(!mp)return;
+ const m=r.party[r.battle.turn]||r.party[0],goal=gdCompassGoal(r.fl);if(!m||!goal)return;const path=gdCompassRoute(r,[m.x,m.y],goal);if(!path||path.length<2)return;
  if(!(lv>=3&&DG.gmode==='move')&&path.length>13)return;
- const T=GD_T,el=document.createElement('div');el.className='gd-csp';mp.appendChild(el);const dur=Math.min(4200,path.length*110);el.animate(path.map(([x,y],k)=>({left:(x*T+T/2)+'px',top:(y*T+T/2)+'px',opacity:k===0?0:k===path.length-1?0:1,offset:k/(path.length-1)})),{duration:dur,easing:'linear',fill:'forwards'});setTimeout(()=>el.remove(),dur+60)}catch(e){}}
+ const T=GD_T,fid=r.fl.id,prints=[],step=230;DG.trailBusy=true;
+ path.slice(1).forEach(([x,y],i)=>setTimeout(()=>{if(!r.fl||r.fl.id!==fid||!mp.isConnected)return;const [px,py]=path[i],ang=Math.atan2(y-py,x-px)*180/Math.PI+90,side=i%2?1:-1,a=(ang-90)*Math.PI/180;
+  const f=document.createElement('i');f.className='gd-foot';f.style.left=(x*T+T/2+Math.cos(a+Math.PI/2)*side*5)+'px';f.style.top=(y*T+T/2+Math.sin(a+Math.PI/2)*side*5)+'px';f.style.transform='translate(-50%,-50%) rotate('+ang+'deg)';mp.insertBefore(f,mp.querySelector('.gd-objs'));prints.push(f)},i*step));
+ const laid=(path.length-1)*step;
+ setTimeout(()=>{prints.slice().reverse().forEach((f,k)=>{f.animate([{opacity:1},{opacity:0}],{duration:4500,delay:k*70,easing:'ease-in',fill:'forwards'});setTimeout(()=>f.remove(),4500+k*70+50)});setTimeout(()=>{DG.trailBusy=false},4500+prints.length*70)},laid+200)}catch(e){if(DG)DG.trailBusy=false}}
 setInterval(gdCompassTick,6500);

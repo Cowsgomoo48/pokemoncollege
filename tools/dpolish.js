@@ -32,10 +32,10 @@ function dpEdges(g,r,fl,th,R,P){const T=GD_T,isF=(x,y)=>x>=0&&y>=0&&x<fl.w&&y<fl
    g.fillStyle='#5a3a1e';if(hz){g.fillRect(X,Y+1,3,6);g.fillRect(X,Y+T-7,3,6)}else{g.fillRect(X+1,Y,6,3);g.fillRect(X+T-7,Y,6,3)}}
   if(n%4===2){const lx=hz?X+T/2:X+3,ly=hz?Y+2:Y+T/2;dpShadow(g,lx+2,ly+6,4,2);g.fillStyle='#3a2614';g.fillRect(lx,ly-10,2,14);g.fillStyle='#ffd27a';g.fillRect(lx-2,ly-14,6,5);P.lights.push([lx+1,ly-12,62,'lamp'])}}}
  // boss arena: banners on the top wall, pillar caps on the corners, a seal on the floor
- if(fl.boss&&fl.stairs){const o=fl.rooms.find(o=>fl.stairs[0]>=o[0]&&fl.stairs[0]<o[0]+o[2]&&fl.stairs[1]>=o[1]&&fl.stairs[1]<o[1]+o[3]);if(o){const S=typeof dlStyle==='function'?dlStyle(r):{acc:'#c9c2b0',torch:'#ffd08a'},cx=(o[0]+o[2]/2)*T,cy=(o[1]+o[3]/2)*T;
+ if(fl.boss&&fl.stairs&&!fl.rc){const o=fl.rooms.find(o=>fl.stairs[0]>=o[0]&&fl.stairs[0]<o[0]+o[2]&&fl.stairs[1]>=o[1]&&fl.stairs[1]<o[1]+o[3]);if(o){const S=typeof dlStyle==='function'?dlStyle(r):{acc:'#c9c2b0',torch:'#ffd08a'},cx=(o[0]+o[2]/2)*T,cy=(o[1]+o[3]/2)*T;
   for(let x=o[0];x<o[0]+o[2];x+=2){const X=x*T+T/2-7,Y=(o[1]-1)*T+T-14;dpShadow(g,X+7,Y+30,8,2);g.fillStyle='#5a1820';g.fillRect(X,Y,14,26);g.fillStyle=S.acc;g.fillRect(X,Y,14,3);g.fillRect(X+5,Y+10,4,8);g.fillStyle='#5a1820';g.beginPath();g.moveTo(X,Y+26);g.lineTo(X+7,Y+32);g.lineTo(X+14,Y+26);g.fill()}
   for(const [px,py] of [[o[0]-1,o[1]-1],[o[0]+o[2],o[1]-1],[o[0]-1,o[1]+o[3]],[o[0]+o[2],o[1]+o[3]]]){const X=px*T,Y=py*T;g.fillStyle='#8a8576';g.fillRect(X+6,Y+6,T-12,T-12);g.fillStyle='#a8a291';g.fillRect(X+6,Y+6,T-12,4);g.fillStyle='rgba(0,0,0,.3)';g.fillRect(X+T-10,Y+6,4,T-12)}
-  const rr=Math.min(o[2],o[3])*T*.32;g.strokeStyle=S.acc;g.lineWidth=3;g.globalAlpha=.55;g.beginPath();g.arc(cx,cy,rr,0,7);g.stroke();g.beginPath();g.arc(cx,cy,rr*.7,0,7);g.stroke();
+  const rr=Math.max(8,Math.min(o[2],o[3])*T*.32);g.strokeStyle=S.acc;g.lineWidth=3;g.globalAlpha=.55;g.beginPath();g.arc(cx,cy,rr,0,7);g.stroke();g.beginPath();g.arc(cx,cy,rr*.7,0,7);g.stroke();
   for(let k=0;k<6;k++){const a=k*Math.PI/3;g.beginPath();g.moveTo(cx+Math.cos(a)*rr*.7,cy+Math.sin(a)*rr*.7);g.lineTo(cx+Math.cos(a+2.09)*rr*.7,cy+Math.sin(a+2.09)*rr*.7);g.stroke()}g.globalAlpha=1;
   P.lights.push([cx,cy,rr*1.4,'seal']);P.seal=[cx,cy,rr]}}}
 // ---------- landmark rooms (their walls are real; see gdLandmark) ----------
