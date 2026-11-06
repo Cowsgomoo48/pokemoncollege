@@ -1,0 +1,13 @@
+# v0.80.0 — Dungeon polish
+- Lighting: each floor slightly darker (deeper layers darker); torches, lanterns, crystals, lava cracks, campfires, statues and seals cut soft light; the party carries a soft light.
+- Mist drifting over chasms/vistas, plus low mist in some rooms (Caves, Sunken Sea, Bubbling Caverns).
+- Shadows under debris, furniture, shelves, statues, tents, lantern posts, banners and pebbles.
+- Smoother edges: uneven wall bases, rounded inner corners, pebbles along walls.
+- Floor variety: blended patches of a second material; softer checker seams.
+- Wall tops far from any floor fade to a dark void.
+- Corridors: mine-cart rails (Stalagmite/Deepslate/Core) or rope lines elsewhere, with lantern posts.
+- Footsteps: ripples in puddles and ponds, leaves in gardens, ember puffs on lava floors.
+- Cave weather: water streams from the ceiling with splashes (Oceanic/Caves/Sunken Sea), glowing spore clouds (Caves), ash fall (Molten, Ashen Ramparts), sparks (Core), light sandstorm in sandy sublayers (Saltstone, Tidal, Shellstone, Driftwood, Saltbound).
+- New vistas below: sunken ship (sea layers), giant fossil, crystal cavern (Stalagmite/Deepslate/Core), underground waterfall over bridges (Oceanic/Caves/Sunken Sea).
+- Landmark rooms with real walls (share the ~30% house slot): shrine (statue + 4 pillars), abandoned camp (tent + campfire + bedrolls), flooded library (shelf rows), mine office (Deepslate; desks, lamps, map). Always fully connected.
+- Boss arenas: banners on the top wall, pillar caps at the corners, a pulsing seal on the floor, tinted to the layer.

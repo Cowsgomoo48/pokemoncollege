@@ -169,7 +169,7 @@ function mdDress(r,fl,taken){const s=mdSub(r);if(!s)return;const rooms=fl.rooms,
  const ctr=o=>[o[0]+(o[2]>>1),o[1]+(o[3]>>1)],near=(x,y)=>[...taken].some(k=>{const [a,b]=k.split(',').map(Number);return Math.max(Math.abs(a-x),Math.abs(b-y))<=1});
  // obstacles: block a share of room tiles, but never cut a room off or touch a doorway
  if(s.obs){fl.ob=ob.join('');const goal=rooms.map(ctr),start=goal[0];
-  rooms.forEach((o,ri)=>{let n=Math.round(o[2]*o[3]*s.obs[1]);for(let t=0;t<n*4&&n>0;t++){const x=rnd(o[0],o[0]+o[2]-1),y=rnd(o[1],o[1]+o[3]-1),k=y*fl.w+x;if(ob[k]==='1'||taken.has(gdKey(x,y))||near(x,y)&&ri===0)continue;
+  rooms.forEach((o,ri)=>{if((fl.houses||[]).some(h=>h[0]===o[0]&&h[1]===o[1]))return;let n=Math.round(o[2]*o[3]*s.obs[1]);for(let t=0;t<n*4&&n>0;t++){const x=rnd(o[0],o[0]+o[2]-1),y=rnd(o[1],o[1]+o[3]-1),k=y*fl.w+x;if(ob[k]==='1'||taken.has(gdKey(x,y))||near(x,y)&&ri===0)continue;
    if(x===o[0]||y===o[1]||x===o[0]+o[2]-1||y===o[1]+o[3]-1){if([[1,0],[-1,0],[0,1],[0,-1]].some(([dx,dy])=>+fl.tiles[y+dy]?.[x+dx]===2))continue}
    if(goal.some(([gx,gy])=>gx===x&&gy===y)||(fl.stairs[0]===x&&fl.stairs[1]===y))continue;ob[k]='1';fl.ob=ob.join('');
    const reach=gdBFS(fl,start,()=>false,999);if(goal.some(g=>!reach.has(gdKey(...g)))||!reach.has(gdKey(...fl.stairs))){ob[k]='0';fl.ob=ob.join('');continue}

@@ -21,15 +21,43 @@ function gdTile(fl,x,y){if(fl.rcRocks&&rcRockAt(fl,x,y))return 0;return x<0||y<0
 function gdInRect(p,o){return p.x>=o[0]&&p.x<o[0]+o[2]&&p.y>=o[1]&&p.y<o[1]+o[3]}
 const gdKey=(x,y)=>x+','+y,gdCheb=(a,b)=>Math.max(Math.abs(a.x-b.x),Math.abs(a.y-b.y));
 // ---------- floor generation ----------
+// Landmark rooms: real walls shaped like a shrine (statue + pillars), camp (tent), flooded library (shelves) or mine
+// office (one inner wall). Never on the centre tile or next to a corridor opening.
+function gdLandmark(g,o,c,kind,out){const [x0,y0,w,h]=o,cells=[],ok=(x,y)=>x>x0-1&&y>y0-1&&x<x0+w&&y<y0+h&&!(x===c[0]&&y===c[1])&&![[0,0],[1,0],[-1,0],[0,1],[0,-1]].some(([dx,dy])=>out(x+dx,y+dy));
+ const add=(x,y)=>{if(ok(x,y)){g[y][x]=0;cells.push([x,y])}};
+ if(kind==='shrine'){add(c[0],y0+1);[[x0+1,y0+1],[x0+w-2,y0+1],[x0+1,y0+h-2],[x0+w-2,y0+h-2]].forEach(([x,y])=>add(x,y))}
+ else if(kind==='camp'){const L=Math.random()<.5,tx=L?x0+1:x0+w-3;for(let y=y0+1;y<y0+3;y++)for(let x=tx;x<tx+2;x++)add(x,y)}
+ else if(kind==='library'){for(let y=y0+1;y<y0+h-1;y+=2){if(y===c[1])continue;const gap=new Set([x0+1+Math.floor(Math.random()*(w-2)),x0+1+Math.floor(Math.random()*(w-2))]);for(let x=x0+1;x<x0+w-1;x++)if(!gap.has(x))add(x,y)}}
+ else if(kind==='office'){let xm=c[0]+(Math.random()<.5?-2:2);const d=y0+Math.floor(Math.random()*h);for(let y=y0;y<y0+h;y++)if(y!==d)add(xm,y)}
+ gdHouseFix(g,o,c,cells)}
+// Inner walls of a ruined house: one wall across the house (two doorways) and one wall in one half (one doorway).
+// They never cover the room's centre (start / stairs) and leave an opening wherever a corridor comes in.
+function gdHouse(g,o,c,kind){const [x0,y0,w,h]=o,H=g.length,W=g[0].length,out=(x,y)=>x>=0&&y>=0&&x<W&&y<H&&g[y][x]===2;
+ if(kind&&kind!=='house')return gdLandmark(g,o,c,kind,out);
+ let ym=y0+(c[1]-y0>=3?2:h-3);if(ym===c[1])ym+=ym<y0+h/2?-1:1;
+ const hall=[];for(let x=x0;x<x0+w;x++)hall.push([x,ym]);
+ const top=ym>c[1]?false:true,ys=top?[y0,ym-1]:[ym+1,y0+h-1];let xm=x0+(c[0]-x0>=4?2+Math.floor(Math.random()*2):w-3-Math.floor(Math.random()*2));if(xm===c[0])xm++;
+ const side=[];for(let y=ys[0];y<=ys[1];y++)side.push([xm,y]);
+ const d1=x0+1+Math.floor(Math.random()*Math.max(1,xm-x0-2)),d2=xm+1+Math.floor(Math.random()*Math.max(1,x0+w-xm-2)),d3=ys[0]+Math.floor(Math.random()*(ys[1]-ys[0]+1));
+ const open=(x,y)=>(x===d1||x===d2)&&y===ym||(x===xm&&y===d3)||out(x-1,y)||out(x+1,y)||out(x,y-1)||out(x,y+1);
+ [...hall,...side].forEach(([x,y])=>{if(!open(x,y)&&!(x===c[0]&&y===c[1]))g[y][x]=0});
+ gdHouseFix(g,o,c,[...hall,...side].filter(([x,y])=>!g[y][x]))}
+// knock a doorway through wherever part of a house/landmark got cut off
+function gdHouseFix(g,o,c,walls){const [x0,y0,w,h]=o,H=g.length,W=g[0].length;for(let guard=0;guard<12;guard++){const seen=new Set([c[0]+','+c[1]]),q=[c];while(q.length){const [x,y]=q.pop();for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const a=x+dx,b=y+dy,k=a+','+b;if(a>=0&&b>=0&&a<W&&b<H&&g[b][a]&&!seen.has(k)){seen.add(k);q.push([a,b])}}}
+  let cut=null;for(let y=y0;y<y0+h&&!cut;y++)for(let x=x0;x<x0+w;x++)if(g[y][x]&&!seen.has(x+','+y)){cut=[x,y];break}if(!cut)break;
+  const door=walls.find(([x,y])=>!g[y][x]&&[[1,0],[-1,0],[0,1],[0,-1]].some(([dx,dy])=>seen.has((x+dx)+','+(y+dy)))&&[[1,0],[-1,0],[0,1],[0,-1]].some(([dx,dy])=>{const a=x+dx,b=y+dy;return g[b]&&g[b][a]&&!seen.has(a+','+b)}));if(!door)break;g[door[1]][door[0]]=1}}
 function gdNewFloor(r){mdPlan(r);const [W,H,NR]=GD_SIZE[r.diff]||GD_SIZE.easy,g=Array.from({length:H},()=>Array(W).fill(0)),rooms=[],rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
  // boss floors: one big room toward the far (right) side for the boss arena
  let big=null;if(gdIsBossFloor(r)){for(let t=0;t<60&&!big;t++){const w=Math.min(W-6,rnd(9,12)),h=Math.min(H-6,rnd(7,9)),x=W-w-2-rnd(0,2),y=rnd(1,H-h-2);if(x>6)big=[x,y,w,h]}if(big)rooms.push(big)}
+ // sometimes a ruined house: a big room split by inner walls with doorways (see gdHouse)
+ let house=null;if(!big&&!r.tower&&Math.random()<.3){for(let t=0;t<60&&!house;t++){const w=Math.min(W-4,rnd(8,10)),h=Math.min(H-4,rnd(7,8)),x=rnd(1,W-w-2),y=rnd(1,H-h-2);if(!rooms.some(o=>x<o[0]+o[2]+2&&o[0]<x+w+2&&y<o[1]+o[3]+2&&o[1]<y+h+2))house=[x,y,w,h]}if(house)rooms.push(house)}
  for(let t=0;t<400&&rooms.length<NR;t++){const w=rnd(4,7),h=rnd(4,6),x=rnd(1,W-w-2),y=rnd(1,H-h-2);if(rooms.some(o=>x<o[0]+o[2]+2&&o[0]<x+w+2&&y<o[1]+o[3]+2&&o[1]<y+h+2))continue;rooms.push([x,y,w,h])}
  rooms.sort((a,b)=>a[0]-b[0]);rooms.forEach(([x,y,w,h])=>{for(let j=y;j<y+h;j++)for(let i=x;i<x+w;i++)g[j][i]=1});
  const ctr=o=>[o[0]+(o[2]>>1),o[1]+(o[3]>>1)],dig=(a,b)=>{let [x,y]=a;const [tx,ty]=b,set=()=>{if(!g[y][x])g[y][x]=2};const hf=Math.random()<.5;
   if(hf){while(x!==tx){x+=Math.sign(tx-x);set()}while(y!==ty){y+=Math.sign(ty-y);set()}}else{while(y!==ty){y+=Math.sign(ty-y);set()}while(x!==tx){x+=Math.sign(tx-x);set()}}};
  for(let i=0;i<rooms.length-1;i++)dig(ctr(rooms[i]),ctr(rooms[i+1]));for(let k=0;k<2&&rooms.length>3;k++){const a=rnd(0,rooms.length-1),b=rnd(0,rooms.length-1);if(Math.abs(a-b)>1)dig(ctr(rooms[a]),ctr(rooms[b]))}
- const tiles=g.map(row=>row.join('')),fl={w:W,h:H,tiles,rooms,items:[],specials:[],seen:'0'.repeat(W*H),boss:gdIsBossFloor(r),stairsHidden:false,id:uid()};
+ if(house){const li=r.sub&&typeof MD_LAYERS!=='undefined'?MD_LAYERS.findIndex(L=>L.subs.includes(r.sub.k)):-1,opts=['house','house','shrine','camp',...(li===3?['office','office','office']:[]),...(li===4||r.sub&&r.sub.k==='archives'?['library','library','library']:['library']),...(li<=2?['camp']:[])];house[4]=opts[Math.floor(Math.random()*opts.length)];gdHouse(g,house,ctr(house),house[4])}
+ const tiles=g.map(row=>row.join('')),fl={w:W,h:H,tiles,rooms,items:[],specials:[],seen:'0'.repeat(W*H),boss:gdIsBossFloor(r),stairsHidden:false,id:uid()};if(house)fl.houses=[house];
  // the farthest room (by walking distance) holds the stairs, and the boss on a boss floor
  const dist=gdBFS(fl,ctr(rooms[0]),()=>false,999),far0=rooms.map((o,i)=>[i,(dist.get(gdKey(...ctr(o)))||{d:0}).d]).sort((a,b)=>b[1]-a[1])[0][0],bi=big?rooms.indexOf(big):-1,far=fl.boss&&bi>0&&dist.has(gdKey(...ctr(big)))?bi:far0;fl.stairs=ctr(rooms[far]);fl.stairsHidden=fl.boss;
  const free=o=>{const out=[];for(let j=o[1];j<o[1]+o[3];j++)for(let i=o[0];i<o[0]+o[2];i++)out.push([i,j]);return shuffle(out)},taken=new Set([gdKey(...fl.stairs)]);
@@ -94,10 +122,10 @@ function gdTilesCanvas(r){const fl=r.fl,th=gdTheme(r),T=GD_T;if(DG&&DG.tilesFor=
   else{g.fillStyle=th.w1;g.fillRect(X,Y,T,T);g.fillStyle=th.w2;g.fillRect(X+2,Y+2,T-4,T-4);if(rr()<.3){g.fillStyle=th.e;g.fillRect(X+8+rr()*20,Y+8+rr()*20,6,6)}
    // edge shading where a wall meets a floor tile, so walls read as raised
    if(+((fl.tiles[y+1]||'')[x]||0)){g.fillStyle=th.e;g.fillRect(X,Y+T-7,T,7)}}}
- mdDecorate(g,r,fl,th);if(DG){DG.tiles=c;DG.tilesFor=fl.id}return c}
+ if(typeof dlPaint==='function')dlPaint(g,r,fl,th);mdDecorate(g,r,fl,th);if(typeof dlPaintPost==='function')dlPaintPost(g,r,fl);if(typeof dvApply==='function')dvApply(g,r,fl,th);if(DG){DG.tiles=c;DG.tilesFor=fl.id}return c}
 function gdDrawBattle(entering){const r=runOf(),b=r&&r.battle,st=$('dgStage');if(!b||!st||!r.fl)return;const fl=r.fl,T=GD_T,L=gdSee(r),th=gdTheme(r);
  let field=st.querySelector('.gd-field');if(!field||entering){st.innerHTML='<div class="dg-field gd-field"><div class="gd-map"><canvas class="gd-tiles"></canvas><div class="gd-objs"></div><canvas class="gd-fog"></canvas><div class="gd-hl"></div><div class="gd-units"></div></div><canvas class="gd-mini"></canvas><div class="gd-envslot"></div><div class="gd-floor"></div><div class="gd-hud"><div class="gd-stones" role="group" aria-label="Stones carried in this dungeon run"></div></div></div>';field=st.querySelector('.gd-field');field.addEventListener('click',gdTap);
-  const mp=field.querySelector('.gd-map');mp.style.width=fl.w*T+'px';mp.style.height=fl.h*T+'px';const tc=field.querySelector('.gd-tiles');tc.width=fl.w*T;tc.height=fl.h*T;tc.getContext('2d').drawImage(gdTilesCanvas(r),0,0)}
+  const mp=field.querySelector('.gd-map');mp.style.width=fl.w*T+'px';mp.style.height=fl.h*T+'px';const tc=field.querySelector('.gd-tiles');tc.width=fl.w*T;tc.height=fl.h*T;tc.getContext('2d').drawImage(gdTilesCanvas(r),0,0)}if(typeof dvDeep==='function')dvDeep(field,r);if(typeof dlAmb==='function')dlAmb(field,r);
  let tk=field.querySelector('.dg-ticker');if(DG&&DG.msg){if(!tk){tk=document.createElement('div');tk.className='dg-ticker';field.querySelector('.gd-hud').prepend(tk)}tk.innerHTML=DG.msg}else if(tk)tk.remove();
  field.querySelector('.gd-floor').innerHTML='B'+(r.floor+1)+'F · '+th.name+(fl.boss?' · 👑':'');field.querySelector('.gd-envslot').innerHTML=mdEnvBtn(r);field.style.background=mdShade(th.w2,.45);field.querySelector('.gd-stones').innerHTML=mdStonesHTML(r);
  // fog: black where you've never been, dim where you can't see right now
@@ -132,7 +160,7 @@ function gdMini(r,L){const fl=r.fl,c=document.querySelector('.gd-mini');if(!c)re
  r.battle.enemies.forEach(e=>{if(e.hp>0&&!e.done&&L.has(gdKey(e.x,e.y))){g.fillStyle='#ff4d4d';g.fillRect(e.x*s,e.y*s,s,s)}});
  r.party.forEach((m,i)=>{g.fillStyle=SLOT_COLORS[i];g.fillRect(m.x*s-1,m.y*s-1,s+2,s+2)})}
 function gdCamera(x,y){if(DG&&DG.camLock){gdOverlap();return}const r=runOf(),f=document.querySelector('.gd-field'),mp=f&&f.querySelector('.gd-map');if(!mp)return;const b=r.battle,m=r.party[b.turn]||r.party[0];let sc=1;if(x==null&&DG&&DG.bcam){[x,y,sc]=DG.bcam;sc=sc||1}x=x??m.x;y=y??m.y;
- const W=f.clientWidth,H=f.clientHeight,T=GD_T*sc,mw=r.fl.w*T,mh=r.fl.h*T;let tx=W/2-(x+.5)*T,ty=H/2-(y+.5)*T;tx=Math.min(0,Math.max(W-mw,tx));ty=Math.min(0,Math.max(H-mh,ty));if(mw<W)tx=(W-mw)/2;if(mh<H)ty=(H-mh)/2;mp.style.transform='translate('+Math.round(tx)+'px,'+Math.round(ty)+'px) scale('+sc+')';if(DG)DG.cam={tx,ty,T};gdOverlap()}
+ const W=f.clientWidth,H=f.clientHeight,T=GD_T*sc,mw=r.fl.w*T,mh=r.fl.h*T;let tx=W/2-(x+.5)*T,ty=H/2-(y+.5)*T;tx=Math.min(0,Math.max(W-mw,tx));ty=Math.min(0,Math.max(H-mh,ty));if(mw<W)tx=(W-mw)/2;if(mh<H)ty=(H-mh)/2;mp.style.transform='translate('+Math.round(tx)+'px,'+Math.round(ty)+'px) scale('+sc+')';if(DG)DG.cam={tx,ty,T};if(typeof dvParallax==='function')dvParallax(mp,tx,ty,sc);gdOverlap()}
 // The floor label, info button, minimap and message bar stay solid, but turn see-through (and let taps pass) while a
 // Pokémon is underneath one. Worked out from where the camera is heading, so it's right before the slide finishes.
 function gdOverlap(){const f=document.querySelector('.gd-field'),r=runOf();if(!f||!DG||!DG.cam||!r||!r.battle)return;const {tx,ty,T}=DG.cam,fr=f.getBoundingClientRect(),pts=[];

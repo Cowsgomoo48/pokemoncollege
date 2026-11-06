@@ -1,0 +1,27 @@
+/* Living dungeon floors: ambient motion (decoration only) */
+.gd-amb{position:absolute;left:0;top:0;width:0;height:0;pointer-events:none}
+.gd-amb i,.gd-amb canvas{position:absolute;display:block;pointer-events:none}
+.dl-torch{width:6px;height:10px;margin-left:-3px;background:#4a2f18;border-radius:1px}
+.dl-torch b{position:absolute;left:-2px;top:-9px;width:10px;height:11px;border-radius:50% 50% 45% 45%;background:radial-gradient(circle at 50% 70%,#fff6c8,var(--tc) 55%,transparent 72%);animation:dlFlick .5s steps(3) infinite alternate}
+.dl-torch::after{content:'';position:absolute;left:-27px;top:-30px;width:60px;height:60px;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--tc) 40%,transparent),transparent 65%);animation:dlGlow 2.2s ease-in-out infinite alternate;animation-delay:inherit}
+.dl-torch.shell{background:#a99a80}
+@keyframes dlFlick{0%{transform:scale(1,1)}50%{transform:scale(.85,1.12) translateY(-1px)}100%{transform:scale(1.1,.92)}}
+@keyframes dlGlow{from{opacity:.55;transform:scale(.94)}to{opacity:1;transform:scale(1.06)}}
+.dl-drip{width:2px;height:4px;border-radius:1px;background:#bfe6ff;opacity:0;animation:dlDrip 3.4s ease-in infinite}
+@keyframes dlDrip{0%,60%{opacity:0;transform:translateY(0)}64%{opacity:.9}92%{opacity:.9;transform:translateY(26px)}100%{opacity:0;transform:translateY(28px) scaleX(3) scaleY(.4)}}
+.dl-crys{width:8px;height:12px;background:var(--cc);clip-path:polygon(50% 0,100% 40%,75% 100%,25% 100%,0 40%);box-shadow:0 0 8px var(--cc);animation:dlPulse 2.6s ease-in-out infinite alternate}
+@keyframes dlPulse{from{opacity:.5;filter:brightness(.9)}to{opacity:1;filter:brightness(1.35) drop-shadow(0 0 4px var(--cc))}}
+.dl-mote{width:3px;height:3px;border-radius:50%;opacity:0;animation:dlDrift 7s linear infinite}
+.m-spore{background:#b8f08a}.m-dust{background:#f2ead8}.m-spark{background:#ffe27a;box-shadow:0 0 4px #ffe27a}
+.m-bubble{width:5px;height:5px;background:transparent;border:1px solid #cdeeff;animation-name:dlRise}
+.m-ember{background:#ff8a3d;box-shadow:0 0 5px #ff6a1f;animation-name:dlRise}
+.m-steam{width:14px;height:10px;background:rgba(230,240,200,.35);filter:blur(2px);animation-name:dlRise}
+@keyframes dlDrift{0%{opacity:0;transform:translate(0,0)}15%{opacity:.85}85%{opacity:.85}100%{opacity:0;transform:translate(46px,-22px)}}
+@keyframes dlRise{0%{opacity:0;transform:translate(0,0)}15%{opacity:.9}50%{transform:translate(6px,-30px)}85%{opacity:.8}100%{opacity:0;transform:translate(-4px,-62px)}}
+.dl-glint{width:6px;height:2px;background:#e8f8ff;opacity:0;animation:dlGlint 2.8s ease-in-out infinite}
+@keyframes dlGlint{0%,100%{opacity:0;transform:scaleX(.4)}50%{opacity:.9;transform:scaleX(1.4)}}
+.dl-fly{width:5px;height:4px;background:var(--fc);border-radius:50%;animation:dlFly 6s ease-in-out infinite}
+@keyframes dlFly{0%{transform:translate(0,0) scaleX(1)}25%{transform:translate(18px,-10px) scaleX(.3)}50%{transform:translate(30px,4px) scaleX(1)}75%{transform:translate(10px,14px) scaleX(.3)}100%{transform:translate(0,0) scaleX(1)}}
+.dl-lava{mix-blend-mode:screen;animation:dlLava 2.4s ease-in-out infinite alternate}
+@keyframes dlLava{from{opacity:.35}to{opacity:1}}
+@media (prefers-reduced-motion:reduce){.gd-amb *{animation:none!important}}

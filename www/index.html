@@ -1166,6 +1166,68 @@ button.tp-locked::after{content:'';position:absolute;right:12px;top:50%;transfor
 #summaryList.ms-on .item[data-sid]{position:relative;padding-left:34px}#summaryList .item[data-sid] .ms-chk{left:16px;top:50%;transform:translate(-50%,-50%)}
 #summaryList.ms-on .item.m-sel{box-shadow:inset 0 0 0 2px #e8504a}
 
+/* Dungeon vistas: deep parallax background behind opened walls */
+.gd-deep{position:absolute;pointer-events:none;transform-origin:0 0;transition:transform .42s cubic-bezier(.25,.8,.3,1);image-rendering:pixelated;z-index:-1}
+
+/* Living dungeon floors: ambient motion (decoration only) */
+.gd-amb{position:absolute;left:0;top:0;width:0;height:0;pointer-events:none}
+.gd-amb i,.gd-amb canvas{position:absolute;display:block;pointer-events:none}
+.dl-torch{width:6px;height:10px;margin-left:-3px;background:#4a2f18;border-radius:1px}
+.dl-torch b{position:absolute;left:-2px;top:-9px;width:10px;height:11px;border-radius:50% 50% 45% 45%;background:radial-gradient(circle at 50% 70%,#fff6c8,var(--tc) 55%,transparent 72%);animation:dlFlick .5s steps(3) infinite alternate}
+.dl-torch::after{content:'';position:absolute;left:-27px;top:-30px;width:60px;height:60px;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--tc) 40%,transparent),transparent 65%);animation:dlGlow 2.2s ease-in-out infinite alternate;animation-delay:inherit}
+.dl-torch.shell{background:#a99a80}
+@keyframes dlFlick{0%{transform:scale(1,1)}50%{transform:scale(.85,1.12) translateY(-1px)}100%{transform:scale(1.1,.92)}}
+@keyframes dlGlow{from{opacity:.55;transform:scale(.94)}to{opacity:1;transform:scale(1.06)}}
+.dl-drip{width:2px;height:4px;border-radius:1px;background:#bfe6ff;opacity:0;animation:dlDrip 3.4s ease-in infinite}
+@keyframes dlDrip{0%,60%{opacity:0;transform:translateY(0)}64%{opacity:.9}92%{opacity:.9;transform:translateY(26px)}100%{opacity:0;transform:translateY(28px) scaleX(3) scaleY(.4)}}
+.dl-crys{width:8px;height:12px;background:var(--cc);clip-path:polygon(50% 0,100% 40%,75% 100%,25% 100%,0 40%);box-shadow:0 0 8px var(--cc);animation:dlPulse 2.6s ease-in-out infinite alternate}
+@keyframes dlPulse{from{opacity:.5;filter:brightness(.9)}to{opacity:1;filter:brightness(1.35) drop-shadow(0 0 4px var(--cc))}}
+.dl-mote{width:3px;height:3px;border-radius:50%;opacity:0;animation:dlDrift 7s linear infinite}
+.m-spore{background:#b8f08a}.m-dust{background:#f2ead8}.m-spark{background:#ffe27a;box-shadow:0 0 4px #ffe27a}
+.m-bubble{width:5px;height:5px;background:transparent;border:1px solid #cdeeff;animation-name:dlRise}
+.m-ember{background:#ff8a3d;box-shadow:0 0 5px #ff6a1f;animation-name:dlRise}
+.m-steam{width:14px;height:10px;background:rgba(230,240,200,.35);filter:blur(2px);animation-name:dlRise}
+@keyframes dlDrift{0%{opacity:0;transform:translate(0,0)}15%{opacity:.85}85%{opacity:.85}100%{opacity:0;transform:translate(46px,-22px)}}
+@keyframes dlRise{0%{opacity:0;transform:translate(0,0)}15%{opacity:.9}50%{transform:translate(6px,-30px)}85%{opacity:.8}100%{opacity:0;transform:translate(-4px,-62px)}}
+.dl-glint{width:6px;height:2px;background:#e8f8ff;opacity:0;animation:dlGlint 2.8s ease-in-out infinite}
+@keyframes dlGlint{0%,100%{opacity:0;transform:scaleX(.4)}50%{opacity:.9;transform:scaleX(1.4)}}
+.dl-fly{width:5px;height:4px;background:var(--fc);border-radius:50%;animation:dlFly 6s ease-in-out infinite}
+@keyframes dlFly{0%{transform:translate(0,0) scaleX(1)}25%{transform:translate(18px,-10px) scaleX(.3)}50%{transform:translate(30px,4px) scaleX(1)}75%{transform:translate(10px,14px) scaleX(.3)}100%{transform:translate(0,0) scaleX(1)}}
+.dl-lava{mix-blend-mode:screen;animation:dlLava 2.4s ease-in-out infinite alternate}
+@keyframes dlLava{from{opacity:.35}to{opacity:1}}
+@media (prefers-reduced-motion:reduce){.gd-amb *{animation:none!important}}
+
+/* Dungeon polish: lighting, mist, weather, footsteps */
+.gd-map>.dl-dark{position:absolute;left:0;top:0;pointer-events:none}
+.dl-plight{width:150px;height:150px;margin:-75px 0 0 -75px;border-radius:50%;background:radial-gradient(circle,rgba(255,240,200,.18),rgba(255,240,200,.06) 45%,transparent 70%);mix-blend-mode:screen;transition:left .35s,top .35s}
+.dl-mist{border-radius:40%;background:radial-gradient(ellipse at 30% 50%,color-mix(in srgb,var(--mc) 40%,transparent),transparent 60%),radial-gradient(ellipse at 75% 60%,color-mix(in srgb,var(--mc) 30%,transparent),transparent 60%);filter:blur(10px);opacity:.38;animation:dpMist 14s ease-in-out infinite alternate}
+.dl-mist.low{opacity:.28;animation-duration:18s}
+@keyframes dpMist{from{transform:translateX(-24px)}to{transform:translateX(24px)}}
+.dl-stream{width:3px;height:86px;background:linear-gradient(transparent,rgba(190,230,255,.75) 30%,rgba(190,230,255,.75));background-size:3px 22px;animation:dpStream .45s linear infinite;opacity:.8}
+@keyframes dpStream{from{background-position:0 0}to{background-position:0 22px}}
+.dl-splash{width:12px;height:4px;margin-left:-5px;border:1px solid rgba(200,235,255,.8);border-radius:50%;animation:dpSplash .8s ease-out infinite}
+@keyframes dpSplash{from{transform:scale(.4);opacity:1}to{transform:scale(2.2);opacity:0}}
+.dl-spores{width:70px;height:46px;border-radius:50%;background:radial-gradient(circle,rgba(170,255,140,.35),transparent 65%);filter:blur(3px);animation:dpSpore 12s ease-in-out infinite}
+@keyframes dpSpore{0%,100%{transform:translate(0,0);opacity:.35}50%{transform:translate(40px,-16px);opacity:.85}}
+.dl-fire{width:14px;height:16px;margin-left:-7px;border-radius:50% 50% 40% 40%;background:radial-gradient(circle at 50% 75%,#fff2b0,#ff9a3d 55%,transparent 72%);animation:dlFlick .35s steps(3) infinite alternate}
+.dl-fire::after{content:'';position:absolute;left:-40px;top:-36px;width:94px;height:94px;border-radius:50%;background:radial-gradient(circle,rgba(255,160,70,.35),transparent 65%);animation:dlGlow 1.6s ease-in-out infinite alternate}
+.dl-seal{border-radius:50%;box-shadow:0 0 18px var(--sc),inset 0 0 18px var(--sc);opacity:.35;animation:dpSeal 3s ease-in-out infinite alternate}
+@keyframes dpSeal{from{opacity:.2}to{opacity:.6}}
+.dl-lamp{width:6px;height:6px;border-radius:50%;background:#ffd27a;box-shadow:0 0 10px 4px rgba(255,200,110,.45);animation:dlGlow 1.8s ease-in-out infinite alternate}
+.gd-weather{position:absolute;inset:0;pointer-events:none;z-index:1}
+.w-ash{background-image:radial-gradient(circle,rgba(200,190,185,.75) 1px,transparent 1.6px),radial-gradient(circle,rgba(255,140,60,.8) 1px,transparent 1.6px);background-size:46px 52px,97px 89px;animation:dpAsh 9s linear infinite;opacity:.7}
+@keyframes dpAsh{from{background-position:0 0,0 0}to{background-position:-46px 520px,97px 445px}}
+.w-sand{background-image:linear-gradient(100deg,transparent 46%,rgba(235,210,160,.35) 50%,transparent 54%),linear-gradient(97deg,transparent 47%,rgba(220,190,140,.28) 50%,transparent 53%);background-size:180px 60px,260px 90px;background-color:rgba(214,180,120,.08);animation:dpSand 2.4s linear infinite}
+@keyframes dpSand{from{background-position:0 0,0 0}to{background-position:-360px 24px,-520px 30px}}
+.w-glow{background-image:radial-gradient(circle,rgba(255,226,122,.7) 1px,transparent 1.8px);background-size:70px 64px;animation:dpGlowUp 12s linear infinite;opacity:.6}
+@keyframes dpGlowUp{from{background-position:0 0}to{background-position:35px -640px}}
+.dl-step{width:16px;height:6px;margin:-3px 0 0 -8px;border-radius:50%;animation:dpStep 1.1s ease-out forwards}
+.s-ripple{border:2px solid rgba(210,240,255,.85)}
+.s-leaf{background:radial-gradient(circle,#7fd05a 30%,transparent 32%) 0 0/6px 6px;border-radius:0;height:10px;margin-top:-8px}
+.s-puff{background:radial-gradient(circle,#ffb35a 25%,transparent 27%) 0 0/5px 5px;border-radius:0;height:12px;margin-top:-10px}
+@keyframes dpStep{from{transform:scale(.5) translateY(0);opacity:1}to{transform:scale(2.2) translateY(-6px);opacity:0}}
+@media (prefers-reduced-motion:reduce){.gd-weather{animation:none!important}}
+
 </style><style id="bundled-animation-style">
 .safari-foreground{position:absolute;inset:0;z-index:10;pointer-events:auto;background:#071b0d;display:flex;align-items:center;justify-content:center;overflow:hidden}
 .safari-foreground img{width:100%;height:100%;object-fit:cover;image-rendering:pixelated}
@@ -4387,15 +4449,43 @@ function gdTile(fl,x,y){if(fl.rcRocks&&rcRockAt(fl,x,y))return 0;return x<0||y<0
 function gdInRect(p,o){return p.x>=o[0]&&p.x<o[0]+o[2]&&p.y>=o[1]&&p.y<o[1]+o[3]}
 const gdKey=(x,y)=>x+','+y,gdCheb=(a,b)=>Math.max(Math.abs(a.x-b.x),Math.abs(a.y-b.y));
 // ---------- floor generation ----------
+// Landmark rooms: real walls shaped like a shrine (statue + pillars), camp (tent), flooded library (shelves) or mine
+// office (one inner wall). Never on the centre tile or next to a corridor opening.
+function gdLandmark(g,o,c,kind,out){const [x0,y0,w,h]=o,cells=[],ok=(x,y)=>x>x0-1&&y>y0-1&&x<x0+w&&y<y0+h&&!(x===c[0]&&y===c[1])&&![[0,0],[1,0],[-1,0],[0,1],[0,-1]].some(([dx,dy])=>out(x+dx,y+dy));
+ const add=(x,y)=>{if(ok(x,y)){g[y][x]=0;cells.push([x,y])}};
+ if(kind==='shrine'){add(c[0],y0+1);[[x0+1,y0+1],[x0+w-2,y0+1],[x0+1,y0+h-2],[x0+w-2,y0+h-2]].forEach(([x,y])=>add(x,y))}
+ else if(kind==='camp'){const L=Math.random()<.5,tx=L?x0+1:x0+w-3;for(let y=y0+1;y<y0+3;y++)for(let x=tx;x<tx+2;x++)add(x,y)}
+ else if(kind==='library'){for(let y=y0+1;y<y0+h-1;y+=2){if(y===c[1])continue;const gap=new Set([x0+1+Math.floor(Math.random()*(w-2)),x0+1+Math.floor(Math.random()*(w-2))]);for(let x=x0+1;x<x0+w-1;x++)if(!gap.has(x))add(x,y)}}
+ else if(kind==='office'){let xm=c[0]+(Math.random()<.5?-2:2);const d=y0+Math.floor(Math.random()*h);for(let y=y0;y<y0+h;y++)if(y!==d)add(xm,y)}
+ gdHouseFix(g,o,c,cells)}
+// Inner walls of a ruined house: one wall across the house (two doorways) and one wall in one half (one doorway).
+// They never cover the room's centre (start / stairs) and leave an opening wherever a corridor comes in.
+function gdHouse(g,o,c,kind){const [x0,y0,w,h]=o,H=g.length,W=g[0].length,out=(x,y)=>x>=0&&y>=0&&x<W&&y<H&&g[y][x]===2;
+ if(kind&&kind!=='house')return gdLandmark(g,o,c,kind,out);
+ let ym=y0+(c[1]-y0>=3?2:h-3);if(ym===c[1])ym+=ym<y0+h/2?-1:1;
+ const hall=[];for(let x=x0;x<x0+w;x++)hall.push([x,ym]);
+ const top=ym>c[1]?false:true,ys=top?[y0,ym-1]:[ym+1,y0+h-1];let xm=x0+(c[0]-x0>=4?2+Math.floor(Math.random()*2):w-3-Math.floor(Math.random()*2));if(xm===c[0])xm++;
+ const side=[];for(let y=ys[0];y<=ys[1];y++)side.push([xm,y]);
+ const d1=x0+1+Math.floor(Math.random()*Math.max(1,xm-x0-2)),d2=xm+1+Math.floor(Math.random()*Math.max(1,x0+w-xm-2)),d3=ys[0]+Math.floor(Math.random()*(ys[1]-ys[0]+1));
+ const open=(x,y)=>(x===d1||x===d2)&&y===ym||(x===xm&&y===d3)||out(x-1,y)||out(x+1,y)||out(x,y-1)||out(x,y+1);
+ [...hall,...side].forEach(([x,y])=>{if(!open(x,y)&&!(x===c[0]&&y===c[1]))g[y][x]=0});
+ gdHouseFix(g,o,c,[...hall,...side].filter(([x,y])=>!g[y][x]))}
+// knock a doorway through wherever part of a house/landmark got cut off
+function gdHouseFix(g,o,c,walls){const [x0,y0,w,h]=o,H=g.length,W=g[0].length;for(let guard=0;guard<12;guard++){const seen=new Set([c[0]+','+c[1]]),q=[c];while(q.length){const [x,y]=q.pop();for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const a=x+dx,b=y+dy,k=a+','+b;if(a>=0&&b>=0&&a<W&&b<H&&g[b][a]&&!seen.has(k)){seen.add(k);q.push([a,b])}}}
+  let cut=null;for(let y=y0;y<y0+h&&!cut;y++)for(let x=x0;x<x0+w;x++)if(g[y][x]&&!seen.has(x+','+y)){cut=[x,y];break}if(!cut)break;
+  const door=walls.find(([x,y])=>!g[y][x]&&[[1,0],[-1,0],[0,1],[0,-1]].some(([dx,dy])=>seen.has((x+dx)+','+(y+dy)))&&[[1,0],[-1,0],[0,1],[0,-1]].some(([dx,dy])=>{const a=x+dx,b=y+dy;return g[b]&&g[b][a]&&!seen.has(a+','+b)}));if(!door)break;g[door[1]][door[0]]=1}}
 function gdNewFloor(r){mdPlan(r);const [W,H,NR]=GD_SIZE[r.diff]||GD_SIZE.easy,g=Array.from({length:H},()=>Array(W).fill(0)),rooms=[],rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
  // boss floors: one big room toward the far (right) side for the boss arena
  let big=null;if(gdIsBossFloor(r)){for(let t=0;t<60&&!big;t++){const w=Math.min(W-6,rnd(9,12)),h=Math.min(H-6,rnd(7,9)),x=W-w-2-rnd(0,2),y=rnd(1,H-h-2);if(x>6)big=[x,y,w,h]}if(big)rooms.push(big)}
+ // sometimes a ruined house: a big room split by inner walls with doorways (see gdHouse)
+ let house=null;if(!big&&!r.tower&&Math.random()<.3){for(let t=0;t<60&&!house;t++){const w=Math.min(W-4,rnd(8,10)),h=Math.min(H-4,rnd(7,8)),x=rnd(1,W-w-2),y=rnd(1,H-h-2);if(!rooms.some(o=>x<o[0]+o[2]+2&&o[0]<x+w+2&&y<o[1]+o[3]+2&&o[1]<y+h+2))house=[x,y,w,h]}if(house)rooms.push(house)}
  for(let t=0;t<400&&rooms.length<NR;t++){const w=rnd(4,7),h=rnd(4,6),x=rnd(1,W-w-2),y=rnd(1,H-h-2);if(rooms.some(o=>x<o[0]+o[2]+2&&o[0]<x+w+2&&y<o[1]+o[3]+2&&o[1]<y+h+2))continue;rooms.push([x,y,w,h])}
  rooms.sort((a,b)=>a[0]-b[0]);rooms.forEach(([x,y,w,h])=>{for(let j=y;j<y+h;j++)for(let i=x;i<x+w;i++)g[j][i]=1});
  const ctr=o=>[o[0]+(o[2]>>1),o[1]+(o[3]>>1)],dig=(a,b)=>{let [x,y]=a;const [tx,ty]=b,set=()=>{if(!g[y][x])g[y][x]=2};const hf=Math.random()<.5;
   if(hf){while(x!==tx){x+=Math.sign(tx-x);set()}while(y!==ty){y+=Math.sign(ty-y);set()}}else{while(y!==ty){y+=Math.sign(ty-y);set()}while(x!==tx){x+=Math.sign(tx-x);set()}}};
  for(let i=0;i<rooms.length-1;i++)dig(ctr(rooms[i]),ctr(rooms[i+1]));for(let k=0;k<2&&rooms.length>3;k++){const a=rnd(0,rooms.length-1),b=rnd(0,rooms.length-1);if(Math.abs(a-b)>1)dig(ctr(rooms[a]),ctr(rooms[b]))}
- const tiles=g.map(row=>row.join('')),fl={w:W,h:H,tiles,rooms,items:[],specials:[],seen:'0'.repeat(W*H),boss:gdIsBossFloor(r),stairsHidden:false,id:uid()};
+ if(house){const li=r.sub&&typeof MD_LAYERS!=='undefined'?MD_LAYERS.findIndex(L=>L.subs.includes(r.sub.k)):-1,opts=['house','house','shrine','camp',...(li===3?['office','office','office']:[]),...(li===4||r.sub&&r.sub.k==='archives'?['library','library','library']:['library']),...(li<=2?['camp']:[])];house[4]=opts[Math.floor(Math.random()*opts.length)];gdHouse(g,house,ctr(house),house[4])}
+ const tiles=g.map(row=>row.join('')),fl={w:W,h:H,tiles,rooms,items:[],specials:[],seen:'0'.repeat(W*H),boss:gdIsBossFloor(r),stairsHidden:false,id:uid()};if(house)fl.houses=[house];
  // the farthest room (by walking distance) holds the stairs, and the boss on a boss floor
  const dist=gdBFS(fl,ctr(rooms[0]),()=>false,999),far0=rooms.map((o,i)=>[i,(dist.get(gdKey(...ctr(o)))||{d:0}).d]).sort((a,b)=>b[1]-a[1])[0][0],bi=big?rooms.indexOf(big):-1,far=fl.boss&&bi>0&&dist.has(gdKey(...ctr(big)))?bi:far0;fl.stairs=ctr(rooms[far]);fl.stairsHidden=fl.boss;
  const free=o=>{const out=[];for(let j=o[1];j<o[1]+o[3];j++)for(let i=o[0];i<o[0]+o[2];i++)out.push([i,j]);return shuffle(out)},taken=new Set([gdKey(...fl.stairs)]);
@@ -4460,10 +4550,10 @@ function gdTilesCanvas(r){const fl=r.fl,th=gdTheme(r),T=GD_T;if(DG&&DG.tilesFor=
   else{g.fillStyle=th.w1;g.fillRect(X,Y,T,T);g.fillStyle=th.w2;g.fillRect(X+2,Y+2,T-4,T-4);if(rr()<.3){g.fillStyle=th.e;g.fillRect(X+8+rr()*20,Y+8+rr()*20,6,6)}
    // edge shading where a wall meets a floor tile, so walls read as raised
    if(+((fl.tiles[y+1]||'')[x]||0)){g.fillStyle=th.e;g.fillRect(X,Y+T-7,T,7)}}}
- mdDecorate(g,r,fl,th);if(DG){DG.tiles=c;DG.tilesFor=fl.id}return c}
+ if(typeof dlPaint==='function')dlPaint(g,r,fl,th);mdDecorate(g,r,fl,th);if(typeof dlPaintPost==='function')dlPaintPost(g,r,fl);if(typeof dvApply==='function')dvApply(g,r,fl,th);if(DG){DG.tiles=c;DG.tilesFor=fl.id}return c}
 function gdDrawBattle(entering){const r=runOf(),b=r&&r.battle,st=$('dgStage');if(!b||!st||!r.fl)return;const fl=r.fl,T=GD_T,L=gdSee(r),th=gdTheme(r);
  let field=st.querySelector('.gd-field');if(!field||entering){st.innerHTML='<div class="dg-field gd-field"><div class="gd-map"><canvas class="gd-tiles"></canvas><div class="gd-objs"></div><canvas class="gd-fog"></canvas><div class="gd-hl"></div><div class="gd-units"></div></div><canvas class="gd-mini"></canvas><div class="gd-envslot"></div><div class="gd-floor"></div><div class="gd-hud"><div class="gd-stones" role="group" aria-label="Stones carried in this dungeon run"></div></div></div>';field=st.querySelector('.gd-field');field.addEventListener('click',gdTap);
-  const mp=field.querySelector('.gd-map');mp.style.width=fl.w*T+'px';mp.style.height=fl.h*T+'px';const tc=field.querySelector('.gd-tiles');tc.width=fl.w*T;tc.height=fl.h*T;tc.getContext('2d').drawImage(gdTilesCanvas(r),0,0)}
+  const mp=field.querySelector('.gd-map');mp.style.width=fl.w*T+'px';mp.style.height=fl.h*T+'px';const tc=field.querySelector('.gd-tiles');tc.width=fl.w*T;tc.height=fl.h*T;tc.getContext('2d').drawImage(gdTilesCanvas(r),0,0)}if(typeof dvDeep==='function')dvDeep(field,r);if(typeof dlAmb==='function')dlAmb(field,r);
  let tk=field.querySelector('.dg-ticker');if(DG&&DG.msg){if(!tk){tk=document.createElement('div');tk.className='dg-ticker';field.querySelector('.gd-hud').prepend(tk)}tk.innerHTML=DG.msg}else if(tk)tk.remove();
  field.querySelector('.gd-floor').innerHTML='B'+(r.floor+1)+'F · '+th.name+(fl.boss?' · 👑':'');field.querySelector('.gd-envslot').innerHTML=mdEnvBtn(r);field.style.background=mdShade(th.w2,.45);field.querySelector('.gd-stones').innerHTML=mdStonesHTML(r);
  // fog: black where you've never been, dim where you can't see right now
@@ -4498,7 +4588,7 @@ function gdMini(r,L){const fl=r.fl,c=document.querySelector('.gd-mini');if(!c)re
  r.battle.enemies.forEach(e=>{if(e.hp>0&&!e.done&&L.has(gdKey(e.x,e.y))){g.fillStyle='#ff4d4d';g.fillRect(e.x*s,e.y*s,s,s)}});
  r.party.forEach((m,i)=>{g.fillStyle=SLOT_COLORS[i];g.fillRect(m.x*s-1,m.y*s-1,s+2,s+2)})}
 function gdCamera(x,y){if(DG&&DG.camLock){gdOverlap();return}const r=runOf(),f=document.querySelector('.gd-field'),mp=f&&f.querySelector('.gd-map');if(!mp)return;const b=r.battle,m=r.party[b.turn]||r.party[0];let sc=1;if(x==null&&DG&&DG.bcam){[x,y,sc]=DG.bcam;sc=sc||1}x=x??m.x;y=y??m.y;
- const W=f.clientWidth,H=f.clientHeight,T=GD_T*sc,mw=r.fl.w*T,mh=r.fl.h*T;let tx=W/2-(x+.5)*T,ty=H/2-(y+.5)*T;tx=Math.min(0,Math.max(W-mw,tx));ty=Math.min(0,Math.max(H-mh,ty));if(mw<W)tx=(W-mw)/2;if(mh<H)ty=(H-mh)/2;mp.style.transform='translate('+Math.round(tx)+'px,'+Math.round(ty)+'px) scale('+sc+')';if(DG)DG.cam={tx,ty,T};gdOverlap()}
+ const W=f.clientWidth,H=f.clientHeight,T=GD_T*sc,mw=r.fl.w*T,mh=r.fl.h*T;let tx=W/2-(x+.5)*T,ty=H/2-(y+.5)*T;tx=Math.min(0,Math.max(W-mw,tx));ty=Math.min(0,Math.max(H-mh,ty));if(mw<W)tx=(W-mw)/2;if(mh<H)ty=(H-mh)/2;mp.style.transform='translate('+Math.round(tx)+'px,'+Math.round(ty)+'px) scale('+sc+')';if(DG)DG.cam={tx,ty,T};if(typeof dvParallax==='function')dvParallax(mp,tx,ty,sc);gdOverlap()}
 // The floor label, info button, minimap and message bar stay solid, but turn see-through (and let taps pass) while a
 // Pokémon is underneath one. Worked out from where the camera is heading, so it's right before the slide finishes.
 function gdOverlap(){const f=document.querySelector('.gd-field'),r=runOf();if(!f||!DG||!DG.cam||!r||!r.battle)return;const {tx,ty,T}=DG.cam,fr=f.getBoundingClientRect(),pts=[];
@@ -4912,7 +5002,7 @@ function mdDress(r,fl,taken){const s=mdSub(r);if(!s)return;const rooms=fl.rooms,
  const ctr=o=>[o[0]+(o[2]>>1),o[1]+(o[3]>>1)],near=(x,y)=>[...taken].some(k=>{const [a,b]=k.split(',').map(Number);return Math.max(Math.abs(a-x),Math.abs(b-y))<=1});
  // obstacles: block a share of room tiles, but never cut a room off or touch a doorway
  if(s.obs){fl.ob=ob.join('');const goal=rooms.map(ctr),start=goal[0];
-  rooms.forEach((o,ri)=>{let n=Math.round(o[2]*o[3]*s.obs[1]);for(let t=0;t<n*4&&n>0;t++){const x=rnd(o[0],o[0]+o[2]-1),y=rnd(o[1],o[1]+o[3]-1),k=y*fl.w+x;if(ob[k]==='1'||taken.has(gdKey(x,y))||near(x,y)&&ri===0)continue;
+  rooms.forEach((o,ri)=>{if((fl.houses||[]).some(h=>h[0]===o[0]&&h[1]===o[1]))return;let n=Math.round(o[2]*o[3]*s.obs[1]);for(let t=0;t<n*4&&n>0;t++){const x=rnd(o[0],o[0]+o[2]-1),y=rnd(o[1],o[1]+o[3]-1),k=y*fl.w+x;if(ob[k]==='1'||taken.has(gdKey(x,y))||near(x,y)&&ri===0)continue;
    if(x===o[0]||y===o[1]||x===o[0]+o[2]-1||y===o[1]+o[3]-1){if([[1,0],[-1,0],[0,1],[0,-1]].some(([dx,dy])=>+fl.tiles[y+dy]?.[x+dx]===2))continue}
    if(goal.some(([gx,gy])=>gx===x&&gy===y)||(fl.stairs[0]===x&&fl.stairs[1]===y))continue;ob[k]='1';fl.ob=ob.join('');
    const reach=gdBFS(fl,start,()=>false,999);if(goal.some(g=>!reach.has(gdKey(...g)))||!reach.has(gdKey(...fl.stairs))){ob[k]='0';fl.ob=ob.join('');continue}
@@ -6397,7 +6487,7 @@ $('navHome').style.display='none';
  if(pcStorageReady)ensureMoveData();
  if(pcStorageReady&&permRoll())save();
  render();scheduleNotifs();aiCheck();window.__pcBooted=true;setTimeout(()=>{try{mdSync()}catch(e){}},1500);setTimeout(()=>{try{facTick()}catch(e){}},2500);setInterval(()=>{try{facTick();if(currentPage==='home'&&hab.scene&&hab.scene!=='home')drawHabitat()}catch(e){}},60000);
- window.__pcVersion='0.77.2';
+ window.__pcVersion='0.80.1';
  document.addEventListener('pointerdown',function(e){try{var t=e.target.closest&&e.target.closest('[onclick],button,a,[id]');if(!t)return;var oc=t.getAttribute('onclick');window.__pcLastTap=(oc?oc.slice(0,60):(t.id?'#'+t.id:t.tagName.toLowerCase()+'.'+String(t.className).split(' ')[0])).replace(/\s+/g,' ')}catch(_){}} ,true);
  Object.keys(window).forEach(function(k){var f=window[k];if(typeof f!=='function'||/^[A-Z]/.test(k)||k==='appError'||k==='$'||k==='esc'||/\[native code\]/.test(Function.prototype.toString.call(f)))return;
   var w=function(){try{return f.apply(this,arguments)}catch(err){if(err&&typeof err==='object'&&!err.__pcLogged){try{err.__pcLogged=1}catch(_){}appError(err,k)}throw err}};try{window[k]=w}catch(_){}});
@@ -6625,5 +6715,324 @@ function sumMassDo(){if(!sumMass)return;const n=sumMass.size;db.summaries=db.sum
  const g=$('boxGrid'),l=$('summaryList');
  if(g){msLongPress(g,e=>{if(e.target.closest('.bx-slot[onclick]'))bxMassStart()});g.addEventListener('click',e=>{if(!bxMass)return;e.stopPropagation();e.preventDefault();if(Date.now()-msLongAt<350)return;const b=e.target.closest('.bx-slot[onclick]'),id=b&&msIdOf(b);if(id)bxMassToggle(id)},true)}
  if(l){msLongPress(l,e=>{if(e.target.closest('.item[data-sid]'))sumMassStart()});l.addEventListener('click',e=>{if(!sumMass)return;e.stopPropagation();e.preventDefault();if(Date.now()-msLongAt<350)return;const r=e.target.closest('.item[data-sid]');if(!r)return;const id=r.dataset.sid;if(sumMass.has(id))sumMass.delete(id);else sumMass.add(id);drawSummaries()},true)}})();
+
+// ===================== MYSTERY DUNGEON · vistas (decoration only) =====================
+// Some floors open parts of their walls onto deep backgrounds: mine shafts beside rooms, corridors that become rope
+// bridges or railways over chasms, and huge rooms that overlook ruins or abandoned wooden houses far below.
+// Opened tiles stay walls in the game logic. The background is a separate canvas that scrolls slower (parallax).
+const DV_F=.55;   // background moves at 55% of the map's speed
+const DV_LAYER=[ // per dungeon layer: far-below glow, haze, rock tone
+ {glow:'#3fb6c9',haze:'#123a4a',rock:'#1c2c3a',water:1},{glow:'#6fae5a',haze:'#16261a',rock:'#1f2a20'},{glow:'#c9c2b0',haze:'#24221f',rock:'#2a2622'},
+ {glow:'#ffb347',haze:'#14141c',rock:'#1b1b24'},{glow:'#2f7fd6',haze:'#0b1a33',rock:'#101c30',water:1},{glow:'#b8d43c',haze:'#1c2410',rock:'#222a14'},
+ {glow:'#ff5a1f',haze:'#2a0d06',rock:'#26100a',lava:1},{glow:'#ffd23f',haze:'#2a2108',rock:'#2b230e',lava:1}];
+function dvLayer(r){const s=r&&!r.tower&&r.sub&&r.sub.k,i=s?MD_LAYERS.findIndex(L=>L.subs.includes(s)):-1;return DV_LAYER[i]||{glow:'#8aa0c0',haze:'#141a26',rock:'#1a2030'}}
+function dvRng(seed){let s=(typeof mdHash==='function'?mdHash(String(seed)):7)||7;return ()=>{s=(s*16807)%2147483647;return s/2147483647}}
+// Work out (once per floor) which wall tiles open up and which corridor tiles become bridges.
+function dvLi(r){const s=r&&!r.tower&&r.sub&&r.sub.k;return s&&typeof MD_LAYERS!=='undefined'?MD_LAYERS.findIndex(L=>L.subs.includes(s)):-1}
+function dvPlan(fl,r){if(fl._dv&&fl._dv.id===fl.id)return fl._dv;const li=dvLi(r||(typeof runOf==='function'?runOf():null));const R=dvRng('dv'+fl.id),W=fl.w,H=fl.h,fl1=(x,y)=>x>=0&&y>=0&&x<W&&y<H&&+fl.tiles[y][x]>0,
+ inRoom=(x,y)=>fl.rooms.some(o=>x>=o[0]&&x<o[0]+o[2]&&y>=o[1]&&y<o[1]+o[3]),voids=new Map(),bridges=new Map(),scenes=[];
+ const wallOK=(x,y)=>x>=0&&y>=0&&x<W&&y<H&&!fl1(x,y);
+ const open=(cells,kind)=>{const ok=cells.filter(c=>!voids.has(c[0]+','+c[1]));if(ok.length<3)return false;ok.forEach(c=>voids.set(c[0]+','+c[1],kind));const xs=ok.map(c=>c[0]),ys=ok.map(c=>c[1]);scenes.push({kind,x0:Math.min(...xs),y0:Math.min(...ys),x1:Math.max(...xs),y1:Math.max(...ys)});return true};
+ // 1) bridges / railways: the longest straight 1-wide corridor run
+ if(R()<.5){let best=null;
+  for(const hz of [1,0])for(let a=1;a<(hz?H:W)-1;a++){let run=[];for(let b=0;b<=(hz?W:H);b++){const x=hz?b:a,y=hz?a:b,n1=hz?[x,y-1]:[x-1,y],n2=hz?[x,y+1]:[x+1,y];
+   if(fl1(x,y)&&!inRoom(x,y)&&!fl1(...n1)&&!fl1(...n2))run.push([x,y]);else{if(run.length>=4&&(!best||run.length>best.run.length))best={run,hz};run=[]}}}
+  if(best){const {run,hz}=best,cells=[],own=(a,b)=>run.some(c=>c[0]===a&&c[1]===b),rail=R()<.45;
+   run.slice(1,-1).forEach(([x,y])=>{for(const s of [-1,1])for(let d=1;d<=2;d++){const a=hz?x:x+s*d,b=hz?y+s*d:y;if(wallOK(a,b,own))cells.push([a,b])}});
+   if(open(cells,'chasm'))run.slice(1,-1).forEach(([x,y])=>bridges.set(x+','+y,{hz,rail}))}}
+ // 2) huge rooms overlook ruins or abandoned houses far below
+ const isH=o=>(fl.houses||[]).some(h=>h[0]===o[0]&&h[1]===o[1]),big=fl.rooms.filter(o=>o[2]*o[3]>=42&&!isH(o)).sort((a,b)=>b[2]*b[3]-a[2]*a[3]);
+ if(big.length&&R()<.45){const o=big[0],own=(a,b)=>a>=o[0]&&a<o[0]+o[2]&&b>=o[1]&&b<o[1]+o[3],kinds=['ruins','houses','fossil',...([0,4].includes(li)?['ship','ship']:[]),...([2,3,7].includes(li)?['crystal','crystal']:[])],kind=kinds[Math.floor(R()*kinds.length)];
+  for(const side of [0,1,2,3].sort(()=>R()-.5).slice(0,2)){const cells=[];
+   for(let d=1;d<=5;d++)for(let k=0;k<(side%2?o[3]:o[2]);k++){const x=side===0?o[0]+k:side===2?o[0]+k:side===1?o[0]+o[2]-1+d:o[0]-d,y=side===0?o[1]-d:side===2?o[1]+o[3]-1+d:o[1]+k;if(wallOK(x,y,own))cells.push([x,y])}
+   open(cells,kind)}}
+ // 3) mine shafts opening beside rooms
+ const nm=R()<.55?1+(R()<.4):0;for(let i=0;i<nm;i++){const o=fl.rooms[Math.floor(R()*fl.rooms.length)];if(!o)break;if((fl.houses||[]).some(h=>h[0]===o[0]&&h[1]===o[1]))continue;const own=(a,b)=>a>=o[0]&&a<o[0]+o[2]&&b>=o[1]&&b<o[1]+o[3],side=Math.floor(R()*4),len=3+Math.floor(R()*4),dep=2+Math.floor(R()*3),cells=[];
+  const span=side%2?o[3]:o[2],st=Math.max(0,Math.floor(R()*(span-len)));
+  for(let d=1;d<=dep;d++)for(let k=st;k<st+len&&k<span;k++){const x=side===0||side===2?o[0]+k:side===1?o[0]+o[2]-1+d:o[0]-d,y=side===0?o[1]-d:side===2?o[1]+o[3]-1+d:o[1]+k;if(wallOK(x,y,own))cells.push([x,y])}
+  if(!cells.some(([x,y])=>[...voids.keys()].some(k=>{const [a,b]=k.split(',').map(Number);return Math.abs(a-x)+Math.abs(b-y)<5})))open(cells,'mine')}
+ Object.defineProperty(fl,'_dv',{value:{id:fl.id,voids,bridges,scenes},enumerable:false,configurable:true,writable:true});return fl._dv}
+// Cut the opened tiles out of the tile canvas, draw cliff lips, and lay the bridges.
+function dvApply(g,r,fl,th){const P=dvPlan(fl),T=GD_T;if(!P.voids.size)return;const isV=(x,y)=>P.voids.has(x+','+y);
+ P.voids.forEach((k,key)=>{const [x,y]=key.split(',').map(Number),X=x*T,Y=y*T;g.clearRect(X,Y,T,T);
+  if(!isV(x,y-1)){g.fillStyle=th.e;g.fillRect(X,Y,T,9);g.fillStyle='rgba(0,0,0,.35)';g.fillRect(X,Y+9,T,5);g.fillStyle=th.g;for(let i=4;i<T;i+=11)g.fillRect(X+i,Y+2,4,2)}
+  if(!isV(x-1,y)){g.fillStyle='rgba(0,0,0,.45)';g.fillRect(X,Y,3,T)}if(!isV(x+1,y)){g.fillStyle='rgba(0,0,0,.45)';g.fillRect(X+T-3,Y,3,T)}
+  if(!isV(x,y+1)){g.fillStyle=th.w2;g.fillRect(X,Y+T-4,T,4)}});
+ P.bridges.forEach((b,key)=>{const [x,y]=key.split(',').map(Number),X=x*T,Y=y*T;g.clearRect(X,Y,T,T);const wood=['#8a5a32','#7a4e2a','#966438'];
+  if(b.hz){for(let i=0;i<T;i+=8){g.fillStyle=wood[(i/8+x)%3];g.fillRect(X+i,Y+5,7,T-10)}g.fillStyle='#4a2f18';g.fillRect(X,Y+5,T,2);g.fillRect(X,Y+T-7,T,2);
+   if(b.rail){g.fillStyle='#b9c2cc';g.fillRect(X,Y+12,T,3);g.fillRect(X,Y+T-15,T,3);g.fillStyle='#6d7680';g.fillRect(X,Y+15,T,1);g.fillRect(X,Y+T-12,T,1)}
+   else{g.fillStyle='#d8c48e';g.fillRect(X,Y+2,T,2);g.fillRect(X,Y+T-4,T,2);g.fillStyle='#5a3a1e';g.fillRect(X+2,Y,3,6);g.fillRect(X+2,Y+T-6,3,6)}}
+  else{for(let i=0;i<T;i+=8){g.fillStyle=wood[(i/8+y)%3];g.fillRect(X+5,Y+i,T-10,7)}g.fillStyle='#4a2f18';g.fillRect(X+5,Y,2,T);g.fillRect(X+T-7,Y,2,T);
+   if(b.rail){g.fillStyle='#b9c2cc';g.fillRect(X+12,Y,3,T);g.fillRect(X+T-15,Y,3,T);g.fillStyle='#6d7680';g.fillRect(X+15,Y,1,T);g.fillRect(X+T-12,Y,1,T)}
+   else{g.fillStyle='#d8c48e';g.fillRect(X+2,Y,2,T);g.fillRect(X+T-4,Y,2,T);g.fillStyle='#5a3a1e';g.fillRect(X,Y+2,6,3);g.fillRect(X+T-6,Y+2,6,3)}}})}
+// ---------- the deep background ----------
+function dvPaint(r,fl){const P=dvPlan(fl),T=GD_T,mw=fl.w*T,mh=fl.h*T,ox=(1-DV_F)*mw,oy=(1-DV_F)*mh,c=document.createElement('canvas');c.width=Math.ceil(mw+ox);c.height=Math.ceil(mh+oy);
+ const g=c.getContext('2d'),L=dvLayer(r),R=dvRng('deep'+fl.id),Wv=400,Hv=560,px=x=>DV_F*x*T+(1-DV_F)*(Wv/2)+ox,py=y=>DV_F*y*T+(1-DV_F)*(Hv/2)+oy;
+ // abyss: haze fading into a glow far below
+ let gr=g.createLinearGradient(0,0,0,c.height);gr.addColorStop(0,'#05060a');gr.addColorStop(.6,L.haze);gr.addColorStop(1,L.glow+'55');g.fillStyle=gr;g.fillRect(0,0,c.width,c.height);
+ for(let i=0;i<260;i++){g.fillStyle=R()<.5?L.rock:'rgba(0,0,0,.35)';const w=8+R()*60,h=4+R()*14;g.fillRect(Math.round(R()*c.width),Math.round(R()*c.height),Math.round(w),Math.round(h))}
+ for(let i=0;i<90;i++){g.fillStyle=L.glow+(R()<.3?'aa':'44');g.fillRect(Math.round(R()*c.width),Math.round(R()*c.height),2,2)}
+ [...P.scenes].sort((a,b)=>(a.kind==='mine'?0:/chasm|waterfall/.test(a.kind)?1:2)-(b.kind==='mine'?0:/chasm|waterfall/.test(b.kind)?1:2)).forEach(s=>{const x0=px(s.x0-1.5),y0=py(s.y0-1.5),x1=px(s.x1+2.5),y1=py(s.y1+2.5),w=Math.max(T*3,x1-x0),h=Math.max(T*3,y1-y0);g.save();g.beginPath();g.rect(x0-T,y0-T,w+T*2,h+T*2);g.clip();
+  ({mine:dvMine,chasm:dvChasm,ruins:dvRuins,houses:dvHouses,ship:dvShip,fossil:dvFossil,crystal:dvCrystal,waterfall:dvFall})[s.kind](g,x0-T,y0-T,w+T*2,h+T*2,L,R);g.restore()});
+ return c}
+const dvR=(g,c,x,y,w,h)=>{g.fillStyle=c;g.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h))};
+function dvDepth(g,x,y,w,h,L){const gr=g.createLinearGradient(0,y,0,y+h);gr.addColorStop(0,'rgba(0,0,0,.4)');gr.addColorStop(.6,'rgba(0,0,0,.05)');gr.addColorStop(1,L.glow+'40');g.fillStyle=gr;g.fillRect(x,y,w,h)}
+function dvMine(g,x,y,w,h,L,R){dvR(g,'#0d0c10',x,y,w,h);for(let i=0;i<30;i++)dvR(g,L.rock,x+R()*w,y+R()*h,10+R()*30,4+R()*8);
+ const n=Math.max(2,Math.round(w/70));for(let i=0;i<n;i++){const bx=x+(i+.5)*w/n,s=.6+.4*((i%2)?.7:1);  // receding timber frames
+  dvR(g,'#4a2e18',bx-26*s,y+h*.15,7*s,h*.75);dvR(g,'#4a2e18',bx+19*s,y+h*.15,7*s,h*.75);dvR(g,'#5e3a1e',bx-30*s,y+h*.15,60*s,8*s);
+  dvR(g,'#2a1a0e',bx-26*s,y+h*.15+8*s,7*s,3);dvR(g,L.glow,bx-3,y+h*.15+12*s,6,8);g.fillStyle=L.glow+'33';g.beginPath();g.arc(bx,y+h*.15+16*s,18*s,0,7);g.fill()}
+ for(let k=0;k<2;k++){const ry=y+h*(.55+k*.25);dvR(g,'#3a2a1c',x,ry,w,6);for(let i=0;i<w;i+=14)dvR(g,'#2a1c10',x+i,ry-2,8,10);dvR(g,'#8d96a0',x,ry,w,2);dvR(g,'#8d96a0',x,ry+5,w,2)}
+ const cx=x+w*.3+R()*w*.4,cy=y+h*.55;dvR(g,'#5c4330',cx,cy-16,30,14);dvR(g,'#3d2b1d',cx+3,cy-2,8,8);dvR(g,'#3d2b1d',cx+19,cy-2,8,8);dvR(g,'#6c7076',cx+4,cy-20,22,6);  // mine cart
+ for(let i=0;i<14;i++)dvR(g,R()<.5?'#cfe8ff':L.glow,x+R()*w,y+R()*h,3,3);dvDepth(g,x,y,w,h,L)}
+function dvChasm(g,x,y,w,h,L,R){const gr=g.createLinearGradient(0,y,0,y+h);gr.addColorStop(0,'#030305');gr.addColorStop(1,L.haze);g.fillStyle=gr;g.fillRect(x,y,w,h);
+ for(let i=0;i<7;i++){const sw=18+R()*40,sx=x+R()*w,sh=h*(.4+R()*.6);dvR(g,L.rock,sx,y+h-sh,sw,sh);dvR(g,'rgba(255,255,255,.05)',sx,y+h-sh,4,sh);dvR(g,'rgba(0,0,0,.3)',sx+sw-5,y+h-sh,5,sh)}
+ for(let k=0;k<3;k++){g.fillStyle='rgba(200,215,235,'+(.05+k*.03)+')';g.fillRect(x,y+h*(.45+k*.15),w,10+k*4)}
+ if(L.water||L.lava){const c=L.lava?'#ff6a2a':'#3a9fd0';dvR(g,c+'88',x,y+h-14,w,14);for(let i=0;i<w;i+=18)dvR(g,L.lava?'#ffd27a':'#bfe6ff',x+i+R()*8,y+h-12+R()*6,8,2)}
+ else for(let i=0;i<20;i++)dvR(g,L.glow+'88',x+R()*w,y+h*.7+R()*h*.3,2,2);dvDepth(g,x,y,w,h,L)}
+function dvRuins(g,x,y,w,h,L,R){dvChasm(g,x,y,w,h,L,R);const stone=['#8c8778','#77725f','#a29c87'],base=y+h*.86;dvR(g,'#5d594b',x,base,w,h-(base-y));
+ for(let i=0;i<w;i+=26){const st=stone[Math.floor(R()*3)];dvR(g,st,x+i,base-6,24,6)}
+ for(let i=0;i<Math.max(3,w/55);i++){const cx=x+20+R()*(w-40),ch=30+R()*70,broken=R()<.5;dvR(g,stone[0],cx,base-ch,14,ch);dvR(g,stone[2],cx,base-ch,3,ch);dvR(g,'#5d594b',cx+11,base-ch,3,ch);
+  if(!broken){dvR(g,stone[1],cx-4,base-ch-6,22,6)}else{dvR(g,stone[1],cx+14,base-8,18,8);dvR(g,stone[1],cx+30,base-5,10,5)}if(R()<.5)dvR(g,'#5f8a4a',cx,base-ch*(.3+R()*.4),14,4)}
+ if(w>140){const ax=x+w*.5-34,ah=60;dvR(g,stone[0],ax,base-ah,10,ah);dvR(g,stone[0],ax+58,base-ah,10,ah);for(let k=0;k<7;k++)dvR(g,stone[k%2?1:2],ax+k*10-1,base-ah-6-Math.sin(k/6*Math.PI)*16,12,8)}
+ for(let i=0;i<12;i++)dvR(g,L.glow+'99',x+R()*w,y+R()*h*.8,2,2);dvDepth(g,x,y,w,h,L)}
+function dvHouses(g,x,y,w,h,L,R){dvChasm(g,x,y,w,h,L,R);const base=y+h*.86;dvR(g,'#4a3828',x,base,w,h-(base-y));g.fillStyle=L.glow+'26';g.fillRect(x,base-60,w,60);
+ for(let i=0;i<Math.max(2,w/70);i++){const hx=x+12+R()*(w-70),hw=40+R()*22,hh=26+R()*16,tilt=R()<.4,top=base-hh;
+  dvR(g,'#9a6e44',hx,top,hw,hh);for(let k=0;k<hh;k+=6)dvR(g,'#7a5434',hx,top+k,hw,2);dvR(g,'#b38556',hx,top,3,hh);
+  g.fillStyle='#6a3f22';g.beginPath();g.moveTo(hx-6,top);g.lineTo(hx+hw/2,top-20-(tilt?6:0));g.lineTo(hx+hw+6,top+(tilt?6:0));g.closePath();g.fill();
+  dvR(g,'#1a120c',hx+hw*.2,top+8,9,9);dvR(g,R()<.6?'#ffd27a':'#1a120c',hx+hw*.62,top+8,9,9);dvR(g,'#24180f',hx+hw*.42,base-14,10,14);if(tilt)dvR(g,'#7d5a38',hx+hw-6,top+4,4,hh-4)}
+ for(let i=0;i<w;i+=10)dvR(g,'#7a5434',x+i,base-8,3,8);dvR(g,'#7a5434',x,base-6,w,2);
+ for(let i=0;i<6;i++){const lx=x+R()*w,ly=y+R()*h*.4;dvR(g,'#3a2a1c',lx,y,1,ly-y);dvR(g,L.glow,lx-2,ly,5,6)}dvDepth(g,x,y,w,h,L)}
+// put the background behind the tiles (once per floor) and keep it in step with the camera
+function dvDeep(field,r){const fl=r&&r.fl;if(!fl||!field)return;const mp=field.querySelector('.gd-map');if(!mp)return;let c=mp.querySelector('.gd-deep');const P=dvPlan(fl);
+ if(!P.voids.size&&!P.bridges.size){if(c)c.remove();return}
+ if(c&&c.dataset.fl===String(fl.id))return;if(c)c.remove();c=dvPaint(r,fl);c.className='gd-deep';c.dataset.fl=fl.id;c.style.left=-(1-DV_F)*fl.w*GD_T+'px';c.style.top=-(1-DV_F)*fl.h*GD_T+'px';mp.prepend(c);
+ if(DG&&DG.cam)dvParallax(mp,DG.cam.tx,DG.cam.ty,DG.cam.T/GD_T)}
+function dvParallax(mp,tx,ty,sc){const c=mp&&mp.querySelector('.gd-deep');if(!c)return;sc=sc||1;c.style.transform='translate('+Math.round((DV_F-1)*tx/sc)+'px,'+Math.round((DV_F-1)*ty/sc)+'px)'}
+
+function dvShip(g,x,y,w,h,L,R){dvChasm(g,x,y,w,h,L,R);const base=y+h*.88,sx=x+w*.18,sw=w*.64,tilt=.12;g.save();g.translate(sx+sw/2,base-20);g.rotate(tilt);
+ g.fillStyle='#4a3020';g.beginPath();g.moveTo(-sw/2,-18);g.lineTo(sw/2,-26);g.lineTo(sw/2-22,10);g.lineTo(-sw/2+16,12);g.closePath();g.fill();
+ for(let k=-18;k<8;k+=6){g.fillStyle='#3a2416';g.fillRect(-sw/2+8,k,sw-24,2)}g.fillStyle='#1a120c';g.fillRect(-sw*.1,-10,14,10);g.fillRect(sw*.15,-14,10,8);
+ g.fillStyle='#5a3a24';g.fillRect(-6,-sw*.45,6,sw*.45-18);g.fillRect(-sw*.25,-8-sw*.3,6,sw*.3);g.fillStyle='#8a7a60';g.fillRect(-1,-sw*.42,sw*.18,sw*.16);g.fillStyle='#6a5a40';g.fillRect(-1,-sw*.42+sw*.16,sw*.12,4);g.restore();
+ dvR(g,'#2a2a2a',x,base,w,h-(base-y));for(let i=0;i<10;i++)dvR(g,L.glow+'88',x+R()*w,y+R()*h*.7,2,2);for(let i=0;i<6;i++){const kx=x+R()*w;dvR(g,'#2f5f3a',kx,base-30-R()*30,3,40)}dvDepth(g,x,y,w,h,L)}
+function dvFossil(g,x,y,w,h,L,R){dvChasm(g,x,y,w,h,L,R);const base=y+h*.86,bone='#d9cfb4',sh='#a89f86',cx=x+w*.5,sw=Math.min(w*.8,320);dvR(g,'#4a4236',x,base,w,h-(base-y));
+ for(let i=0;i<9;i++){const bx=cx-sw/2+i*sw/10,bh=18+Math.sin(i/9*Math.PI)*28;dvR(g,bone,bx,base-30-bh,5,bh);dvR(g,sh,bx+4,base-30-bh,1,bh)}  // ribs
+ dvR(g,bone,cx-sw/2,base-34,sw,6);for(let i=0;i<14;i++)dvR(g,bone,cx-sw/2+i*sw/14,base-38,6,10);  // spine
+ const hx=cx+sw/2-6;dvR(g,bone,hx,base-58,44,26);dvR(g,'#2a2620',hx+26,base-50,8,8);for(let i=0;i<6;i++)dvR(g,bone,hx+6+i*6,base-34,3,7);dvR(g,sh,hx,base-36,44,3);  // skull
+ for(let i=0;i<10;i++)dvR(g,bone,cx-sw/2-10-i*12,base-30+i*1.5,9,5);dvDepth(g,x,y,w,h,L)}
+function dvCrystal(g,x,y,w,h,L,R){dvChasm(g,x,y,w,h,L,R);const cols=['#9f8cff','#7fd6ff','#ff9fd8',L.glow];
+ for(let i=0;i<Math.max(6,w/18);i++){const cx=x+R()*w,ch=24+R()*70,cw=10+R()*14,c=cols[Math.floor(R()*cols.length)],by=y+h-R()*h*.15;
+  g.fillStyle=c+'33';g.beginPath();g.arc(cx,by-ch/2,ch*.7,0,7);g.fill();g.fillStyle=c;g.beginPath();g.moveTo(cx-cw/2,by);g.lineTo(cx-cw/3,by-ch*.8);g.lineTo(cx,by-ch);g.lineTo(cx+cw/3,by-ch*.8);g.lineTo(cx+cw/2,by);g.closePath();g.fill();
+  g.fillStyle='rgba(255,255,255,.45)';g.fillRect(Math.round(cx-cw/4),Math.round(by-ch*.8),2,Math.round(ch*.6))}
+ for(let i=0;i<20;i++)dvR(g,'#ffffffaa',x+R()*w,y+R()*h,2,2);dvDepth(g,x,y,w,h,L)}
+function dvFall(g,x,y,w,h,L,R){dvChasm(g,x,y,w,h,L,R);const fx=x+w*.35,fw=Math.max(30,w*.3);
+ for(let i=0;i<fw;i+=3){const c=i%9<3?'#cfeeff':i%9<6?'#8fc8ea':'#5fa8d8';dvR(g,c,fx+i,y,3,h)}
+ g.fillStyle='rgba(230,245,255,.35)';for(let k=0;k<4;k++){g.beginPath();g.ellipse(fx+fw/2,y+h-6,fw*(.7+k*.25),10+k*4,0,0,7);g.fill()}
+ dvR(g,'#3a9fd0aa',x,y+h-12,w,12);dvDepth(g,x,y,w,h,L)}
+
+// ===================== MYSTERY DUNGEON · living floors (decoration only) =====================
+// Textured walls with raised front faces, themed floor dressing, special rooms (pond / mossy garden / cracked lava)
+// and light CSS ambient motion (torches, drips, drifting spores/bubbles/embers, glowing crystals). Nothing here
+// changes movement or combat.
+const DL_STYLE=[ // per dungeon layer: wall texture, face accent, floor dressing, ambient particle, torch colour
+ {wall:'rock',acc:'#cfe3e8',dress:'puddle',mote:'bubble',torch:'#7fe0ff',rooms:['pond','pond','garden']},
+ {wall:'rock',acc:'#5f9a46',dress:'moss',mote:'spore',torch:'#ffcf6b',rooms:['garden','garden','pond']},
+ {wall:'spike',acc:'#e8e2d0',dress:'crack',mote:'dust',torch:'#ffd08a',crystal:'#bfe3ff',rooms:['pond','garden']},
+ {wall:'brick',acc:'#8a8fa8',dress:'coal',mote:'dust',torch:'#ffb347',crystal:'#9f8cff',rooms:['pond','garden']},
+ {wall:'brick',acc:'#4f8f6a',dress:'puddle',mote:'bubble',torch:'#6fd0ff',rooms:['pond','pond','garden']},
+ {wall:'rock',acc:'#d8d23c',dress:'sulfur',mote:'steam',torch:'#d8ff6b',rooms:['pond','lava']},
+ {wall:'basalt',acc:'#ff6a1f',dress:'ash',mote:'ember',torch:'#ff8a3d',rooms:['lava','lava','garden']},
+ {wall:'basalt',acc:'#ffd23f',dress:'gold',mote:'spark',torch:'#ffe27a',crystal:'#ffe9a0',rooms:['lava','pond']}];
+function dlStyle(r){const s=r&&!r.tower&&r.sub&&r.sub.k,i=s&&typeof MD_LAYERS!=='undefined'?MD_LAYERS.findIndex(L=>L.subs.includes(s)):-1;return DL_STYLE[i]||DL_STYLE[2]}
+function dlPlan(r,fl){if(fl._dl&&fl._dl.id===fl.id)return fl._dl;const R=dvRng('dl'+fl.id),S=dlStyle(r),V=typeof dvPlan==='function'?dvPlan(fl):{voids:new Map(),bridges:new Map()},room=[];
+ const free=(x,y)=>!V.voids.has(x+','+y)&&!V.bridges.has(x+','+y);
+ const cand=fl.rooms.filter(o=>o[2]>=5&&o[3]>=5&&o[2]*o[3]<120&&!(fl.houses||[]).some(h=>h[0]===o[0]&&h[1]===o[1]));
+ if(cand.length&&R()<.5){const o=cand[Math.floor(R()*cand.length)],st=fl.stairs,hasSt=st&&st[0]>=o[0]&&st[0]<o[0]+o[2]&&st[1]>=o[1]&&st[1]<o[1]+o[3];let kind=S.rooms[Math.floor(R()*S.rooms.length)];if(kind==='pond'&&hasSt)kind='garden';const cracks=[];
+  if(kind==='lava'){const T=GD_T;for(let i=0;i<5+o[2];i++){let x=(o[0]+R()*o[2])*T,y=(o[1]+R()*o[3])*T;const seg=[[x,y]];for(let k=0;k<5;k++){x=Math.max(o[0]*T+4,Math.min((o[0]+o[2])*T-4,x+(R()-.5)*44));y=Math.max(o[1]*T+4,Math.min((o[1]+o[3])*T-4,y+(R()-.5)*44));seg.push([x,y])}cracks.push(seg)}}
+  room.push({o,kind,cracks})}
+ const torches=[],drips=[],crystals=[];
+ for(let y=0;y<fl.h-1;y++)for(let x=0;x<fl.w;x++){const wall=!(+fl.tiles[y][x]>0)&&!V.voids.has(x+','+y),below=+fl.tiles[y+1][x]>0&&free(x,y+1);if(!wall||!below)continue;
+  const r0=R();if(r0<.14)torches.push([x,y]);else if(r0<.24&&(S.mote==='bubble'||S.dress==='moss'||S.dress==='puddle'))drips.push([x,y])}
+ if(S.crystal)for(let y=1;y<fl.h-1;y++)for(let x=1;x<fl.w-1;x++){if(+fl.tiles[y][x]>0&&free(x,y)&&!(+fl.tiles[y-1][x]>0)&&R()<.08)crystals.push([x,y])}
+ const P={id:fl.id,room,torches:torches.slice(0,10),drips:drips.slice(0,8),crystals:crystals.slice(0,6),free};Object.defineProperty(fl,'_dl',{value:P,enumerable:false,configurable:true,writable:true});return P}
+const dlR=(g,c,x,y,w,h)=>{g.fillStyle=c;g.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h))};
+// ---------- static paint (into the cached tile canvas, under the existing props) ----------
+function dlPaint(g,r,fl,th){const T=GD_T,S=dlStyle(r),P=dlPlan(r,fl),R=dvRng('dlp'+fl.id),isF=(x,y)=>x>=0&&y>=0&&x<fl.w&&y<fl.h&&+fl.tiles[y][x]>0;P.lights=[];P.puddles=new Set();delete P.fire;delete P.seal;
+ if(typeof dpFloor==='function')dpFloor(g,r,fl,th,dvRng('dpf'+fl.id));
+ // walls: texture on top, a taller raised face where a wall meets the floor below it
+ for(let y=0;y<fl.h;y++)for(let x=0;x<fl.w;x++){if(isF(x,y))continue;const X=x*T,Y=y*T;
+  if(S.wall==='brick'){for(let k=0;k<4;k++){dlR(g,'rgba(0,0,0,.18)',X+2,Y+2+k*9+8,T-4,1);dlR(g,'rgba(0,0,0,.18)',X+2+((k+y)%2?18:8),Y+2+k*9,1,9)}}
+  else if(S.wall==='basalt'){dlR(g,'rgba(0,0,0,.2)',X+R()*20+4,Y+4,1,T-8);dlR(g,'rgba(0,0,0,.2)',X+4,Y+R()*20+8,T-8,1);if(R()<.25)dlR(g,S.acc+'66',X+6+R()*22,Y+6+R()*22,6,2)}
+  else{if(R()<.6){const cx=X+6+R()*24,cy=Y+6+R()*24;dlR(g,'rgba(0,0,0,.2)',cx,cy,8,1);dlR(g,'rgba(0,0,0,.2)',cx+7,cy,1,5)}if(R()<.4)dlR(g,'rgba(255,255,255,.07)',X+4+R()*24,Y+4+R()*24,6,2)}
+  if(isF(x,y+1)){const fy=Y+T-14;dlR(g,th.e,X,fy,T,14);dlR(g,'rgba(255,255,255,.14)',X,fy,T,2);dlR(g,'rgba(0,0,0,.3)',X,Y+T-3,T,3);
+   if(S.wall==='brick'){dlR(g,'rgba(0,0,0,.28)',X,fy+7,T,1);for(let i=(x%2)*10;i<T;i+=20)dlR(g,'rgba(0,0,0,.28)',X+i,fy+2,1,5);for(let i=((x+1)%2)*10;i<T;i+=20)dlR(g,'rgba(0,0,0,.28)',X+i,fy+8,1,5)}
+   else for(let i=3;i<T;i+=7+Math.floor(R()*5))dlR(g,'rgba(0,0,0,.25)',X+i,fy+3,1,8+R()*3);
+   if(S.wall==='spike')for(let i=4;i<T;i+=12){g.fillStyle=S.acc;g.beginPath();g.moveTo(X+i,Y+T-3);g.lineTo(X+i+3,Y+T+5);g.lineTo(X+i+6,Y+T-3);g.fill()}
+   if(S.dress==='moss')for(let i=2;i<T;i+=6)if(R()<.6)dlR(g,S.acc,X+i,Y+T-3,3,3+R()*6);
+   if(S.dress==='sulfur'&&R()<.6)dlR(g,S.acc+'aa',X+R()*28,fy+4,10,3);
+   if(S.wall==='basalt'&&R()<.5)dlR(g,S.acc,X+4+R()*28,fy+5+R()*5,8,1)}}
+ // floor dressing
+ for(let y=0;y<fl.h;y++)for(let x=0;x<fl.w;x++){if(!isF(x,y)||!P.free(x,y)||R()>.13)continue;const X=x*T,Y=y*T,ox=X+6+R()*16,oy=Y+8+R()*18;if(S.dress==='puddle')P.puddles.add(x+','+y);
+  ({puddle:()=>{g.fillStyle='rgba(120,190,230,.35)';g.beginPath();g.ellipse(ox+8,oy+5,9+R()*5,4+R()*2,0,0,7);g.fill();dlR(g,'rgba(255,255,255,.5)',ox+4,oy+3,4,1)},
+   moss:()=>{for(let k=0;k<5;k++)dlR(g,k%2?S.acc:'#4c7f38',ox+R()*14,oy+R()*10,4,3)},
+   crack:()=>{let cx=ox,cy=oy;for(let k=0;k<4;k++){const nx=cx+3+R()*5,ny=cy+(R()-.5)*8;g.strokeStyle='rgba(0,0,0,.28)';g.lineWidth=1;g.beginPath();g.moveTo(cx,cy);g.lineTo(nx,ny);g.stroke();cx=nx;cy=ny}},
+   coal:()=>{for(let k=0;k<3;k++)dlR(g,'#2b2b33',ox+R()*14,oy+R()*10,3+R()*3,3);if(R()<.3)dlR(g,'#9f8cff',ox+6,oy+4,2,2)},
+   sulfur:()=>{g.fillStyle='rgba(216,210,60,.32)';g.beginPath();g.ellipse(ox+8,oy+5,8+R()*6,5,0,0,7);g.fill()},
+   ash:()=>{for(let k=0;k<6;k++)dlR(g,'rgba(60,50,50,.4)',ox+R()*16,oy+R()*12,2,2);if(R()<.4)dlR(g,'#ff6a1f',ox+R()*14,oy+R()*10,2,1)},
+   gold:()=>{for(let k=0;k<4;k++)dlR(g,'#ffd23f',ox+R()*16,oy+R()*12,2,2)}})[S.dress]()}
+ if(typeof dpEdges==='function')dpEdges(g,r,fl,th,dvRng('dpe'+fl.id),P);
+ (fl.houses||[]).forEach(o=>o[4]&&o[4]!=='house'&&typeof dpLandmark==='function'?dpLandmark(g,fl,o,th,R,P):dlHouse(g,fl,o,th,R));
+ // special rooms (ponds are painted after the props, so nothing stands in the water)
+ dlRooms(g,P,S,false)}
+function dlPaintPost(g,r,fl){const P=dlPlan(r,fl);dlRooms(g,P,dlStyle(r),true)}
+function dlRooms(g,P,S,post){const T=GD_T,R=dvRng('dlr'+P.id);P.room.forEach(({o,kind,cracks})=>{if((kind==='pond')!==post)return;const X0=o[0]*T,Y0=o[1]*T,W=o[2]*T,H=o[3]*T,cx=X0+W/2,cy=Y0+H/2;
+  if(kind==='pond'){const rx=W/2-T*1.1,ry=H/2-T*1.1,water=S.mote==='steam'?['#7fae4a','#9cc95a']:['#3f8fc4','#5fb0dc'];
+   g.fillStyle='#8c8778';g.beginPath();g.ellipse(cx,cy,rx+6,ry+6,0,0,7);g.fill();g.fillStyle=water[0];g.beginPath();g.ellipse(cx,cy,rx,ry,0,0,7);g.fill();
+   g.fillStyle=water[1];g.beginPath();g.ellipse(cx-rx*.15,cy-ry*.2,rx*.7,ry*.55,0,0,7);g.fill();
+   for(let a=0;a<6.28;a+=.45){dlR(g,R()<.5?'#a29c87':'#77725f',cx+Math.cos(a)*(rx+5)-4,cy+Math.sin(a)*(ry+5)-3,8,6)}
+   for(let k=0;k<3;k++){const lx=cx+(R()-.5)*rx,ly=cy+(R()-.5)*ry;g.fillStyle='#5fa04a';g.beginPath();g.arc(lx,ly,5,0,5.6);g.fill()}}
+  else if(kind==='garden'){for(let y=o[1];y<o[1]+o[3];y++)for(let x=o[0];x<o[0]+o[2];x++){const X=x*T,Y=y*T;g.fillStyle='rgba(80,140,60,.38)';g.fillRect(X,Y,T,T);
+    for(let k=0;k<5;k++)dlR(g,R()<.5?'#6fae4f':'#4c8a38',X+R()*34,Y+R()*34,3,4);
+    if(R()<.22){const fx=X+8+R()*20,fy=Y+8+R()*20,c=['#ff8fb8','#ffe36b','#ffffff','#b48cff'][Math.floor(R()*4)];dlR(g,'#4c8a38',fx+2,fy+3,1,5);dlR(g,c,fx,fy,5,4);dlR(g,'#ffd23f',fx+2,fy+1,1,1)}}
+   for(let x=o[0];x<o[0]+o[2];x++)for(const y of [o[1],o[1]+o[3]-1])if(R()<.35){g.fillStyle='#3f7a30';g.beginPath();g.arc(x*T+T/2,y*T+T/2,9,0,7);g.fill();dlR(g,'#5fa04a',x*T+T/2-4,y*T+T/2-6,5,4)}}
+  else if(kind==='lava'){g.fillStyle='rgba(30,16,14,.45)';g.fillRect(X0,Y0,W,H);g.lineCap='round';
+   cracks.forEach(seg=>{g.strokeStyle='#3a1208';g.lineWidth=6;g.beginPath();seg.forEach(([x,y],i)=>i?g.lineTo(x,y):g.moveTo(x,y));g.stroke();g.strokeStyle='#c2410c';g.lineWidth=3;g.stroke();g.strokeStyle='#ff9a3d';g.lineWidth=1;g.stroke()})}})}
+// ---------- ambient motion (DOM + CSS animation, rebuilt once per floor) ----------
+function dlAmb(field,r){const fl=r&&r.fl,mp=field&&field.querySelector('.gd-map');if(!fl||!mp)return;let el=mp.querySelector('.gd-amb');if(el&&el.dataset.fl===String(fl.id)){if(typeof dpFeet==='function')dpFeet(el,r,fl,dlPlan(r,fl));return}if(el)el.remove();mp.querySelectorAll('.dl-dark').forEach(c=>c.remove());
+ const T=GD_T,S=dlStyle(r),P=dlPlan(r,fl),R=dvRng('dla'+fl.id),h=[];el=document.createElement('div');el.className='gd-amb';el.dataset.fl=fl.id;el.style.setProperty('--tc',S.torch);el.style.setProperty('--mc',S.acc);
+ const d=()=>(-R()*6).toFixed(2)+'s';
+ P.torches.forEach(([x,y])=>h.push('<i class="dl-torch'+(S.mote==='bubble'?' shell':'')+'" style="left:'+(x*T+T/2)+'px;top:'+(y*T+T-14)+'px;animation-delay:'+d()+'"><b></b></i>'));
+ P.drips.forEach(([x,y])=>h.push('<i class="dl-drip" style="left:'+(x*T+8+Math.floor(R()*24))+'px;top:'+(y*T+T-2)+'px;animation-delay:'+d()+'"></i>'));
+ P.crystals.forEach(([x,y])=>h.push('<i class="dl-crys" style="left:'+(x*T+6+Math.floor(R()*20))+'px;top:'+(y*T+4)+'px;--cc:'+S.crystal+';animation-delay:'+d()+'"></i>'));
+ const rooms=fl.rooms.filter(o=>o[2]*o[3]>=12);for(let i=0;i<12&&rooms.length;i++){const o=rooms[Math.floor(R()*rooms.length)],x=(o[0]+R()*o[2])*T,y=(o[1]+R()*o[3])*T;if(!P.free(Math.floor(x/T),Math.floor(y/T)))continue;
+  h.push('<i class="dl-mote m-'+S.mote+'" style="left:'+Math.round(x)+'px;top:'+Math.round(y)+'px;animation-delay:'+d()+';animation-duration:'+(5+R()*5).toFixed(1)+'s"></i>')}
+ P.room.forEach(({o,kind,cracks})=>{const X0=o[0]*T,Y0=o[1]*T,W=o[2]*T,H=o[3]*T;
+  if(kind==='pond'){for(let k=0;k<5;k++)h.push('<i class="dl-glint" style="left:'+Math.round(X0+W/2+(R()-.5)*(W-3*T))+'px;top:'+Math.round(Y0+H/2+(R()-.5)*(H-3*T))+'px;animation-delay:'+d()+'"></i>')}
+  else if(kind==='garden'){for(let k=0;k<4;k++)h.push('<i class="dl-fly" style="left:'+Math.round(X0+R()*W)+'px;top:'+Math.round(Y0+R()*H)+'px;animation-delay:'+d()+';--fc:'+['#ff8fb8','#ffe36b','#b48cff','#9dffb0'][k]+'"></i>')}
+  else if(kind==='lava'){const c=document.createElement('canvas');c.width=W;c.height=H;const g=c.getContext('2d');g.lineCap='round';g.translate(-X0,-Y0);g.strokeStyle='#ffd27a';g.shadowColor='#ff6a1f';g.shadowBlur=8;g.lineWidth=2;
+   cracks.forEach(seg=>{g.beginPath();seg.forEach(([x,y],i)=>i?g.lineTo(x,y):g.moveTo(x,y));g.stroke()});c.className='dl-lava';c.style.left=X0+'px';c.style.top=Y0+'px';el.appendChild(c);
+   for(let k=0;k<5;k++)h.push('<i class="dl-mote m-ember" style="left:'+Math.round(X0+R()*W)+'px;top:'+Math.round(Y0+R()*H)+'px;animation-delay:'+d()+'"></i>')}});
+ if(typeof dpAmbient==='function')dpAmbient(el,field,r,fl,P,S,R,h);
+ el.insertAdjacentHTML('beforeend',h.join(''));const objs=mp.querySelector('.gd-objs');mp.insertBefore(el,objs||null);
+ if(typeof dpLight==='function')mp.insertBefore(dpLight(r,fl,P,S),el);if(typeof dpFeet==='function')dpFeet(el,r,fl,P)}
+
+// ---------- ruined houses: wooden floors, inner walls, windows and scattered debris (walls are real; debris is not) ----------
+function dlHouse(g,fl,o,th,R){const T=GD_T,[x0,y0,w,h]=o,isF=(x,y)=>x>=0&&y>=0&&x<fl.w&&y<fl.h&&+fl.tiles[y][x]>0,inH=(x,y)=>x>=x0&&x<x0+w&&y>=y0&&y<y0+h;
+ const wood=['#5a4330','#4f3a29','#634a35'],tileA='#3d3a3a',tileB='#343131';
+ // floors: tiled kitchen in one corner area, worn planks elsewhere
+ const tx=x0+(R()<.5?0:Math.floor(w/2)),ty=y0;
+ for(let y=y0;y<y0+h;y++)for(let x=x0;x<x0+w;x++){if(!isF(x,y))continue;const X=x*T,Y=y*T;
+  if(x>=tx&&x<tx+Math.ceil(w/2)&&y<ty+Math.floor(h/2)-0){for(let j=0;j<4;j++)for(let i=0;i<4;i++)dlR(g,(i+j)%2?tileA:tileB,X+i*10,Y+j*10,10,10);dlR(g,'rgba(0,0,0,.15)',X,Y,T,1)}
+  else{for(let k=0;k<5;k++){dlR(g,wood[(k+y*2+x)%3],X,Y+k*8,T,8);dlR(g,'rgba(0,0,0,.35)',X,Y+k*8+7,T,1);if((k+x)%3===0)dlR(g,'rgba(0,0,0,.35)',X+((k*13+x*7)%30)+4,Y+k*8,1,7)}}
+  if(R()<.3){g.fillStyle='rgba(15,12,10,.16)';g.beginPath();g.ellipse(X+20,Y+20,10+R()*6,6+R()*4,R()*3,0,7);g.fill()}}
+ // walls: inner walls and the ring around the house look like timber-framed plaster; windows on the outer walls
+ for(let y=y0-1;y<=y0+h;y++)for(let x=x0-1;x<=x0+w;x++){if(isF(x,y)||x<0||y<0||x>=fl.w||y>=fl.h)continue;const X=x*T,Y=y*T,ring=!inH(x,y);
+  dlR(g,'#2a2422',X,Y,T,T);dlR(g,'#3a322d',X+2,Y+2,T-4,T-4);dlR(g,'#24180f',X,Y+T/2-2,T,4);
+  if(isF(x,y+1)){dlR(g,'#4b3a2c',X,Y+T-16,T,16);dlR(g,'#6a5240',X,Y+T-16,T,2);for(let i=4;i<T;i+=9)dlR(g,'#3a2b1f',X+i,Y+T-14,1,13);
+   if(ring&&x%3===0){dlR(g,'#1c2a30',X+10,Y+T-30,20,14);dlR(g,'#7fb2c8',X+12,Y+T-28,7,10);dlR(g,'#9cc8da',X+21,Y+T-28,7,10);dlR(g,'#2a2422',X+19,Y+T-28,2,10);if(R()<.5)dlR(g,'#1c2a30',X+14,Y+T-24,10,2)}}
+  else if(ring&&(isF(x+1,y)||isF(x-1,y))&&y%3===1){const lx=isF(x+1,y)?X+T-8:X+2;dlR(g,'#1c2a30',lx,Y+8,6,24);dlR(g,'#7fb2c8',lx+1,Y+10,4,20)}}
+ // debris: broken crates, planks, a couch, rubble, a toppled chair, shelves along the top wall
+ const fx=[];for(let y=y0;y<y0+h;y++)for(let x=x0;x<x0+w;x++)if(isF(x,y))fx.push([x,y]);
+ const pick=()=>fx.splice(Math.floor(R()*fx.length),1)[0],put=(f)=>{const p=pick();if(p){if(typeof dpShadow==='function')dpShadow(g,p[0]*T+20,p[1]*T+31,15,4);f(p[0]*T,p[1]*T)}};
+ for(let i=0;i<Math.round(fx.length*.22);i++)put([
+  (X,Y)=>{dlR(g,'#7a5434',X+8,Y+10,22,18);dlR(g,'#5a3d24',X+8,Y+10,22,3);dlR(g,'#5a3d24',X+8,Y+18,22,2);dlR(g,'#3a2614',X+8,Y+10,2,18);dlR(g,'#3a2614',X+28,Y+10,2,18)},
+  (X,Y)=>{g.save();g.translate(X+20,Y+20);g.rotate(R()*3);dlR(g,'#8a6440',-16,-3,32,6);dlR(g,'#5a3d24',-16,2,32,1);g.restore();g.save();g.translate(X+18,Y+24);g.rotate(R()*3);dlR(g,'#7a5434',-12,-2,24,4);g.restore()},
+  (X,Y)=>{for(let k=0;k<7;k++)dlR(g,k%2?'#6a6460':'#57524e',X+8+R()*20,Y+10+R()*18,4+R()*5,3+R()*4)},
+  (X,Y)=>{dlR(g,'#5a3d24',X+10,Y+14,14,12);dlR(g,'#3a2614',X+10,Y+8,3,8);dlR(g,'#3a2614',X+22,Y+26,3,6);dlR(g,'#3a2614',X+10,Y+26,3,6)},
+  (X,Y)=>{g.fillStyle='rgba(180,200,210,.5)';for(let k=0;k<5;k++){g.beginPath();g.moveTo(X+10+R()*20,Y+10+R()*20);g.lineTo(X+14+R()*20,Y+12+R()*20);g.lineTo(X+10+R()*20,Y+16+R()*20);g.fill()}}
+ ][Math.floor(R()*5)]);
+ if(w>=8)put((X,Y)=>{dlR(g,'#2f4a2c',X+2,Y+6,36,28);dlR(g,'#3f5f3a',X+4,Y+8,32,12);dlR(g,'#3a5536',X+4,Y+22,15,10);dlR(g,'#3a5536',X+21,Y+22,15,10);dlR(g,'#24381f',X+2,Y+6,4,28);dlR(g,'#24381f',X+34,Y+6,4,28)});
+ for(let x=x0;x<x0+w;x++)if(isF(x,y0)&&!isF(x,y0-1)&&R()<.3){const X=x*T,Y=y0*T;dlR(g,'#4a2f1b',X+4,Y,32,10);for(let k=0;k<5;k++)dlR(g,['#7a3b3b','#3b5a7a','#6a6a3b','#4a6a4a'][k%4],X+6+k*6,Y+1,4,7)}}
+
+// ===================== MYSTERY DUNGEON · polish (decoration only, except landmark walls made in dgrid.js) =====================
+// Softer floor checker, blended floor patches, uneven wall edges with rubble, dark "void" for deep wall, corridor
+// dressing, landmark rooms, boss-arena dressing, lighting, mist, cave weather and small reactions to footsteps.
+const DP_DARK=[.1,.18,.22,.34,.3,.3,.24,.38],DP_SAND=new Set(['tidal','driftwood','shellstone','saltstone','saltbound']);
+const dpLi=r=>typeof dvLi==='function'?dvLi(r):-1;
+function dpMix(a,b,t){const p=c=>[1,3,5].map(i=>parseInt(c.slice(i,i+2),16)),A=p(a),B=p(b);return '#'+A.map((v,i)=>Math.round(v+(B[i]-v)*t).toString(16).padStart(2,'0')).join('')}
+function dpShadow(g,x,y,rx,ry){g.fillStyle='rgba(0,0,0,.22)';g.beginPath();g.ellipse(x,y,rx,ry,0,0,7);g.fill()}
+// ---------- floors: softer checker + blended patches of a second material ----------
+function dpFloor(g,r,fl,th,R){const T=GD_T,isF=(x,y)=>x>=0&&y>=0&&x<fl.w&&y<fl.h&&+fl.tiles[y][x]>0,mid=dpMix(th.f1,th.f2,.5);
+ g.globalAlpha=.55;for(let y=0;y<fl.h;y++)for(let x=0;x<fl.w;x++)if(isF(x,y)){g.fillStyle=mid;g.fillRect(x*T,y*T,T,T)}g.globalAlpha=1;
+ const alt=[dpMix(th.f1,th.e,.25),dpMix(th.f2,th.g,.45),dpMix(th.f1,'#ffffff',.18)],blobs=[];for(let i=0;i<4+Math.floor(R()*4);i++)blobs.push([R()*fl.w*T,R()*fl.h*T,(1.5+R()*2.5)*T,alt[i%3]]);
+ const S=10;for(let y=0;y<fl.h;y++)for(let x=0;x<fl.w;x++){if(!isF(x,y))continue;for(let j=0;j<T;j+=S)for(let i=0;i<T;i+=S){const px=x*T+i+S/2,py=y*T+j+S/2;
+  for(const [bx,by,br,c] of blobs){const d=Math.hypot(px-bx,py-by)/br;if(d<1){g.globalAlpha=(1-d)*.55;g.fillStyle=c;g.fillRect(x*T+i,y*T+j,S,S)}}}}g.globalAlpha=1}
+// ---------- edges, rubble, void walls, corridors, arena ----------
+function dpEdges(g,r,fl,th,R,P){const T=GD_T,isF=(x,y)=>x>=0&&y>=0&&x<fl.w&&y<fl.h&&+fl.tiles[y][x]>0,V=typeof dvPlan==='function'?dvPlan(fl,r):{voids:new Map(),bridges:new Map()},inH=(x,y)=>(fl.houses||[]).some(o=>x>=o[0]-1&&x<=o[0]+o[2]&&y>=o[1]-1&&y<=o[1]+o[3]);
+ // void: wall far from any floor fades to near-black
+ for(let y=0;y<fl.h;y++)for(let x=0;x<fl.w;x++){if(isF(x,y)||V.voids.has(x+','+y))continue;let d=9;for(let j=-3;j<=3;j++)for(let i=-3;i<=3;i++)if(isF(x+i,y+j))d=Math.min(d,Math.max(Math.abs(i),Math.abs(j)));
+  if(d>=2){g.fillStyle='rgba(6,7,12,'+(d===2?.38:.72)+')';g.fillRect(x*T,y*T,T,T)}}
+ // uneven edges and rounded inner corners where floor meets wall; pebbles along wall bases
+ const wc=th.w2;for(let y=0;y<fl.h;y++)for(let x=0;x<fl.w;x++){if(!isF(x,y)||inH(x,y))continue;const X=x*T,Y=y*T,wL=!isF(x-1,y)&&!V.voids.has((x-1)+','+y),wR=!isF(x+1,y)&&!V.voids.has((x+1)+','+y),wU=!isF(x,y-1)&&!V.voids.has(x+','+(y-1)),wD=!isF(x,y+1)&&!V.voids.has(x+','+(y+1));
+  g.fillStyle=wc;
+  if(wL)for(let k=0;k<T;k+=6)if(R()<.5)g.fillRect(X,Y+k,1+Math.floor(R()*3),6);if(wR)for(let k=0;k<T;k+=6)if(R()<.5){const w=1+Math.floor(R()*3);g.fillRect(X+T-w,Y+k,w,6)}
+  if(wD)for(let k=0;k<T;k+=6)if(R()<.5){const h=1+Math.floor(R()*3);g.fillRect(X+k,Y+T-h,6,h)}
+  for(const [a,b,cx,cy] of [[wL,wU,X,Y],[wR,wU,X+T,Y],[wL,wD,X,Y+T],[wR,wD,X+T,Y+T]])if(a&&b){g.beginPath();g.moveTo(cx,cy);g.lineTo(cx+(cx===X?9:-9),cy);g.quadraticCurveTo(cx+(cx===X?2:-2),cy+(cy===Y?2:-2),cx,cy+(cy===Y?9:-9));g.closePath();g.fill()}
+  if(wU)for(let k=0;k<3;k++)if(R()<.55){const px=X+3+R()*(T-8),py=Y+2+R()*6;dpShadow(g,px+2,py+3,3,1.5);g.fillStyle=R()<.5?th.e:th.w1;g.fillRect(Math.round(px),Math.round(py),3+Math.floor(R()*3),2+Math.floor(R()*2))}}
+ // corridors: rails (stalagmite/deepslate/core), rope lines elsewhere, lantern posts every few tiles
+ const li=dpLi(r),rails=[2,3,7].includes(li),inRoom=(x,y)=>fl.rooms.some(o=>x>=o[0]&&x<o[0]+o[2]&&y>=o[1]&&y<o[1]+o[3]);
+ if(R()<.75){let n=0;for(let y=0;y<fl.h;y++)for(let x=0;x<fl.w;x++){if(+fl.tiles[y][x]!==2||inRoom(x,y)||V.bridges.has(x+','+y))continue;const X=x*T,Y=y*T,hz=isF(x-1,y)&&isF(x+1,y)&&!isF(x,y-1)&&!isF(x,y+1),vt=isF(x,y-1)&&isF(x,y+1)&&!isF(x-1,y)&&!isF(x+1,y);if(!hz&&!vt)continue;n++;
+  if(rails){if(hz){for(let i=2;i<T;i+=10)g.fillStyle='#4a3020',g.fillRect(X+i,Y+11,5,18);g.fillStyle='#9aa4ae';g.fillRect(X,Y+14,T,2);g.fillRect(X,Y+24,T,2)}
+   else{for(let i=2;i<T;i+=10)g.fillStyle='#4a3020',g.fillRect(X+11,Y+i,18,5);g.fillStyle='#9aa4ae';g.fillRect(X+14,Y,2,T);g.fillRect(X+24,Y,2,T)}}
+  else{g.strokeStyle='#b89a64';g.lineWidth=1.5;g.beginPath();if(hz){g.moveTo(X,Y+4);g.quadraticCurveTo(X+T/2,Y+9,X+T,Y+4);g.moveTo(X,Y+T-4);g.quadraticCurveTo(X+T/2,Y+T+1,X+T,Y+T-4)}else{g.moveTo(X+4,Y);g.quadraticCurveTo(X+9,Y+T/2,X+4,Y+T);g.moveTo(X+T-4,Y);g.quadraticCurveTo(X+T+1,Y+T/2,X+T-4,Y+T)}g.stroke();
+   g.fillStyle='#5a3a1e';if(hz){g.fillRect(X,Y+1,3,6);g.fillRect(X,Y+T-7,3,6)}else{g.fillRect(X+1,Y,6,3);g.fillRect(X+T-7,Y,6,3)}}
+  if(n%4===2){const lx=hz?X+T/2:X+3,ly=hz?Y+2:Y+T/2;dpShadow(g,lx+2,ly+6,4,2);g.fillStyle='#3a2614';g.fillRect(lx,ly-10,2,14);g.fillStyle='#ffd27a';g.fillRect(lx-2,ly-14,6,5);P.lights.push([lx+1,ly-12,62,'lamp'])}}}
+ // boss arena: banners on the top wall, pillar caps on the corners, a seal on the floor
+ if(fl.boss&&fl.stairs){const o=fl.rooms.find(o=>fl.stairs[0]>=o[0]&&fl.stairs[0]<o[0]+o[2]&&fl.stairs[1]>=o[1]&&fl.stairs[1]<o[1]+o[3]);if(o){const S=typeof dlStyle==='function'?dlStyle(r):{acc:'#c9c2b0',torch:'#ffd08a'},cx=(o[0]+o[2]/2)*T,cy=(o[1]+o[3]/2)*T;
+  for(let x=o[0];x<o[0]+o[2];x+=2){const X=x*T+T/2-7,Y=(o[1]-1)*T+T-14;dpShadow(g,X+7,Y+30,8,2);g.fillStyle='#5a1820';g.fillRect(X,Y,14,26);g.fillStyle=S.acc;g.fillRect(X,Y,14,3);g.fillRect(X+5,Y+10,4,8);g.fillStyle='#5a1820';g.beginPath();g.moveTo(X,Y+26);g.lineTo(X+7,Y+32);g.lineTo(X+14,Y+26);g.fill()}
+  for(const [px,py] of [[o[0]-1,o[1]-1],[o[0]+o[2],o[1]-1],[o[0]-1,o[1]+o[3]],[o[0]+o[2],o[1]+o[3]]]){const X=px*T,Y=py*T;g.fillStyle='#8a8576';g.fillRect(X+6,Y+6,T-12,T-12);g.fillStyle='#a8a291';g.fillRect(X+6,Y+6,T-12,4);g.fillStyle='rgba(0,0,0,.3)';g.fillRect(X+T-10,Y+6,4,T-12)}
+  const rr=Math.min(o[2],o[3])*T*.32;g.strokeStyle=S.acc;g.lineWidth=3;g.globalAlpha=.55;g.beginPath();g.arc(cx,cy,rr,0,7);g.stroke();g.beginPath();g.arc(cx,cy,rr*.7,0,7);g.stroke();
+  for(let k=0;k<6;k++){const a=k*Math.PI/3;g.beginPath();g.moveTo(cx+Math.cos(a)*rr*.7,cy+Math.sin(a)*rr*.7);g.lineTo(cx+Math.cos(a+2.09)*rr*.7,cy+Math.sin(a+2.09)*rr*.7);g.stroke()}g.globalAlpha=1;
+  P.lights.push([cx,cy,rr*1.4,'seal']);P.seal=[cx,cy,rr]}}}
+// ---------- landmark rooms (their walls are real; see gdLandmark) ----------
+function dpLandmark(g,fl,o,th,R,P){const T=GD_T,[x0,y0,w,h,kind]=o,isF=(x,y)=>x>=0&&y>=0&&x<fl.w&&y<fl.h&&+fl.tiles[y][x]>0,inH=(x,y)=>x>=x0&&x<x0+w&&y>=y0&&y<y0+h,cx=(x0+w/2)*T,cy=(y0+h/2)*T;
+ const floorT=kind==='shrine'?['#8d887a','#7f7a6d']:kind==='camp'?['#7a6448','#6e5940']:kind==='library'?['#4f3a29','#5a4330']:['#5a4330','#634a35'];
+ for(let y=y0;y<y0+h;y++)for(let x=x0;x<x0+w;x++){const X=x*T,Y=y*T;
+  if(kind==='shrine'){g.fillStyle=floorT[(x+y)%2];g.fillRect(X,Y,T,T);g.fillStyle='rgba(0,0,0,.18)';g.fillRect(X,Y,T,1);g.fillRect(X,Y,1,T)}
+  else if(kind==='camp'){g.fillStyle=floorT[0];g.fillRect(X,Y,T,T);for(let k=0;k<5;k++){g.fillStyle=R()<.5?floorT[1]:'#86704f';g.fillRect(X+R()*36,Y+R()*36,3+R()*4,2)}}
+  else{for(let k=0;k<5;k++){g.fillStyle=floorT[(k+x+y)%2];g.fillRect(X,Y+k*8,T,8);g.fillStyle='rgba(0,0,0,.35)';g.fillRect(X,Y+k*8+7,T,1)}}
+  if(kind==='library'&&R()<.35){g.fillStyle='rgba(90,160,210,.38)';g.beginPath();g.ellipse(X+20,Y+22,16+R()*6,9+R()*4,0,0,7);g.fill();g.fillStyle='rgba(255,255,255,.4)';g.fillRect(X+12,Y+18,6,1)}}
+ // objects standing on the inner wall tiles
+ for(let y=y0;y<y0+h;y++)for(let x=x0;x<x0+w;x++){if(isF(x,y))continue;const X=x*T,Y=y*T;
+  if(kind==='shrine'){if(x===Math.floor(x0+w/2)||x===x0+(w>>1)){dpShadow(g,X+20,Y+36,15,4);g.fillStyle='#9a9484';g.fillRect(X+6,Y+26,28,12);g.fillStyle='#b8b2a0';g.fillRect(X+12,Y+6,16,22);g.fillRect(X+9,Y+2,22,8);g.fillStyle='#d8d2bf';g.fillRect(X+15,Y-6,10,10);g.fillStyle='#7a7466';g.fillRect(X+12,Y+14,16,2);P.lights.push([X+20,Y+10,70,'statue'])}
+   else{dpShadow(g,X+20,Y+36,13,3);g.fillStyle='#8a8576';g.fillRect(X+8,Y+4,24,32);g.fillStyle='#a8a291';g.fillRect(X+8,Y+4,24,4);g.fillRect(X+5,Y+32,30,5);g.fillStyle='rgba(0,0,0,.25)';g.fillRect(X+26,Y+8,6,24)}}
+  else if(kind==='camp'){g.fillStyle=floorT[0];g.fillRect(X,Y,T,T)}
+  else if(kind==='library'){dpShadow(g,X+20,Y+37,18,3);g.fillStyle='#3a2414';g.fillRect(X+1,Y+2,T-2,T-4);g.fillStyle='#24160c';g.fillRect(X+1,Y+14,T-2,2);g.fillRect(X+1,Y+26,T-2,2);
+   for(const sy of [4,16,28])for(let i=3;i<T-4;i+=4){g.fillStyle=['#7a3b3b','#3b5a7a','#6a6a3b','#4a6a4a','#8a6a3a'][Math.floor(R()*5)];g.fillRect(X+i,Y+sy+(R()<.15?3:0),3,R()<.15?7:9)}}
+  else{dpShadow(g,X+20,Y+38,18,3);g.fillStyle='#3a322d';g.fillRect(X,Y,T,T);g.fillStyle='#4b3a2c';g.fillRect(X,Y+T-14,T,14);g.fillStyle='#24180f';g.fillRect(X,Y+T/2-2,T,4)}}
+ if(kind==='camp'){const t=[];for(let y=y0;y<y0+h;y++)for(let x=x0;x<x0+w;x++)if(!isF(x,y))t.push([x,y]);if(t.length){const xs=t.map(p=>p[0]),ys=t.map(p=>p[1]),X=Math.min(...xs)*T,Y=Math.min(...ys)*T,W=(Math.max(...xs)+1)*T-X,H=(Math.max(...ys)+1)*T-Y;
+   dpShadow(g,X+W/2,Y+H-2,W/2,6);g.fillStyle='#4f6b3a';g.beginPath();g.moveTo(X+2,Y+H-2);g.lineTo(X+W/2,Y+6);g.lineTo(X+W-2,Y+H-2);g.closePath();g.fill();g.fillStyle='#3f5a2e';g.beginPath();g.moveTo(X+W/2,Y+6);g.lineTo(X+W-2,Y+H-2);g.lineTo(X+W/2,Y+H-2);g.closePath();g.fill();
+   g.fillStyle='#1c140c';g.beginPath();g.moveTo(X+W/2-10,Y+H-2);g.lineTo(X+W/2,Y+H-26);g.lineTo(X+W/2+10,Y+H-2);g.fill();g.fillStyle='#8a6a3a';g.fillRect(X+W/2-1,Y+4,2,6)}
+  const fx=cx+(R()<.5?-T:T),fy=cy+T*.6;dpShadow(g,fx,fy+6,14,4);for(let k=0;k<6;k++){g.save();g.translate(fx,fy);g.rotate(k*1.05);g.fillStyle='#6a4a2a';g.fillRect(-2,-12,4,12);g.restore()}g.fillStyle='#ff9a3d';g.fillRect(fx-5,fy-8,10,8);g.fillStyle='#ffe08a';g.fillRect(fx-2,fy-10,4,6);P.lights.push([fx,fy-4,96,'fire']);P.fire=[fx,fy];
+  for(let k=0;k<2;k++){const bx=x0*T+T*(1+k*2.2)+R()*10,by=(y0+h-2)*T+R()*10;dpShadow(g,bx+14,by+12,15,3);g.fillStyle=['#7a3b3b','#3b5a7a'][k];g.fillRect(bx,by,28,12);g.fillStyle='#e8e0cc';g.fillRect(bx,by,8,12)}}
+ if(kind==='office'){for(let k=0;k<2;k++){const dx=(x0+1+k*(w-3))*T+4,dy=(y0+1)*T+10;dpShadow(g,dx+16,dy+24,18,4);g.fillStyle='#6a4a2c';g.fillRect(dx,dy,34,18);g.fillStyle='#8a6440';g.fillRect(dx,dy,34,3);g.fillStyle='#e8e0cc';g.fillRect(dx+6,dy+5,10,7);g.fillStyle='#ffd27a';g.fillRect(dx+24,dy+3,5,6);P.lights.push([dx+26,dy+4,60,'lamp'])}
+  const mx=(x0+(w>>1))*T,my=(y0+h-1)*T+8;g.fillStyle='#c9b98a';g.fillRect(mx-12,my,30,20);g.strokeStyle='#7a3b3b';g.lineWidth=1;g.beginPath();g.moveTo(mx-8,my+4);g.lineTo(mx+2,my+12);g.lineTo(mx+12,my+6);g.stroke()}
+ if(kind==='library')for(let k=0;k<4;k++){const bx=(x0+R()*w)*T,by=(y0+R()*h)*T;if(!isF(Math.floor(bx/T),Math.floor(by/T)))continue;g.save();g.translate(bx,by);g.rotate(R()*3);g.fillStyle=['#7a3b3b','#3b5a7a','#6a6a3b'][k%3];g.fillRect(-6,-4,12,8);g.fillStyle='#e8e0cc';g.fillRect(-5,-3,10,1);g.restore()}
+ if(kind==='shrine'){g.strokeStyle='#ffe9a0';g.globalAlpha=.4;g.lineWidth=2;g.beginPath();g.arc(cx,cy,T*1.1,0,7);g.stroke();g.globalAlpha=1}}
+// ---------- lighting: a dark veil with soft holes at every light; the party carries its own light ----------
+function dpLight(r,fl,P,S){const T=GD_T,li=dpLi(r),a=DP_DARK[li]??.2,c=document.createElement('canvas');c.width=fl.w*T;c.height=fl.h*T;const g=c.getContext('2d');
+ g.fillStyle='rgba(4,6,14,'+a+')';g.fillRect(0,0,c.width,c.height);g.globalCompositeOperation='destination-out';
+ const hole=(x,y,rad,k=1)=>{const gr=g.createRadialGradient(x,y,0,x,y,rad);gr.addColorStop(0,'rgba(0,0,0,'+k+')');gr.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=gr;g.fillRect(x-rad,y-rad,rad*2,rad*2)};
+ (P.torches||[]).forEach(([x,y])=>hole(x*T+T/2,y*T+T-14,78));(P.crystals||[]).forEach(([x,y])=>hole(x*T+12,y*T+10,46,.8));(P.lights||[]).forEach(([x,y,rad])=>hole(x,y,rad));
+ (P.room||[]).forEach(({kind,cracks})=>{if(kind==='lava')cracks.forEach(seg=>seg.forEach(([x,y])=>hole(x,y,34,.7)))});
+ g.globalCompositeOperation='source-over';
+ c.className='dl-dark';return c}
+// ---------- weather, mist and footsteps (called from dlAmb) ----------
+function dpAmbient(el,field,r,fl,P,S,R,h){const T=GD_T,li=dpLi(r),sub=r&&r.sub&&r.sub.k,V=typeof dvPlan==='function'?dvPlan(fl,r):{scenes:[]},mc=({0:'#cfe8f0',1:'#cfe6c0',4:'#9fc0e6',5:'#e6e8b0',6:'#e0a080',7:'#ffe9b0'})[li]||'#d8dde6';
+ V.scenes.forEach(s=>h.push('<i class="dl-mist" style="left:'+((s.x0-1)*T)+'px;top:'+(s.y0*T)+'px;width:'+((s.x1-s.x0+3)*T)+'px;height:'+((s.y1-s.y0+1)*T)+'px;--mc:'+mc+'"></i>'));
+ if([1,4,5].includes(li)){const big=fl.rooms.filter(o=>o[2]*o[3]>=20);for(let i=0;i<2&&big.length;i++){const o=big[Math.floor(R()*big.length)];h.push('<i class="dl-mist low" style="left:'+(o[0]*T)+'px;top:'+((o[1]+o[3]-2)*T)+'px;width:'+(o[2]*T)+'px;height:'+(2*T)+'px;--mc:'+mc+';animation-delay:-'+(R()*9).toFixed(1)+'s"></i>')}}
+ if([0,1,4].includes(li)){let n=0;for(let t=0;t<40&&n<3;t++){const o=fl.rooms[Math.floor(R()*fl.rooms.length)],x=o[0]+Math.floor(R()*o[2]),y=o[1]+Math.floor(R()*o[3]);if(!P.free(x,y))continue;n++;h.push('<i class="dl-stream" style="left:'+(x*T+18)+'px;top:'+(y*T-60)+'px;animation-delay:-'+(R()*2).toFixed(1)+'s"></i><i class="dl-splash" style="left:'+(x*T+20)+'px;top:'+(y*T+26)+'px;animation-delay:-'+(R()*.8).toFixed(1)+'s"></i>')}}
+ if(li===1)for(let i=0;i<4;i++){const o=fl.rooms[Math.floor(R()*fl.rooms.length)];h.push('<i class="dl-spores" style="left:'+((o[0]+R()*o[2])*T)+'px;top:'+((o[1]+R()*o[3])*T)+'px;animation-delay:-'+(R()*12).toFixed(1)+'s"></i>')}
+ if(P.fire)h.push('<i class="dl-fire" style="left:'+P.fire[0]+'px;top:'+(P.fire[1]-6)+'px"></i>');if(P.seal)h.push('<i class="dl-seal" style="left:'+(P.seal[0]-P.seal[2])+'px;top:'+(P.seal[1]-P.seal[2])+'px;width:'+(P.seal[2]*2)+'px;height:'+(P.seal[2]*2)+'px;--sc:'+S.acc+'"></i>');
+ (P.lights||[]).filter(l=>l[3]==='lamp').forEach(([x,y])=>h.push('<i class="dl-lamp" style="left:'+(x-3)+'px;top:'+(y-3)+'px;animation-delay:-'+(R()*2).toFixed(1)+'s"></i>'));
+ // screen-space weather in the field (ash in fiery places, sand in sandy sublayers)
+ let wx=field.querySelector('.gd-weather');if(wx)wx.remove();const kind=(li===6||sub==='ashen')?'ash':DP_SAND.has(sub)?'sand':li===7?'glow':'';if(kind){wx=document.createElement('div');wx.className='gd-weather w-'+kind;const mpEl=field.querySelector('.gd-map');mpEl.after(wx)}}
+function dpFeet(el,r,fl,P){const T=GD_T,b=r.battle,units=[...r.party,...(b?b.enemies.filter(e=>e.hp>0&&!e.done):[])],last=el._pos||(el._pos={}),fx=[];
+ const inRoom=(o,x,y)=>x>=o[0]&&x<o[0]+o[2]&&y>=o[1]&&y<o[1]+o[3];
+ units.forEach((u,i)=>{const k=u.x+','+u.y,id=u.id||('e'+i);if(last[id]&&last[id]!==k){let t=(P.puddles&&P.puddles.has(k))?'ripple':'';
+   (P.room||[]).forEach(({o,kind})=>{if(inRoom(o,u.x,u.y)){if(kind==='pond'){const cx=o[0]+o[2]/2,cy=o[1]+o[3]/2;if(((u.x+.5-cx)/(o[2]/2-1.1))**2+((u.y+.5-cy)/(o[3]/2-1.1))**2<=1)t='ripple'}else if(kind==='garden')t='leaf';else if(kind==='lava')t='puff'}});
+   if(t)fx.push('<i class="dl-step s-'+t+'" style="left:'+(u.x*T+T/2)+'px;top:'+(u.y*T+T-8)+'px"></i>')}last[id]=k});
+ // party light follows the team
+ el.querySelectorAll('.dl-plight').forEach(e=>e.remove());el.insertAdjacentHTML('beforeend',r.party.filter(m=>m.hp>0&&m.x>=0).map(m=>'<i class="dl-plight" style="left:'+(m.x*T+T/2)+'px;top:'+(m.y*T+T/2)+'px"></i>').join('')+fx.join(''));
+ if(fx.length)setTimeout(()=>el.querySelectorAll('.dl-step').forEach(e=>{if(e.getAnimations&&e.getAnimations().every(a=>a.playState==='finished'))e.remove()}),1400)}
 
 </script><input type="file" id="backupPicker" style="display:none" onchange="onPickedBackup(this)"></body></html>
