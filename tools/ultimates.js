@@ -52,7 +52,12 @@ async function ultSplash(p,U,context){const head=U.fx==='kjseries'?rareDir(rareC
 function fxField(){return document.querySelector('.dg-field')}
 function fxPos(sel){const f=fxField(),el=document.querySelector(sel);if(!f||!el)return null;const a=f.getBoundingClientRect(),s=(el.querySelector('.dg-spr')||el).getBoundingClientRect();return {x:s.left-a.left+s.width/2,y:s.top-a.top+s.height/2,w:s.width,h:s.height,b:s.bottom-a.top}}
 const fxA=i=>fxPos('.dg-ally[data-i="'+i+'"]'),fxF=i=>fxPos('.dg-foe[data-i="'+i+'"]');
-function fxEl(cls,style,html){const f=fxField();if(!f)return null;const d=document.createElement('div');d.className='ufx '+cls;for(const k in style||{})d.style.setProperty(k,style[k]);if(html)d.innerHTML=html;f.appendChild(d);return d}
+function fxEl(cls,style,html){const f=fxField();if(!f)return null;const d=document.createElement('div');d.className='ufx '+cls;for(const k in style||{})d.style.setProperty(k,style[k]);if(html)d.innerHTML=html;f.appendChild(d);if(!/^ov\b/.test(cls))fxPin(d);return d}
+// Effects are placed in field coordinates when they spawn. If the camera pans afterwards, each pinned effect is
+// shifted by exactly how far the map has moved since it spawned, so it stays on the same tiles.
+const fxPinned=new Set();let fxPinRaf=0;
+function fxPin(d){const mp=document.querySelector('.gd-field .gd-map');if(!d||!mp)return d;const r=mp.getBoundingClientRect();d._pin={mp,x:r.left,y:r.top};fxPinned.add(d);if(!fxPinRaf)fxPinRaf=requestAnimationFrame(fxPinTick);return d}
+function fxPinTick(){fxPinRaf=0;for(const d of fxPinned){if(!d.isConnected||!d._pin.mp.isConnected){fxPinned.delete(d);continue}const r=d._pin.mp.getBoundingClientRect();d.style.translate=Math.round(r.left-d._pin.x)+'px '+Math.round(r.top-d._pin.y)+'px'}if(fxPinned.size)fxPinRaf=requestAnimationFrame(fxPinTick)}
 function fxGone(d,ms){if(d)setTimeout(()=>d.remove(),ms)}
 function fxFly(from,to,cls,ms,style,ease){const d=fxEl(cls,Object.assign({left:from.x+'px',top:from.y+'px'},style||{}));if(!d)return;d.animate([{transform:'translate(-50%,-50%)'},{transform:'translate(calc(-50% + '+(to.x-from.x)+'px),calc(-50% + '+(to.y-from.y)+'px))'}],{duration:ms,easing:ease||'ease-in',fill:'forwards'});fxGone(d,ms+40)}
 function fxBoom(at,color,size){if(!at)return;fxGone(fxEl('boom',{left:at.x+'px',top:at.y+'px','--c':color,'--s':(size||64)+'px'}),620)}
