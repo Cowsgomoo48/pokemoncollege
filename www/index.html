@@ -6344,8 +6344,7 @@ let safariRevealId=null,safariRevealUntil=0;
 const RARE_COSTUMES={Pawniard:{id:'masked',name:'KJ',num:'0624',sheets:true},Bisharp:{id:'masked',name:'KJ',num:'0625',sheets:true},Ralts:{id:'battle_machine',name:'Battle Machine',num:'0280',sheets:true},Gardevoir:{id:'battle_machine',name:'Battle Machine',num:'0282',sheets:true},
  Charcadet:{id:'sage',name:'Sage',num:'0935',sheets:true},Armarouge:{id:'sage',name:'Sage',num:'0936',sheets:true},Ceruledge:{id:'sage',name:'Sage',num:'0937',sheets:true},
  Snorunt:{id:'miku',name:'Miku',num:'0361',sheets:true},Froslass:{id:'miku',name:'Miku',num:'0478',sheets:true},
- Hatenna:{id:'kaboom',name:'Kaboom',num:'0856',sheets:true},Hattrem:{id:'kaboom',name:'Kaboom',num:'0857',sheets:true},Hatterene:{id:'kaboom',name:'Kaboom',num:'0858',sheets:true},
- Braixen:{id:'navigator',name:'Navigator',num:'0654',sheets:true,noShiny:true},Delphox:{id:'navigator',name:'Navigator',num:'0655',sheets:true,noShiny:true}};
+ Hatenna:{id:'kaboom',name:'Kaboom',num:'0856',sheets:true},Hattrem:{id:'kaboom',name:'Kaboom',num:'0857',sheets:true},Hatterene:{id:'kaboom',name:'Kaboom',num:'0858',sheets:true}};
 let rareManifest=null;
 function rareDir(r,p){return './assets/costume/rare/'+r.id+'/'+r.num+'/'+(p&&p.shiny&&!r.noShiny?'shiny':'normal')+'/'}
 async function loadRareAnims(r){if(!rareManifest)rareManifest=fetch('./assets/costume/rare/manifest.json').then(x=>x.json());const all=await rareManifest,a=all[r.id+'|'+r.num+'|'+r.variant]||all[r.id+'|'+r.num+'|normal'];if(!a)throw new Error('costume sheets missing');return a}
@@ -6522,7 +6521,7 @@ $('navHome').style.display='none';
  if(pcStorageReady)ensureMoveData();
  if(pcStorageReady&&permRoll())save();
  render();scheduleNotifs();aiCheck();window.__pcBooted=true;setTimeout(()=>{try{mdSync()}catch(e){}},1500);setTimeout(()=>{try{facTick()}catch(e){}},2500);setInterval(()=>{try{facTick();if(currentPage==='home'&&hab.scene&&hab.scene!=='home')drawHabitat()}catch(e){}},60000);
- window.__pcVersion='0.83.0';
+ window.__pcVersion='0.84.0';
  document.addEventListener('pointerdown',function(e){try{var t=e.target.closest&&e.target.closest('[onclick],button,a,[id]');if(!t)return;var oc=t.getAttribute('onclick');window.__pcLastTap=(oc?oc.slice(0,60):(t.id?'#'+t.id:t.tagName.toLowerCase()+'.'+String(t.className).split(' ')[0])).replace(/\s+/g,' ')}catch(_){}} ,true);
  Object.keys(window).forEach(function(k){var f=window[k];if(typeof f!=='function'||/^[A-Z]/.test(k)||k==='appError'||k==='$'||k==='esc'||/\[native code\]/.test(Function.prototype.toString.call(f)))return;
   var w=function(){try{return f.apply(this,arguments)}catch(err){if(err&&typeof err==='object'&&!err.__pcLogged){try{err.__pcLogged=1}catch(_){}appError(err,k)}throw err}};try{window[k]=w}catch(_){}});
@@ -7077,6 +7076,8 @@ function dpFeet(el,r,fl,P){const T=GD_T,b=r.battle,units=[...r.party,...(b?b.ene
  if(fx.length)setTimeout(()=>el.querySelectorAll('.dl-step').forEach(e=>{if(e.getAnimations&&e.getAnimations().every(a=>a.playState==='finished'))e.remove()}),1400)}
 
 
+// Navigator costume was removed (v0.84.0): Braixen/Delphox that had it go back to normal
+setTimeout(function(){try{let n=0;(db.pokemon||[]).forEach(function(p){if(p.costume==='navigator'){p.costume=null;n++}});if(n)save()}catch(_){}},1200);
 // One-time gift requested by the player (v0.83.0): 1 Facility Ticket
 setTimeout(function(){try{if(db&&!db.gift0830){inv().facticket=(inv().facticket||0)+1;db.gift0830=1;save();toast('🎫 +1 Facility Ticket added to your Bag')}}catch(_){}},1500);
 // Functions added after the boot-time wrapper also get wrapped, so iOS logs their errors with details instead of "Script error."
