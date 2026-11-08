@@ -1230,6 +1230,70 @@ button.tp-locked::after{content:'';position:absolute;right:12px;top:50%;transfor
 @keyframes dpStep{from{transform:scale(.5) translateY(0);opacity:1}to{transform:scale(2.2) translateY(-6px);opacity:0}}
 @media (prefers-reduced-motion:reduce){.gd-weather{animation:none!important}}
 
+/* Misc tab: Pokédex + Advancements */
+.dock-misc,.misc-adv{position:relative}
+.adv-bang{display:none;position:absolute;top:2px;right:18%;width:17px;height:17px;border-radius:50%;background:#e8504a;color:#fff;font-style:normal;font-weight:900;font-size:12px;line-height:17px;text-align:center;box-shadow:0 0 0 2px #fff;animation:advBang 1.2s ease-in-out infinite}
+.misc-adv .adv-bang{top:10px;right:12px;width:22px;height:22px;line-height:22px;font-size:15px}
+.adv-ready .adv-bang{display:block}
+@keyframes advBang{0%,100%{transform:scale(1)}50%{transform:scale(1.25)}}
+.misc-menu{display:grid;gap:14px;padding:6px 0}
+.misc-big{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-height:150px;border:0;border-radius:24px;background:linear-gradient(160deg,#ffffff,#eef4fb);box-shadow:0 8px 22px #0e274422,inset 0 0 0 2px #dbe6f2;color:#1f3446;font-size:22px;font-weight:900;letter-spacing:.5px}
+.misc-big .ico,.misc-big img{width:58px!important;height:58px!important}
+.misc-big small{font-size:12px;font-weight:700;color:#6c829a;letter-spacing:0}
+.misc-top{display:flex;align-items:center;gap:10px;margin-bottom:10px}.misc-top b{flex:1;font-size:17px;color:#1f3446}
+.dex-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(82px,1fr));gap:8px}
+.dex-cell{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 4px 8px;border:0;border-radius:14px;background:#fff;box-shadow:inset 0 0 0 2px #e3ebf4;min-height:104px}
+.dex-cell small{font-size:9px;color:#8aa0b6;font-weight:800}.dex-cell b{font-size:10px;color:#35566f;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dex-cell.unk{background:#eef2f6}.dex-q{display:grid;place-items:center;width:52px;height:52px;border-radius:50%;background:#d7e0ea;color:#fff;font-size:30px;font-weight:900}
+.dex-detail{display:flex;flex-direction:column;align-items:center;gap:8px}
+#dexCv{width:160px;height:160px;border-radius:18px;background:radial-gradient(circle at 50% 70%,#e8f1fa,#d3e1ef);image-rendering:pixelated}
+.dex-types{display:flex;gap:6px}.type-pill{padding:2px 10px;border-radius:999px;background:#8aa0b6;color:#fff;font-size:11px;font-weight:900}
+.dex-stats{width:100%;display:grid;gap:4px}.dex-stats>div{display:grid;grid-template-columns:62px 34px 1fr;align-items:center;gap:6px;font-size:12px}
+.dex-stats span{color:#6c829a;font-weight:800}.dex-stats b{text-align:right;color:#1f3446}.dex-stats i{height:8px;border-radius:4px;background:#e6edf4;overflow:hidden}.dex-stats em{display:block;height:100%;background:linear-gradient(90deg,#5cc2a0,#3f8fc4)}
+.dex-total{grid-template-columns:62px 34px 1fr!important;border-top:1px solid #e3ebf4;padding-top:4px}
+.dex-anims{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.adv-view{position:relative;height:min(62vh,560px);overflow:hidden;border-radius:22px;background:radial-gradient(circle at 30% 20%,#fffaf2,#f3ece0);box-shadow:inset 0 0 0 2px #e8dcc6;touch-action:none}
+.adv-board{position:absolute;left:0;top:0;transform-origin:0 0}
+.adv-lines{position:absolute;left:0;top:0;pointer-events:none}.adv-lines line{stroke:#cdbfa8;stroke-width:5;stroke-linecap:round}.adv-lines line.on{stroke:#f0b84e}
+.adv-head{position:absolute;top:22px;text-align:center;font-size:22px;font-weight:900;color:#5a4a36;letter-spacing:.5px}
+.adv-node{position:absolute;width:56px;height:56px;padding:0;border:0;border-radius:16px;background:#fff;box-shadow:0 4px 10px #5a4a3622,inset 0 0 0 3px #e4d8c4;display:grid;place-items:center;filter:grayscale(1);opacity:.55;transition:filter .3s,opacity .3s}
+.adv-node .ico,.adv-node img{width:36px!important;height:36px!important}
+.adv-node.done{filter:none;opacity:1;box-shadow:0 4px 10px #5a4a3633,inset 0 0 0 3px #f0b84e}
+.adv-node.can{animation:advGlow 1.4s ease-in-out infinite}
+@keyframes advGlow{0%,100%{box-shadow:0 0 0 0 #ffd16600,inset 0 0 0 3px #f0b84e}50%{box-shadow:0 0 16px 4px #ffd166cc,inset 0 0 0 3px #f0b84e}}
+.adv-tier{position:absolute;top:-7px;left:-7px;min-width:20px;height:20px;padding:0 4px;border-radius:10px;background:#5a4a36;color:#fff;font-style:normal;font-size:10px;font-weight:900;line-height:20px}
+.adv-chk{position:absolute;right:-6px;bottom:-6px;width:20px;height:20px;border-radius:50%;background:#3fb27f;color:#fff;font-style:normal;font-weight:900;font-size:13px;line-height:20px;box-shadow:0 0 0 2px #fff}
+.adv-bar{position:absolute;left:6px;right:6px;bottom:5px;height:4px;border-radius:2px;background:#e6dccb;overflow:hidden}.adv-bar u{display:block;height:100%;background:#f0b84e}
+.adv-shake{filter:grayscale(1)!important;opacity:.8!important;animation:advShake .55s linear}
+@keyframes advShake{0%,100%{transform:translate(0)}20%{transform:translate(-3px,1px) rotate(-4deg)}40%{transform:translate(3px,-1px) rotate(4deg)}60%{transform:translate(-2px,1px) rotate(-3deg)}80%{transform:translate(2px,0) rotate(3deg)}}
+.adv-slam{animation:advSlam .5s cubic-bezier(.3,1.6,.5,1)}
+@keyframes advSlam{0%{transform:scale(1)}35%{transform:scale(1.45)}70%{transform:scale(.9)}100%{transform:scale(1)}}
+.adv-cut::after{content:'Tap to skip';position:absolute;right:12px;bottom:10px;padding:4px 10px;border-radius:999px;background:#5a4a36cc;color:#fff;font-size:11px;font-weight:800}
+.adv-claimall{animation:advBang 1.2s ease-in-out infinite}
+.adv-hint{text-align:center;margin-top:6px}
+.adv-card{display:flex;gap:14px;align-items:flex-start}
+.adv-card-l{display:flex;flex-direction:column;align-items:center;gap:8px;width:42%}
+.adv-card-ico{width:100%;aspect-ratio:1;border-radius:22px;background:#fff;box-shadow:inset 0 0 0 3px #f0b84e;display:grid;place-items:center}.adv-card-ico.off{filter:grayscale(1);opacity:.55;box-shadow:inset 0 0 0 3px #e4d8c4}
+.adv-card-ico .ico,.adv-card-ico img{width:64%!important;height:64%!important}
+.adv-card-rw{display:flex;flex-wrap:wrap;gap:4px;justify-content:center;width:100%;border:0;border-radius:14px;background:#f6f1e8;padding:8px 6px}.adv-card-rw.can{background:#fff3cf;box-shadow:inset 0 0 0 2px #f0b84e;animation:advGlow 1.4s ease-in-out infinite}
+.adv-card-rw small{width:100%;font-size:11px;font-weight:900;color:#a07a2c}
+.adv-rw{display:inline-flex;align-items:center;gap:3px;font-size:11px;color:#5a4a36}.adv-rw .ico,.adv-rw img{width:18px!important;height:18px!important}
+.adv-card-r{flex:1}.adv-card-r h3{margin:2px 0 8px;padding-bottom:6px;border-bottom:2px solid #e4d8c4;font-size:17px;color:#1f3446}.adv-card-r p{margin:0 0 8px;font-size:13px;color:#4a5a6a}
+.adv-prog{position:relative;height:18px;border-radius:9px;background:#efe6d6;overflow:hidden}.adv-prog i{display:block;height:100%;background:linear-gradient(90deg,#f6d27a,#f0b84e)}.adv-prog b{position:absolute;inset:0;text-align:center;font-size:11px;line-height:18px;color:#5a4a36}
+.adv-flow{position:fixed;left:0;right:0;bottom:calc(96px + env(safe-area-inset-bottom));z-index:9000;display:flex;justify-content:center;pointer-events:none;animation:advUp .35s cubic-bezier(.3,1.4,.5,1)}
+.adv-flow.out{transition:opacity .45s,transform .45s;opacity:0;transform:translateY(20px)}
+.adv-flow-box{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:220px;max-width:86vw;padding:10px 14px;border-radius:18px;background:#1f3446;color:#fff;box-shadow:0 10px 26px #0006}
+.adv-flow-box>.ico,.adv-flow-box>img{width:30px!important;height:30px!important}
+.adv-flow-list{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}.adv-flow .adv-rw{color:#fff}
+.adv-rw.fly{animation:advIn .45s cubic-bezier(.3,1.4,.5,1)}
+@keyframes advUp{from{transform:translateY(60px);opacity:0}to{transform:none;opacity:1}}
+@keyframes advIn{from{transform:translateY(-60px) scale(.6);opacity:0}to{transform:none;opacity:1}}
+.adv-card .adv-card-ico img.ico,.adv-card .adv-card-ico .ico{width:64%!important;height:64%!important}
+.adv-node img.ico{width:36px!important;height:36px!important}
+.misc-big img.ico{width:58px!important;height:58px!important}
+.adv-rw img.ico{width:18px!important;height:18px!important;margin:0!important;vertical-align:middle}
+.adv-flow-box>img.ico{width:30px!important;height:30px!important}
+
 </style><style id="bundled-animation-style">
 .safari-foreground{position:absolute;inset:0;z-index:10;pointer-events:auto;background:#071b0d;display:flex;align-items:center;justify-content:center;overflow:hidden}
 .safari-foreground img{width:100%;height:100%;object-fit:cover;image-rendering:pixelated}
@@ -1246,6 +1310,7 @@ button.tp-locked::after{content:'';position:absolute;right:12px;top:50%;transfor
 </button>
 <div class="home-section-head"><span>QUICK ACCESS</span><span class="head-decoration" aria-hidden="true">✧ • ✧</span></div>
 <div class="menu"><button class="tile-task" onclick="go('tasks')"><span class="pic">🌳</span><span><b>Sutodo List</b><small>Plan your assignments</small></span></button><button class="tile-chat" onclick="go('chat')"><span class="pic">🎙️</span><span><b>ChatTalk</b><small>Record & transcribe</small></span></button><button class="tile-pics" onclick="go('pics')"><span class="pic">📷</span><span><b>PokéPics</b><small>Photo study library</small></span></button><button class="tile-games" onclick="go('minigames')"><span class="pic">🎮</span><span><b>Minigames</b><small>Study and play</small></span></button></div><button class="fullbtn" onclick="go('summaries')">📚 SUMMARIES</button><div class="secondaryMenu"><button class="btn stretch" onclick="go('safari')">🌿 POKÉSAFARI</button><button class="btn stretch" onclick="go('collection')">▦ POKÉMON BOX</button></div><div class="secondaryMenu"><button class="btn stretch" onclick="go('focus')">⏱ FOCUS</button><button class="btn stretch" onclick="go('shop')">🛒 COG SHOP</button></div><div class="foot">ON-DEVICE PROGRESS • FAN PROJECT</div><div class="notice" id="installHint" style="display:none">To use PokémonCollege like an app: in Safari, tap Share → Add to Home Screen → enable Open as Web App. Open PokémonCollege from its new icon.</div></section>
+<section class="section" id="misc"><div id="miscBody"></div></section>
 <section class="section" id="shop"><div class="shop-scene"><img src="assets/shop/shop_bg.jpg" alt="Magearna's shop counter"><div class="shop-mag" id="shopMag" onclick="magTap()" role="button" aria-label="Tap Magearna"><div class="mag-in"><img class="mag-arm l" src="assets/shop/mag_armL.png" alt=""><img class="mag-arm r" src="assets/shop/mag_armR.png" alt=""><img src="assets/shop/mag_body.png" alt="Magearna"></div></div><img class="shop-front" src="assets/shop/shop_bg.jpg" alt=""><div class="shop-bubble" id="shopBubble"></div></div><div class="bar" style="margin-top:0;border-radius:0 0 16px 16px">🛒 MAGEARNA&#39;S SHOP <span id="shopBalance">0 ⚙</span></div><div id="shopArea"></div><div class="bar" style="margin-top:17px">💿 TM COUNTER · RARE CANDIES <span id="tmShopDate"></span></div><div id="tmDailyShop"></div><div id="tmRerollRow" class="tm-reroll"></div><p class="small muted">The stock rotates each day based on your iPhone's calendar date. You get one free reroll a day, and Reroll Tickets give more. TMs are saved in your collection, even after the shop rotates.</p><button class="btn blue" style="width:100%" onclick="go('safari')">🎟️ BUY SAFARI TICKETS →</button></section>
 
 <section class="section" id="tasks"><div class="sd-top"><div class="sd-title"><b>🌳 SUTODO LIST</b><span id="taskCount">0 OPEN</span><button class="sd-add" onclick="taskForm()" aria-label="Add task">＋</button></div><div class="sd-sort" role="group" aria-label="Sort tasks"><button data-s="due" onclick="setTaskSort('due')">DUE</button><button data-s="reward" onclick="setTaskSort('reward')">REWARD</button><button data-s="priority" onclick="setTaskSort('priority')">PRIORITY</button><button data-s="newest" onclick="setTaskSort('newest')">NEWEST</button><button id="doneToggle" onclick="toggleDone()">DONE (0)</button></div></div><div class="sd-scene" id="sdScene"><div class="sd-stars" id="sdStars"></div><div class="sd-axis"></div><div class="sd-tower" id="sdTower"><img class="sd-head" src="assets/sudo/head.png" alt=""><div class="sd-body" id="sdBody"></div><img class="sd-feet" src="assets/sudo/feet.png" alt=""></div><div class="sd-branches" id="sdBranches"></div><div class="sd-ground" id="sdGround"><button class="btn red sd-addbig" onclick="taskForm()">＋ ADD TASK</button></div></div><button class="sd-upload" onclick="ctTaskPicker()" aria-label="Import tasks from ChatTalk recordings">⇧</button></section>
@@ -1266,6 +1331,7 @@ button.tp-locked::after{content:'';position:absolute;right:12px;top:50%;transfor
   <button class="dockbtn" data-page="safari" onclick="go('safari')" aria-label="Safari"><span class="dockico">◉</span><small>Safari</small></button>
   <button class="dockbtn" data-page="collection" onclick="go('collection')" aria-label="Pokémon Box"><span class="dockico">▦</span><small>Box</small></button>
   <button class="dockbtn" data-page="shop" onclick="go('shop')" aria-label="Cog Shop"><span class="dockico">✦</span><small>Shop</small></button>
+  <button class="dockbtn dock-misc" data-page="misc" onclick="go('misc')" aria-label="Misc: Pokédex and Advancements"><span class="dockico">☰</span><small>Misc</small><i class="adv-bang">!</i></button>
 </nav>
 <div class="modal" id="modal"><div class="sheet"><div class="sheethead"><b id="modalTitle">DETAILS</b><button class="close" onclick="closeModal()" aria-label="Close">×</button></div><div id="modalBody"></div></div></div><div id="toastMount"></div>
 <script>
@@ -3552,7 +3618,7 @@ function nurInfo(){const f=nur(),L=facLv(f),next=L<10?FAC_XP[L+1]:null,{m,d}=nur
   +'<p class="small muted">Eggs hatched: '+(f.hatched||0)+'</p><div class="actions">'+(f.phase==='idle'?'<button class="btn red" onclick="nurOpen()">CHOOSE PARENTS</button>':'')+(inv().facticket&&L<10?'<button class="btn blue" onclick="facTicketUse(\'nursery\')">USE FACILITY TICKET</button>':'')+'<button class="btn" onclick="closeModal()">CLOSE</button></div>')}
 // ---------- egg menus ----------
 const eggIco=(e,c='')=>'<span class="egg-ico r'+Math.min(4,e.tier||0)+' '+c+'">'+(typeof icoHTML==='function'?icoHTML('egg'):'🥚')+'</span>';
-const eggSrc=e=>e.src==='totem'?'Totem egg':e.src==='alpha'?'Alpha egg':e.from?'From '+e.from.join(' & '):'Nursery egg';
+const eggSrc=e=>e.src==='totem'?'Totem egg':e.src==='alpha'?'Alpha egg':e.src==='adv'?'Advancement egg':e.from?'From '+e.from.join(' & '):'Nursery egg';
 function eggStatsHTML(e,n){const g=[0,1,2,3,4,5].map(i=>e.growth&&e.growth[i]!=null?GRADES[e.growth[i]-1]||'?':'?');
  return '<div class="nur-stats"><div><span>Rarity</span><b>'+RARITIES[Math.min(4,e.tier||0)]+'</b></div><div><span>Source</span><b>'+esc(eggSrc(e))+'</b></div>'
   +'<div><span>Likely growth</span><b>'+FAC_STATS.map((s,i)=>s+' '+g[i]).join(' · ')+'</b></div><div><span>Shiny chance</span><b>'+(e.shinyP>=1?'Shiny!':'1 in '+money(Math.round(1/(e.shinyP||NUR_SHINY))))+'</b></div>'
@@ -3699,7 +3765,7 @@ function mgBank(sids){const out=[];for(const s of db.summaries){if(!sids.include
 function qstat(key){const q=db.qstats||(db.qstats={});return q[key]||(q[key]={r:0,w:0,last:0,miss:0})}
 // Every answer is recorded per item (r = right, w = wrong). The extra details (first try or Make-Up, hints used, which wrong
 // answer was picked, a day-by-day tally per study set) feed the Export Study Data sheet.
-function qRecord(item,ok,info){const s=qstat(item.key),I=info||{};if(typeof facAnswer==='function')facAnswer(ok,ok&&!I.makeup);if(ok){s.r++;s.miss=Math.max(0,s.miss-1);if(I.makeup)s.mk=(s.mk||0)+1;else if(I.first)s.ft=(s.ft||0)+1}else{s.w++;s.miss=Math.min(5,s.miss+2)}s.last=Date.now();if(!s.first)s.first=s.last;if(I.hints)s.h=(s.h||0)+1;
+function qRecord(item,ok,info){if(typeof advQ==='function'){const q0=qstat(item.key);advQ(item,ok,info||{},{w:q0.w||0,h:q0.h||0})}const s=qstat(item.key),I=info||{};if(typeof facAnswer==='function')facAnswer(ok,ok&&!I.makeup);if(ok){s.r++;s.miss=Math.max(0,s.miss-1);if(I.makeup)s.mk=(s.mk||0)+1;else if(I.first)s.ft=(s.ft||0)+1}else{s.w++;s.miss=Math.min(5,s.miss+2)}s.last=Date.now();if(!s.first)s.first=s.last;if(I.hints)s.h=(s.h||0)+1;
  if(!ok&&I.pick!=null){s.wp=(s.wp||[]);s.wp.unshift({q:String(I.prompt||'').slice(0,240),p:String(I.pick).slice(0,160),a:String(I.answer||'').slice(0,160),at:s.last});s.wp.length=Math.min(s.wp.length,3)}
  if(item.sid){const H=db.qhist||(db.qhist={}),d=localDay(),hs=H[item.sid]||(H[item.sid]={}),t=hs[d]||(hs[d]=[0,0]);t[ok?0:1]++;const days=Object.keys(hs).sort();while(days.length>90)delete hs[days.shift()]}}
 function isWeak(item){const set=(db.summaries||[]).find(s=>s.id===item.sid);if(set&&typeof sdItems==='function'){const row=sdItems(set).find(x=>item.kind==='gen'?x.gid===item.gid:x.key===item.key);return !!row&&sdWeak(row)}const s=(db.qstats||{})[item.key];return !!s&&(s.w>0||s.g>0||s.miss>0)}
@@ -3773,7 +3839,7 @@ function askQ(item,bank,opts={}){__qMissReset();
   const answered=(o,b)=>{if(submitted||!protection.allowed()||ov.querySelector('.guided-final')?.hidden)return;submitted=true;studyLog(item,Date.now()-__qT0);__qT0=Date.now();protection.stop();if(typeof apNote==='function')apNote({ms:performance.now()-t0,protectedMs:protection.duration,ok:!!o.ok,chars:String(q.prompt).length+q.options.reduce((a,x)=>a+String(x.t).length,0),hinted,typed,guided:guidance.engaged,inputChars:typed?String(o.t).length:0});const hb2=ov.querySelector('.mgq-hint');if(hb2)hb2.remove();
    ov.querySelectorAll('.answer').forEach(x=>{x.disabled=true;if(q.options[+x.dataset.i].ok)x.classList.add('correct')});const card=ov.querySelector('.mgq-card');
    if(typed){const inp=ov.querySelector('.sa-in');inp.disabled=true;inp.classList.add(o.ok?'ok':'no');const g=ov.querySelector('.sa-go');if(g)g.remove();const k=ov.querySelector('.sa-keys');if(k)k.remove()}
-   if(o.ok){qRecord(item,true,{first:!isMakeUp,makeup:isMakeUp,hints:hi});
+   if(o.ok){qRecord(item,true,{first:!isMakeUp,makeup:isMakeUp,hints:hi,typed:!!typed});
     // confidence tap: a lucky guess still wins the turn, but the question comes back later as a weak spot
     if(!isMakeUp&&!typed&&opts.confidence!==false){card.insertAdjacentHTML('beforeend','<div class="mgq-conf"><span>Did you know it?</span><button class="btn smallbtn" data-c="k">✅ Knew it</button><button class="btn smallbtn" data-c="g">🤔 Guessed</button></div>');
      let fin=false;const pick=c=>{if(fin)return;fin=true;if(c==='g'){qGuessed(item);toast('🤔 Got it. That one will come back for practice.')}done('full')};
@@ -4006,7 +4072,7 @@ function askDIY(item,opts={}){return new Promise(res=>{const p=prInstance(item.g
  ov.querySelector('.diy-go').onclick=()=>{if(submitted||!protection.allowed()||ov.querySelector('.guided-final')?.hidden)return;const lines=[...box.querySelectorAll('input')].map(i=>i.value.trim()).filter(Boolean);if(!lines.length){toast('Write at least one line');return}
   submitted=true;protection.stop();const checks=lines.map(l=>diyLineCheck(l,ansX)),last=lines[lines.length-1],lastSeg=last.split(/=|≈/).pop(),ok=saMatch(lastSeg,p.a)||saMatch(last,p.a);
   if(typeof apNote==='function')apNote({ms:performance.now()-t0,protectedMs:protection.duration,ok,chars:String(p.q).length,hinted:true,typed:true});
-  qRecord(item,ok,ok?{first:true,hints:hi}:{pick:last,prompt:p.q,answer:p.a,hints:hi});
+  qRecord(item,ok,ok?{first:true,hints:hi,typed:true}:{pick:last,prompt:p.q,answer:p.a,hints:hi});
   if(!ok&&typeof __qMissSet==='function')__qMissSet({prompt:p.q,pick:last,answer:p.a,why:(p.steps&&p.steps.length?p.steps[p.steps.length-1][1]||p.steps[p.steps.length-1][0]:p.ex)});
   const card=ov.querySelector('.mgq-card');
   card.innerHTML='<span class="badge diy-b">🛠 DO IT YOURSELF</span><h3>'+mathHTML(p.q)+'</h3><div class="notice '+(ok?'diy-ok':'diy-no')+'">'+(ok?'✅ Your answer is right!':'❌ Your last line doesn’t reach the answer.')+' The answer is <b>'+mathHTML(p.a)+'</b>.</div>'
@@ -5690,7 +5756,7 @@ async function sdSaveFile(){const ids=sdChosen();if(!ids.length)return;const txt
  const url=URL.createObjectURL(file),a=document.createElement('a');a.href=url;a.download=nm;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),30000)}
 // ===================== SOFT ICONS =====================
 // Every emoji listed here is shown as a soft painted icon (assets/ico, drawn by tools/make_icons_soft.py) instead of the system emoji.
-const ICO_MAP={"✨":"sparkles","🔧":"settings","⚙":"cog","🎟":"ticket","⚡":"bolt","🍬":"candy","👑":"crown","🛡":"shield","⏱":"stopwatch","🎯":"target","💎":"gem","📚":"books","💾":"floppy","🧁":"cupcake","⚠":"warning","🎒":"backpack","⚔":"swords","🗡":"swords","🌿":"herb","🛒":"cart","💿":"disc","🎁":"gift","📁":"folder","🗂":"folder","📂":"folder_open","🗼":"tower","💥":"burst","📷":"camera","💡":"bulb","📋":"clipboard","🌳":"tree","📥":"inbox","⭐":"star","🗑":"trash","🎉":"party","💤":"zzz","💭":"thought","🧲":"magnet","🕊":"dove","🌱":"seedling","🔁":"repeat","🔄":"repeat","🎀":"ribbon","🌐":"globe","🧮":"abacus","💪":"dumbbell","🏋":"dumbbell","✅":"check","🏁":"flag","🔥":"fire","💨":"dash","🌬":"dash","🃏":"joker","🎙":"mic","🎮":"controller","📊":"chart","🎫":"ticket2","📖":"book","📘":"book","📒":"book","😋":"yum","😵":"dizzy_face","😤":"huff","🤔":"thinking","⏰":"alarm","🌙":"moon","🐾":"paw","👣":"paw","🔮":"crystal_ball","🛠":"tools","🍎":"apple","👻":"ghost","💫":"dizzy","🏆":"trophy","🏅":"trophy","🪜":"ladder","☣":"biohazard","🗓":"calendar","📅":"calendar","🔔":"bell","⏳":"hourglass","🚨":"siren","👀":"eyes","🏰":"dungeon","❌":"cross","🌠":"shooting_star","🏠":"house","💧":"drop","🪴":"potted","⛑":"helmet","🎗":"reminder","💰":"moneybag","🌟":"glow_star","🌾":"wheat","🎨":"palette","🐞":"ladybug","🧨":"firecracker","🔴":"red_circle","🟡":"yellow_circle","⏹":"stop","📝":"memo","✍":"memo","🖼":"frame","❓":"question","❔":"question","🔊":"speaker","🧢":"cap","📌":"pin","☀":"sun","🔒":"lock","🎴":"flashcards","🧩":"puzzle","🫐":"blueberry","🌩":"storm","🐝":"bee","🔺":"triangle","🌀":"cyclone","🧠":"brain","🧂":"salt","⛲":"fountain","🧭":"compass","⏭":"next","⏩":"next","📐":"ruler","🌸":"blossom","🏙":"city","🐉":"dragon","🏛":"temple","🌊":"wave","🦇":"bat","❄":"snowflake","🎲":"die","🏥":"hospital","🧱":"bricks","🕸":"web","👓":"glasses","🍲":"stew","🐚":"shell","⛏":"pickaxe","🪙":"coin","🍫":"chocolate","🥚":"egg","📦":"package","🥋":"gi","💗":"heart","❤":"heart","🧤":"glove","🦺":"vest","🔋":"battery","📿":"beads","🏷":"tag","🎽":"shirt","⛰":"mountain","👊":"fist","🔗":"link","🐍":"luxor","⏲":"mg_speed","🪸":"coral","🪵":"wood","🍄":"mushroom","🪡":"needle","🦷":"tooth","🗿":"moai","🔇":"mute","🌑":"newmoon","🐋":"whale","🦪":"oyster","🫧":"bubbles","🏮":"lantern","⚓":"anchor","♨":"hotspring","⚗":"alembic","🌋":"volcano","🌫":"fog","🔨":"hammer","🕯":"candle","⛓":"chain","📜":"scroll","🦴":"bone","🪨":"rock","🍃":"mint","🟠":"fire_stone","🔵":"water_stone","🟢":"leaf_stone","🟣":"soul_stone","🎩":"hatshop","😩":"tired","🍰":"cake_slice","🗜":"press","💞":"hearts","🪺":"nest","🐣":"hatch"};
+const ICO_MAP={"✨":"sparkles","🔧":"settings","⚙":"cog","🎟":"ticket","⚡":"bolt","🍬":"candy","👑":"crown","🛡":"shield","⏱":"stopwatch","🎯":"target","💎":"gem","📚":"books","💾":"floppy","🧁":"cupcake","⚠":"warning","🎒":"backpack","⚔":"swords","🗡":"swords","🌿":"herb","🛒":"cart","💿":"disc","🎁":"gift","📁":"folder","🗂":"folder","📂":"folder_open","🗼":"tower","💥":"burst","📷":"camera","💡":"bulb","📋":"clipboard","🌳":"tree","📥":"inbox","⭐":"star","🗑":"trash","🎉":"party","💤":"zzz","💭":"thought","🧲":"magnet","🕊":"dove","🌱":"seedling","🔁":"repeat","🔄":"repeat","🎀":"ribbon","🌐":"globe","🧮":"abacus","💪":"dumbbell","🏋":"dumbbell","✅":"check","🏁":"flag","🔥":"fire","💨":"dash","🌬":"dash","🃏":"joker","🎙":"mic","🎮":"controller","📊":"chart","🎫":"ticket2","📖":"book","📘":"book","📒":"book","😋":"yum","😵":"dizzy_face","😤":"huff","🤔":"thinking","⏰":"alarm","🌙":"moon","🐾":"paw","👣":"paw","🔮":"crystal_ball","🛠":"tools","🍎":"apple","👻":"ghost","💫":"dizzy","🏆":"trophy","🏅":"trophy","🪜":"ladder","☣":"biohazard","🗓":"calendar","📅":"calendar","🔔":"bell","⏳":"hourglass","🚨":"siren","👀":"eyes","🏰":"dungeon","❌":"cross","🌠":"shooting_star","🏠":"house","💧":"drop","🪴":"potted","⛑":"helmet","🎗":"reminder","💰":"moneybag","🌟":"glow_star","🌾":"wheat","🎨":"palette","🐞":"ladybug","🧨":"firecracker","🔴":"red_circle","🟡":"yellow_circle","⏹":"stop","📝":"memo","✍":"memo","🖼":"frame","❓":"question","❔":"question","🔊":"speaker","🧢":"cap","📌":"pin","☀":"sun","🔒":"lock","🎴":"flashcards","🧩":"puzzle","🫐":"blueberry","🌩":"storm","🐝":"bee","🔺":"triangle","🌀":"cyclone","🧠":"brain","🧂":"salt","⛲":"fountain","🧭":"compass","⏭":"next","⏩":"next","📐":"ruler","🌸":"blossom","🏙":"city","🐉":"dragon","🏛":"temple","🌊":"wave","🦇":"bat","❄":"snowflake","🎲":"die","🏥":"hospital","🧱":"bricks","🕸":"web","👓":"glasses","🍲":"stew","🐚":"shell","⛏":"pickaxe","🪙":"coin","🍫":"chocolate","🥚":"egg","📦":"package","🥋":"gi","💗":"heart","❤":"heart","🧤":"glove","🦺":"vest","🔋":"battery","📿":"beads","🏷":"tag","🎽":"shirt","⛰":"mountain","👊":"fist","🔗":"link","🐍":"luxor","⏲":"mg_speed","🪸":"coral","🪵":"wood","🍄":"mushroom","🪡":"needle","🦷":"tooth","🗿":"moai","🔇":"mute","🌑":"newmoon","🐋":"whale","🦪":"oyster","🫧":"bubbles","🏮":"lantern","⚓":"anchor","♨":"hotspring","⚗":"alembic","🌋":"volcano","🌫":"fog","🔨":"hammer","🕯":"candle","⛓":"chain","📜":"scroll","🦴":"bone","🪨":"rock","🍃":"mint","🟠":"fire_stone","🔵":"water_stone","🟢":"leaf_stone","🟣":"soul_stone","🎩":"hatshop","😩":"tired","🍰":"cake_slice","🗜":"press","💞":"hearts","🪺":"nest","🐣":"hatch","📟":"pokedex"};
 // Swaps emoji in the page for the soft painted icons in assets/ico (ICO_MAP comes from tools/make_icons_soft.py).
 // Works on every text node as it appears, so nothing that writes emoji into the page needs to know about it.
 // Skipped: form fields, <select>/<option>, canvas, SVG, and anything inside .no-ico.
@@ -6529,7 +6595,7 @@ $('navHome').style.display='none';
  if(pcStorageReady)ensureMoveData();
  if(pcStorageReady&&permRoll())save();
  render();scheduleNotifs();aiCheck();window.__pcBooted=true;setTimeout(()=>{try{mdSync()}catch(e){}},1500);setTimeout(()=>{try{facTick()}catch(e){}},2500);setInterval(()=>{try{facTick();if(currentPage==='home'&&hab.scene&&hab.scene!=='home')drawHabitat()}catch(e){}},60000);
- window.__pcVersion='0.84.2';
+ window.__pcVersion='0.85.0';
  document.addEventListener('pointerdown',function(e){try{var t=e.target.closest&&e.target.closest('[onclick],button,a,[id]');if(!t)return;var oc=t.getAttribute('onclick');window.__pcLastTap=(oc?oc.slice(0,60):(t.id?'#'+t.id:t.tagName.toLowerCase()+'.'+String(t.className).split(' ')[0])).replace(/\s+/g,' ')}catch(_){}} ,true);
  Object.keys(window).forEach(function(k){var f=window[k];if(typeof f!=='function'||/^[A-Z]/.test(k)||k==='appError'||k==='$'||k==='esc'||/\[native code\]/.test(Function.prototype.toString.call(f)))return;
   var w=function(){try{return f.apply(this,arguments)}catch(err){if(err&&typeof err==='object'&&!err.__pcLogged){try{err.__pcLogged=1}catch(_){}appError(err,k)}throw err}};try{window[k]=w}catch(_){}});
@@ -7086,6 +7152,204 @@ function dpFeet(el,r,fl,P){const T=GD_T,b=r.battle,units=[...r.party,...(b?b.ene
 
 // Navigator costume was removed (v0.84.0): Braixen/Delphox that had it go back to normal
 setTimeout(function(){try{let n=0;(db.pokemon||[]).forEach(function(p){if(p.costume==='navigator'){p.costume=null;n++}});if(n)save()}catch(_){}},1200);
+// ===================== MISC TAB: Pokédex + Advancements =====================
+// Advancement progress lives in db.adv: c = counters, f = one-time flags, s = sets (stored as arrays),
+// claimed / seen = advancement ids. Counters only go up, so tiered advancements (I, II, III…) share one counter.
+const ADV_RW={1:{cogs:25,pxp:2000},2:{cogs:60,pxp:5000,items:{exp_t1:1}},3:{cogs:150,pxp:12000,items:{hasten:1}},4:{cogs:400,pxp:30000,items:{facticket:1},egg:2},5:{cogs:1000,pxp:80000,items:{facticket:1,exp_t3:1},egg:3},one:{cogs:50,pxp:4000},big:{cogs:120,pxp:10000,egg:1},boss:{cogs:300,pxp:20000,items:{facticket:1},egg:3}};
+const ADV_CATS=[['study','Study'],['log','“Logging” In'],['mon','Pokémon'],['dun','Dungeon']];
+function advSt(){const a=db.adv||(db.adv={c:{},f:{},s:{},claimed:{},seen:{},day:{}});a.c=a.c||{};a.f=a.f||{};a.s=a.s||{};a.claimed=a.claimed||{};a.seen=a.seen||{};a.day=a.day||{};return a}
+const advC=k=>advSt().c[k]||0,advF=k=>!!advSt().f[k],advSet=k=>advSt().s[k]||(advSt().s[k]=[]);
+function advInc(k,n=1){advSt().c[k]=advC(k)+n}
+function advFlag(k){const a=advSt();if(!a.f[k]){a.f[k]=Date.now();advPing()}}
+function advAdd(k,v){const s=advSet(k);if(!s.includes(v))s.push(v)}
+function advDay(){const a=advSt(),d=ymd(new Date());if(a.day.d!==d)a.day={d,correct:0,sets:[],task:0,bought:0};return a.day}
+// ---------- definitions ----------
+const fam=(id,cat,icon,name,goals,desc,val)=>goals.map((g,i)=>({id:id+(i+1),fam:id,tier:i+1,cat,icon,name:name+' '+['I','II','III','IV','V'][i],desc:desc(g),goal:g,val,rw:ADV_RW[i+1]}));
+const one=(id,cat,icon,name,desc,flag,rw)=>({id,cat,icon,name,desc,goal:1,val:()=>advF(flag||id)?1:0,rw:rw||ADV_RW.one});
+const ADV=[
+ ...fam('ans','study','brain','Answerer',[10,30,100,500,2000],g=>'Answer '+money(g)+' questions correctly.',()=>advC('correct')),
+ ...fam('typed','study','memo','Show Your Work',[5,25,100],g=>'Correctly solve '+g+' questions using typed answers.',()=>advC('typed')),
+ ...fam('sw','study','repeat','Second Wind',[5,25,100],g=>'Correctly answer '+g+' different questions you previously answered incorrectly.',()=>advSet('sw').length),
+ one('hang','study','calendar','Getting the Hang of It','Answer a previously missed question correctly on three separate study days.'),
+ one('hint','study','bulb','A Little Help','Use a hint, then correctly answer the question.'),
+ one('own','study','fist','On My Own','Correctly answer a question without hints after previously needing a hint for it.'),
+ one('mixed','study','books','Mixed Bag','Correctly answer questions from three different study sets in one day.'),
+ ...fam('leaf','log','herb','Leaf by Leaf',[5,25,100,300],g=>'Complete '+g+' Sutodo tasks.',()=>advC('tasks')),
+ ...fam('ahead','log','alarm','Ahead of the Curve',[3,15,50],g=>'Complete '+g+' tasks at least 24 hours before their deadlines.',()=>advC('early')),
+ one('late','log','hourglass','Still Counts','Complete an overdue task.'),
+ one('oldest','log','clipboard','One Less Thing','Complete the oldest unfinished task on your list.'),
+ one('room','log','inbox','Making Room','Finish every task that was due today, with at least three completed.'),
+ one('calibur','log','shooting_star','EXP-Calibur','Have every kind of EXP Ticket active at once.',null,ADV_RW.big),
+ one('full','mon','house','Full-House','Enter a Mystery Dungeon with 4 Pokémon.'),
+ one('apple','mon','apple','Scrumptious','While under a Golden Apple, level a Lv 1 Pokémon up to Lv 50 before it wears off.',null,ADV_RW.big),
+ ...fam('decor','mon','potted','Interior Designer',[5,15,30],g=>'Own '+g+' different decorations.',()=>advDecorOwned()),
+ one('home','mon','frame','Make Yourself at Home','Equip a decoration you bought.'),
+ one('refresh','mon','palette','Room Refresh','Change both your background and an equipped decoration.'),
+ one('treat','mon','gift','A Well-Earned Treat','Complete a Sutodo task and correctly answer 10 study questions, then buy something from the shop that day.'),
+ ...fam('dex','mon','pokedex','Professor’s Pal',[10,25,50,100,200],g=>'Have '+g+' different Pokémon species in the Pokédex.',()=>advDexCount()),
+ ...fam('evo','mon','seedling','Growing Together',[1,10,30],g=>g===1?'Evolve your first Pokémon.':'Evolve '+g+' Pokémon.',()=>advC('evolves')),
+ one('familiar','mon','eyes','A Familiar Face','Obtain a Pokémon species you already own.'),
+ one('shiny','mon','sparkles','A Shiny Color','Obtain your first shiny Pokémon.',null,{cogs:150,pxp:8000,items:{facticket:1}}),
+ one('costume','mon','ribbon','Dressed for the Occasion','Obtain your first costumed Pokémon.',null,{cogs:150,pxp:8000,items:{facticket:1}}),
+ one('both','mon','crown','Double Take','Obtain a Pokémon that is both shiny and costumed.',null,{cogs:500,pxp:30000,items:{facticket:2},egg:3}),
+ one('tm','mon','disc','Signature Style','Equip a TM Disc move on a Pokémon.'),
+ one('ult','mon','bolt','UNLIMITED POWERRRR','Unlock a Pokémon’s Ultimate.',null,ADV_RW.big),
+ one('sig','mon','medal','Truly You','Equip a Pokémon with that species’ signature move.'),
+ ...fam('floor','dun','ladder','Down We Go',[5,25,100,500],g=>'Clear '+g+' Mystery Dungeon floors in total.',()=>advC('floors')),
+ ...fam('slay','dun','swords','Giant Slayer',[1,10,50],g=>g===1?'Defeat your first dungeon boss.':'Defeat '+g+' dungeon bosses.',()=>advC('bosses')),
+ one('swarm','dun','bee','Crowd Control','Win a Swarm encounter.'),
+ one('alpha','dun','dragon','Against the Odds','Defeat an Alpha Boss.',null,ADV_RW.big),
+ one('revive','dun','heart','Not Done Yet','Revive a fainted teammate and then win that encounter.'),
+ one('clutch','dun','target','Clutch Answer','Correctly answer an attack question while the acting Pokémon has 25% HP or less, then defeat the target with that attack.'),
+ one('home2','dun','flag','Everyone Comes Home','Clear a dungeon’s final floor with every party member conscious.',null,ADV_RW.big),
+ one('perfect','dun','star','Perfect Execution','Win a battle after answering at least five questions, every one right on the first try.'),
+ one('planb','dun','link','Plan B','Defeat an enemy with a Disc Move after it survives your Basic Move.'),
+ one('finish','dun','firecracker','The Big Finish','Defeat a boss with an Ultimate.',null,ADV_RW.big),
+ {id:'types',cat:'dun',icon:'burst',name:'Type Advantage',desc:'Land super-effective attacks using five different move types across your adventures.',goal:5,val:()=>advSet('types').length,rw:ADV_RW.big},
+ one('brink','dun','dizzy_face','Back From The Brink','Have a party member survive an attack on 1 HP.'),
+ one('manaphy','dun','wave','Down the Drain','Defeat Manaphy, the named boss of the first layer.',null,ADV_RW.boss),
+ one('regirock','dun','moai','Put to Bed-rock','Defeat Regirock, the named boss of the second layer.',null,ADV_RW.boss)];
+const ADV_BY=Object.fromEntries(ADV.map(a=>[a.id,a]));
+function advDone(a){return a.val()>=a.goal}
+function advPrevOk(a){if(!a.fam||a.tier===1)return true;return advDone(ADV_BY[a.fam+(a.tier-1)])}
+function advClaimable(a){return advDone(a)&&advPrevOk(a)&&!advSt().claimed[a.id]}
+function advAnyClaim(){return ADV.some(advClaimable)}
+// ---------- derived counts ----------
+const ADV_DECOR_KINDS=new Set(['small','medium','bg','floor']);
+function advDecorOwned(){const own=new Set(Object.keys(inv()).filter(id=>inv()[id]>0&&ITEMS[id]&&ADV_DECOR_KINDS.has(ITEMS[id].kind)&&id!=='bg_default'));const d=db.decor||{};[...(d.small||[]),...(d.medium||[])].forEach(x=>{const id=x&&(x.id||x);if(id&&ITEMS[id])own.add(id)});if(d.bg&&d.bg!=='bg_default')own.add(d.bg);advSet('decorEver').forEach(x=>own.add(x));own.forEach(x=>advAdd('decorEver',x));return own.size}
+function advDexCount(){(db.pokemon||[]).forEach(p=>advAdd('dex',p.species));return advSet('dex').length}
+// ---------- one-time seeding from what the app already recorded ----------
+function advSeed(){const a=advSt();if(a.v)return;a.v=1;const q=db.qstats||{};
+ a.c.correct=Math.max(a.c.correct||0,Object.values(q).reduce((n,s)=>n+(s.r||0),0));Object.keys(q).forEach(k=>{if(q[k].r>0&&q[k].w>0)advAdd('sw',k)});
+ const done=(db.tasks||[]).filter(t=>t.done);a.c.tasks=Math.max(a.c.tasks||0,done.length);
+ a.c.early=Math.max(a.c.early||0,done.filter(t=>t.due&&t.completedAt&&dueAt(t)-new Date(t.completedAt)>=864e5).length);
+ advMonScan(true)}
+function advMonScan(seed){const ps=db.pokemon||[],seen={};ps.forEach(p=>{advAdd('dex',p.species);seen[p.species]=(seen[p.species]||0)+1;if(p.shiny)advFlag('shiny');if(p.costume)advFlag('costume');if(p.shiny&&p.costume)advFlag('both');
+  if(typeof ultUnlocked==='function'&&typeof ultAvailable==='function'&&ultUnlocked(p,ultAvailable(p)))advFlag('ult');if(advSigOk(p))advFlag('sig')});
+ if(seed&&Object.values(seen).some(n=>n>1))advFlag('familiar')}
+function advSigOk(p){if(typeof SIGNATURE_EXTRA==='undefined')return false;return [p.fastMove,p.discMove].some(m=>m&&SIGNATURE_EXTRA[m]&&!SIGNATURE_EXTRA[m].includes(p.species)&&typeof canLearn==='function'&&canLearn(p.species,m))}
+// ---------- study hooks (called from qRecord) ----------
+function advQ(item,ok,I,before){try{advSeed();const key=item&&item.key,day=advDay(),hadMiss=before&&before.w>0,hadHint=before&&before.h>0;
+ if(mgState&&/dungeon|tower/.test(mgState.game)&&typeof runOf==='function'){const b=runOf()&&runOf().battle;if(b){b._advQ=(b._advQ||0)+1;if(!ok||!I.first)b._advBad=1}}
+ if(!ok)return;advInc('correct');day.correct++;if(I.typed)advInc('typed');
+ if(item&&item.sid&&!day.sets.includes(item.sid)){day.sets.push(item.sid);if(day.sets.length>=3)advFlag('mixed')}
+ if(I.hints)advFlag('hint');else if(hadHint)advFlag('own');
+ if(key&&hadMiss){advAdd('sw',key);const H=advSt().s.hang||(advSt().s.hang={});const ds=H[key]||(H[key]=[]);if(!ds.includes(day.d))ds.push(day.d);if(ds.length>=3)advFlag('hang')}
+ advPing()}catch(e){}}
+// ---------- wrap existing actions (they keep working exactly as before) ----------
+function advWrap(name,before,after){const f=window[name];if(typeof f!=='function'||f.__adv)return;const w=function(){let ctx;try{ctx=before&&before.apply(this,arguments)}catch(_){}const out=f.apply(this,arguments);const fin=v=>{try{after&&after(ctx,arguments,v)}catch(_){}return v};return out&&typeof out.then==='function'?out.then(fin):fin(out)};w.__adv=1;window[name]=w}
+function advInstall(){
+ advWrap('completeTask',id=>{const t=db.tasks.find(x=>x.id===id);if(!t||t.done)return null;const open=db.tasks.filter(x=>!x.done&&!x.permeate),now=Date.now();
+   return {t,late:!!(t.due&&dueAt(t)<now),oldest:open.length>1&&open.every(x=>(x.createdAt||'')>=(t.createdAt||'')),early:!!(t.due&&dueAt(t)-now>=864e5),before:t.permeate?JSON.stringify(t.doneDates||t.done||''):null}},
+  ctx=>{if(!ctx)return;const t=ctx.t;if(!t.done&&!t.permeate)return;advInc('tasks');const day=advDay();day.task=1;if(ctx.late)advFlag('late');if(ctx.oldest)advFlag('oldest');if(ctx.early)advInc('early');
+   const td=ymd(new Date()),due=db.tasks.filter(x=>x.due===td&&!x.permeate);if(due.length>=3&&due.every(x=>x.done))advFlag('room');advPing()});
+ advWrap('feedSnack',id=>{const p=db.pokemon.find(x=>x.id===db.mainId);return {p,lv:p&&monLv(p),id}},ctx=>{if(ctx&&ctx.id==='goldapple'&&ctx.p&&ctx.lv===1&&ctx.p.buff)ctx.p.advGA=ctx.p.buff.until});
+ advWrap('evolveMon',id=>{const p=db.pokemon.find(x=>x.id===id);return {p,sp:p&&p.species}},ctx=>{if(ctx&&ctx.p&&ctx.p.species!==ctx.sp){advInc('evolves');advAdd('dex',ctx.p.species);advPing()}});
+ advWrap('giveMon',m=>({owned:(db.pokemon||[]).some(p=>p.species===m.species)}),(ctx,args,p)=>{if(!p)return;if(ctx&&ctx.owned)advFlag('familiar');advAdd('dex',p.species);if(p.shiny)advFlag('shiny');if(p.costume)advFlag('costume');if(p.shiny&&p.costume)advFlag('both');advPing()});
+ advWrap('equipTM',(monId)=>{const p=db.pokemon.find(x=>x.id===monId);return p&&{p,d:p.discMove,f:p.fastMove}},ctx=>{if(!ctx)return;if(ctx.p.discMove!==ctx.d)advFlag('tm');if(advSigOk(ctx.p))advFlag('sig')});
+ advWrap('unlockUlt',null,()=>advMonScan());
+ const shop=()=>({inv:{...inv()},cogs:db.cogs}),shopAfter=ctx=>{if(!ctx||db.cogs>=ctx.cogs)return;const day=advDay();day.bought=1;Object.keys(inv()).forEach(id=>{if((inv()[id]||0)>(ctx.inv[id]||0))advAdd('bought',id)});if(day.task&&day.correct>=10)advFlag('treat');advPing()};
+ advWrap('buyDeal',shop,shopAfter);advWrap('buyItem',shop,shopAfter);
+ advWrap('dgStartRun',null,()=>{const r=runOf();if(r&&r.party&&r.party.length>=4)advFlag('full')});
+ advWrap('gdStairs',()=>{const r=runOf();return r&&{f:r.floor}},ctx=>{const r=runOf();if(ctx&&r&&r.floor>ctx.f)advInc('floors')});
+ advWrap('dgFloorClear',()=>{const r=runOf();return r&&{last:typeof mdIsLast==='function'&&mdIsLast(r),up:r.party.every(m=>m.hp>0)}},ctx=>{if(!ctx)return;advInc('floors');if(ctx.last&&ctx.up)advFlag('home2');advPing()});
+ // which player attack is happening, so kills and super-effective hits can be credited
+ const atk=kind=>function(slot,a2,a3,a4,a5){const r=runOf(),b=r&&r.battle,m=b&&r.party[slot];let lowHp=false;try{const c=combatant(partyMon(m));lowHp=m.hp/c.hp<=.25}catch(_){}
+   const mv=kind==='mv4'?a4:kind==='mv3'?a3:null,k=kind==='ult'?'ult':mv&&mv[3]==='fast'?'fast':'disc',mult=kind==='mv4'?a5:kind==='mv3'?a4:a2;DG.advLast={k,lowHp,ok:(mult??1)>=1,t:Date.now()}};
+ advWrap('dgAttack',atk('mv4'));advWrap('dgAttackAll',atk('mv3'));advWrap('gdAttackMulti',atk('mv3'));advWrap('dgUltimate',atk('ult'));advWrap('legendUltimate',atk('ult'));
+ advWrap('dgDamage',(att,def,mv)=>{const L=DG&&DG.advLast,b=runOf()&&runOf().battle;if(L&&Date.now()-L.t<20000&&b&&!b.enemyPhase&&def&&mv&&typeof typeEff==='function'&&typeEff(mv[0],def.types)>1)advAdd('types',String(mv[0]).toLowerCase())});
+ ['gdDrawBattle','dgDrawBattle'].forEach(n=>advWrap(n,null,()=>advBattleWatch()));
+ advWrap('ocDefeat',null,()=>{advFlag('manaphy');advInc('bosses')});advWrap('rcDefeat',null,()=>{advFlag('regirock');advInc('bosses')});
+ advWrap('go',null,(c,args)=>{if(args[0]==='misc'){miscView='menu';drawMisc()}advBadge()});}
+// Compares the battle with the last time it was drawn: kills, revives, 1-HP survivals and battle wins.
+function advBattleWatch(){const r=typeof runOf==='function'&&runOf(),b=r&&r.battle;if(!b)return;const prev=b._advSnap,L=DG&&DG.advLast,recent=L&&Date.now()-L.t<20000;
+ const snap={p:r.party.map(m=>m.hp),e:b.enemies.map(e=>e.hp)};
+ if(prev&&prev.e.length===b.enemies.length){
+  r.party.forEach((m,i)=>{const was=prev.p[i];if(was==null)return;if(was<=0&&m.hp>0)b._advRevived=1;if(was>1&&m.hp===1)advFlag('brink')});
+  b.enemies.forEach((e,i)=>{const was=prev.e[i];if(was==null||was<=0)return;
+   if(e.hp>0&&e.hp<was&&recent&&!b.enemyPhase&&L.k==='fast')e._advFast=1;
+   if(e.hp<=0&&recent){if(L.k==='disc'&&e._advFast)advFlag('planb');if(L.lowHp&&L.ok)advFlag('clutch');if(e.boss&&L.k==='ult')advFlag('finish')}
+   if(e.hp<=0&&e.boss&&!e.ocBoss&&!e.rcBoss){advInc('bosses');if(e.boss==='alpha')advFlag('alpha')}});
+  const wasLive=prev.e.some(h=>h>0),nowLive=b.enemies.some(e=>e.hp>0&&!e.gdOut);
+  if(wasLive&&!nowLive&&r.party.some(m=>m.hp>0)&&!b._advWon){b._advWon=1;if(b.enemies.some(e=>e.swarm))advFlag('swarm');if(b._advRevived)advFlag('revive');if((b._advQ||0)>=5&&!b._advBad)advFlag('perfect')}}
+ Object.defineProperty(b,'_advSnap',{value:snap,enumerable:false,configurable:true,writable:true})}
+// state checks (every 30 s and when the Misc tab opens)
+function advTick(){try{if(!db)return;advSeed();advMonScan();advDecorOwned();advDexCount();
+ if(typeof expBoostActive==='function'&&typeof EXP_TICKETS!=='undefined'&&expBoostActive().length>=Object.keys(EXP_TICKETS).length)advFlag('calibur');
+ (db.pokemon||[]).forEach(p=>{if(p.advGA){if(Date.now()>p.advGA+60000)delete p.advGA;else if(monLv(p)>=50)advFlag('apple')}});
+ const d=db.decor||{},sig=JSON.stringify([d.small,d.medium]),a=advSt();if(a.decSig&&a.decSig!==sig){a.f.decCh=a.f.decCh||Date.now();const placed=[...(d.small||[]),...(d.medium||[])].map(x=>x&&(x.id||x)).filter(Boolean);if(placed.some(id=>advSet('bought').includes(id)))advFlag('home')}
+ if(a.bgSig&&a.bgSig!==d.bg)a.f.bgCh=a.f.bgCh||Date.now();a.decSig=sig;a.bgSig=d.bg;if(a.f.decCh&&a.f.bgCh)advFlag('refresh');advBadge()}catch(e){}}
+let advPingT=0;function advPing(){clearTimeout(advPingT);advPingT=setTimeout(advBadge,300)}
+function advBadge(){const on=advAnyClaim();document.querySelectorAll('.dock-misc,.misc-adv').forEach(el=>el.classList.toggle('adv-ready',on))}
+// ---------- rewards ----------
+function advRewardList(rw){const out=[];if(rw.cogs)out.push(['cog','+'+money(rw.cogs)+' Cogs']);if(rw.pxp)out.push(['star','+'+money(rw.pxp)+' EXP']);Object.entries(rw.items||{}).forEach(([id,n])=>out.push([id,(n>1?n+'× ':'')+ITEMS[id].name]));if(rw.egg)out.push(['egg',RARITIES[Math.min(4,rw.egg)]+' Egg']);return out}
+function advRewardHTML(rw){return advRewardList(rw).map(([ic,t])=>'<span class="adv-rw">'+(ITEMS[ic]?itemIcon(ic):icoHTML(ic))+'<b>'+esc(t)+'</b></span>').join('')}
+function advGrant(rw){db.cogs=Math.round((db.cogs||0)+(rw.cogs||0));const p=db.pokemon.find(x=>x.id===db.mainId);if(p&&rw.pxp)p.pxp=(p.pxp||0)+rw.pxp;Object.entries(rw.items||{}).forEach(([id,n])=>invAdd(id,n));
+ if(rw.egg&&typeof eggAdd==='function'){const pool=Object.keys(INDEX).filter(sp=>INDEX[sp].tier===rw.egg&&!PRE_EVO[sp]&&!(typeof NUR_BABY!=='undefined'&&NUR_BABY.has(sp))),sp=pool[Math.floor(Math.random()*pool.length)]||Object.keys(INDEX)[0];eggAdd({sp,tier:INDEX[sp].tier,shinyP:1/4096,src:'adv'})}}
+function advClaim(ids){const got=[];ids.forEach(id=>{const a=ADV_BY[id];if(!a||!advClaimable(a))return;advSt().claimed[id]=Date.now();advGrant(a.rw);got.push(...advRewardList(a.rw))});if(!got.length)return;save();advFlow(got);advBadge();if($('advBoard')){advDrawBoard(true);if(!advAnyClaim())document.querySelectorAll('.adv-claimall').forEach(b=>b.remove())}}
+function advFlow(list){let box=document.querySelector('.adv-flow');if(box)box.remove();box=document.createElement('div');box.className='adv-flow';box.innerHTML='<div class="adv-flow-box">'+icoHTML('gift')+'<b>Rewards claimed</b><div class="adv-flow-list"></div></div>';document.body.appendChild(box);
+ const L=box.querySelector('.adv-flow-list');list.forEach(([ic,t],i)=>setTimeout(()=>{const s=document.createElement('span');s.className='adv-rw fly';s.innerHTML=(ITEMS[ic]?itemIcon(ic):icoHTML(ic))+'<b>'+esc(t)+'</b>';L.appendChild(s)},180+i*160));
+ setTimeout(()=>box.classList.add('out'),1400+list.length*160);setTimeout(()=>box.remove(),1900+list.length*160)}
+// ---------- Misc tab ----------
+let miscView='menu';
+function drawMisc(){const el=$('miscBody');if(!el)return;advTick();
+ if(miscView==='dex')return dexDraw(el);if(miscView==='adv')return advDraw(el);
+ el.innerHTML='<div class="misc-menu"><button class="misc-big" onclick="miscView=\'dex\';drawMisc()">'+icoHTML('pokedex')+'<b>Pokédex</b><small>'+advDexCount()+' / '+dexAll().length+' species</small></button><button class="misc-big misc-adv" onclick="miscView=\'adv\';drawMisc()">'+icoHTML('trophy')+'<b>Advancements</b><small>'+ADV.filter(a=>advSt().claimed[a.id]).length+' / '+ADV.length+' claimed</small><i class="adv-bang">!</i></button></div>';advBadge()}
+// ---------- Pokédex ----------
+function dexAll(){return Object.keys(INDEX).filter(sp=>!(typeof RETIRED_SPECIES!=='undefined'&&RETIRED_SPECIES.has(sp))).sort((a,b)=>INDEX[a].number-INDEX[b].number)}
+function dexDraw(el){const have=new Set(advSet('dex')),all=dexAll();
+ el.innerHTML='<div class="misc-top"><button class="btn smallbtn" onclick="miscView=\'menu\';drawMisc()">‹ BACK</button><b>Pokédex · '+all.filter(s=>have.has(s)).length+'/'+all.length+'</b></div><div class="dex-grid">'+all.map(sp=>'<button class="dex-cell'+(have.has(sp)?'':' unk')+'" onclick="dexOpen(\''+esc(sp)+'\')"><small>#'+String(INDEX[sp].number).padStart(4,'0')+'</small>'+(have.has(sp)?monSprite({species:sp},'',52):'<span class="dex-q">?</span>')+'<b>'+(have.has(sp)?esc(sp):'???')+'</b></button>').join('')+'</div>';fillMonSprites(el)}
+let dexAnim=null;
+function dexOpen(sp){const have=advSet('dex').includes(sp);if(!have){toast('You haven’t caught this one yet');return}const D=SPECIES_DATA[sp]||{},st=D.stats||[0,0,0,0,0,0],L=['HP','Atk','Def','Sp. Atk','Sp. Def','Speed'];
+ modal('#'+String(INDEX[sp].number).padStart(4,'0')+' '+sp.toUpperCase(),'<div class="dex-detail"><canvas id="dexCv" width="160" height="160"></canvas><div class="dex-types">'+(D.types||[]).map(t=>'<span class="type-pill t-'+t+'">'+t.toUpperCase()+'</span>').join('')+'</div>'
+  +'<div class="dex-stats">'+st.map((v,i)=>'<div><span>'+L[i]+'</span><b>'+v+'</b><i><em style="width:'+Math.min(100,v/1.6)+'%"></em></i></div>').join('')+'<div class="dex-total"><span>Total</span><b>'+st.reduce((a,b)=>a+b,0)+'</b></div></div>'
+  +'<div class="dex-anims" id="dexAnims"><small class="muted">Loading animations…</small></div><button class="btn smallbtn" onclick="dexTurn()">↻ TURN</button></div>');
+ dexAnim={sp,anim:'Idle',dir:0};loadAnims(sp).then(a=>{dexAnim.all=a;const names=['Idle','Walk','Attack','Sleep','Hurt','Eat','Charge','Shoot','Hop','Swing'].filter(n=>a[n]);const box=$('dexAnims');if(box)box.innerHTML=names.map(n=>'<button class="btn smallbtn'+(n==='Idle'?' blue':'')+'" onclick="dexPlay(\''+n+'\',this)">'+n+'</button>').join('');dexLoop()}).catch(()=>{const box=$('dexAnims');if(box)box.innerHTML='<small class="muted">No animations bundled.</small>'})}
+function dexPlay(n,btn){if(!dexAnim)return;dexAnim.anim=n;document.querySelectorAll('#dexAnims .btn').forEach(b=>b.classList.toggle('blue',b===btn))}
+function dexTurn(){if(dexAnim)dexAnim.dir=(dexAnim.dir+1)%8}
+function dexLoop(){const cv=$('dexCv');if(!cv||!dexAnim||!dexAnim.all)return;const g=cv.getContext('2d'),A=dexAnim.all[dexAnim.anim]||dexAnim.all.Idle;if(!A)return;
+ const img=A._img||(A._img=Object.assign(new Image(),{src:A.url}));const tot=A.d.reduce((a,b)=>a+b,0),t=Math.floor(performance.now()/1000*60)%tot;let f=0,acc=0;for(;f<A.d.length;f++){acc+=A.d[f];if(t<acc)break}
+ const row=(A.rows||1)>=8?dexAnim.dir:0,k=Math.min(4,Math.floor(150/Math.max(A.w,A.h)));g.imageSmoothingEnabled=false;g.clearRect(0,0,160,160);
+ if(img.complete&&img.naturalWidth)g.drawImage(img,f*A.w,row*A.h,A.w,A.h,80-A.w*k/2,84-A.h*k/2,A.w*k,A.h*k);requestAnimationFrame(dexLoop)}
+// ---------- Advancements board ----------
+const ADV_T=74;let advCam={x:0,y:0,s:1},advLayout=null;
+function advPlace(){if(advLayout)return advLayout;const pos={},heads=[];let X=0;
+ ADV_CATS.forEach(([cat,label])=>{const list=ADV.filter(a=>a.cat===cat),fams=[...new Set(list.filter(a=>a.fam).map(a=>a.fam))],singles=list.filter(a=>!a.fam);let x=X,maxY=0;
+  fams.forEach((f,i)=>{const chain=list.filter(a=>a.fam===f);chain.forEach((a,j)=>{pos[a.id]={x:x+j*58,y:150+i*96-j*24}});maxY=Math.max(maxY,150+i*96);x=x});
+  const fw=Math.max(...fams.map(f=>list.filter(a=>a.fam===f).length*58),58);const sy=maxY+120;singles.forEach((a,i)=>{pos[a.id]={x:X+(i%4)*92,y:sy+Math.floor(i/4)*96}});
+  const w=Math.max(fw,Math.min(4,singles.length)*92);heads.push({label,x:X,w});X+=w+150});
+ return advLayout={pos,heads,w:X,h:Math.max(...Object.values(pos).map(p=>p.y))+140}}
+function advDraw(el){const L=advPlace(),a=advSt();
+ el.innerHTML='<div class="misc-top"><button class="btn smallbtn" onclick="miscView=\'menu\';drawMisc()">‹ BACK</button><b>Advancements</b>'+(advAnyClaim()?'<button class="btn smallbtn red adv-claimall" onclick="advClaim(ADV.filter(advClaimable).map(a=>a.id))">CLAIM ALL</button>':'')+'</div><div class="adv-view" id="advView"><div class="adv-board" id="advBoard"></div></div><p class="small muted adv-hint">Drag to look around · pinch to zoom</p>';
+ advDrawBoard();advPanZoom($('advView'));const fresh=ADV.filter(x=>advDone(x)&&!a.seen[x.id]);if(fresh.length)advCutscene(fresh);else advCenter(ADV.filter(advClaimable)[0]||ADV[0],false)}
+function advDrawBoard(keep){const B=$('advBoard');if(!B)return;const L=advPlace(),a=advSt();B.style.width=L.w+'px';B.style.height=L.h+'px';
+ let svg='<svg class="adv-lines" width="'+L.w+'" height="'+L.h+'">';ADV.filter(x=>x.fam&&x.tier>1).forEach(x=>{const p=L.pos[x.id],q=L.pos[x.fam+(x.tier-1)];svg+='<line x1="'+(q.x+28)+'" y1="'+(q.y+28)+'" x2="'+(p.x+28)+'" y2="'+(p.y+28)+'" class="'+(advDone(x)?'on':'')+'"/>'});svg+='</svg>';
+ B.innerHTML=svg+L.heads.map(h=>'<div class="adv-head" style="left:'+h.x+'px;width:'+h.w+'px">'+esc(h.label)+'</div>').join('')+ADV.map(x=>{const p=L.pos[x.id],done=advDone(x),cl=a.claimed[x.id],can=advClaimable(x),v=Math.min(x.goal,x.val());
+  return '<button class="adv-node'+(done&&a.seen[x.id]?' done':'')+(can?' can':'')+'" data-id="'+x.id+'" style="left:'+p.x+'px;top:'+p.y+'px" onclick="advOpen(\''+x.id+'\')">'+icoHTML(x.icon)+(x.tier?'<i class="adv-tier">'+['I','II','III','IV','V'][x.tier-1]+'</i>':'')+(cl?'<i class="adv-chk">✓</i>':'')+(x.goal>1&&!done?'<em class="adv-bar"><u style="width:'+(v/x.goal*100)+'%"></u></em>':'')+'</button>'}).join('');advApplyCam()}
+function advOpen(id){const x=ADV_BY[id],a=advSt(),v=Math.min(x.goal,x.val()),done=advDone(x),can=advClaimable(x),cl=a.claimed[id];
+ modal('ADVANCEMENT','<div class="adv-card"><div class="adv-card-l"><div class="adv-card-ico'+(done?'':' off')+'">'+icoHTML(x.icon)+'</div><button class="adv-card-rw'+(can?' can':'')+'" '+(can?'onclick="closeModal();advClaim([\''+id+'\'])"':'disabled')+'>'+advRewardHTML(x.rw)+(can?'<small>Tap to claim</small>':cl?'<small>✓ Claimed</small>':'')+'</button></div>'
+  +'<div class="adv-card-r"><h3>'+esc(x.name)+'</h3><p>'+esc(x.desc)+'</p>'+(x.goal>1?'<div class="adv-prog"><i style="width:'+(v/x.goal*100)+'%"></i><b>'+money(v)+' / '+money(x.goal)+'</b></div>':'<p class="small muted">'+(done?'Completed':'Not completed yet')+'</p>')
+  +(done&&!advPrevOk(x)?'<p class="small muted">Claim '+esc(ADV_BY[x.fam+(x.tier-1)].name)+' first.</p>':'')+'</div></div>')}
+function advApplyCam(){const B=$('advBoard');if(B)B.style.transform='translate('+advCam.x+'px,'+advCam.y+'px) scale('+advCam.s+')'}
+function advCenter(x,anim){const V=$('advView'),p=advPlace().pos[x.id];if(!V||!p)return;advCam.x=V.clientWidth/2-(p.x+28)*advCam.s;advCam.y=V.clientHeight/2-(p.y+28)*advCam.s;const B=$('advBoard');if(B)B.style.transition=anim?'transform .45s cubic-bezier(.3,.8,.3,1)':'none';advApplyCam()}
+function advPanZoom(V){const pts=new Map();let start=null;
+ const st=()=>{const a=[...pts.values()];return a.length>1?{cx:(a[0].x+a[1].x)/2,cy:(a[0].y+a[1].y)/2,d:Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y)}:{cx:a[0].x,cy:a[0].y,d:0}};
+ V.addEventListener('pointerdown',e=>{pts.set(e.pointerId,{x:e.clientX,y:e.clientY});start={...st(),cam:{...advCam},moved:false};$('advBoard').style.transition='none'});
+ V.addEventListener('pointermove',e=>{if(!pts.has(e.pointerId)||!start)return;pts.set(e.pointerId,{x:e.clientX,y:e.clientY});const s=st(),r=V.getBoundingClientRect();
+  let sc=start.cam.s;if(s.d&&start.d)sc=Math.max(.35,Math.min(2.2,start.cam.s*s.d/start.d));const ox=start.cx-r.left,oy=start.cy-r.top,wx=(ox-start.cam.x)/start.cam.s,wy=(oy-start.cam.y)/start.cam.s;
+  advCam.s=sc;advCam.x=s.cx-r.left-wx*sc;advCam.y=s.cy-r.top-wy*sc;if(Math.hypot(s.cx-start.cx,s.cy-start.cy)>6||s.d)start.moved=true;advApplyCam()});
+ const up=e=>{pts.delete(e.pointerId);if(pts.size){start={...st(),cam:{...advCam},moved:true}}else setTimeout(()=>{start=null},0)};['pointerup','pointercancel','pointerleave'].forEach(k=>V.addEventListener(k,up));
+ V.addEventListener('click',e=>{if(start&&start.moved){e.stopPropagation();e.preventDefault()}},true);
+ V.addEventListener('wheel',e=>{e.preventDefault();const r=V.getBoundingClientRect(),ox=e.clientX-r.left,oy=e.clientY-r.top,wx=(ox-advCam.x)/advCam.s,wy=(oy-advCam.y)/advCam.s;advCam.s=Math.max(.35,Math.min(2.2,advCam.s*(e.deltaY<0?1.1:.9)));advCam.x=ox-wx*advCam.s;advCam.y=oy-wy*advCam.s;advApplyCam()},{passive:false})}
+// cutscene: fly to each newly completed advancement, shake it grey, then slam it into colour
+async function advCutscene(list){const V=$('advView');if(!V)return;let skip=false;const a=advSt(),finish=()=>{list.forEach(x=>{a.seen[x.id]=Date.now()});save();advDrawBoard();V.classList.remove('adv-cut')};
+ const onTap=e=>{skip=true;e.stopPropagation();e.preventDefault()};V.classList.add('adv-cut');V.addEventListener('pointerdown',onTap,true);V.addEventListener('click',onTap,true);
+ for(const x of list){if(skip||!V.isConnected)break;advCenter(x,true);await new Promise(r=>setTimeout(r,520));const n=document.querySelector('.adv-node[data-id="'+x.id+'"]');if(!n||skip)break;
+  n.classList.add('adv-shake');await new Promise(r=>setTimeout(r,560));if(skip)break;n.classList.remove('adv-shake');n.classList.add('adv-slam','done');a.seen[x.id]=Date.now();await new Promise(r=>setTimeout(r,520));n.classList.remove('adv-slam')}
+ V.removeEventListener('pointerdown',onTap,true);setTimeout(()=>V.removeEventListener('click',onTap,true),50);finish()}
+// boot
+advInstall();setTimeout(()=>{advTick();advBadge()},1600);setInterval(advTick,30000);
+
 // One-time gift requested by the player (v0.83.0): 1 Facility Ticket
 setTimeout(function(){try{if(db&&!db.gift0830){inv().facticket=(inv().facticket||0)+1;db.gift0830=1;save();toast('🎫 +1 Facility Ticket added to your Bag')}}catch(_){}},1500);
 // Functions added after the boot-time wrapper also get wrapped, so iOS logs their errors with details instead of "Script error."

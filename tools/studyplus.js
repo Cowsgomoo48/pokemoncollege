@@ -69,7 +69,7 @@ function askDIY(item,opts={}){return new Promise(res=>{const p=prInstance(item.g
  ov.querySelector('.diy-go').onclick=()=>{if(submitted||!protection.allowed()||ov.querySelector('.guided-final')?.hidden)return;const lines=[...box.querySelectorAll('input')].map(i=>i.value.trim()).filter(Boolean);if(!lines.length){toast('Write at least one line');return}
   submitted=true;protection.stop();const checks=lines.map(l=>diyLineCheck(l,ansX)),last=lines[lines.length-1],lastSeg=last.split(/=|≈/).pop(),ok=saMatch(lastSeg,p.a)||saMatch(last,p.a);
   if(typeof apNote==='function')apNote({ms:performance.now()-t0,protectedMs:protection.duration,ok,chars:String(p.q).length,hinted:true,typed:true});
-  qRecord(item,ok,ok?{first:true,hints:hi}:{pick:last,prompt:p.q,answer:p.a,hints:hi});
+  qRecord(item,ok,ok?{first:true,hints:hi,typed:true}:{pick:last,prompt:p.q,answer:p.a,hints:hi});
   if(!ok&&typeof __qMissSet==='function')__qMissSet({prompt:p.q,pick:last,answer:p.a,why:(p.steps&&p.steps.length?p.steps[p.steps.length-1][1]||p.steps[p.steps.length-1][0]:p.ex)});
   const card=ov.querySelector('.mgq-card');
   card.innerHTML='<span class="badge diy-b">🛠 DO IT YOURSELF</span><h3>'+mathHTML(p.q)+'</h3><div class="notice '+(ok?'diy-ok':'diy-no')+'">'+(ok?'✅ Your answer is right!':'❌ Your last line doesn’t reach the answer.')+' The answer is <b>'+mathHTML(p.a)+'</b>.</div>'

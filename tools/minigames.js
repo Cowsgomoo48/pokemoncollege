@@ -9,7 +9,7 @@ function mgBank(sids){const out=[];for(const s of db.summaries){if(!sids.include
 function qstat(key){const q=db.qstats||(db.qstats={});return q[key]||(q[key]={r:0,w:0,last:0,miss:0})}
 // Every answer is recorded per item (r = right, w = wrong). The extra details (first try or Make-Up, hints used, which wrong
 // answer was picked, a day-by-day tally per study set) feed the Export Study Data sheet.
-function qRecord(item,ok,info){const s=qstat(item.key),I=info||{};if(typeof facAnswer==='function')facAnswer(ok,ok&&!I.makeup);if(ok){s.r++;s.miss=Math.max(0,s.miss-1);if(I.makeup)s.mk=(s.mk||0)+1;else if(I.first)s.ft=(s.ft||0)+1}else{s.w++;s.miss=Math.min(5,s.miss+2)}s.last=Date.now();if(!s.first)s.first=s.last;if(I.hints)s.h=(s.h||0)+1;
+function qRecord(item,ok,info){if(typeof advQ==='function'){const q0=qstat(item.key);advQ(item,ok,info||{},{w:q0.w||0,h:q0.h||0})}const s=qstat(item.key),I=info||{};if(typeof facAnswer==='function')facAnswer(ok,ok&&!I.makeup);if(ok){s.r++;s.miss=Math.max(0,s.miss-1);if(I.makeup)s.mk=(s.mk||0)+1;else if(I.first)s.ft=(s.ft||0)+1}else{s.w++;s.miss=Math.min(5,s.miss+2)}s.last=Date.now();if(!s.first)s.first=s.last;if(I.hints)s.h=(s.h||0)+1;
  if(!ok&&I.pick!=null){s.wp=(s.wp||[]);s.wp.unshift({q:String(I.prompt||'').slice(0,240),p:String(I.pick).slice(0,160),a:String(I.answer||'').slice(0,160),at:s.last});s.wp.length=Math.min(s.wp.length,3)}
  if(item.sid){const H=db.qhist||(db.qhist={}),d=localDay(),hs=H[item.sid]||(H[item.sid]={}),t=hs[d]||(hs[d]=[0,0]);t[ok?0:1]++;const days=Object.keys(hs).sort();while(days.length>90)delete hs[days.shift()]}}
 function isWeak(item){const set=(db.summaries||[]).find(s=>s.id===item.sid);if(set&&typeof sdItems==='function'){const row=sdItems(set).find(x=>item.kind==='gen'?x.gid===item.gid:x.key===item.key);return !!row&&sdWeak(row)}const s=(db.qstats||{})[item.key];return !!s&&(s.w>0||s.g>0||s.miss>0)}
@@ -83,7 +83,7 @@ function askQ(item,bank,opts={}){__qMissReset();
   const answered=(o,b)=>{if(submitted||!protection.allowed()||ov.querySelector('.guided-final')?.hidden)return;submitted=true;studyLog(item,Date.now()-__qT0);__qT0=Date.now();protection.stop();if(typeof apNote==='function')apNote({ms:performance.now()-t0,protectedMs:protection.duration,ok:!!o.ok,chars:String(q.prompt).length+q.options.reduce((a,x)=>a+String(x.t).length,0),hinted,typed,guided:guidance.engaged,inputChars:typed?String(o.t).length:0});const hb2=ov.querySelector('.mgq-hint');if(hb2)hb2.remove();
    ov.querySelectorAll('.answer').forEach(x=>{x.disabled=true;if(q.options[+x.dataset.i].ok)x.classList.add('correct')});const card=ov.querySelector('.mgq-card');
    if(typed){const inp=ov.querySelector('.sa-in');inp.disabled=true;inp.classList.add(o.ok?'ok':'no');const g=ov.querySelector('.sa-go');if(g)g.remove();const k=ov.querySelector('.sa-keys');if(k)k.remove()}
-   if(o.ok){qRecord(item,true,{first:!isMakeUp,makeup:isMakeUp,hints:hi});
+   if(o.ok){qRecord(item,true,{first:!isMakeUp,makeup:isMakeUp,hints:hi,typed:!!typed});
     // confidence tap: a lucky guess still wins the turn, but the question comes back later as a weak spot
     if(!isMakeUp&&!typed&&opts.confidence!==false){card.insertAdjacentHTML('beforeend','<div class="mgq-conf"><span>Did you know it?</span><button class="btn smallbtn" data-c="k">✅ Knew it</button><button class="btn smallbtn" data-c="g">🤔 Guessed</button></div>');
      let fin=false;const pick=c=>{if(fin)return;fin=true;if(c==='g'){qGuessed(item);toast('🤔 Got it. That one will come back for practice.')}done('full')};

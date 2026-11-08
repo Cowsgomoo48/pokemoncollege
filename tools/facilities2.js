@@ -94,7 +94,7 @@ function nurInfo(){const f=nur(),L=facLv(f),next=L<10?FAC_XP[L+1]:null,{m,d}=nur
   +'<p class="small muted">Eggs hatched: '+(f.hatched||0)+'</p><div class="actions">'+(f.phase==='idle'?'<button class="btn red" onclick="nurOpen()">CHOOSE PARENTS</button>':'')+(inv().facticket&&L<10?'<button class="btn blue" onclick="facTicketUse(\'nursery\')">USE FACILITY TICKET</button>':'')+'<button class="btn" onclick="closeModal()">CLOSE</button></div>')}
 // ---------- egg menus ----------
 const eggIco=(e,c='')=>'<span class="egg-ico r'+Math.min(4,e.tier||0)+' '+c+'">'+(typeof icoHTML==='function'?icoHTML('egg'):'🥚')+'</span>';
-const eggSrc=e=>e.src==='totem'?'Totem egg':e.src==='alpha'?'Alpha egg':e.from?'From '+e.from.join(' & '):'Nursery egg';
+const eggSrc=e=>e.src==='totem'?'Totem egg':e.src==='alpha'?'Alpha egg':e.src==='adv'?'Advancement egg':e.from?'From '+e.from.join(' & '):'Nursery egg';
 function eggStatsHTML(e,n){const g=[0,1,2,3,4,5].map(i=>e.growth&&e.growth[i]!=null?GRADES[e.growth[i]-1]||'?':'?');
  return '<div class="nur-stats"><div><span>Rarity</span><b>'+RARITIES[Math.min(4,e.tier||0)]+'</b></div><div><span>Source</span><b>'+esc(eggSrc(e))+'</b></div>'
   +'<div><span>Likely growth</span><b>'+FAC_STATS.map((s,i)=>s+' '+g[i]).join(' · ')+'</b></div><div><span>Shiny chance</span><b>'+(e.shinyP>=1?'Shiny!':'1 in '+money(Math.round(1/(e.shinyP||NUR_SHINY))))+'</b></div>'
