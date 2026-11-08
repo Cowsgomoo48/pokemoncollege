@@ -86,8 +86,10 @@ function dvHouses(g,x,y,w,h,L,R){dvChasm(g,x,y,w,h,L,R);const base=y+h*.86;dvR(g
  for(let i=0;i<6;i++){const lx=x+R()*w,ly=y+R()*h*.4;dvR(g,'#3a2a1c',lx,y,1,ly-y);dvR(g,L.glow,lx-2,ly,5,6)}dvDepth(g,x,y,w,h,L)}
 // put the background behind the tiles (once per floor) and keep it in step with the camera
 function dvDeep(field,r){const fl=r&&r.fl;if(!fl||!field)return;const mp=field.querySelector('.gd-map');if(!mp)return;let c=mp.querySelector('.gd-deep');const P=dvPlan(fl);
- if(!P.voids.size&&!P.bridges.size){if(c)c.remove();return}
- if(c&&c.dataset.fl===String(fl.id))return;if(c)c.remove();c=dvPaint(r,fl);c.className='gd-deep';c.dataset.fl=fl.id;c.style.left=-(1-DV_F)*fl.w*GD_T+'px';c.style.top=-(1-DV_F)*fl.h*GD_T+'px';mp.prepend(c);
+ if(!P.voids.size&&!P.bridges.size){mp.querySelectorAll('.gd-deepwrap').forEach(w=>w.remove());return}
+ if(c&&c.dataset.fl===String(fl.id))return;mp.querySelectorAll('.gd-deepwrap').forEach(w=>w.remove());c=dvPaint(r,fl);c.className='gd-deep';c.dataset.fl=fl.id;c.style.left=-(1-DV_F)*fl.w*GD_T+'px';c.style.top=-(1-DV_F)*fl.h*GD_T+'px';
+ // the background is larger than the map (for parallax); clip it to the map so it never shows past the edges
+ const wrap=document.createElement('div');wrap.className='gd-deepwrap';wrap.style.width=fl.w*GD_T+'px';wrap.style.height=fl.h*GD_T+'px';wrap.appendChild(c);mp.prepend(wrap);
  if(DG&&DG.cam)dvParallax(mp,DG.cam.tx,DG.cam.ty,DG.cam.T/GD_T)}
 function dvParallax(mp,tx,ty,sc){const c=mp&&mp.querySelector('.gd-deep');if(!c)return;sc=sc||1;c.style.transform='translate('+Math.round((DV_F-1)*tx/sc)+'px,'+Math.round((DV_F-1)*ty/sc)+'px)'}
 

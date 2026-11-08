@@ -60,7 +60,9 @@ function studyLog(item,ms){const sid=item&&item.sid;if(!sid||!(ms>0))return;db.s
 // Smart Study: multiple choice only while the set's average is unknown or under 50%
 function smartMC(item,bank){const m=typeof DG!=='undefined'&&DG&&bank===DG.bank?(runOf()||{}).mode:mgState&&bank===mgState.bank?mgState.mode:mgState?mgState.mode:(typeof runOf==='function'&&runOf()||{}).mode;if(m!=='smart')return false;
  let r=0,w=0;for(const b of bank||[]){if(item&&b.sid!==item.sid)continue;const s=db.qstats&&db.qstats[b.key];if(s){r+=s.r||0;w+=s.w||0}}return !(r+w)||r/(r+w)<.5}
-function askQ(item,bank,opts={}){__qMissReset();let __qT0=Date.now();return new Promise(res=>{const ov=document.createElement('div');ov.className='mgq';document.body.appendChild(ov);const v0=Math.random()<.5?0:1;
+function askQ(item,bank,opts={}){__qMissReset();
+ // Quick-Study (a Mystery Dungeon / Tower run option): every question in the run is multiple choice
+ try{if(mgState&&/dungeon|tower/.test(mgState.game)&&typeof runOf==='function'&&runOf()&&runOf().quick)opts=Object.assign({},opts,{typed:false,typedChance:0})}catch(_){}let __qT0=Date.now();return new Promise(res=>{const ov=document.createElement('div');ov.className='mgq';document.body.appendChild(ov);const v0=Math.random()<.5?0:1;
  // about 1 question in 5 asks you to type the answer instead of picking it (never a Make-Up)
  const plan=opts.typed!==false&&!smartMC(item,bank)&&Math.random()<(opts.typedChance??(item.kind==='gen'&&PR[item.gid]&&PR[item.gid].cmd?.85:.2))?saPlan(item):null;
  let protection=null;
