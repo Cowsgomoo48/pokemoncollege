@@ -2240,7 +2240,7 @@ function drawMagSound(){const el=$('magSndBox');if(!el)return;const on=db.magSou
 // ---- Inventory (the gift box): swipe up from the dock, or tap the bag tab ----
 let invTab='all';
 // the bag stays closed while a minigame (or one of its questions) is on screen
-function invBlocked(){return !!((typeof mgState!=='undefined'&&mgState)||document.querySelector('.mgq,.dg-slider'))}
+function invBlocked(){return !!((typeof mgState!=='undefined'&&mgState)||document.querySelector('.mgq,.dg-slider')||(typeof currentPage!=='undefined'&&currentPage==='misc'))}
 setInterval(()=>document.body.classList.toggle('mg-busy',invBlocked()),400);
 function openInv(){if(invBlocked())return;const w=$('invWrap');drawInv();w.classList.add('open')}
 function closeInv(){const w=$('invWrap');if(w)w.classList.remove('open')}
@@ -2305,7 +2305,7 @@ document.querySelector('.habitat').classList.toggle('big',hab.big);document.quer
  drawTray()}
 function drawTray(){const tray=$('habTray'),ed=$('habEdit');if(!tray)return;if(!hab.big){tray.innerHTML='';ed.innerHTML='';return}const v=inv();
  const snacks=Object.keys(v).filter(id=>ITEMS[id]&&ITEMS[id].kind==='snack'),toys=Object.keys(v).filter(id=>ITEMS[id]&&ITEMS[id].kind==='toy');
- if(!hab.big||hab.scene!=='nursery')hab.nurShown=false;if(hab.scene&&hab.scene!=='home'&&facs()[hab.scene]&&FAC[hab.scene].tray){const id=hab.scene;tray.innerHTML=FAC[id].tray(id);if(id==='nursery'&&nur().phase==='idle'&&!hab.nurShown&&!document.querySelector('#modal.open')){hab.nurShown=true;setTimeout(nurOpen,60)}}
+ if(hab.scene!=='nursery'){const ns=$('nurNests');if(ns)ns.remove()}if(hab.scene&&hab.scene!=='home'&&facs()[hab.scene]&&FAC[hab.scene].tray){const id=hab.scene;tray.innerHTML=FAC[id].tray(id)}
  else if(hab.scene&&hab.scene!=='home'&&facs()[hab.scene]){const id=hab.scene,f=facs()[id];tray.innerHTML='<div class="tray-actions fac-actions"><button class="btn smallbtn red" onclick="facChooser(\''+id+'\')">'+(f.mon?'↔ SWAP POKÉMON':'＋ CHOOSE POKÉMON')+'</button>'+(f.mon?'<button class="btn smallbtn" onclick="facRemove(\''+id+'\')">REMOVE</button>':'')+'<button class="btn smallbtn" onclick="facInfo(\''+id+'\')">LV '+facLv(f)+' · INFO</button><button class="btn smallbtn" onclick="hab.edit=!hab.edit;drawHabitat()">'+(hab.edit?'✓ DONE':'✎ DECOR')+'</button><button class="btn smallbtn" onclick="closeHabitat()">✕</button></div>'}
  else{tray.innerHTML='<div class="tray-row">'+(snacks.length||toys.length?snacks.map(id=>'<button class="tray-it" onclick="habFeed(\''+id+'\')" aria-label="Feed '+esc(ITEMS[id].name)+'">'+itemIcon(id)+'<b>'+v[id]+'</b></button>').join('')+toys.map(id=>'<button class="tray-it toy" onclick="habToy(\''+id+'\')" aria-label="Play with '+esc(ITEMS[id].name)+'">'+itemIcon(id)+'</button>').join(''):'<span class="small" style="color:#cfe6f7">No snacks or toys yet. Find them in boxes and Daily Deals.</span>')+'</div><div class="tray-actions"><button class="btn smallbtn" onclick="hab.edit=!hab.edit;drawHabitat()">'+(hab.edit?'✓ DONE':'✎ EDIT')+'</button><button class="btn smallbtn" onclick="closeHabitat()">✕</button></div>';}
  if(!hab.edit){ed.innerHTML='';return}
@@ -3555,11 +3555,13 @@ function nurRoot(sp){let s=sp,g=0;while(PRE_EVO[s]&&PRE_EVO[s]!==s&&g++<5)s=PRE_
 function nurTypes(p){return (SPECIES_DATA[p.species]||{types:[]}).types.map(t=>String(t).toLowerCase())}
 const NUR_BABY=new Set(['Pichu','Cleffa','Igglybuff','Togepi','Tyrogue','Smoochum','Elekid','Magby','Azurill','Wynaut','Budew','Chingling','Bonsly','Mime Jr.','Happiny','Munchlax','Riolu','Mantyke','Toxel']);
 const nurDitto=p=>p&&p.species==='Ditto';
-function nurCan(p){return p&&(INDEX[p.species]?INDEX[p.species].tier:0)<4&&!NUR_BABY.has(p.species)&&(monGender(p)!==null||nurDitto(p))&&!inRun(p.id)}
+// Legendaries can breed and fill either parent slot, but never two in one pair
+const nurLegend=p=>!!p&&(INDEX[p.species]?INDEX[p.species].tier:0)>=4;
+function nurCan(p){return p&&!NUR_BABY.has(p.species)&&(monGender(p)!==null||nurDitto(p)||nurLegend(p))&&!inRun(p.id)}
 // a Pokémon that is breeding can't be changed (like one on a dungeon run)
 function nurBusy(id){const f=db&&db.facilities&&db.facilities.nursery;return !!f&&f.phase==='breeding'&&(f.mother===id||f.father===id)}
 function nurPair(f){const m=f&&db.pokemon.find(p=>p.id===f.mother),d=f&&db.pokemon.find(p=>p.id===f.father);return {m,d}}
-function nurOdds(m,d){if(!m||!d)return null;const dm=nurDitto(m),dd=nurDitto(d);if(dm&&dd)return {bad:'Two Ditto can’t breed with each other.'};const shared=dm||dd||nurTypes(m).some(t=>nurTypes(d).includes(t));if(!shared)return {bad:'These two don’t share a type, so they can’t breed.'};
+function nurOdds(m,d){if(!m||!d)return null;const dm=nurDitto(m),dd=nurDitto(d);if(dm&&dd)return {bad:'Two Ditto can’t breed with each other.'};if(nurLegend(m)&&nurLegend(d))return {bad:'Two Legendary Pokémon can’t breed together.'};const shared=dm||dd||nurTypes(m).some(t=>nurTypes(d).includes(t));if(!shared)return {bad:'These two don’t share a type, so they can’t breed.'};
  const rm=nurRoot(m.species),rd=nurRoot(d.species),same=rm===rd,shM=1+[m,d].reduce((a,p)=>a+(p.shiny?1:0)+(nurDitto(p)?.25:0),0),cM=1+.15*[m,d].filter(p=>p.costume).length,sh=NUR_SHINY*shM*(1+.05*(facLv(facs().nursery)-1)),opts=dm?[{sp:rd,p:1}]:dd?[{sp:rm,p:1}]:same?[{sp:rm,p:1}]:[{sp:rm,p:.7},{sp:rd,p:.3}];
  return {shiny:sh,opts,fast:dd?null:d.fastMove,disc:dd?null:d.discMove,moveP:dd?0:.3,costume:cM>1?cM:0,shM,cM,ditto:dm||dd}}
 function nurDur(){return facBonus('nursery').hrs*36e5}
@@ -3602,8 +3604,8 @@ function nurMenu(){const m=db.pokemon.find(p=>p.id===nurSel.mother),d=db.pokemon
   +'<div class="nur-egg">'+(typeof icoHTML==='function'?icoHTML('egg'):'🥚')+'</div>'+stats
   +'<div class="actions"><button class="btn" onclick="closeModal()">CLOSE</button><button class="btn red" '+(ok?'':'disabled')+' onclick="nurStart()">START BREEDING</button></div></div>')}
 function nurPick(role){const want=role==='mother'?'F':'M',other=role==='mother'?nurSel.father:nurSel.mother,op=db.pokemon.find(p=>p.id===other);
- const list=db.pokemon.filter(p=>p.id!==db.mainId&&p.id!==other&&nurCan(p)&&(nurDitto(p)?!nurDitto(op):monGender(p)===want)&&!facOf(p.id)&&(!op||nurDitto(p)||nurDitto(op)||nurTypes(p).some(t=>nurTypes(op).includes(t))));
- if(!list.length){toast('No '+(want==='F'?'♀':'♂')+' Pokémon that can breed'+(op?' with '+facName(op):'')+' (not legendary or a baby, not your companion, not on a run or in a Facility'+(op?', sharing a type':'')+'). Ditto can breed with anything.');return}
+ const list=db.pokemon.filter(p=>p.id!==db.mainId&&p.id!==other&&nurCan(p)&&(nurDitto(p)?!nurDitto(op):nurLegend(p)?!nurLegend(op):monGender(p)===want)&&!facOf(p.id)&&(!op||nurDitto(p)||nurDitto(op)||nurTypes(p).some(t=>nurTypes(op).includes(t))));
+ if(!list.length){toast('No '+(want==='F'?'♀':'♂')+' Pokémon that can breed'+(op?' with '+facName(op):'')+' (not a baby, not your companion, not on a run or in a Facility'+(op?', sharing a type':'')+'). Ditto can breed with anything; a Legendary can fill either slot, but not both.');return}
  monChooser('CHOOSE '+(role==='mother'?'♀ MOTHER':'♂ FATHER'),list,'nurSet_'+role,'<p class="small muted">'+(op?'Showing Pokémon that share a type with '+esc(facName(op))+'.':'Pick a '+(want==='F'?'female':'male')+' Pokémon.')+'</p>')}
 window.nurSet_mother=id=>{nurSel.mother=id;nurMenu()};window.nurSet_father=id=>{nurSel.father=id;nurMenu()};
 function nurStart(){const f=nur(),m=db.pokemon.find(p=>p.id===nurSel.mother),d=db.pokemon.find(p=>p.id===nurSel.father),o=nurOdds(m,d);if(!f||!o||o.bad)return;
@@ -3612,7 +3614,7 @@ function nurRemove(){const f=nur();if(!f)return;f.mother=f.father=null;f.phase='
 function nurTray(){const f=nur();return '<div class="tray-actions fac-actions">'+(f.phase==='idle'?'<button class="btn smallbtn red" onclick="nurOpen()">＋ CHOOSE PARENTS</button>':'<button class="btn smallbtn red" onclick="nurInfo()">💞 BREEDING</button><button class="btn smallbtn" onclick="nurRemove()">REMOVE PARENTS</button>')+'<button class="btn smallbtn" onclick="nestOpen(0)">🪺 NESTS</button><button class="btn smallbtn" onclick="nurInfo()">LV '+facLv(f)+' · INFO</button><button class="btn smallbtn" onclick="hab.edit=!hab.edit;drawHabitat()">'+(hab.edit?'✓ DONE':'✎ DECOR')+'</button><button class="btn smallbtn" onclick="closeHabitat()">✕</button></div>'}
 function nurInfo(){const f=nur(),L=facLv(f),next=L<10?FAC_XP[L+1]:null,{m,d}=nurPair(f),B=facBonus('nursery');
  const cur=f.phase==='idle'?'<p class="small">Nobody is breeding right now.</p>':'<div class="nur-now"><div class="nur-pair">'+(m?monSprite(m,'',48):'')+(d?monSprite(d,'',48):'')+'</div><p><b>💞 '+esc(facName(m))+' and '+esc(facName(d))+' are breeding</b><br>Egg in about '+fmtHM(nurLeft(f))+' · speed ×'+(f.speed||1).toFixed(2)+'</p><div class="fac-xp"><span style="width:'+Math.min(100,(f.prog||0)/f.dur*100)+'%"></span></div></div>';
- modal('🥚 NURSERY · LV '+L,cur+'<p class="small">Put a ♀ and a ♂ that share a type (no legendaries or babies) in the Nursery; Ditto can pair with anything and gives a small shiny boost. Each shiny parent adds +1× to the shiny odds and Ditto adds +0.25× (a shiny Ditto +1.25×); each costumed parent adds +0.15× to the costume odds. Parents are locked while they breed. After the breeding time they leave an egg in your Bag. Totems and Alphas also give eggs.</p><p class="small">Put eggs in the nests to hatch them (1 nest at Lv 1, 2 at Lv 4, 3 at Lv 6). Hatching takes '+EGG_MIN.map((m,i)=>RARITIES[i]+' '+fmtHM(m*6e4*B.hrs/6)).join(' · ')+'. An egg can’t leave its nest once it starts. Each fully correct answer makes breeding and every hatching egg '+B.per+'% faster; each egg keeps its own bonus.</p>'
+ modal('🥚 NURSERY · LV '+L,cur+'<p class="small">Put a ♀ and a ♂ that share a type (no babies) in the Nursery; a Legendary can fill either slot, but two Legendaries can’t pair; Ditto can pair with anything and gives a small shiny boost. Each shiny parent adds +1× to the shiny odds and Ditto adds +0.25× (a shiny Ditto +1.25×); each costumed parent adds +0.15× to the costume odds. Parents are locked while they breed. After the breeding time they leave an egg in your Bag. Totems and Alphas also give eggs.</p><p class="small">Put eggs in the nests to hatch them (1 nest at Lv 1, 2 at Lv 4, 3 at Lv 6). Hatching takes '+EGG_MIN.map((m,i)=>RARITIES[i]+' '+fmtHM(m*6e4*B.hrs/6)).join(' · ')+'. An egg can’t leave its nest once it starts. Each fully correct answer makes breeding and every hatching egg '+B.per+'% faster; each egg keeps its own bonus.</p>'
   +'<div class="fac-xp"><span style="width:'+(next?Math.min(100,((f.xp||0)-FAC_XP[L])/(next-FAC_XP[L])*100):100)+'%"></span></div><p class="small muted">'+(next?money(Math.round((f.xp||0)-FAC_XP[L]))+' / '+money(next-FAC_XP[L])+' Facility EXP to Lv '+(L+1):'Max level')+'</p>'
   +'<table class="fac-tbl"><tr><th>Level</th><th>Breed time</th><th>Speed per answer</th><th>Nests</th></tr>'+FAC.nursery.levels.slice(1).map((b,i)=>'<tr'+(i+1===L?' class="on"':'')+'><td>Lv '+(i+1)+'</td><td>'+fmtHM(b.hrs*36e5)+'</td><td>+'+b.per+'%</td><td>'+NEST_LV.filter(l=>i+1>=l).length+'</td></tr>').join('')+'</table>'
   +'<p class="small muted">Eggs hatched: '+(f.hatched||0)+'</p><div class="actions">'+(f.phase==='idle'?'<button class="btn red" onclick="nurOpen()">CHOOSE PARENTS</button>':'')+(inv().facticket&&L<10?'<button class="btn blue" onclick="facTicketUse(\'nursery\')">USE FACILITY TICKET</button>':'')+'<button class="btn" onclick="closeModal()">CLOSE</button></div>')}
@@ -6595,7 +6597,7 @@ $('navHome').style.display='none';
  if(pcStorageReady)ensureMoveData();
  if(pcStorageReady&&permRoll())save();
  render();scheduleNotifs();aiCheck();window.__pcBooted=true;setTimeout(()=>{try{mdSync()}catch(e){}},1500);setTimeout(()=>{try{facTick()}catch(e){}},2500);setInterval(()=>{try{facTick();if(currentPage==='home'&&hab.scene&&hab.scene!=='home')drawHabitat()}catch(e){}},60000);
- window.__pcVersion='0.85.0';
+ window.__pcVersion='0.85.1';
  document.addEventListener('pointerdown',function(e){try{var t=e.target.closest&&e.target.closest('[onclick],button,a,[id]');if(!t)return;var oc=t.getAttribute('onclick');window.__pcLastTap=(oc?oc.slice(0,60):(t.id?'#'+t.id:t.tagName.toLowerCase()+'.'+String(t.className).split(' ')[0])).replace(/\s+/g,' ')}catch(_){}} ,true);
  Object.keys(window).forEach(function(k){var f=window[k];if(typeof f!=='function'||/^[A-Z]/.test(k)||k==='appError'||k==='$'||k==='esc'||/\[native code\]/.test(Function.prototype.toString.call(f)))return;
   var w=function(){try{return f.apply(this,arguments)}catch(err){if(err&&typeof err==='object'&&!err.__pcLogged){try{err.__pcLogged=1}catch(_){}appError(err,k)}throw err}};try{window[k]=w}catch(_){}});
@@ -7347,8 +7349,14 @@ async function advCutscene(list){const V=$('advView');if(!V)return;let skip=fals
  for(const x of list){if(skip||!V.isConnected)break;advCenter(x,true);await new Promise(r=>setTimeout(r,520));const n=document.querySelector('.adv-node[data-id="'+x.id+'"]');if(!n||skip)break;
   n.classList.add('adv-shake');await new Promise(r=>setTimeout(r,560));if(skip)break;n.classList.remove('adv-shake');n.classList.add('adv-slam','done');a.seen[x.id]=Date.now();await new Promise(r=>setTimeout(r,520));n.classList.remove('adv-slam')}
  V.removeEventListener('pointerdown',onTap,true);setTimeout(()=>V.removeEventListener('click',onTap,true),50);finish()}
+// One-time reset (v0.85.1, requested): Answerer and Second Wind start from zero; rewards already claimed from them are taken back.
+function advResetStudy(){const a=advSt();if(a.r851)return;a.r851=1;const ids=ADV.filter(x=>x.fam==='ans'||x.fam==='sw').map(x=>x.id);let eggsBack=0;
+ ids.forEach(id=>{if(!a.claimed[id])return;const rw=ADV_BY[id].rw;db.cogs=Math.max(0,Math.round((db.cogs||0)-(rw.cogs||0)));const p=db.pokemon.find(x=>x.id===db.mainId);if(p&&rw.pxp)p.pxp=Math.max(0,(p.pxp||0)-rw.pxp);
+  Object.entries(rw.items||{}).forEach(([it,n])=>invAdd(it,-Math.min(n,inv()[it]||0)));if(rw.egg)eggsBack++;delete a.claimed[id]});
+ for(let i=eggs().length-1;i>=0&&eggsBack>0;i--)if(eggs()[i].src==='adv'){eggs().splice(i,1);eggsBack--}
+ ids.forEach(id=>delete a.seen[id]);a.c.correct=0;a.s.sw=[];save()}
 // boot
-advInstall();setTimeout(()=>{advTick();advBadge()},1600);setInterval(advTick,30000);
+advInstall();setTimeout(()=>{try{advSeed();advResetStudy()}catch(_){}},1500);setTimeout(()=>{advTick();advBadge()},1600);setInterval(advTick,30000);
 
 // One-time gift requested by the player (v0.83.0): 1 Facility Ticket
 setTimeout(function(){try{if(db&&!db.gift0830){inv().facticket=(inv().facticket||0)+1;db.gift0830=1;save();toast('🎫 +1 Facility Ticket added to your Bag')}}catch(_){}},1500);

@@ -193,5 +193,11 @@ async function advCutscene(list){const V=$('advView');if(!V)return;let skip=fals
  for(const x of list){if(skip||!V.isConnected)break;advCenter(x,true);await new Promise(r=>setTimeout(r,520));const n=document.querySelector('.adv-node[data-id="'+x.id+'"]');if(!n||skip)break;
   n.classList.add('adv-shake');await new Promise(r=>setTimeout(r,560));if(skip)break;n.classList.remove('adv-shake');n.classList.add('adv-slam','done');a.seen[x.id]=Date.now();await new Promise(r=>setTimeout(r,520));n.classList.remove('adv-slam')}
  V.removeEventListener('pointerdown',onTap,true);setTimeout(()=>V.removeEventListener('click',onTap,true),50);finish()}
+// One-time reset (v0.85.1, requested): Answerer and Second Wind start from zero; rewards already claimed from them are taken back.
+function advResetStudy(){const a=advSt();if(a.r851)return;a.r851=1;const ids=ADV.filter(x=>x.fam==='ans'||x.fam==='sw').map(x=>x.id);let eggsBack=0;
+ ids.forEach(id=>{if(!a.claimed[id])return;const rw=ADV_BY[id].rw;db.cogs=Math.max(0,Math.round((db.cogs||0)-(rw.cogs||0)));const p=db.pokemon.find(x=>x.id===db.mainId);if(p&&rw.pxp)p.pxp=Math.max(0,(p.pxp||0)-rw.pxp);
+  Object.entries(rw.items||{}).forEach(([it,n])=>invAdd(it,-Math.min(n,inv()[it]||0)));if(rw.egg)eggsBack++;delete a.claimed[id]});
+ for(let i=eggs().length-1;i>=0&&eggsBack>0;i--)if(eggs()[i].src==='adv'){eggs().splice(i,1);eggsBack--}
+ ids.forEach(id=>delete a.seen[id]);a.c.correct=0;a.s.sw=[];save()}
 // boot
-advInstall();setTimeout(()=>{advTick();advBadge()},1600);setInterval(advTick,30000);
+advInstall();setTimeout(()=>{try{advSeed();advResetStudy()}catch(_){}},1500);setTimeout(()=>{advTick();advBadge()},1600);setInterval(advTick,30000);
