@@ -1,9 +1,11 @@
 // ===================== GENDERS · STUDY HALL · NURSERY =====================
 // Genders: assigned once per Pokémon (legendaries and genderless species have none)
 const GENDERLESS=new Set(['Magnemite','Magneton','Magnezone','Voltorb','Electrode','Staryu','Starmie','Porygon','Porygon2','Porygon-Z','Beldum','Metang','Metagross','Bronzor','Bronzong','Klink','Klang','Klinklang','Golett','Golurk','Rotom','Carbink','Minior','Dhelmise','Sinistea','Polteageist','Baltoy','Claydol','Lunatone','Solrock','Shedinja','Cryogonal','Ditto','Unown']);
-const FEMALE_ONLY=new Set(['Hatenna','Hattrem','Hatterene','Froslass','Salazzle','Vespiquen','Combee','Kangaskhan','Miltank','Chansey','Blissey','Happiny','Jynx','Smoochum','Nidoran♀','Nidorina','Nidoqueen','Petilil','Lilligant','Vullaby','Mandibuzz','Flabébé','Floette','Florges','Bounsweet','Steenee','Tsareena']);
-const MALE_ONLY=new Set(['Gallade','Tyrogue','Hitmonlee','Hitmonchan','Hitmontop','Throh','Sawk','Rufflet','Braviary','Tauros','Nidoran♂','Nidorino','Nidoking','Impidimp','Morgrem','Grimmsnarl','Mothim','Tinkatink']);
-function monGender(p){if(!p)return null;if(p.gender!==undefined)return p.gender;const sp=p.species,t=INDEX[sp]?INDEX[sp].tier:0;p.gender=t>=4||GENDERLESS.has(sp)?null:FEMALE_ONLY.has(sp)?'F':MALE_ONLY.has(sp)?'M':Math.random()<.5?'M':'F';return p.gender}
+const FEMALE_ONLY=new Set(['Hatenna','Hattrem','Hatterene','Froslass','Salazzle','Vespiquen','Kangaskhan','Miltank','Chansey','Blissey','Happiny','Jynx','Smoochum','Nidoran♀','Nidorina','Nidoqueen','Petilil','Lilligant','Vullaby','Mandibuzz','Flabébé','Floette','Florges','Bounsweet','Steenee','Tsareena','Tinkatink','Tinkatuff','Tinkaton','Wormadam']);
+const MALE_ONLY=new Set(['Gallade','Tyrogue','Hitmonlee','Hitmonchan','Hitmontop','Throh','Sawk','Rufflet','Braviary','Tauros','Nidoran♂','Nidorino','Nidoking','Impidimp','Morgrem','Grimmsnarl','Mothim']);
+const FEMALE_RATE={Squirtle:.125,Wartortle:.125,Blastoise:.125,Mudkip:.125,Marshtomp:.125,Swampert:.125,Fuecoco:.125,Crocalor:.125,Skeledirge:.125,Braixen:.125,Delphox:.125,Lileep:.125,Cradily:.125,Combee:.125,Salandit:.125,Eevee:.125,Gothita:.75,Gothorita:.75,Gothitelle:.75};
+function monGender(p){if(!p)return null;const sp=p.species;if(p.gender!==undefined){if(p.gender&&FEMALE_ONLY.has(sp))p.gender='F';else if(p.gender&&MALE_ONLY.has(sp))p.gender='M';return p.gender}const t=INDEX[sp]?INDEX[sp].tier:0;p.gender=t>=4||GENDERLESS.has(sp)?null:FEMALE_ONLY.has(sp)?'F':MALE_ONLY.has(sp)?'M':Math.random()<(FEMALE_RATE[sp]??.5)?'F':'M';return p.gender}
+function evoGenderBad(p,name){const g=monGender(p);return FEMALE_ONLY.has(name)&&g==='M'?'Females only':MALE_ONLY.has(name)&&g==='F'?'Males only':''}
 function monGenderHTML(p){const g=monGender(p);return g==='M'?'<span class="g-m">♂\uFE0E</span>':g==='F'?'<span class="g-f">♀\uFE0E</span>':''}
 // ---------- shared answer hook: called for every study answer ----------
 function facAnswer(ok,full){try{if(!db||!db.facilities)return;if(full){studyAnswer();nurseryAnswer()}}catch(e){}}
@@ -43,13 +45,14 @@ function nurOdds(m,d){if(!m||!d)return null;const dm=nurDitto(m),dd=nurDitto(d);
 function nurDur(){return facBonus('nursery').hrs*36e5}
 // ---------- Eggs: kept in db.eggs (bag) and hatched in Nursery nests ----------
 const EGG_MIN=[60,90,120,180,360],EGG_COGS=[3,6,12,25,50],NEST_LV=[1,4,6];
-function eggs(){return db.eggs||(db.eggs=[])}
+function eggs(){const E=db.eggs||(db.eggs=[]);if(db.totemFix!==2){db.totemFix=2;const boss=e=>e&&(e.src==='totem'||e.src==='alpha');E.forEach(e=>{if(boss(e))e.shinyP=NUR_SHINY});(((db.facilities||{}).nursery||{}).nests||[]).forEach(n=>{if(n&&boss(n.egg))n.egg.shinyP=NUR_SHINY})}return E}
 const eggVal=e=>Math.round(EGG_COGS[Math.min(4,e.tier||0)]*(e.src==='breed'?.1:1));
 const eggDur=e=>EGG_MIN[Math.min(4,e.tier||0)]*6e4*(facs().nursery?facBonus('nursery').hrs/6:1);
 const nestsOpen=()=>{const f=facs().nursery;if(!f)return 0;const L=facLv(f);return NEST_LV.filter(l=>L>=l).length};
 function eggAdd(e){e.id=e.id||uid();e.at=e.at||Date.now();eggs().push(e);return e}
 // Totem / Alpha rewards arrive as eggs (their boosted growth and size are kept; shiny is rolled on hatching)
-function eggFromBoss(m,kind){return eggAdd({sp:m.species,tier:m.tier||0,shinyP:1/4096+.05,growth:m.growth,size:m.size,src:kind})}
+// Totem and Alpha eggs use base shiny odds
+function eggFromBoss(m,kind){return eggAdd({sp:m.species,tier:m.tier||0,shinyP:NUR_SHINY,growth:m.growth,size:m.size,src:kind})}
 function nestArr(f){f.nests=f.nests||[null,null,null];return f.nests}
 function nurTick(now){const f=nur();if(!f)return [];now=now||Date.now();const ev=[];
  if(f.phase==='egg'){if(f.egg){const e=f.egg;nestArr(f)[0]=nestArr(f)[0]||{egg:eggAdd({sp:e.sp,tier:INDEX[e.sp]?INDEX[e.sp].tier:0,shinyP:e.shiny?1:NUR_SHINY,growth:e.growth,fast:e.fast,disc:e.disc,moveP:1,costumeM:e.costume?1.15:1,src:'breed'}),prog:f.prog||0,dur:0,speed:f.speed||1,last:now};eggs().pop();f.egg=null}const {m,d}=nurPair(f);f.phase=m&&d?'breeding':'idle';f.prog=0;f.speed=1;f.dur=nurDur()}
@@ -102,7 +105,7 @@ function eggStatsHTML(e,n){const g=[0,1,2,3,4,5].map(i=>e.growth&&e.growth[i]!=n
   +'<div><span>Likely growth</span><b>'+FAC_STATS.map((s,i)=>s+' '+g[i]).join(' · ')+'</b></div><div><span>Shiny chance</span><b>'+(e.shinyP>=1?'Shiny!':'1 in '+money(Math.round(1/(e.shinyP||NUR_SHINY))))+'</b></div>'
   +'<div><span>Inherited moves</span><b>'+(e.fast||e.disc?[e.fast,e.disc].filter(Boolean).map(m=>Math.round((e.moveP??.3)*100)+'% '+esc(m)).join(' · '):'None')+'</b></div>'+(e.costumeM>1||e.costume?'<div><span>Costume chance</span><b>×'+(e.costumeM||1.15).toFixed(2)+'</b></div>':'')
   +'<div><span>Hatch time</span><b>'+(n?fmtHM(Math.max(0,(n.dur-n.prog)/(n.speed||1)))+' left · speed ×'+(n.speed||1).toFixed(2):fmtHM(eggDur(e)))+'</b></div></div>'}
-function eggInvHTML(){return eggs().map(e=>'<button class="inv-slot egg-slot t'+Math.min(3,e.tier||0)+'" onclick="eggInfo(\''+e.id+'\')">'+eggIco(e)+'<b>'+RARITIES[Math.min(4,e.tier||0)].replace('Very ','V.')+'</b></button>').join('')}
+function eggInvHTML(){return eggs().map(e=>'<button class="inv-slot egg-slot t'+Math.min(3,e.tier||0)+'" onclick="eggInfo(\''+e.id+'\')">'+eggIco(e)+'<b>'+['C','UC','R','VR','L'][Math.min(4,e.tier||0)]+'</b></button>').join('')}
 function eggInfo(id){const e=eggs().find(x=>x.id===id);if(!e)return;const free=facs().nursery?nestArr(nur()).slice(0,nestsOpen()).findIndex(n=>!n):-1;
  modal('🥚 '+RARITIES[Math.min(4,e.tier||0)].toUpperCase()+' EGG','<div class="nur egg-menu">'+eggIco(e,'big')+eggStatsHTML(e)+'</div><div class="actions"><button class="btn" onclick="eggRelease(\''+id+'\')">RELEASE · +'+eggVal(e)+' COGS</button>'+(free>=0?'<button class="btn red" onclick="nestSel=\''+id+'\';nestOpen('+free+')">PUT IN A NEST</button>':'')+'</div>'+(facs().nursery?'':'<p class="small muted">Unlock the Nursery to hatch eggs.</p>'))}
 function eggRelease(id){const e=eggs().find(x=>x.id===id);if(!e)return;modal('RELEASE EGG','<p class="small">Release this '+RARITIES[Math.min(4,e.tier||0)]+' egg for '+eggVal(e)+' Cogs? This cannot be undone.</p><div class="actions"><button class="btn" onclick="eggInfo(\''+id+'\')">CANCEL</button><button class="btn red" onclick="eggReleaseDo(\''+id+'\')">RELEASE</button></div>')}
@@ -114,7 +117,7 @@ function nestOpen(i){const f=nur();if(!f)return;nurTick();const open=nestsOpen()
  if(n){modal('🪺 NEST '+(i+1),tabs+'<div class="nur egg-menu">'+eggIco(n.egg,'big wob')+'<div class="fac-xp"><span style="width:'+Math.min(100,n.prog/n.dur*100)+'%"></span></div>'+eggStatsHTML(n.egg,n)+'<p class="small muted">This egg is hatching and can’t be taken out.</p></div><div class="actions"><button class="btn" onclick="closeModal()">CLOSE</button></div>');return}
  const e=eggs().find(x=>x.id===nestSel);if(!e)nestSel=null;
  modal('🪺 NEST '+(i+1),tabs+'<div class="nest-confirm'+(e?' full':'')+'">'+(e?eggIco(e,'big')+eggStatsHTML(e):'<span class="nur-plus">＋</span><b>Choose an egg below</b>')+'</div>'
-  +'<p class="small"><b>Your eggs</b></p><div class="nest-eggs">'+(eggs().length?eggs().map(x=>'<button class="inv-slot egg-slot t'+Math.min(3,x.tier||0)+(x.id===nestSel?' on':'')+'" onclick="nestSel=\''+x.id+'\';nestOpen('+i+')">'+eggIco(x)+'<b>'+RARITIES[Math.min(4,x.tier||0)].replace('Very ','V.')+'</b></button>').join(''):'<span class="small muted">No eggs. Breed Pokémon here, or beat Totems and Alphas.</span>')+'</div>'
+  +'<p class="small"><b>Your eggs</b></p><div class="nest-eggs">'+(eggs().length?eggs().map(x=>'<button class="inv-slot egg-slot t'+Math.min(3,x.tier||0)+(x.id===nestSel?' on':'')+'" onclick="nestSel=\''+x.id+'\';nestOpen('+i+')">'+eggIco(x)+'<b>'+['C','UC','R','VR','L'][Math.min(4,x.tier||0)]+'</b></button>').join(''):'<span class="small muted">No eggs. Breed Pokémon here, or beat Totems and Alphas.</span>')+'</div>'
   +'<div class="actions"><button class="btn" onclick="nestSel=null;closeModal()">CLOSE</button><button class="btn red" '+(e?'':'disabled')+' onclick="nestStart('+i+')">START HATCHING</button></div>')}
 function nestStart(i){const f=nur(),e=eggs().find(x=>x.id===nestSel);if(!f||!e||i>=nestsOpen()||nestArr(f)[i])return;db.eggs=eggs().filter(x=>x!==e);f.nests[i]={egg:e,prog:0,dur:eggDur(e),speed:1,last:Date.now()};nestSel=null;save();closeModal();drawHabitat();toast('🥚 The egg is warming up in Nest '+(i+1)+' · hatches in '+fmtHM(f.nests[i].dur))}
 function nestsHTML(){const f=nur(),open=nestsOpen();return [0,1,2].map(i=>{const n=nestArr(f)[i];return '<button class="nest'+(i>=open?' lock':'')+(n?' busy':'')+'" onclick="event.stopPropagation();nestOpen('+i+')">'+(i>=open?'<span>🔒</span><small>Lv '+NEST_LV[i]+'</small>':n?eggIco(n.egg,'wob')+'<small>'+fmtHM(Math.max(0,(n.dur-n.prog)/(n.speed||1)))+'</small>':'<span>＋</span><small>Nest '+(i+1)+'</small>')+'</button>'}).join('')}

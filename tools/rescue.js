@@ -1,5 +1,5 @@
 // Rescue Drill: random study loot, never a timed or guaranteed drop.
-const MD_RESCUE_CHANCE=1/80;
+const MD_RESCUE_CHANCE=1/150;
 function mdRescueFind(r){if(!r||r.tower||!r.fl||r.rescueDrill||Math.random()>=MD_RESCUE_CHANCE)return false;r.bag.rescue_drill=(r.bag.rescue_drill||0)+1;save();toast('Rescue Drill found! Added to your run bag.');return true}
 function mdNamedBossFloor(r){if(!r||r.tower)return false;const {start,L}=mdLayerAt(r.floor||0);return r.floor===start+L.floors-1||!!r.fl?.namedBoss||!!r.battle?.enemies?.some(e=>e.namedBoss||e.ocBoss)}
 function mdRescueDepth(from,correct){const {start,L}=mdLayerAt(from);return Math.max(0,Math.min(correct,start+L.floors-1-from))}

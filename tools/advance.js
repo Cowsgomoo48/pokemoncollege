@@ -1,7 +1,9 @@
 // ===================== MISC TAB: Pokédex + Advancements =====================
 // Advancement progress lives in db.adv: c = counters, f = one-time flags, s = sets (stored as arrays),
 // claimed / seen = advancement ids. Counters only go up, so tiered advancements (I, II, III…) share one counter.
-const ADV_RW={1:{cogs:25,pxp:2000},2:{cogs:60,pxp:5000,items:{exp_t1:1}},3:{cogs:150,pxp:12000,items:{hasten:1}},4:{cogs:400,pxp:30000,items:{facticket:1},egg:2},5:{cogs:1000,pxp:80000,items:{facticket:1,exp_t3:1},egg:3},one:{cogs:50,pxp:4000},big:{cogs:120,pxp:10000,egg:1},boss:{cogs:300,pxp:20000,items:{facticket:1},egg:3}};
+const ADV_RW={1:{cogs:15,xp:10},2:{cogs:50,xp:50,candy:1,items:{exp_t1:1}},3:{cogs:100,xp:100,candy:2,items:{hasten:1}},4:{cogs:250,xp:250,candy:3,items:{facticket:1},egg:2},5:{cogs:500,xp:500,candy:5,items:{facticket:1,exp_t3:1},egg:3},one:{cogs:25,xp:20},big:{cogs:100,xp:100,candy:1,egg:1},boss:{cogs:500,xp:500,items:{facticket:1},egg:3}};
+// Named bosses get harder per layer: Manaphy easy, Regirock mid, later bosses hard
+const ADV_BOSS=[{cogs:25,xp:20,items:{hasten:1},egg:1},{cogs:100,xp:100,candy:2,items:{facticket:1},egg:2},{cogs:250,xp:250,candy:3,items:{facticket:1},egg:3},{cogs:500,xp:500,candy:5,items:{facticket:2},egg:3}];
 const ADV_CATS=[['study','Study'],['log','“Logging” In'],['mon','Pokémon'],['dun','Dungeon']];
 function advSt(){const a=db.adv||(db.adv={c:{},f:{},s:{},claimed:{},seen:{},day:{}});a.c=a.c||{};a.f=a.f||{};a.s=a.s||{};a.claimed=a.claimed||{};a.seen=a.seen||{};a.day=a.day||{};return a}
 const advC=k=>advSt().c[k]||0,advF=k=>!!advSt().f[k],advSet=k=>advSt().s[k]||(advSt().s[k]=[]);
@@ -35,9 +37,9 @@ const ADV=[
  ...fam('dex','mon','pokedex','Professor’s Pal',[10,25,50,100,200],g=>'Have '+g+' different Pokémon species in the Pokédex.',()=>advDexCount()),
  ...fam('evo','mon','seedling','Growing Together',[1,10,30],g=>g===1?'Evolve your first Pokémon.':'Evolve '+g+' Pokémon.',()=>advC('evolves')),
  one('familiar','mon','eyes','A Familiar Face','Obtain a Pokémon species you already own.'),
- one('shiny','mon','sparkles','A Shiny Color','Obtain your first shiny Pokémon.',null,{cogs:150,pxp:8000,items:{facticket:1}}),
- one('costume','mon','ribbon','Dressed for the Occasion','Obtain your first costumed Pokémon.',null,{cogs:150,pxp:8000,items:{facticket:1}}),
- one('both','mon','crown','Double Take','Obtain a Pokémon that is both shiny and costumed.',null,{cogs:500,pxp:30000,items:{facticket:2},egg:3}),
+ one('shiny','mon','sparkles','A Shiny Color','Obtain your first shiny Pokémon.',null,{cogs:100,xp:100,items:{facticket:1}}),
+ one('costume','mon','ribbon','Dressed for the Occasion','Obtain your first costumed Pokémon.',null,{cogs:100,xp:100,items:{facticket:1}}),
+ one('both','mon','crown','Double Take','Obtain a Pokémon that is both shiny and costumed naturally (catching or hatching; Shiny/Costume Tickets don’t count).',null,{cogs:500,xp:500,candy:3,items:{facticket:2,shinyconv:1,costumeticket:1},egg:3}),
  one('tm','mon','disc','Signature Style','Equip a TM Disc move on a Pokémon.'),
  one('ult','mon','bolt','UNLIMITED POWERRRR','Unlock a Pokémon’s Ultimate.',null,ADV_RW.big),
  one('sig','mon','medal','Truly You','Equip a Pokémon with that species’ signature move.'),
@@ -53,9 +55,11 @@ const ADV=[
  one('finish','dun','firecracker','The Big Finish','Defeat a boss with an Ultimate.',null,ADV_RW.big),
  {id:'types',cat:'dun',icon:'burst',name:'Type Advantage',desc:'Land super-effective attacks using five different move types across your adventures.',goal:5,val:()=>advSet('types').length,rw:ADV_RW.big},
  one('brink','dun','dizzy_face','Back From The Brink','Have a party member survive an attack on 1 HP.'),
- one('manaphy','dun','wave','Down the Drain','Defeat Manaphy, the named boss of the first layer.',null,ADV_RW.boss),
- one('regirock','dun','moai','Put to Bed-rock','Defeat Regirock, the named boss of the second layer.',null,ADV_RW.boss)];
+ one('manaphy','dun','wave','Down the Drain','Defeat Manaphy, the named boss of the first layer.',null,ADV_BOSS[0]),
+ one('regirock','dun','moai','Put to Bed-rock','Defeat Regirock, the named boss of the second layer.',null,ADV_BOSS[1])];
 const ADV_BY=Object.fromEntries(ADV.map(a=>[a.id,a]));
+// Shiny/Costume Tickets are Master-Ball rare: only these four advancements give one
+[['ans5','shinyconv'],['dex5','shinyconv'],['floor4','costumeticket']].forEach(([id,t])=>{const a=ADV_BY[id];if(a)a.rw={...a.rw,items:{...a.rw.items,[t]:1}}});
 function advDone(a){return a.val()>=a.goal}
 function advPrevOk(a){if(!a.fam||a.tier===1)return true;return advDone(ADV_BY[a.fam+(a.tier-1)])}
 function advClaimable(a){return advDone(a)&&advPrevOk(a)&&!advSt().claimed[a.id]}
@@ -70,7 +74,7 @@ function advSeed(){const a=advSt();if(a.v)return;a.v=1;const q=db.qstats||{};
  const done=(db.tasks||[]).filter(t=>t.done);a.c.tasks=Math.max(a.c.tasks||0,done.length);
  a.c.early=Math.max(a.c.early||0,done.filter(t=>t.due&&t.completedAt&&dueAt(t)-new Date(t.completedAt)>=864e5).length);
  advMonScan(true)}
-function advMonScan(seed){const ps=db.pokemon||[],seen={};ps.forEach(p=>{advAdd('dex',p.species);seen[p.species]=(seen[p.species]||0)+1;if(p.shiny)advFlag('shiny');if(p.costume)advFlag('costume');if(p.shiny&&p.costume)advFlag('both');
+function advMonScan(seed){const ps=db.pokemon||[],seen={};ps.forEach(p=>{advAdd('dex',p.species);seen[p.species]=(seen[p.species]||0)+1;if(p.shiny)advFlag('shiny');if(p.costume)advFlag('costume');if(p.shiny&&p.costume&&!p.ticketed)advFlag('both');
   if(typeof ultUnlocked==='function'&&typeof ultAvailable==='function'&&ultUnlocked(p,ultAvailable(p)))advFlag('ult');if(advSigOk(p))advFlag('sig')});
  if(seed&&Object.values(seen).some(n=>n>1))advFlag('familiar')}
 function advSigOk(p){if(typeof SIGNATURE_EXTRA==='undefined')return false;return [p.fastMove,p.discMove].some(m=>m&&SIGNATURE_EXTRA[m]&&!SIGNATURE_EXTRA[m].includes(p.species)&&typeof canLearn==='function'&&canLearn(p.species,m))}
@@ -91,7 +95,7 @@ function advInstall(){
    const td=ymd(new Date()),due=db.tasks.filter(x=>x.due===td&&!x.permeate);if(due.length>=3&&due.every(x=>x.done))advFlag('room');advPing()});
  advWrap('feedSnack',id=>{const p=db.pokemon.find(x=>x.id===db.mainId);return {p,lv:p&&monLv(p),id}},ctx=>{if(ctx&&ctx.id==='goldapple'&&ctx.p&&ctx.lv===1&&ctx.p.buff)ctx.p.advGA=ctx.p.buff.until});
  advWrap('evolveMon',id=>{const p=db.pokemon.find(x=>x.id===id);return {p,sp:p&&p.species}},ctx=>{if(ctx&&ctx.p&&ctx.p.species!==ctx.sp){advInc('evolves');advAdd('dex',ctx.p.species);advPing()}});
- advWrap('giveMon',m=>({owned:(db.pokemon||[]).some(p=>p.species===m.species)}),(ctx,args,p)=>{if(!p)return;if(ctx&&ctx.owned)advFlag('familiar');advAdd('dex',p.species);if(p.shiny)advFlag('shiny');if(p.costume)advFlag('costume');if(p.shiny&&p.costume)advFlag('both');advPing()});
+ advWrap('giveMon',m=>({owned:(db.pokemon||[]).some(p=>p.species===m.species)}),(ctx,args,p)=>{if(!p)return;if(ctx&&ctx.owned)advFlag('familiar');advAdd('dex',p.species);if(p.shiny)advFlag('shiny');if(p.costume)advFlag('costume');if(p.shiny&&p.costume&&!p.ticketed)advFlag('both');advPing()});
  advWrap('equipTM',(monId)=>{const p=db.pokemon.find(x=>x.id===monId);return p&&{p,d:p.discMove,f:p.fastMove}},ctx=>{if(!ctx)return;if(ctx.p.discMove!==ctx.d)advFlag('tm');if(advSigOk(ctx.p))advFlag('sig')});
  advWrap('unlockUlt',null,()=>advMonScan());
  const shop=()=>({inv:{...inv()},cogs:db.cogs}),shopAfter=ctx=>{if(!ctx||db.cogs>=ctx.cogs)return;const day=advDay();day.bought=1;Object.keys(inv()).forEach(id=>{if((inv()[id]||0)>(ctx.inv[id]||0))advAdd('bought',id)});if(day.task&&day.correct>=10)advFlag('treat');advPing()};
@@ -128,9 +132,9 @@ function advTick(){try{if(!db)return;advSeed();advMonScan();advDecorOwned();advD
 let advPingT=0;function advPing(){clearTimeout(advPingT);advPingT=setTimeout(advBadge,300)}
 function advBadge(){const on=advAnyClaim();document.querySelectorAll('.dock-misc,.misc-adv').forEach(el=>el.classList.toggle('adv-ready',on))}
 // ---------- rewards ----------
-function advRewardList(rw){const out=[];if(rw.cogs)out.push(['cog','+'+money(rw.cogs)+' Cogs']);if(rw.pxp)out.push(['star','+'+money(rw.pxp)+' EXP']);Object.entries(rw.items||{}).forEach(([id,n])=>out.push([id,(n>1?n+'× ':'')+ITEMS[id].name]));if(rw.egg)out.push(['egg',RARITIES[Math.min(4,rw.egg)]+' Egg']);return out}
+function advRewardList(rw){const out=[];if(rw.cogs)out.push(['cog','+'+money(rw.cogs)+' Cogs']);if(rw.xp)out.push(['star','+'+money(rw.xp)+' Player EXP']);if(rw.candy)out.push(['candy','+'+rw.candy+' Rare Cand'+(rw.candy>1?'ies':'y')]);Object.entries(rw.items||{}).forEach(([id,n])=>out.push([id,(n>1?n+'× ':'')+ITEMS[id].name]));if(rw.egg)out.push(['egg',RARITIES[Math.min(4,rw.egg)]+' Egg']);return out}
 function advRewardHTML(rw){return advRewardList(rw).map(([ic,t])=>'<span class="adv-rw">'+(ITEMS[ic]?itemIcon(ic):icoHTML(ic))+'<b>'+esc(t)+'</b></span>').join('')}
-function advGrant(rw){db.cogs=Math.round((db.cogs||0)+(rw.cogs||0));const p=db.pokemon.find(x=>x.id===db.mainId);if(p&&rw.pxp)p.pxp=(p.pxp||0)+rw.pxp;Object.entries(rw.items||{}).forEach(([id,n])=>invAdd(id,n));
+function advGrant(rw){db.cogs=Math.round((db.cogs||0)+(rw.cogs||0));if(rw.xp)grantXp(rw.xp/expBoostMult());if(rw.candy)db.candies=(db.candies||0)+rw.candy;Object.entries(rw.items||{}).forEach(([id,n])=>invAdd(id,n));
  if(rw.egg&&typeof eggAdd==='function'){const pool=Object.keys(INDEX).filter(sp=>INDEX[sp].tier===rw.egg&&!PRE_EVO[sp]&&!(typeof NUR_BABY!=='undefined'&&NUR_BABY.has(sp))),sp=pool[Math.floor(Math.random()*pool.length)]||Object.keys(INDEX)[0];eggAdd({sp,tier:INDEX[sp].tier,shinyP:1/4096,src:'adv'})}}
 function advClaim(ids){const got=[];ids.forEach(id=>{const a=ADV_BY[id];if(!a||!advClaimable(a))return;advSt().claimed[id]=Date.now();advGrant(a.rw);got.push(...advRewardList(a.rw))});if(!got.length)return;save();advFlow(got);advBadge();if($('advBoard')){advDrawBoard(true);if(!advAnyClaim())document.querySelectorAll('.adv-claimall').forEach(b=>b.remove())}}
 function advFlow(list){let box=document.querySelector('.adv-flow');if(box)box.remove();box=document.createElement('div');box.className='adv-flow';box.innerHTML='<div class="adv-flow-box">'+icoHTML('gift')+'<b>Rewards claimed</b><div class="adv-flow-list"></div></div>';document.body.appendChild(box);
