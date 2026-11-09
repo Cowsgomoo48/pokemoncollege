@@ -17,7 +17,8 @@ public class ChatTalkPlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "transcribe", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "remove", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "folder", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "splice", returnType: CAPPluginReturnPromise)
+        CAPPluginMethod(name: "splice", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "export", returnType: CAPPluginReturnPromise)
     ]
 
     private var recorder: AVAudioRecorder?
@@ -125,6 +126,40 @@ public class ChatTalkPlugin: CAPPlugin, CAPBridgedPlugin {
         guard let id = call.getString("id") else { call.reject("Missing id"); return }
         try? FileManager.default.removeItem(at: fileURL(id))
         call.resolve()
+    }
+
+    // Rebuilds Documents/ChatTalk Exports: one file per recording named by its title, inside a subfolder per in-app folder.
+    // Files are hard links to the originals, so they take no extra space.
+    @objc func export(_ call: CAPPluginCall) {
+        guard let items = call.getArray("items", JSObject.self) else { call.reject("Nothing to export"); return }
+        let fm = FileManager.default
+        let root = fm.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("ChatTalk Exports", isDirectory: true)
+        let clean: (String) -> String = { s in
+            let bad = CharacterSet(charactersIn: "/\\:*?\"<>|").union(.newlines).union(.controlCharacters)
+            let t = s.components(separatedBy: bad).joined(separator: " ").trimmingCharacters(in: .whitespacesAndNewlines)
+            return t.isEmpty ? "Untitled" : String(t.prefix(80))
+        }
+        do {
+            try? fm.removeItem(at: root)
+            try fm.createDirectory(at: root, withIntermediateDirectories: true)
+            var n = 0, used = Set<String>()
+            for it in items {
+                guard let id = it["id"] as? String else { continue }
+                let src = fileURL(id)
+                guard fm.fileExists(atPath: src.path) else { continue }
+                var dir = root
+                if let f = it["folder"] as? String, !f.isEmpty { dir = root.appendingPathComponent(clean(f), isDirectory: true); try fm.createDirectory(at: dir, withIntermediateDirectories: true) }
+                let base = clean(it["name"] as? String ?? id)
+                var name = base + ".m4a", k = 2
+                while used.contains(dir.appendingPathComponent(name).path.lowercased()) { name = base + " (\(k)).m4a"; k += 1 }
+                let dst = dir.appendingPathComponent(name); used.insert(dst.path.lowercased())
+                do { try fm.linkItem(at: src, to: dst) } catch { try fm.copyItem(at: src, to: dst) }
+                n += 1
+            }
+            call.resolve(["count": n, "folder": "ChatTalk Exports"])
+        } catch {
+            call.reject("Export failed: " + error.localizedDescription)
+        }
     }
 
     // PokeSplicer: joins recording A then recording B into one new .m4a. "fade" fades A out over its last moments and fades B in.

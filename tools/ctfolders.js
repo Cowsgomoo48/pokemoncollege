@@ -24,7 +24,7 @@ async function ctMsDeleteDo(){const ids=[...(ctMs||[])];for(const id of ids){try
   if(ctMs){const on=ctMs.has(r.id);el.classList.toggle('m-sel',on);el.insertAdjacentHTML('afterbegin','<i class="ms-chk'+(on?' on':'')+'">'+(on?'✓':'')+'</i>')}});
  L.classList.toggle('ms-on',!!ctMs);
  const fo=ctFolders().find(f=>f.id===ctOpen);
- const top='<div class="ct-tools"><button class="btn ct-splice-btn" onclick="ctSplicer()">🧬 POKESPLICER</button><button class="btn" onclick="ctFolderNew()">📁 NEW FOLDER</button>'+(all.length?'<button class="btn" onclick="ctMsStart()">☑ SELECT</button>':'')+'</div>'
+ const top='<div class="ct-tools"><button class="btn ct-splice-btn" onclick="ctSplicer()">🧬 POKESPLICER</button><button class="btn" onclick="ctFolderNew()">📁 NEW FOLDER</button>'+(all.length?'<button class="btn" onclick="ctMsStart()">☑ SELECT</button><button class="btn" onclick="ctExport()">💾 EXPORT</button>':'')+'</div>'
   +(fo?'<div class="ct-crumb"><button class="ct-folder ct-back" data-fid="" onclick="ctOpenFolder(null)">⬅ All recordings</button><b>📁 '+esc(fo.name)+'</b><button class="ct-fbtn" onclick="ctFolderRename(\''+fo.id+'\')" aria-label="Rename folder">✎</button><button class="ct-fbtn" onclick="ctFolderDelete(\''+fo.id+'\')" aria-label="Delete folder">🗑</button></div>'
    :(ctFolders().length?'<div class="ct-folders">'+ctFolders().map(f=>'<button class="ct-folder" data-fid="'+f.id+'" onclick="ctOpenFolder(\''+f.id+'\')"><span>📁</span><b>'+esc(f.name)+'</b><small>'+ctIn(f.id).length+'</small></button>').join('')+'</div>':''));
  L.insertAdjacentHTML('afterbegin',top);if(fo&&!shown.length)L.insertAdjacentHTML('beforeend','<div class="empty">This folder is empty.<br>Drag recordings here with ⠿, or use Select → Move.</div>');
@@ -55,3 +55,7 @@ async function ctSpliceGo(){const A=ctRec(ctSplice.a),B=ctRec(ctSplice.b);if(!A|
    transcript:A.transcript&&B.transcript?A.transcript.trim()+'\n\n'+B.transcript.trim():undefined});
   ctSplice.a=ctSplice.b=null;save();closeModal();drawChat();toast('🧬 Spliced into one recording ✓')}
  catch(e){toast(e.message||String(e));ctSplicer()}finally{ctSplice.busy=false;if($('modalBody')&&/SPLICING/.test($('modalBody').textContent))ctSplicer()}}
+// ---------- Export: Documents/ChatTalk Exports, titled files grouped by folder (see Apple Devices > Files) ----------
+async function ctExport(){const recs=(db.recordings||[]).filter(r=>r.status==='saved');if(!recs.length){toast('No saved recordings to export');return}
+ const fn=id=>(ctFolders().find(f=>f.id===id)||{}).name||'';
+ try{const res=await ct('export',{items:recs.map(r=>({id:r.id,name:r.title,folder:r.folder?fn(r.folder):''}))});toast('💾 '+res.count+' recording'+(res.count===1?'':'s')+' exported to “ChatTalk Exports”')}catch(e){toast(e.message||String(e))}}

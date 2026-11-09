@@ -6641,7 +6641,7 @@ $('navHome').style.display='none';
  if(pcStorageReady)ensureMoveData();
  if(pcStorageReady&&permRoll())save();
  render();scheduleNotifs();aiCheck();window.__pcBooted=true;setTimeout(()=>{try{mdSync()}catch(e){}},1500);setTimeout(()=>{try{facTick()}catch(e){}},2500);setInterval(()=>{try{facTick();if(currentPage==='home'&&hab.scene&&hab.scene!=='home')drawHabitat()}catch(e){}},60000);
- window.__pcVersion='0.88.0';
+ window.__pcVersion='0.88.1';
  document.addEventListener('pointerdown',function(e){try{var t=e.target.closest&&e.target.closest('[onclick],button,a,[id]');if(!t)return;var oc=t.getAttribute('onclick');window.__pcLastTap=(oc?oc.slice(0,60):(t.id?'#'+t.id:t.tagName.toLowerCase()+'.'+String(t.className).split(' ')[0])).replace(/\s+/g,' ')}catch(_){}} ,true);
  Object.keys(window).forEach(function(k){var f=window[k];if(typeof f!=='function'||/^[A-Z]/.test(k)||k==='appError'||k==='$'||k==='esc'||/\[native code\]/.test(Function.prototype.toString.call(f)))return;
   var w=function(){try{return f.apply(this,arguments)}catch(err){if(err&&typeof err==='object'&&!err.__pcLogged){try{err.__pcLogged=1}catch(_){}appError(err,k)}throw err}};try{window[k]=w}catch(_){}});
@@ -7477,7 +7477,7 @@ async function ctMsDeleteDo(){const ids=[...(ctMs||[])];for(const id of ids){try
   if(ctMs){const on=ctMs.has(r.id);el.classList.toggle('m-sel',on);el.insertAdjacentHTML('afterbegin','<i class="ms-chk'+(on?' on':'')+'">'+(on?'✓':'')+'</i>')}});
  L.classList.toggle('ms-on',!!ctMs);
  const fo=ctFolders().find(f=>f.id===ctOpen);
- const top='<div class="ct-tools"><button class="btn ct-splice-btn" onclick="ctSplicer()">🧬 POKESPLICER</button><button class="btn" onclick="ctFolderNew()">📁 NEW FOLDER</button>'+(all.length?'<button class="btn" onclick="ctMsStart()">☑ SELECT</button>':'')+'</div>'
+ const top='<div class="ct-tools"><button class="btn ct-splice-btn" onclick="ctSplicer()">🧬 POKESPLICER</button><button class="btn" onclick="ctFolderNew()">📁 NEW FOLDER</button>'+(all.length?'<button class="btn" onclick="ctMsStart()">☑ SELECT</button><button class="btn" onclick="ctExport()">💾 EXPORT</button>':'')+'</div>'
   +(fo?'<div class="ct-crumb"><button class="ct-folder ct-back" data-fid="" onclick="ctOpenFolder(null)">⬅ All recordings</button><b>📁 '+esc(fo.name)+'</b><button class="ct-fbtn" onclick="ctFolderRename(\''+fo.id+'\')" aria-label="Rename folder">✎</button><button class="ct-fbtn" onclick="ctFolderDelete(\''+fo.id+'\')" aria-label="Delete folder">🗑</button></div>'
    :(ctFolders().length?'<div class="ct-folders">'+ctFolders().map(f=>'<button class="ct-folder" data-fid="'+f.id+'" onclick="ctOpenFolder(\''+f.id+'\')"><span>📁</span><b>'+esc(f.name)+'</b><small>'+ctIn(f.id).length+'</small></button>').join('')+'</div>':''));
  L.insertAdjacentHTML('afterbegin',top);if(fo&&!shown.length)L.insertAdjacentHTML('beforeend','<div class="empty">This folder is empty.<br>Drag recordings here with ⠿, or use Select → Move.</div>');
@@ -7508,6 +7508,10 @@ async function ctSpliceGo(){const A=ctRec(ctSplice.a),B=ctRec(ctSplice.b);if(!A|
    transcript:A.transcript&&B.transcript?A.transcript.trim()+'\n\n'+B.transcript.trim():undefined});
   ctSplice.a=ctSplice.b=null;save();closeModal();drawChat();toast('🧬 Spliced into one recording ✓')}
  catch(e){toast(e.message||String(e));ctSplicer()}finally{ctSplice.busy=false;if($('modalBody')&&/SPLICING/.test($('modalBody').textContent))ctSplicer()}}
+// ---------- Export: Documents/ChatTalk Exports, titled files grouped by folder (see Apple Devices > Files) ----------
+async function ctExport(){const recs=(db.recordings||[]).filter(r=>r.status==='saved');if(!recs.length){toast('No saved recordings to export');return}
+ const fn=id=>(ctFolders().find(f=>f.id===id)||{}).name||'';
+ try{const res=await ct('export',{items:recs.map(r=>({id:r.id,name:r.title,folder:r.folder?fn(r.folder):''}))});toast('💾 '+res.count+' recording'+(res.count===1?'':'s')+' exported to “ChatTalk Exports”')}catch(e){toast(e.message||String(e))}}
 
 // One-time gift requested by the player (v0.83.0): 1 Facility Ticket
 setTimeout(function(){try{if(db&&!db.gift0830){inv().facticket=(inv().facticket||0)+1;db.gift0830=1;save();toast('🎫 +1 Facility Ticket added to your Bag')}}catch(_){}},1500);
