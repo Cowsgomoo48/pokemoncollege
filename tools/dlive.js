@@ -3,19 +3,19 @@
 // and light CSS ambient motion (torches, drips, drifting spores/bubbles/embers, glowing crystals). Nothing here
 // changes movement or combat.
 const DL_STYLE=[ // per dungeon layer: wall texture, face accent, floor dressing, ambient particle, torch colour
- {wall:'rock',acc:'#cfe3e8',dress:'puddle',mote:'bubble',torch:'#7fe0ff',rooms:['pond','pond','garden']},
- {wall:'rock',acc:'#5f9a46',dress:'moss',mote:'spore',torch:'#ffcf6b',rooms:['garden','garden','pond']},
- {wall:'spike',acc:'#e8e2d0',dress:'crack',mote:'dust',torch:'#ffd08a',crystal:'#bfe3ff',rooms:['pond','garden']},
- {wall:'brick',acc:'#8a8fa8',dress:'coal',mote:'dust',torch:'#ffb347',crystal:'#9f8cff',rooms:['pond','garden']},
- {wall:'brick',acc:'#4f8f6a',dress:'puddle',mote:'bubble',torch:'#6fd0ff',rooms:['pond','pond','garden']},
- {wall:'rock',acc:'#d8d23c',dress:'sulfur',mote:'steam',torch:'#d8ff6b',rooms:['pond','lava']},
- {wall:'basalt',acc:'#ff6a1f',dress:'ash',mote:'ember',torch:'#ff8a3d',rooms:['lava','lava','garden']},
- {wall:'basalt',acc:'#ffd23f',dress:'gold',mote:'spark',torch:'#ffe27a',crystal:'#ffe9a0',rooms:['lava','pond']}];
+ {wall:'rock',acc:'#cfe3e8',dress:'puddle',mote:'bubble',torch:'#7fe0ff',rooms:['pond','flooded','crystal','garden']},
+ {wall:'rock',acc:'#5f9a46',dress:'moss',mote:'spore',torch:'#ffcf6b',rooms:['garden','mushroom','ruin','pond']},
+ {wall:'spike',acc:'#e8e2d0',dress:'crack',mote:'dust',torch:'#ffd08a',crystal:'#bfe3ff',rooms:['crystal','bones','mine','pond']},
+ {wall:'brick',acc:'#8a8fa8',dress:'coal',mote:'dust',torch:'#ffb347',crystal:'#9f8cff',rooms:['mine','crystal','ruin','garden']},
+ {wall:'brick',acc:'#4f8f6a',dress:'puddle',mote:'bubble',torch:'#6fd0ff',rooms:['flooded','ruin','mushroom','pond']},
+ {wall:'rock',acc:'#d8d23c',dress:'sulfur',mote:'steam',torch:'#d8ff6b',rooms:['pond','bones','crystal','lava']},
+ {wall:'basalt',acc:'#ff6a1f',dress:'ash',mote:'ember',torch:'#ff8a3d',rooms:['lava','bones','mine']},
+ {wall:'basalt',acc:'#ffd23f',dress:'gold',mote:'spark',torch:'#ffe27a',crystal:'#ffe9a0',rooms:['lava','crystal','mine']}];
 function dlStyle(r){const s=r&&!r.tower&&r.sub&&r.sub.k,i=s&&typeof MD_LAYERS!=='undefined'?MD_LAYERS.findIndex(L=>L.subs.includes(s)):-1;return DL_STYLE[i]||DL_STYLE[2]}
 function dlPlan(r,fl){if(fl._dl&&fl._dl.id===fl.id)return fl._dl;const R=dvRng('dl'+fl.id),S=dlStyle(r),V=typeof dvPlan==='function'?dvPlan(fl):{voids:new Map(),bridges:new Map()},room=[];
  const free=(x,y)=>!V.voids.has(x+','+y)&&!V.bridges.has(x+','+y);
- const cand=fl.rooms.filter(o=>o[2]>=5&&o[3]>=5&&o[2]*o[3]<120&&!(fl.houses||[]).some(h=>h[0]===o[0]&&h[1]===o[1]));
- if(cand.length&&R()<.5){const o=cand[Math.floor(R()*cand.length)],st=fl.stairs,hasSt=st&&st[0]>=o[0]&&st[0]<o[0]+o[2]&&st[1]>=o[1]&&st[1]<o[1]+o[3];let kind=S.rooms[Math.floor(R()*S.rooms.length)];if(kind==='pond'&&hasSt)kind='garden';const cracks=[];
+ const cand=fl.rooms.filter(o=>o[2]>=5&&o[3]>=5&&o[2]*o[3]<120&&!o[5]&&!(fl.houses||[]).some(h=>h[0]===o[0]&&h[1]===o[1]));
+ for(let n=0;n<2&&cand.length&&R()<(n?.4:.7);n++){const o=cand.splice(Math.floor(R()*cand.length),1)[0],st=fl.stairs,hasSt=st&&st[0]>=o[0]&&st[0]<o[0]+o[2]&&st[1]>=o[1]&&st[1]<o[1]+o[3];let kind=S.rooms[Math.floor(R()*S.rooms.length)];if(kind==='pond'&&hasSt)kind='garden';const cracks=[];
   if(kind==='lava'){const T=GD_T;for(let i=0;i<5+o[2];i++){let x=(o[0]+R()*o[2])*T,y=(o[1]+R()*o[3])*T;const seg=[[x,y]];for(let k=0;k<5;k++){x=Math.max(o[0]*T+4,Math.min((o[0]+o[2])*T-4,x+(R()-.5)*44));y=Math.max(o[1]*T+4,Math.min((o[1]+o[3])*T-4,y+(R()-.5)*44));seg.push([x,y])}cracks.push(seg)}}
   room.push({o,kind,cracks})}
  const torches=[],drips=[],crystals=[];
@@ -51,7 +51,7 @@ function dlPaint(g,r,fl,th){if(fl.rc)return;const T=GD_T,S=dlStyle(r),P=dlPlan(r
  if(typeof dpEdges==='function')dpEdges(g,r,fl,th,dvRng('dpe'+fl.id),P);
  (fl.houses||[]).forEach(o=>o[4]&&o[4]!=='house'&&typeof dpLandmark==='function'?dpLandmark(g,fl,o,th,R,P):dlHouse(g,fl,o,th,R));
  // special rooms (ponds are painted after the props, so nothing stands in the water)
- dlRooms(g,P,S,false)}
+ dlRooms(g,P,S,false);if(typeof drPaintMech==='function')drPaintMech(g,fl)}
 function dlPaintPost(g,r,fl){if(fl.rc)return;const P=dlPlan(r,fl);dlRooms(g,P,dlStyle(r),true)}
 function dlRooms(g,P,S,post){const T=GD_T,R=dvRng('dlr'+P.id);P.room.forEach(({o,kind,cracks})=>{if((kind==='pond')!==post)return;const X0=o[0]*T,Y0=o[1]*T,W=o[2]*T,H=o[3]*T,cx=X0+W/2,cy=Y0+H/2;
   if(kind==='pond'){const rx=W/2-T*1.1,ry=H/2-T*1.1,water=S.mote==='steam'?['#7fae4a','#9cc95a']:['#3f8fc4','#5fb0dc'];
@@ -64,7 +64,8 @@ function dlRooms(g,P,S,post){const T=GD_T,R=dvRng('dlr'+P.id);P.room.forEach(({o
     if(R()<.22){const fx=X+8+R()*20,fy=Y+8+R()*20,c=['#ff8fb8','#ffe36b','#ffffff','#b48cff'][Math.floor(R()*4)];dlR(g,'#4c8a38',fx+2,fy+3,1,5);dlR(g,c,fx,fy,5,4);dlR(g,'#ffd23f',fx+2,fy+1,1,1)}}
    for(let x=o[0];x<o[0]+o[2];x++)for(const y of [o[1],o[1]+o[3]-1])if(R()<.35){g.fillStyle='#3f7a30';g.beginPath();g.arc(x*T+T/2,y*T+T/2,9,0,7);g.fill();dlR(g,'#5fa04a',x*T+T/2-4,y*T+T/2-6,5,4)}}
   else if(kind==='lava'){g.fillStyle='rgba(30,16,14,.45)';g.fillRect(X0,Y0,W,H);g.lineCap='round';
-   cracks.forEach(seg=>{g.strokeStyle='#3a1208';g.lineWidth=6;g.beginPath();seg.forEach(([x,y],i)=>i?g.lineTo(x,y):g.moveTo(x,y));g.stroke();g.strokeStyle='#c2410c';g.lineWidth=3;g.stroke();g.strokeStyle='#ff9a3d';g.lineWidth=1;g.stroke()})}})}
+   cracks.forEach(seg=>{g.strokeStyle='#3a1208';g.lineWidth=6;g.beginPath();seg.forEach(([x,y],i)=>i?g.lineTo(x,y):g.moveTo(x,y));g.stroke();g.strokeStyle='#c2410c';g.lineWidth=3;g.stroke();g.strokeStyle='#ff9a3d';g.lineWidth=1;g.stroke()})}
+  else if(typeof drPaintRoom==='function')drPaintRoom(g,o,kind,S,R)})}
 // ---------- ambient motion (DOM + CSS animation, rebuilt once per floor) ----------
 function dlAmb(field,r){const fl=r&&r.fl,mp=field&&field.querySelector('.gd-map');if(!fl||!mp)return;let el=mp.querySelector('.gd-amb');if(el&&el.dataset.fl===String(fl.id)){if(typeof dpFeet==='function')dpFeet(el,r,fl,dlPlan(r,fl));return}if(el)el.remove();mp.querySelectorAll('.dl-dark').forEach(c=>c.remove());
  const T=GD_T,S=dlStyle(r),P=dlPlan(r,fl),R=dvRng('dla'+fl.id),h=[];el=document.createElement('div');el.className='gd-amb';el.dataset.fl=fl.id;el.style.setProperty('--tc',S.torch);el.style.setProperty('--mc',S.acc);

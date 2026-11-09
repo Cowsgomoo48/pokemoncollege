@@ -52,7 +52,7 @@ function gdNewFloor(r){mdPlan(r);const [W,H,NR]=GD_SIZE[r.diff]||GD_SIZE.easy,g=
  // sometimes a ruined house: a big room split by inner walls with doorways (see gdHouse)
  let house=null;if(!big&&!r.tower&&Math.random()<.3){for(let t=0;t<60&&!house;t++){const w=Math.min(W-4,rnd(8,10)),h=Math.min(H-4,rnd(7,8)),x=rnd(1,W-w-2),y=rnd(1,H-h-2);if(!rooms.some(o=>x<o[0]+o[2]+2&&o[0]<x+w+2&&y<o[1]+o[3]+2&&o[1]<y+h+2))house=[x,y,w,h]}if(house)rooms.push(house)}
  for(let t=0;t<400&&rooms.length<NR;t++){const w=rnd(4,7),h=rnd(4,6),x=rnd(1,W-w-2),y=rnd(1,H-h-2);if(rooms.some(o=>x<o[0]+o[2]+2&&o[0]<x+w+2&&y<o[1]+o[3]+2&&o[1]<y+h+2))continue;rooms.push([x,y,w,h])}
- rooms.sort((a,b)=>a[0]-b[0]);rooms.forEach(([x,y,w,h])=>{for(let j=y;j<y+h;j++)for(let i=x;i<x+w;i++)g[j][i]=1});
+ rooms.sort((a,b)=>a[0]-b[0]);rooms.forEach(([x,y,w,h])=>{for(let j=y;j<y+h;j++)for(let i=x;i<x+w;i++)g[j][i]=1});if(typeof drShape==='function')drShape(g,rooms,big,house,r);
  const ctr=o=>[o[0]+(o[2]>>1),o[1]+(o[3]>>1)],dig=(a,b)=>{let [x,y]=a;const [tx,ty]=b,set=()=>{if(!g[y][x])g[y][x]=2};const hf=Math.random()<.5;
   if(hf){while(x!==tx){x+=Math.sign(tx-x);set()}while(y!==ty){y+=Math.sign(ty-y);set()}}else{while(y!==ty){y+=Math.sign(ty-y);set()}while(x!==tx){x+=Math.sign(tx-x);set()}}};
  for(let i=0;i<rooms.length-1;i++)dig(ctr(rooms[i]),ctr(rooms[i+1]));for(let k=0;k<2&&rooms.length>3;k++){const a=rnd(0,rooms.length-1),b=rnd(0,rooms.length-1);if(Math.abs(a-b)>1)dig(ctr(rooms[a]),ctr(rooms[b]))}
@@ -80,6 +80,7 @@ function gdNewFloor(r){mdPlan(r);const [W,H,NR]=GD_SIZE[r.diff]||GD_SIZE.easy,g=
    fl.bossRoom=o.slice();en.forEach(e=>{if(gdInRect(e,o)){e.aware=0;e.dormant=1}});return}
   if(i>1&&Math.random()<.14){const sp=mdSp(0,0);for(let k=0;k<rnd(4,6);k++){const e=makeEnemy(sp,spread(avg-6,2,avg-10,avg-3),{hpMul:.7,atkMul:.75});e.swarm=1;put(e,o)}return}
   if(Math.random()<.62){const n=rnd(1,r.diff==='hard'?3:2);for(let k=0;k<n;k++)put(makeEnemy(mdSp(0,2),spread(avg+(cap-avg)*.4,sd,avg-6,cap+3),{hpMul:1.15}),o)}});
+ if(typeof drMech==='function')drMech(r,fl,rooms,far,en,put,takeIn,taken,avg,cap,sd,spread);
  dgFoeScale(r,en);
  // items lying on the ground, and special spots
  const mid=rooms.map((o,i)=>i).filter(i=>i&&i!==far),nIt=rnd(2,4)+(mdFx(r).items||0);for(let k=0;k<nIt;k++){const o=rooms[rnd(0,rooms.length-1)],t=takeIn(o);if(!t)continue;
@@ -97,7 +98,7 @@ function gdAliveFoes(b){return b.enemies.map((e,i)=>[e,i]).filter(([e])=>(e.hp>0
 function gdUnitAt(r,x,y){const b=r.battle;const ai=r.party.findIndex(m=>m.x===x&&m.y===y);if(ai>=0)return {side:'ally',i:ai};const fi=b.enemies.findIndex(e=>(e.hp>0||e.gdOut)&&!e.diving&&!e.done&&e.x===x&&e.y===y);return fi>=0?{side:'foe',i:fi}:null}
 // ---------- what you can see ----------
 function gdRoomOf(fl,x,y){return fl.rooms.findIndex(o=>x>=o[0]&&x<o[0]+o[2]&&y>=o[1]&&y<o[1]+o[3])}
-function gdLit(r){if(r.fl.oc==='arena'||r.fl.rc==='arena')return new Set(r.fl.tiles.flatMap((row,y)=>[...row].map((v,x)=>v!=='0'?gdKey(x,y):null).filter(Boolean)));const fl=r.fl,L=new Set();r.party.forEach(m=>{const ri=gdRoomOf(fl,m.x,m.y);if(ri>=0&&!mdFx(r).dark){const o=fl.rooms[ri];for(let j=o[1]-1;j<=o[1]+o[3];j++)for(let i=o[0]-1;i<=o[0]+o[2];i++)L.add(gdKey(i,j))}
+function gdLit(r){if(r.fl.oc==='arena'||r.fl.rc==='arena')return new Set(r.fl.tiles.flatMap((row,y)=>[...row].map((v,x)=>v!=='0'?gdKey(x,y):null).filter(Boolean)));const fl=r.fl,L=new Set();r.party.forEach(m=>{const ri=gdRoomOf(fl,m.x,m.y);if(ri>=0&&!mdFx(r).dark&&fl.rooms[ri][6]!=='dark'){const o=fl.rooms[ri];for(let j=o[1]-1;j<=o[1]+o[3];j++)for(let i=o[0]-1;i<=o[0]+o[2];i++)L.add(gdKey(i,j))}
   const lr=mdFx(r).dark?2+mdLvOf(r,'light'):2;for(let dy=-lr;dy<=lr;dy++)for(let dx=-lr;dx<=lr;dx++)L.add(gdKey(m.x+dx,m.y+dy))});return L}
 function gdSee(r){const fl=r.fl,L=gdLit(r),s=fl.seen.split('');L.forEach(k=>{const [x,y]=k.split(',').map(Number);if(x>=0&&y>=0&&x<fl.w&&y<fl.h)s[y*fl.w+x]='1'});fl.seen=s.join('');
  // wild Pokémon that can see your team wake up and start hunting
@@ -143,9 +144,9 @@ function gdDrawBattle(entering){const r=runOf(),b=r&&r.battle,st=$('dgStage');if
  r.party.forEach((m,i)=>{const c=combatant(partyMon(m));if(m.hp>0)delete m.koAt;else if(!m.koAt){m.koAt=now;gdKoFx('dg-ally'+i,false)}const ko=m.hp>0?0:now-m.koAt;unit('dg-ally',i,m.x,m.y,partyMon(m).species,m.dir||0,m.hp/c.hp*100,(m.hp<=0?'ko ':'')+(m.hp<=0&&ko<700?'gd-stagger ':'')+(b.turn===i&&!b.enemyPhase?'active ':'')+(m.acted?'done ':'')+(b.guard[i]?'guard ':''),SLOT_COLORS[i],m.hp<=0&&ko>=600?'Sleep':'')});
  // a fainted foe staggers, falls asleep and fades out instead of vanishing
  b.enemies.forEach((e,i)=>{if(e.ocBoss&&e.diving)return;if((e.ocBoss||e.rcBoss)&&e.hp<=0){if(!e.done)unit('dg-foe',i,e.x,e.y,e.species,e.dir||0,0,'big oc-rest',null,'Sleep');return}const dead=e.hp<=0&&!e.gdOut;if(dead&&!e.koAt&&!e.done){e.koAt=now;gdKoFx('dg-foe'+i,true)}if(dead?!(e.koAt&&now-e.koAt<1500):e.done)return;if(!vis(e.x,e.y))return;
-  unit('dg-foe',i,e.x,e.y,e.species,e.dir||0,dead?0:(e.gdOut?e.gdHp:e.hp)/e.maxhp*100,(e.boss?'big ':'')+(e.ocBoss?'oc-manaphy ':'')+(e.rcBoss?'rc-regirock ':'')+(e.ocBoss&&e.pending?.some(p=>p.kind==='beam')?'oc-charge ':'')+(e.aware||dead?'':e.dormant?'gd-idle ':'asleep ')+(dead?'gd-faint ':''),null,dead&&now-e.koAt>=600?'Sleep':'')});
+  unit('dg-foe',i,e.x,e.y,e.species,e.dir||0,dead?0:(e.gdOut?e.gdHp:e.hp)/e.maxhp*100,(e.mh&&e.dormant?'mh-hide ':'')+(e.boss?'big ':'')+(e.ocBoss?'oc-manaphy ':'')+(e.rcBoss?'rc-regirock ':'')+(e.ocBoss&&e.pending?.some(p=>p.kind==='beam')?'oc-charge ':'')+(e.aware||dead?'':e.dormant?'gd-idle ':'asleep ')+(dead?'gd-faint ':''),null,dead&&now-e.koAt>=600?'Sleep':'')});
  U.querySelectorAll('.gd-u').forEach(el=>{if(!want.has(el.dataset.u))el.remove()});dgFillSprites();
- if(gdBossSeal(r)){gdDrawBattle();return}
+ if(typeof drWake==='function'&&drWake(r)){gdDrawBattle();return}if(gdBossSeal(r)){gdDrawBattle();return}
  if(DG){const free=gdFree(r);if(DG.wasFree===true&&!free)mdBattleStart(r);if(DG.wasFree===false&&free)mdBattleEnd(r);DG.bcam=free?null:gdBattleCam(r);DG.wasFree=free}
  if(entering)gdFit();gdHighlight();gdMini(r,L);if(entering||DG&&DG.follow!==false)gdCamera();else gdOverlap();gdOverlays();setTimeout(gdOverlays,340);ocDecor(r);rcDecor(r);
  if(DG&&DG.busy&&!b.enemyPhase)$('dgPanel').innerHTML='<div class="dg-msg">…</div>';else dgPanelBattle()}

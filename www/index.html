@@ -1294,6 +1294,44 @@ button.tp-locked::after{content:'';position:absolute;right:12px;top:50%;transfor
 .adv-rw img.ico{width:18px!important;height:18px!important;margin:0!important;vertical-align:middle}
 .adv-flow-box>img.ico{width:30px!important;height:30px!important}
 
+/* Monster House foes stay hidden until the room springs */
+.gd-u.mh-hide{opacity:0!important;pointer-events:none!important}
+/* ChatTalk folders + PokeSplicer */
+.ct-tools{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}.ct-tools .btn{flex:1;min-width:110px}
+.ct-splice-btn{background:linear-gradient(135deg,#14324a,#1d5a5a)!important;color:#7dffb0!important;border:0!important;letter-spacing:.5px}
+.ct-folders{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:8px;margin-top:10px}
+.ct-folder{display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 6px;border:0;border-radius:14px;background:#fff4d6;box-shadow:inset 0 0 0 2px #f0d59a;color:#5a4320;min-height:0;transition:transform .15s,box-shadow .15s}
+.ct-folder span{font-size:26px}.ct-folder b{font-size:12px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.ct-folder small{font-size:10px;color:#a0844f;font-weight:800}
+.ct-folder.hot{transform:scale(1.08);box-shadow:inset 0 0 0 3px #f0b84e,0 0 14px #f0b84e99}
+.ct-crumb{display:flex;align-items:center;gap:8px;margin-top:10px}.ct-crumb b{flex:1;color:#1f3550;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ct-crumb .ct-back{flex-direction:row;padding:8px 10px;font-size:12px;font-weight:900}
+.ct-fbtn{border:0;background:#eef3f7;border-radius:10px;min-height:32px;padding:0 10px}
+.ct-grip{font-style:normal;color:#9fb0c0;font-size:18px;padding:0 6px 0 0;touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none}
+.ct-item{position:relative}.ct-item.ct-dragging{opacity:.45}
+#ctList.ms-on .ct-item{padding-left:40px}#ctList .ms-chk{position:absolute;left:10px;top:12px}
+.ct-item.m-sel{box-shadow:0 0 0 3px #3f8fc4,0 3px 10px #0b21401f}
+.ct-ghost{position:fixed;z-index:9999;transform:translate(-50%,-120%);pointer-events:none;padding:8px 12px;border-radius:12px;background:#1f3550;color:#fff;font-size:12px;font-weight:800;box-shadow:0 8px 20px #0006;max-width:70vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ct-movelist{display:grid;gap:8px}
+.sp-mon{position:relative;overflow:hidden;height:150px;border-radius:16px;background:radial-gradient(circle at 50% 50%,#0d3b2c,#04140f);border:3px solid #1f3550;box-shadow:inset 0 0 30px #00ff9033}
+.sp-mon::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,#ffffff08 0 1px,transparent 1px 4px),linear-gradient(90deg,#7dffb012 1px,transparent 1px) 0 0/22px 22px,linear-gradient(0deg,#7dffb012 1px,transparent 1px) 0 0/22px 22px}
+.sp-scan{position:absolute;left:0;right:0;height:30px;background:linear-gradient(#7dffb000,#7dffb033,#7dffb000);animation:spScan 2.6s linear infinite}
+@keyframes spScan{from{top:-30px}to{top:150px}}
+.sp-helix{position:absolute;left:8%;right:8%;top:22px;height:80px;display:flex;justify-content:space-between}
+.sp-helix i{position:relative;width:4px;height:100%;animation:spTwist 2.4s ease-in-out infinite;animation-delay:calc(var(--i)*-.17s)}
+.sp-helix i::before,.sp-helix i::after{content:'';position:absolute;left:-4px;width:12px;height:12px;border-radius:50%;background:#7dffb0;box-shadow:0 0 8px #7dffb0}
+.sp-helix i::after{bottom:0;background:#ff7dd6;box-shadow:0 0 8px #ff7dd6}
+.sp-helix i::before{top:0}
+.sp-helix.fast i{animation-duration:.8s}
+@keyframes spTwist{0%,100%{transform:scaleY(1)}50%{transform:scaleY(-1)}}
+.sp-readout{position:absolute;left:0;right:0;bottom:10px;text-align:center;font:900 12px ui-monospace,Menlo,monospace;letter-spacing:2px;color:#7dffb0;text-shadow:0 0 6px #7dffb0}
+.sp-slots{display:grid;grid-template-columns:1fr auto 1fr;gap:6px;align-items:center;margin-top:12px}
+.sp-plus{font-size:20px;font-weight:900;color:#1d5a5a}
+.sp-slot{display:flex;flex-direction:column;gap:3px;align-items:flex-start;text-align:left;min-height:86px;padding:10px;border:0;border-radius:14px;background:#eaf6f1;box-shadow:inset 0 0 0 2px #9fd8bf}
+.sp-slot.on{background:#fff;box-shadow:inset 0 0 0 2px #2fae7a}
+.sp-slot small{font-size:9px;font-weight:900;letter-spacing:1px;color:#2f8f68}.sp-slot b{font-size:12px;color:#1f3550;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}.sp-slot i{font-style:normal;font-size:10px;color:#6c829a}.sp-empty{color:#8aa0b6!important}
+.sp-modes{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.sp-modes label{display:flex;flex-wrap:wrap;gap:4px;align-items:center;padding:8px;border-radius:12px;background:#f3f7f8}.sp-modes small{width:100%;font-size:10px;color:#6c829a}
+.sp-pick{display:grid;gap:6px;max-height:55vh;overflow:auto}.sp-pickrow{display:flex;flex-direction:column;align-items:flex-start;gap:2px;border:0;text-align:left;margin-top:0}.sp-pickrow small{font-size:11px;color:#6c829a}
 </style><style id="bundled-animation-style">
 .safari-foreground{position:absolute;inset:0;z-index:10;pointer-events:auto;background:#071b0d;display:flex;align-items:center;justify-content:center;overflow:hidden}
 .safari-foreground img{width:100%;height:100%;object-fit:cover;image-rendering:pixelated}
@@ -4571,7 +4609,7 @@ function gdNewFloor(r){mdPlan(r);const [W,H,NR]=GD_SIZE[r.diff]||GD_SIZE.easy,g=
  // sometimes a ruined house: a big room split by inner walls with doorways (see gdHouse)
  let house=null;if(!big&&!r.tower&&Math.random()<.3){for(let t=0;t<60&&!house;t++){const w=Math.min(W-4,rnd(8,10)),h=Math.min(H-4,rnd(7,8)),x=rnd(1,W-w-2),y=rnd(1,H-h-2);if(!rooms.some(o=>x<o[0]+o[2]+2&&o[0]<x+w+2&&y<o[1]+o[3]+2&&o[1]<y+h+2))house=[x,y,w,h]}if(house)rooms.push(house)}
  for(let t=0;t<400&&rooms.length<NR;t++){const w=rnd(4,7),h=rnd(4,6),x=rnd(1,W-w-2),y=rnd(1,H-h-2);if(rooms.some(o=>x<o[0]+o[2]+2&&o[0]<x+w+2&&y<o[1]+o[3]+2&&o[1]<y+h+2))continue;rooms.push([x,y,w,h])}
- rooms.sort((a,b)=>a[0]-b[0]);rooms.forEach(([x,y,w,h])=>{for(let j=y;j<y+h;j++)for(let i=x;i<x+w;i++)g[j][i]=1});
+ rooms.sort((a,b)=>a[0]-b[0]);rooms.forEach(([x,y,w,h])=>{for(let j=y;j<y+h;j++)for(let i=x;i<x+w;i++)g[j][i]=1});if(typeof drShape==='function')drShape(g,rooms,big,house,r);
  const ctr=o=>[o[0]+(o[2]>>1),o[1]+(o[3]>>1)],dig=(a,b)=>{let [x,y]=a;const [tx,ty]=b,set=()=>{if(!g[y][x])g[y][x]=2};const hf=Math.random()<.5;
   if(hf){while(x!==tx){x+=Math.sign(tx-x);set()}while(y!==ty){y+=Math.sign(ty-y);set()}}else{while(y!==ty){y+=Math.sign(ty-y);set()}while(x!==tx){x+=Math.sign(tx-x);set()}}};
  for(let i=0;i<rooms.length-1;i++)dig(ctr(rooms[i]),ctr(rooms[i+1]));for(let k=0;k<2&&rooms.length>3;k++){const a=rnd(0,rooms.length-1),b=rnd(0,rooms.length-1);if(Math.abs(a-b)>1)dig(ctr(rooms[a]),ctr(rooms[b]))}
@@ -4599,6 +4637,7 @@ function gdNewFloor(r){mdPlan(r);const [W,H,NR]=GD_SIZE[r.diff]||GD_SIZE.easy,g=
    fl.bossRoom=o.slice();en.forEach(e=>{if(gdInRect(e,o)){e.aware=0;e.dormant=1}});return}
   if(i>1&&Math.random()<.14){const sp=mdSp(0,0);for(let k=0;k<rnd(4,6);k++){const e=makeEnemy(sp,spread(avg-6,2,avg-10,avg-3),{hpMul:.7,atkMul:.75});e.swarm=1;put(e,o)}return}
   if(Math.random()<.62){const n=rnd(1,r.diff==='hard'?3:2);for(let k=0;k<n;k++)put(makeEnemy(mdSp(0,2),spread(avg+(cap-avg)*.4,sd,avg-6,cap+3),{hpMul:1.15}),o)}});
+ if(typeof drMech==='function')drMech(r,fl,rooms,far,en,put,takeIn,taken,avg,cap,sd,spread);
  dgFoeScale(r,en);
  // items lying on the ground, and special spots
  const mid=rooms.map((o,i)=>i).filter(i=>i&&i!==far),nIt=rnd(2,4)+(mdFx(r).items||0);for(let k=0;k<nIt;k++){const o=rooms[rnd(0,rooms.length-1)],t=takeIn(o);if(!t)continue;
@@ -4616,7 +4655,7 @@ function gdAliveFoes(b){return b.enemies.map((e,i)=>[e,i]).filter(([e])=>(e.hp>0
 function gdUnitAt(r,x,y){const b=r.battle;const ai=r.party.findIndex(m=>m.x===x&&m.y===y);if(ai>=0)return {side:'ally',i:ai};const fi=b.enemies.findIndex(e=>(e.hp>0||e.gdOut)&&!e.diving&&!e.done&&e.x===x&&e.y===y);return fi>=0?{side:'foe',i:fi}:null}
 // ---------- what you can see ----------
 function gdRoomOf(fl,x,y){return fl.rooms.findIndex(o=>x>=o[0]&&x<o[0]+o[2]&&y>=o[1]&&y<o[1]+o[3])}
-function gdLit(r){if(r.fl.oc==='arena'||r.fl.rc==='arena')return new Set(r.fl.tiles.flatMap((row,y)=>[...row].map((v,x)=>v!=='0'?gdKey(x,y):null).filter(Boolean)));const fl=r.fl,L=new Set();r.party.forEach(m=>{const ri=gdRoomOf(fl,m.x,m.y);if(ri>=0&&!mdFx(r).dark){const o=fl.rooms[ri];for(let j=o[1]-1;j<=o[1]+o[3];j++)for(let i=o[0]-1;i<=o[0]+o[2];i++)L.add(gdKey(i,j))}
+function gdLit(r){if(r.fl.oc==='arena'||r.fl.rc==='arena')return new Set(r.fl.tiles.flatMap((row,y)=>[...row].map((v,x)=>v!=='0'?gdKey(x,y):null).filter(Boolean)));const fl=r.fl,L=new Set();r.party.forEach(m=>{const ri=gdRoomOf(fl,m.x,m.y);if(ri>=0&&!mdFx(r).dark&&fl.rooms[ri][6]!=='dark'){const o=fl.rooms[ri];for(let j=o[1]-1;j<=o[1]+o[3];j++)for(let i=o[0]-1;i<=o[0]+o[2];i++)L.add(gdKey(i,j))}
   const lr=mdFx(r).dark?2+mdLvOf(r,'light'):2;for(let dy=-lr;dy<=lr;dy++)for(let dx=-lr;dx<=lr;dx++)L.add(gdKey(m.x+dx,m.y+dy))});return L}
 function gdSee(r){const fl=r.fl,L=gdLit(r),s=fl.seen.split('');L.forEach(k=>{const [x,y]=k.split(',').map(Number);if(x>=0&&y>=0&&x<fl.w&&y<fl.h)s[y*fl.w+x]='1'});fl.seen=s.join('');
  // wild Pokémon that can see your team wake up and start hunting
@@ -4662,9 +4701,9 @@ function gdDrawBattle(entering){const r=runOf(),b=r&&r.battle,st=$('dgStage');if
  r.party.forEach((m,i)=>{const c=combatant(partyMon(m));if(m.hp>0)delete m.koAt;else if(!m.koAt){m.koAt=now;gdKoFx('dg-ally'+i,false)}const ko=m.hp>0?0:now-m.koAt;unit('dg-ally',i,m.x,m.y,partyMon(m).species,m.dir||0,m.hp/c.hp*100,(m.hp<=0?'ko ':'')+(m.hp<=0&&ko<700?'gd-stagger ':'')+(b.turn===i&&!b.enemyPhase?'active ':'')+(m.acted?'done ':'')+(b.guard[i]?'guard ':''),SLOT_COLORS[i],m.hp<=0&&ko>=600?'Sleep':'')});
  // a fainted foe staggers, falls asleep and fades out instead of vanishing
  b.enemies.forEach((e,i)=>{if(e.ocBoss&&e.diving)return;if((e.ocBoss||e.rcBoss)&&e.hp<=0){if(!e.done)unit('dg-foe',i,e.x,e.y,e.species,e.dir||0,0,'big oc-rest',null,'Sleep');return}const dead=e.hp<=0&&!e.gdOut;if(dead&&!e.koAt&&!e.done){e.koAt=now;gdKoFx('dg-foe'+i,true)}if(dead?!(e.koAt&&now-e.koAt<1500):e.done)return;if(!vis(e.x,e.y))return;
-  unit('dg-foe',i,e.x,e.y,e.species,e.dir||0,dead?0:(e.gdOut?e.gdHp:e.hp)/e.maxhp*100,(e.boss?'big ':'')+(e.ocBoss?'oc-manaphy ':'')+(e.rcBoss?'rc-regirock ':'')+(e.ocBoss&&e.pending?.some(p=>p.kind==='beam')?'oc-charge ':'')+(e.aware||dead?'':e.dormant?'gd-idle ':'asleep ')+(dead?'gd-faint ':''),null,dead&&now-e.koAt>=600?'Sleep':'')});
+  unit('dg-foe',i,e.x,e.y,e.species,e.dir||0,dead?0:(e.gdOut?e.gdHp:e.hp)/e.maxhp*100,(e.mh&&e.dormant?'mh-hide ':'')+(e.boss?'big ':'')+(e.ocBoss?'oc-manaphy ':'')+(e.rcBoss?'rc-regirock ':'')+(e.ocBoss&&e.pending?.some(p=>p.kind==='beam')?'oc-charge ':'')+(e.aware||dead?'':e.dormant?'gd-idle ':'asleep ')+(dead?'gd-faint ':''),null,dead&&now-e.koAt>=600?'Sleep':'')});
  U.querySelectorAll('.gd-u').forEach(el=>{if(!want.has(el.dataset.u))el.remove()});dgFillSprites();
- if(gdBossSeal(r)){gdDrawBattle();return}
+ if(typeof drWake==='function'&&drWake(r)){gdDrawBattle();return}if(gdBossSeal(r)){gdDrawBattle();return}
  if(DG){const free=gdFree(r);if(DG.wasFree===true&&!free)mdBattleStart(r);if(DG.wasFree===false&&free)mdBattleEnd(r);DG.bcam=free?null:gdBattleCam(r);DG.wasFree=free}
  if(entering)gdFit();gdHighlight();gdMini(r,L);if(entering||DG&&DG.follow!==false)gdCamera();else gdOverlap();gdOverlays();setTimeout(gdOverlays,340);ocDecor(r);rcDecor(r);
  if(DG&&DG.busy&&!b.enemyPhase)$('dgPanel').innerHTML='<div class="dg-msg">…</div>';else dgPanelBattle()}
@@ -5105,14 +5144,14 @@ function mdDress(r,fl,taken){const s=mdSub(r);if(!s)return;const rooms=fl.rooms,
  const ctr=o=>[o[0]+(o[2]>>1),o[1]+(o[3]>>1)],near=(x,y)=>[...taken].some(k=>{const [a,b]=k.split(',').map(Number);return Math.max(Math.abs(a-x),Math.abs(b-y))<=1});
  // obstacles: block a share of room tiles, but never cut a room off or touch a doorway
  if(s.obs){fl.ob=ob.join('');const goal=rooms.map(ctr),start=goal[0];
-  rooms.forEach((o,ri)=>{if((fl.houses||[]).some(h=>h[0]===o[0]&&h[1]===o[1]))return;let n=Math.round(o[2]*o[3]*s.obs[1]);for(let t=0;t<n*4&&n>0;t++){const x=rnd(o[0],o[0]+o[2]-1),y=rnd(o[1],o[1]+o[3]-1),k=y*fl.w+x;if(ob[k]==='1'||taken.has(gdKey(x,y))||near(x,y)&&ri===0)continue;
+  rooms.forEach((o,ri)=>{if((fl.houses||[]).some(h=>h[0]===o[0]&&h[1]===o[1]))return;let n=Math.round(o[2]*o[3]*s.obs[1]);for(let t=0;t<n*4&&n>0;t++){const x=rnd(o[0],o[0]+o[2]-1),y=rnd(o[1],o[1]+o[3]-1),k=y*fl.w+x;if(!(+fl.tiles[y][x]>0)||ob[k]==='1'||taken.has(gdKey(x,y))||near(x,y)&&ri===0)continue;
    if(x===o[0]||y===o[1]||x===o[0]+o[2]-1||y===o[1]+o[3]-1){if([[1,0],[-1,0],[0,1],[0,-1]].some(([dx,dy])=>+fl.tiles[y+dy]?.[x+dx]===2))continue}
    if(goal.some(([gx,gy])=>gx===x&&gy===y)||(fl.stairs[0]===x&&fl.stairs[1]===y))continue;ob[k]='1';fl.ob=ob.join('');
    const reach=gdBFS(fl,start,()=>false,999);if(goal.some(g=>!reach.has(gdKey(...g)))||!reach.has(gdKey(...fl.stairs))){ob[k]='0';fl.ob=ob.join('');continue}
    if(--n<=0)break}})}
  // hazards: on open room tiles away from where your team starts
  if(s.fx.hz){const [kind,n]=s.fx.hz;for(let t=0;t<n*6&&Object.keys(hz).length<n;t++){const ri=rnd(1,rooms.length-1),o=rooms[ri];if(!o)break;const x=rnd(o[0],o[0]+o[2]-1),y=rnd(o[1],o[1]+o[3]-1),key=gdKey(x,y);
-   if(taken.has(key)||hz[key]||(fl.ob&&fl.ob[y*fl.w+x]==='1')||(fl.stairs[0]===x&&fl.stairs[1]===y))continue;hz[key]=kind}fl.hz=hz}}
+   if(!(+fl.tiles[y][x]>0)||taken.has(key)||hz[key]||(fl.ob&&fl.ob[y*fl.w+x]==='1')||(fl.stairs[0]===x&&fl.stairs[1]===y))continue;hz[key]=kind}fl.hz=hz}}
 // ---------- drawing the floor: patterns, props, obstacles, hazards, wall decorations ----------
 function mdShade(hex,k){const n=parseInt(hex.slice(1),16),c=[n>>16,n>>8&255,n&255].map(v=>Math.max(0,Math.min(255,Math.round(k>1?v+(255-v)*(k-1):v*k))));return '#'+c.map(v=>v.toString(16).padStart(2,'0')).join('')}
 function mdHash(s){let h=2166136261;for(const ch of String(s)){h^=ch.charCodeAt(0);h=Math.imul(h,16777619)}return (h>>>0)||7}
@@ -6602,7 +6641,7 @@ $('navHome').style.display='none';
  if(pcStorageReady)ensureMoveData();
  if(pcStorageReady&&permRoll())save();
  render();scheduleNotifs();aiCheck();window.__pcBooted=true;setTimeout(()=>{try{mdSync()}catch(e){}},1500);setTimeout(()=>{try{facTick()}catch(e){}},2500);setInterval(()=>{try{facTick();if(currentPage==='home'&&hab.scene&&hab.scene!=='home')drawHabitat()}catch(e){}},60000);
- window.__pcVersion='0.86.6';
+ window.__pcVersion='0.88.0';
  document.addEventListener('pointerdown',function(e){try{var t=e.target.closest&&e.target.closest('[onclick],button,a,[id]');if(!t)return;var oc=t.getAttribute('onclick');window.__pcLastTap=(oc?oc.slice(0,60):(t.id?'#'+t.id:t.tagName.toLowerCase()+'.'+String(t.className).split(' ')[0])).replace(/\s+/g,' ')}catch(_){}} ,true);
  Object.keys(window).forEach(function(k){var f=window[k];if(typeof f!=='function'||/^[A-Z]/.test(k)||k==='appError'||k==='$'||k==='esc'||/\[native code\]/.test(Function.prototype.toString.call(f)))return;
   var w=function(){try{return f.apply(this,arguments)}catch(err){if(err&&typeof err==='object'&&!err.__pcLogged){try{err.__pcLogged=1}catch(_){}appError(err,k)}throw err}};try{window[k]=w}catch(_){}});
@@ -6955,19 +6994,19 @@ function dvFall(g,x,y,w,h,L,R){dvChasm(g,x,y,w,h,L,R);const fx=x+w*.35,fw=Math.m
 // and light CSS ambient motion (torches, drips, drifting spores/bubbles/embers, glowing crystals). Nothing here
 // changes movement or combat.
 const DL_STYLE=[ // per dungeon layer: wall texture, face accent, floor dressing, ambient particle, torch colour
- {wall:'rock',acc:'#cfe3e8',dress:'puddle',mote:'bubble',torch:'#7fe0ff',rooms:['pond','pond','garden']},
- {wall:'rock',acc:'#5f9a46',dress:'moss',mote:'spore',torch:'#ffcf6b',rooms:['garden','garden','pond']},
- {wall:'spike',acc:'#e8e2d0',dress:'crack',mote:'dust',torch:'#ffd08a',crystal:'#bfe3ff',rooms:['pond','garden']},
- {wall:'brick',acc:'#8a8fa8',dress:'coal',mote:'dust',torch:'#ffb347',crystal:'#9f8cff',rooms:['pond','garden']},
- {wall:'brick',acc:'#4f8f6a',dress:'puddle',mote:'bubble',torch:'#6fd0ff',rooms:['pond','pond','garden']},
- {wall:'rock',acc:'#d8d23c',dress:'sulfur',mote:'steam',torch:'#d8ff6b',rooms:['pond','lava']},
- {wall:'basalt',acc:'#ff6a1f',dress:'ash',mote:'ember',torch:'#ff8a3d',rooms:['lava','lava','garden']},
- {wall:'basalt',acc:'#ffd23f',dress:'gold',mote:'spark',torch:'#ffe27a',crystal:'#ffe9a0',rooms:['lava','pond']}];
+ {wall:'rock',acc:'#cfe3e8',dress:'puddle',mote:'bubble',torch:'#7fe0ff',rooms:['pond','flooded','crystal','garden']},
+ {wall:'rock',acc:'#5f9a46',dress:'moss',mote:'spore',torch:'#ffcf6b',rooms:['garden','mushroom','ruin','pond']},
+ {wall:'spike',acc:'#e8e2d0',dress:'crack',mote:'dust',torch:'#ffd08a',crystal:'#bfe3ff',rooms:['crystal','bones','mine','pond']},
+ {wall:'brick',acc:'#8a8fa8',dress:'coal',mote:'dust',torch:'#ffb347',crystal:'#9f8cff',rooms:['mine','crystal','ruin','garden']},
+ {wall:'brick',acc:'#4f8f6a',dress:'puddle',mote:'bubble',torch:'#6fd0ff',rooms:['flooded','ruin','mushroom','pond']},
+ {wall:'rock',acc:'#d8d23c',dress:'sulfur',mote:'steam',torch:'#d8ff6b',rooms:['pond','bones','crystal','lava']},
+ {wall:'basalt',acc:'#ff6a1f',dress:'ash',mote:'ember',torch:'#ff8a3d',rooms:['lava','bones','mine']},
+ {wall:'basalt',acc:'#ffd23f',dress:'gold',mote:'spark',torch:'#ffe27a',crystal:'#ffe9a0',rooms:['lava','crystal','mine']}];
 function dlStyle(r){const s=r&&!r.tower&&r.sub&&r.sub.k,i=s&&typeof MD_LAYERS!=='undefined'?MD_LAYERS.findIndex(L=>L.subs.includes(s)):-1;return DL_STYLE[i]||DL_STYLE[2]}
 function dlPlan(r,fl){if(fl._dl&&fl._dl.id===fl.id)return fl._dl;const R=dvRng('dl'+fl.id),S=dlStyle(r),V=typeof dvPlan==='function'?dvPlan(fl):{voids:new Map(),bridges:new Map()},room=[];
  const free=(x,y)=>!V.voids.has(x+','+y)&&!V.bridges.has(x+','+y);
- const cand=fl.rooms.filter(o=>o[2]>=5&&o[3]>=5&&o[2]*o[3]<120&&!(fl.houses||[]).some(h=>h[0]===o[0]&&h[1]===o[1]));
- if(cand.length&&R()<.5){const o=cand[Math.floor(R()*cand.length)],st=fl.stairs,hasSt=st&&st[0]>=o[0]&&st[0]<o[0]+o[2]&&st[1]>=o[1]&&st[1]<o[1]+o[3];let kind=S.rooms[Math.floor(R()*S.rooms.length)];if(kind==='pond'&&hasSt)kind='garden';const cracks=[];
+ const cand=fl.rooms.filter(o=>o[2]>=5&&o[3]>=5&&o[2]*o[3]<120&&!o[5]&&!(fl.houses||[]).some(h=>h[0]===o[0]&&h[1]===o[1]));
+ for(let n=0;n<2&&cand.length&&R()<(n?.4:.7);n++){const o=cand.splice(Math.floor(R()*cand.length),1)[0],st=fl.stairs,hasSt=st&&st[0]>=o[0]&&st[0]<o[0]+o[2]&&st[1]>=o[1]&&st[1]<o[1]+o[3];let kind=S.rooms[Math.floor(R()*S.rooms.length)];if(kind==='pond'&&hasSt)kind='garden';const cracks=[];
   if(kind==='lava'){const T=GD_T;for(let i=0;i<5+o[2];i++){let x=(o[0]+R()*o[2])*T,y=(o[1]+R()*o[3])*T;const seg=[[x,y]];for(let k=0;k<5;k++){x=Math.max(o[0]*T+4,Math.min((o[0]+o[2])*T-4,x+(R()-.5)*44));y=Math.max(o[1]*T+4,Math.min((o[1]+o[3])*T-4,y+(R()-.5)*44));seg.push([x,y])}cracks.push(seg)}}
   room.push({o,kind,cracks})}
  const torches=[],drips=[],crystals=[];
@@ -7003,7 +7042,7 @@ function dlPaint(g,r,fl,th){if(fl.rc)return;const T=GD_T,S=dlStyle(r),P=dlPlan(r
  if(typeof dpEdges==='function')dpEdges(g,r,fl,th,dvRng('dpe'+fl.id),P);
  (fl.houses||[]).forEach(o=>o[4]&&o[4]!=='house'&&typeof dpLandmark==='function'?dpLandmark(g,fl,o,th,R,P):dlHouse(g,fl,o,th,R));
  // special rooms (ponds are painted after the props, so nothing stands in the water)
- dlRooms(g,P,S,false)}
+ dlRooms(g,P,S,false);if(typeof drPaintMech==='function')drPaintMech(g,fl)}
 function dlPaintPost(g,r,fl){if(fl.rc)return;const P=dlPlan(r,fl);dlRooms(g,P,dlStyle(r),true)}
 function dlRooms(g,P,S,post){const T=GD_T,R=dvRng('dlr'+P.id);P.room.forEach(({o,kind,cracks})=>{if((kind==='pond')!==post)return;const X0=o[0]*T,Y0=o[1]*T,W=o[2]*T,H=o[3]*T,cx=X0+W/2,cy=Y0+H/2;
   if(kind==='pond'){const rx=W/2-T*1.1,ry=H/2-T*1.1,water=S.mote==='steam'?['#7fae4a','#9cc95a']:['#3f8fc4','#5fb0dc'];
@@ -7016,7 +7055,8 @@ function dlRooms(g,P,S,post){const T=GD_T,R=dvRng('dlr'+P.id);P.room.forEach(({o
     if(R()<.22){const fx=X+8+R()*20,fy=Y+8+R()*20,c=['#ff8fb8','#ffe36b','#ffffff','#b48cff'][Math.floor(R()*4)];dlR(g,'#4c8a38',fx+2,fy+3,1,5);dlR(g,c,fx,fy,5,4);dlR(g,'#ffd23f',fx+2,fy+1,1,1)}}
    for(let x=o[0];x<o[0]+o[2];x++)for(const y of [o[1],o[1]+o[3]-1])if(R()<.35){g.fillStyle='#3f7a30';g.beginPath();g.arc(x*T+T/2,y*T+T/2,9,0,7);g.fill();dlR(g,'#5fa04a',x*T+T/2-4,y*T+T/2-6,5,4)}}
   else if(kind==='lava'){g.fillStyle='rgba(30,16,14,.45)';g.fillRect(X0,Y0,W,H);g.lineCap='round';
-   cracks.forEach(seg=>{g.strokeStyle='#3a1208';g.lineWidth=6;g.beginPath();seg.forEach(([x,y],i)=>i?g.lineTo(x,y):g.moveTo(x,y));g.stroke();g.strokeStyle='#c2410c';g.lineWidth=3;g.stroke();g.strokeStyle='#ff9a3d';g.lineWidth=1;g.stroke()})}})}
+   cracks.forEach(seg=>{g.strokeStyle='#3a1208';g.lineWidth=6;g.beginPath();seg.forEach(([x,y],i)=>i?g.lineTo(x,y):g.moveTo(x,y));g.stroke();g.strokeStyle='#c2410c';g.lineWidth=3;g.stroke();g.strokeStyle='#ff9a3d';g.lineWidth=1;g.stroke()})}
+  else if(typeof drPaintRoom==='function')drPaintRoom(g,o,kind,S,R)})}
 // ---------- ambient motion (DOM + CSS animation, rebuilt once per floor) ----------
 function dlAmb(field,r){const fl=r&&r.fl,mp=field&&field.querySelector('.gd-map');if(!fl||!mp)return;let el=mp.querySelector('.gd-amb');if(el&&el.dataset.fl===String(fl.id)){if(typeof dpFeet==='function')dpFeet(el,r,fl,dlPlan(r,fl));return}if(el)el.remove();mp.querySelectorAll('.dl-dark').forEach(c=>c.remove());
  const T=GD_T,S=dlStyle(r),P=dlPlan(r,fl),R=dvRng('dla'+fl.id),h=[];el=document.createElement('div');el.className='gd-amb';el.dataset.fl=fl.id;el.style.setProperty('--tc',S.torch);el.style.setProperty('--mc',S.acc);
@@ -7366,6 +7406,108 @@ function advResetStudy(){const a=advSt();if(a.r851)return;a.r851=1;const ids=ADV
  ids.forEach(id=>delete a.seen[id]);a.c.correct=0;a.s.sw=[];save()}
 // boot
 advInstall();setTimeout(()=>{try{advSeed();advResetStudy()}catch(_){}},1500);setTimeout(()=>{advTick();advBadge()},1600);setInterval(advTick,30000);
+
+// ===== Mystery Dungeon room variety: shaped rooms, themed rooms and rooms with mechanics =====
+// o[5] = shape (L, cross, round, pillars); o[6] = mechanic (mh = Monster House, dark, trap); o[7] = mechanic triggered
+function drShape(g,rooms,big,house,r){if(r.tower)return;const rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+ rooms.forEach((o,i)=>{if(!i||o===big||o===house||o[2]<5||o[3]<4||o[2]*o[3]>=42||Math.random()>.45)return;const [x,y,w,h]=o,cx=x+(w>>1),cy=y+(h>>1),cut=(i,j)=>{if(i!==cx&&j!==cy)g[j][i]=0};
+  const opts=['L','L','round'].concat(h>=5?['cross','pillars','round']:[]),s=opts[rnd(0,opts.length-1)];o[5]=s;
+  if(s==='L'){const L=Math.random()<.5,T=Math.random()<.5;for(let j=y;j<y+h;j++)for(let i=x;i<x+w;i++)if((L?i<cx:i>cx)&&(T?j<cy:j>cy))cut(i,j)}
+  else if(s==='cross'){const a=Math.max(1,Math.floor(w/3)),b=Math.max(1,Math.floor(h/3));for(let j=y;j<y+h;j++)for(let i=x;i<x+w;i++)if((i<x+a||i>=x+w-a)&&(j<y+b||j>=y+h-b))cut(i,j)}
+  else if(s==='round'){const mx=x+w/2,my=y+h/2;for(let j=y;j<y+h;j++)for(let i=x;i<x+w;i++){const dx=(i+.5-mx)/(w/2),dy=(j+.5-my)/(h/2);if(dx*dx+dy*dy>1.08)cut(i,j)}}
+  else for(let j=y+1;j<y+h-1;j+=2)for(let i=x+1;i<x+w-1;i+=2)cut(i,j);
+  // drop any floor bits the cut left stranded from the room's centre
+  const keep=new Set([cx+','+cy]),q=[[cx,cy]];while(q.length){const [a,b]=q.pop();for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const nx=a+dx,ny=b+dy,k=nx+','+ny;if(nx<x||ny<y||nx>=x+w||ny>=y+h||keep.has(k)||!g[ny][nx])continue;keep.add(k);q.push([nx,ny])}}
+  for(let j=y;j<y+h;j++)for(let i=x;i<x+w;i++)if(g[j][i]&&!keep.has(i+','+j))g[j][i]=0})}
+function drMech(r,fl,rooms,far,en,put,takeIn,taken,avg,cap,sd,spread){if(r.tower||rooms.length<4||Math.random()>.4)return;
+ const rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1)),cand=rooms.map((o,i)=>i).filter(i=>i&&i!==far&&!(fl.houses||[]).includes(rooms[i])&&rooms[i]!==fl.bossRoom);if(!cand.length)return;
+ const o=rooms[cand[rnd(0,cand.length-1)]],fx=mdFx(r),kinds=['mh','mh','dark'].concat(fx.hz?['trap','trap']:[]),k=kinds[rnd(0,kinds.length-1)];o[6]=k;
+ if(k==='mh'){for(let n=rnd(4,6);n>0;n--){const e=makeEnemy(mdSp(0,2),spread(avg,sd,avg-4,cap));put(e,o);if(en.includes(e)){e.mh=1;e.dormant=1;e.aware=0}}
+  en.forEach(e=>{if(gdInRect(e,o)&&!e.boss){e.mh=1;e.dormant=1;e.aware=0}});
+  for(let n=rnd(2,3);n>0;n--){const t=takeIn(o);if(!t)break;if(Math.random()<.5)fl.items.push({x:t[0],y:t[1],tickets:mdTix(rnd(5,10))});else{const pool=Object.keys(DITEMS).filter(id=>!DITEMS[id].mdOnly&&id!=='snag').map(id=>({id,w:DITEM_TIER_W[DITEMS[id].tier||0]}));fl.items.push({x:t[0],y:t[1],k:pickWeighted(pool).id})}}}
+ else if(k==='trap'){const hz=fl.hz||{};for(let n=rnd(4,6),t=0;n>0&&t<40;t++){const x=rnd(o[0],o[0]+o[2]-1),y=rnd(o[1],o[1]+o[3]-1),key=gdKey(x,y);if(!(+fl.tiles[y][x]>0)||taken.has(key)||hz[key]||(fl.ob&&fl.ob[y*fl.w+x]==='1')||(fl.stairs[0]===x&&fl.stairs[1]===y))continue;hz[key]=fx.hz[0];taken.add(key);n--}fl.hz=hz;
+  const t=takeIn(o);if(t)fl.specials.push({x:t[0],y:t[1],k:'chest'})}}
+// called every redraw: springs a room's mechanic the first time your team walks in
+function drWake(r){const fl=r&&r.fl;if(!fl||!fl.rooms)return false;let hit=false;fl.rooms.forEach(o=>{if(!o[6]||o[7]||!r.party.some(m=>m.hp>0&&gdInRect(m,o)))return;o[7]=1;hit=true;
+ if(o[6]==='mh'){r.battle.enemies.forEach(e=>{if(e.mh&&e.hp>0){e.mh=0;e.dormant=0;e.aware=1}});toast('⚠️ It’s a Monster House!');try{navigator.vibrate&&navigator.vibrate(120)}catch(e){}}
+ else if(o[6]==='dark')toast('🌑 This room is pitch dark; you can only see close by.');else if(o[6]==='trap')toast('⚠️ This room is full of traps! Something shiny waits inside…');save()});return hit}
+// ---------- themed room paint (visual only) ----------
+function drPaintRoom(g,o,kind,S,R){const T=GD_T,dR=dlR,X0=o[0]*T,Y0=o[1]*T,W=o[2]*T,H=o[3]*T,each=f=>{for(let y=o[1];y<o[1]+o[3];y++)for(let x=o[0];x<o[0]+o[2];x++)f(x*T,y*T,x,y)};
+ if(kind==='crystal'){const c=S.crystal||'#bfe3ff';g.fillStyle='rgba(150,130,255,.12)';g.fillRect(X0,Y0,W,H);
+  for(let k=0;k<4+o[2];k++){const bx=X0+8+R()*(W-16),by=Y0+14+R()*(H-20);for(let s=0;s<3;s++){const hgt=10+R()*16,wd=5+R()*4,ox=bx+(s-1)*6;g.fillStyle=s===1?c:c+'bb';g.beginPath();g.moveTo(ox-wd/2,by);g.lineTo(ox,by-hgt);g.lineTo(ox+wd/2,by);g.closePath();g.fill();dR(g,'rgba(255,255,255,.6)',ox-1,by-hgt+4,1,hgt*.5)}g.fillStyle=c+'33';g.beginPath();g.ellipse(bx,by,14,5,0,0,7);g.fill()}}
+ else if(kind==='mushroom'){g.fillStyle='rgba(60,40,90,.2)';g.fillRect(X0,Y0,W,H);
+  for(let k=0;k<6+o[2];k++){const mx=X0+8+R()*(W-16),my=Y0+12+R()*(H-18),sz=6+R()*7,col=['#e8504a','#5fb0ff','#c58cff','#ffb347'][Math.floor(R()*4)];dR(g,'#efe6d2',mx-1.5,my-sz*.4,3,sz);g.fillStyle=col;g.beginPath();g.ellipse(mx,my-sz*.4,sz,sz*.6,0,Math.PI,0);g.fill();dR(g,'rgba(255,255,255,.75)',mx-sz*.4,my-sz*.75,2,2);dR(g,'rgba(255,255,255,.75)',mx+sz*.2,my-sz*.6,2,2);g.fillStyle=col+'22';g.beginPath();g.arc(mx,my-sz*.4,sz*2,0,7);g.fill()}}
+ else if(kind==='flooded'){each((X,Y)=>{dR(g,'rgba(60,140,200,.32)',X,Y,T,T);if(R()<.35)dR(g,'rgba(255,255,255,.28)',X+4+R()*20,Y+6+R()*24,8+R()*6,1)});
+  for(let k=0;k<3+o[2];k++){const sx=X0+10+R()*(W-20),sy=Y0+10+R()*(H-20);g.fillStyle='#8c8778';g.beginPath();g.ellipse(sx,sy,8,6,0,0,7);g.fill();g.fillStyle='#a8a291';g.beginPath();g.ellipse(sx-1,sy-1,6,4,0,0,7);g.fill()}}
+ else if(kind==='bones'){g.fillStyle='rgba(210,195,160,.16)';g.fillRect(X0,Y0,W,H);
+  for(let k=0;k<5+o[2];k++){const bx=X0+8+R()*(W-16),by=Y0+8+R()*(H-16),a=R()*3.14,l=6+R()*6,dx=Math.cos(a)*l,dy=Math.sin(a)*l;g.strokeStyle='#ece3cc';g.lineWidth=3;g.beginPath();g.moveTo(bx-dx,by-dy);g.lineTo(bx+dx,by+dy);g.stroke();g.fillStyle='#ece3cc';for(const s of [-1,1]){g.beginPath();g.arc(bx+dx*s,by+dy*s,2.6,0,7);g.fill()}}
+  for(let k=0;k<1+(o[2]>5?1:0);k++){const sx=X0+12+R()*(W-24),sy=Y0+12+R()*(H-24);g.fillStyle='#ece3cc';g.beginPath();g.arc(sx,sy,7,0,7);g.fill();dR(g,'#ece3cc',sx-4,sy+4,8,5);dR(g,'#3a3226',sx-4,sy-1,3,3);dR(g,'#3a3226',sx+1,sy-1,3,3);dR(g,'#3a3226',sx-1,sy+4,1,3);dR(g,'#3a3226',sx+1,sy+4,1,3)}}
+ else if(kind==='ruin'){each((X,Y)=>{if(R()<.3){g.strokeStyle='rgba(0,0,0,.22)';g.lineWidth=1;g.strokeRect(X+3,Y+3,T-6,T-6)}if(R()<.18)for(let k=0;k<4;k++)dR(g,k%2?'#5f9a46':'#4c7f38',X+R()*30,Y+R()*30,3,3)});
+  for(let k=0;k<2+(o[2]>5?1:0);k++){const px=X0+14+R()*(W-28),py=Y0+16+R()*(H-28),h=14+R()*12;g.fillStyle='rgba(0,0,0,.25)';g.beginPath();g.ellipse(px,py+3,14,5,0,0,7);g.fill();dR(g,'#9a9488',px-10,py-h,20,h);dR(g,'#b8b2a4',px-10,py-h,20,4);dR(g,'rgba(0,0,0,.18)',px+4,py-h,6,h);dR(g,'#9a9488',px+12,py-4,7,5);
+   g.strokeStyle='#4c7f38';g.lineWidth=2;g.beginPath();g.moveTo(px-8,py-h+2);g.quadraticCurveTo(px-2,py-h/2,px+6,py);g.stroke()}}
+ else if(kind==='mine'){const my=Y0+Math.floor(o[3]/2)*T+T/2;for(let x=X0+2;x<X0+W-2;x+=8)dR(g,'#6b4a2e',x,my-7,4,14);dR(g,'#8a8f9a',X0,my-5,W,2);dR(g,'#8a8f9a',X0,my+3,W,2);
+  for(let x=o[0];x<o[0]+o[2];x+=3){const bx=x*T+T/2;dR(g,'#7a5434',bx-14,Y0+2,28,5);dR(g,'#5c3e26',bx-14,Y0+6,4,10);dR(g,'#5c3e26',bx+10,Y0+6,4,10)}
+  const cx=X0+T*(1+Math.floor(R()*Math.max(1,o[2]-2)));dR(g,'#4a4f5c',cx,my-14,22,13);dR(g,'#6a7080',cx+2,my-12,18,3);dR(g,'#2b2b33',cx+3,my-1,5,5);dR(g,'#2b2b33',cx+14,my-1,5,5);for(let k=0;k<4;k++)dR(g,['#2b2b33','#ffd23f','#9f8cff'][k%3],cx+3+R()*14,my-17+R()*3,4,3)}}
+// dark rooms: a heavy shade painted over the floor
+function drPaintMech(g,fl){const T=GD_T;(fl.rooms||[]).forEach(o=>{if(o[6]!=='dark')return;g.fillStyle='rgba(6,8,20,.45)';for(let y=o[1];y<o[1]+o[3];y++)for(let x=o[0];x<o[0]+o[2];x++)if(+fl.tiles[y][x]>0)g.fillRect(x*T,y*T,T,T)})}
+
+// ===================== ChatTalk: recording folders, multi-select, PokeSplicer =====================
+let ctOpen=null,ctMs=null,ctDrag=null;const ctSplice={a:null,b:null,mode:'seamless',busy:false};
+const ctFolders=()=>db.ctFolders||(db.ctFolders=[]);
+const ctRec=id=>(db.recordings||[]).find(r=>r.id===id);
+const ctIn=f=>(db.recordings||[]).filter(r=>(r.folder||null)===f);
+function ctFolderNew(){const n=prompt('Folder name:','');if(n===null||!n.trim())return;ctFolders().push({id:uid(),name:n.trim().slice(0,40)});save();drawChat()}
+function ctFolderRename(id){const f=ctFolders().find(x=>x.id===id);if(!f)return;const n=prompt('Rename folder:',f.name);if(n===null||!n.trim())return;f.name=n.trim().slice(0,40);save();drawChat()}
+function ctFolderDelete(id){const f=ctFolders().find(x=>x.id===id);if(!f)return;const n=ctIn(id).length;if(!confirm('Delete the folder "'+f.name+'"?'+(n?' Its '+n+' recording'+(n===1?'':'s')+' will move back out, not be deleted.':'')))return;
+ ctIn(id).forEach(r=>r.folder=null);db.ctFolders=ctFolders().filter(x=>x.id!==id);if(ctOpen===id)ctOpen=null;save();drawChat()}
+function ctOpenFolder(id){if(ctMs&&ctDrag)return;ctOpen=id;drawChat()}
+function ctMove(ids,f){let n=0;ids.forEach(id=>{const r=ctRec(id);if(r&&(r.folder||null)!==f){r.folder=f;n++}});if(!n)return;save();const fo=ctFolders().find(x=>x.id===f);toast('📁 '+n+' recording'+(n===1?'':'s')+' moved to '+(fo?fo.name:'All recordings'));if(ctMs)ctMs.clear();drawChat()}
+function ctMoveMenu(){const ids=[...(ctMs||[])];if(!ids.length)return;
+ modal('MOVE TO FOLDER','<div class="ct-movelist">'+(ctOpen?'<button class="btn" onclick="closeModal();ctMove(['+ids.map(i=>"'"+i+"'").join(',')+'],null)">⬅ All recordings (no folder)</button>':'')+ctFolders().filter(f=>f.id!==ctOpen).map(f=>'<button class="btn" onclick="closeModal();ctMove(['+ids.map(i=>"'"+i+"'").join(',')+'],\''+f.id+'\')">📁 '+esc(f.name)+'</button>').join('')+'<button class="btn blue" onclick="closeModal();ctFolderNew()">+ NEW FOLDER</button></div>')}
+function ctMsStart(id){if(ctMs)return;ctMs=new Set(id?[id]:[]);drawChat();toast('Select recordings · drag one onto a folder to move them all')}
+function ctMsExit(){ctMs=null;drawChat()}
+function ctMsDelete(){const ids=[...(ctMs||[])];if(!ids.length)return;if(ids.some(id=>(ctRec(id)||{}).status==='recording')){toast('Stop the recording first');return}
+ modal('DELETE RECORDINGS','<p class="small">Delete <b>'+ids.length+' recording'+(ids.length===1?'':'s')+'</b> and their audio? This cannot be undone.</p><div class="actions"><button class="btn" onclick="closeModal()">CANCEL</button><button class="btn red" onclick="ctMsDeleteDo()">DELETE</button></div>')}
+async function ctMsDeleteDo(){const ids=[...(ctMs||[])];for(const id of ids){try{await ct('remove',{id})}catch(e){}}db.recordings=db.recordings.filter(r=>!ids.includes(r.id));ctMs=null;save();closeModal();drawChat();toast('🗑 '+ids.length+' deleted')}
+// ---------- drawing ----------
+(()=>{const dc=drawChat;drawChat=function(){const all=db.recordings||[];if(ctOpen&&!ctFolders().some(f=>f.id===ctOpen))ctOpen=null;const shown=all.filter(r=>(r.folder||null)===ctOpen);
+ db.recordings=shown;try{dc.apply(this,arguments)}finally{db.recordings=all}
+ $('ctCount').textContent=all.length+' RECORDING'+(all.length===1?'':'S');const L=$('ctList');if(!L)return;
+ const items=[...L.querySelectorAll('.ct-item')];items.forEach((el,i)=>{const r=shown[i];if(!r)return;el.dataset.rid=r.id;const h=el.querySelector('h4');if(h&&r.status==='saved')h.insertAdjacentHTML('afterbegin','<i class="ct-grip" aria-label="Drag to a folder">⠿</i>');
+  if(ctMs){const on=ctMs.has(r.id);el.classList.toggle('m-sel',on);el.insertAdjacentHTML('afterbegin','<i class="ms-chk'+(on?' on':'')+'">'+(on?'✓':'')+'</i>')}});
+ L.classList.toggle('ms-on',!!ctMs);
+ const fo=ctFolders().find(f=>f.id===ctOpen);
+ const top='<div class="ct-tools"><button class="btn ct-splice-btn" onclick="ctSplicer()">🧬 POKESPLICER</button><button class="btn" onclick="ctFolderNew()">📁 NEW FOLDER</button>'+(all.length?'<button class="btn" onclick="ctMsStart()">☑ SELECT</button>':'')+'</div>'
+  +(fo?'<div class="ct-crumb"><button class="ct-folder ct-back" data-fid="" onclick="ctOpenFolder(null)">⬅ All recordings</button><b>📁 '+esc(fo.name)+'</b><button class="ct-fbtn" onclick="ctFolderRename(\''+fo.id+'\')" aria-label="Rename folder">✎</button><button class="ct-fbtn" onclick="ctFolderDelete(\''+fo.id+'\')" aria-label="Delete folder">🗑</button></div>'
+   :(ctFolders().length?'<div class="ct-folders">'+ctFolders().map(f=>'<button class="ct-folder" data-fid="'+f.id+'" onclick="ctOpenFolder(\''+f.id+'\')"><span>📁</span><b>'+esc(f.name)+'</b><small>'+ctIn(f.id).length+'</small></button>').join('')+'</div>':''));
+ L.insertAdjacentHTML('afterbegin',top);if(fo&&!shown.length)L.insertAdjacentHTML('beforeend','<div class="empty">This folder is empty.<br>Drag recordings here with ⠿, or use Select → Move.</div>');
+ msBar('chat',ctMs?'<span>'+ctMs.size+' selected</span><button class="btn" onclick="ctMsExit()">EXIT</button><button class="btn blue" onclick="ctMoveMenu()"'+(ctMs.size?'':' disabled')+'>MOVE</button><button class="btn red" onclick="ctMsDelete()"'+(ctMs.size?'':' disabled')+'>DELETE</button>':'')}})();
+// ---------- touch drag onto folders ----------
+(()=>{const L=$('ctList');if(!L)return;
+ msLongPress(L,e=>{const it=e.target.closest('.ct-item[data-rid]');if(it&&!e.target.closest('.ct-grip,button,audio,.ct-text'))ctMsStart(it.dataset.rid)});
+ L.addEventListener('click',e=>{if(!ctMs)return;const it=e.target.closest('.ct-item[data-rid]');if(!it||e.target.closest('.ct-tools,.ct-crumb,audio'))return;e.stopPropagation();e.preventDefault();if(Date.now()-msLongAt<350)return;const id=it.dataset.rid;if(ctMs.has(id))ctMs.delete(id);else ctMs.add(id);drawChat()},true);
+ L.addEventListener('pointerdown',e=>{const g=e.target.closest('.ct-grip');if(!g)return;e.preventDefault();const it=g.closest('.ct-item'),id=it.dataset.rid,ids=ctMs&&ctMs.has(id)?[...ctMs]:[id];
+  const gh=document.createElement('div');gh.className='ct-ghost';gh.textContent='🎙 '+(ids.length>1?ids.length+' recordings':(ctRec(id)||{}).title||'');document.body.appendChild(gh);ctDrag={ids,gh,over:null};it.classList.add('ct-dragging');
+  const mv=ev=>{gh.style.left=ev.clientX+'px';gh.style.top=ev.clientY+'px';const t=document.elementFromPoint(ev.clientX,ev.clientY),f=t&&t.closest('.ct-folder');document.querySelectorAll('.ct-folder.hot').forEach(x=>x.classList.remove('hot'));if(f)f.classList.add('hot');ctDrag.over=f?(f.dataset.fid||null):undefined};
+  const up=()=>{document.removeEventListener('pointermove',mv);document.removeEventListener('pointerup',up);document.removeEventListener('pointercancel',up);gh.remove();it.classList.remove('ct-dragging');const d=ctDrag;ctDrag=null;if(d&&d.over!==undefined)ctMove(d.ids,d.over);else document.querySelectorAll('.ct-folder.hot').forEach(x=>x.classList.remove('hot'))};
+  mv(e);document.addEventListener('pointermove',mv);document.addEventListener('pointerup',up);document.addEventListener('pointercancel',up)})})();
+// ---------- PokeSplicer ----------
+function ctSplicer(){const recs=(db.recordings||[]).filter(r=>r.status==='saved');if(recs.length<2){modal('POKESPLICER','<div class="notice">You need at least two saved recordings to splice.</div>');return}
+ const slot=k=>{const r=ctRec(ctSplice[k]);return '<button class="sp-slot'+(r?' on':'')+'" onclick="ctSplicePick(\''+k+'\')"><small>'+(k==='a'?'STRAND A · FIRST':'STRAND B · SECOND')+'</small>'+(r?'<b>'+esc(r.title)+'</b><i>'+ctClock(r.seconds)+(r.transcript?' · transcript ✓':' · no transcript')+'</i>':'<b class="sp-empty">+ choose a recording</b>')+'</button>'};
+ const A=ctRec(ctSplice.a),B=ctRec(ctSplice.b),ready=A&&B&&!ctSplice.busy;
+ modal('🧬 POKESPLICER','<div class="sp-mon"><div class="sp-scan"></div><div class="sp-helix'+(ctSplice.busy?' fast':'')+'">'+Array.from({length:14},(_,i)=>'<i style="--i:'+i+'"></i>').join('')+'</div><div class="sp-readout">'+(ctSplice.busy?'SPLICING SEQUENCE…':ready?'SEQUENCE READY · '+ctClock((A.seconds||0)+(B.seconds||0)):'AWAITING DNA SAMPLES')+'</div></div>'
+  +'<div class="sp-slots">'+slot('a')+'<span class="sp-plus">＋</span>'+slot('b')+'</div>'
+  +'<div class="sp-modes"><label><input type="radio" name="spm" '+(ctSplice.mode==='seamless'?'checked':'')+' onchange="ctSplice.mode=\'seamless\'"> <b>Seamless</b><small>B plays right after A</small></label><label><input type="radio" name="spm" '+(ctSplice.mode==='fade'?'checked':'')+' onchange="ctSplice.mode=\'fade\'"> <b>Fade</b><small>A fades out at its end, B fades in</small></label></div>'
+  +(A&&B&&(!A.transcript||!B.transcript)?'<p class="small muted">Both need transcripts to combine them. Otherwise you can transcribe the spliced recording afterwards.</p>':'')
+  +'<div class="actions"><button class="btn" onclick="closeModal()">CLOSE</button><button class="btn red" '+(ready?'':'disabled')+' onclick="ctSpliceGo()">🧬 SPLICE</button></div>')}
+function ctSplicePick(k){const other=ctSplice[k==='a'?'b':'a'],recs=(db.recordings||[]).filter(r=>r.status==='saved'&&r.id!==other);
+ modal(k==='a'?'STRAND A (PLAYS FIRST)':'STRAND B (PLAYS SECOND)','<div class="sp-pick">'+recs.map(r=>'<button class="ct-item sp-pickrow" onclick="ctSplice.'+k+'=\''+r.id+'\';ctSplicer()"><b>🎙 '+esc(r.title)+'</b><small>'+ctClock(r.seconds)+(r.folder?' · 📁 '+esc((ctFolders().find(f=>f.id===r.folder)||{}).name||''):'')+(r.transcript?' · transcript ✓':'')+'</small></button>').join('')+'</div><div class="actions"><button class="btn" onclick="ctSplicer()">BACK</button></div>')}
+async function ctSpliceGo(){const A=ctRec(ctSplice.a),B=ctRec(ctSplice.b);if(!A||!B||ctSplice.busy)return;ctSplice.busy=true;ctSplicer();const id=uid();
+ try{const res=await ct('splice',{a:A.id,b:B.id,id,mode:ctSplice.mode});db.recordings=db.recordings||[];
+  db.recordings.unshift({id,title:(A.title+' + '+B.title).slice(0,80),createdAt:stamp(),seconds:res.seconds||((A.seconds||0)+(B.seconds||0)),status:'saved',path:res.path,webPath:res.webPath,folder:ctOpen,spliced:[A.id,B.id],spliceMode:ctSplice.mode,
+   transcript:A.transcript&&B.transcript?A.transcript.trim()+'\n\n'+B.transcript.trim():undefined});
+  ctSplice.a=ctSplice.b=null;save();closeModal();drawChat();toast('🧬 Spliced into one recording ✓')}
+ catch(e){toast(e.message||String(e));ctSplicer()}finally{ctSplice.busy=false;if($('modalBody')&&/SPLICING/.test($('modalBody').textContent))ctSplicer()}}
 
 // One-time gift requested by the player (v0.83.0): 1 Facility Ticket
 setTimeout(function(){try{if(db&&!db.gift0830){inv().facticket=(inv().facticket||0)+1;db.gift0830=1;save();toast('🎫 +1 Facility Ticket added to your Bag')}}catch(_){}},1500);

@@ -16,7 +16,8 @@ public class ChatTalkPlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "status", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "transcribe", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "remove", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "folder", returnType: CAPPluginReturnPromise)
+        CAPPluginMethod(name: "folder", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "splice", returnType: CAPPluginReturnPromise)
     ]
 
     private var recorder: AVAudioRecorder?
@@ -124,6 +125,42 @@ public class ChatTalkPlugin: CAPPlugin, CAPBridgedPlugin {
         guard let id = call.getString("id") else { call.reject("Missing id"); return }
         try? FileManager.default.removeItem(at: fileURL(id))
         call.resolve()
+    }
+
+    // PokeSplicer: joins recording A then recording B into one new .m4a. "fade" fades A out over its last moments and fades B in.
+    @objc func splice(_ call: CAPPluginCall) {
+        guard let a = call.getString("a"), let b = call.getString("b"), let id = call.getString("id") else { call.reject("Missing recordings"); return }
+        let fade = call.getString("mode") == "fade"
+        let ua = fileURL(a), ub = fileURL(b), out = fileURL(id)
+        guard FileManager.default.fileExists(atPath: ua.path), FileManager.default.fileExists(atPath: ub.path) else { call.reject("A recording's audio file is missing"); return }
+        Task {
+            do {
+                let comp = AVMutableComposition()
+                guard let track = comp.addMutableTrack(withMediaType: .audio, preferredTrackID: kCMPersistentTrackID_Invalid) else { throw NSError(domain: "ChatTalk", code: 3, userInfo: [NSLocalizedDescriptionKey: "Could not build the spliced track"]) }
+                var at = CMTime.zero, durA = CMTime.zero
+                for (i, u) in [ua, ub].enumerated() {
+                    let asset = AVURLAsset(url: u)
+                    guard let src = asset.tracks(withMediaType: .audio).first else { throw NSError(domain: "ChatTalk", code: 4, userInfo: [NSLocalizedDescriptionKey: "A recording has no audio"]) }
+                    try track.insertTimeRange(CMTimeRange(start: .zero, duration: asset.duration), of: src, at: at)
+                    at = CMTimeAdd(at, asset.duration); if i == 0 { durA = asset.duration }
+                }
+                try? FileManager.default.removeItem(at: out)
+                guard let exp = AVAssetExportSession(asset: comp, presetName: AVAssetExportPresetAppleM4A) else { throw NSError(domain: "ChatTalk", code: 5, userInfo: [NSLocalizedDescriptionKey: "Could not export the spliced track"]) }
+                exp.outputURL = out; exp.outputFileType = .m4a
+                if fade {
+                    let f = min(1.5, CMTimeGetSeconds(durA) / 3), p = AVMutableAudioMixInputParameters(track: track)
+                    let fd = CMTime(seconds: f, preferredTimescale: 600)
+                    p.setVolumeRamp(fromStartVolume: 1, toEndVolume: 0, timeRange: CMTimeRange(start: CMTimeSubtract(durA, fd), duration: fd))
+                    p.setVolumeRamp(fromStartVolume: 0, toEndVolume: 1, timeRange: CMTimeRange(start: durA, duration: fd))
+                    let mix = AVMutableAudioMix(); mix.inputParameters = [p]; exp.audioMix = mix
+                }
+                await withCheckedContinuation { (c: CheckedContinuation<Void, Never>) in exp.exportAsynchronously { c.resume() } }
+                guard exp.status == .completed else { throw exp.error ?? NSError(domain: "ChatTalk", code: 6, userInfo: [NSLocalizedDescriptionKey: "Export failed"]) }
+                call.resolve(["id": id, "seconds": CMTimeGetSeconds(at), "path": out.path, "webPath": self.webPath(out)])
+            } catch {
+                call.reject("Splice failed: " + error.localizedDescription)
+            }
+        }
     }
 
     // Transcribes in 50-second pieces, which keeps each request inside the recognizer's comfortable range.

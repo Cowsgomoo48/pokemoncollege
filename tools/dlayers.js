@@ -169,14 +169,14 @@ function mdDress(r,fl,taken){const s=mdSub(r);if(!s)return;const rooms=fl.rooms,
  const ctr=o=>[o[0]+(o[2]>>1),o[1]+(o[3]>>1)],near=(x,y)=>[...taken].some(k=>{const [a,b]=k.split(',').map(Number);return Math.max(Math.abs(a-x),Math.abs(b-y))<=1});
  // obstacles: block a share of room tiles, but never cut a room off or touch a doorway
  if(s.obs){fl.ob=ob.join('');const goal=rooms.map(ctr),start=goal[0];
-  rooms.forEach((o,ri)=>{if((fl.houses||[]).some(h=>h[0]===o[0]&&h[1]===o[1]))return;let n=Math.round(o[2]*o[3]*s.obs[1]);for(let t=0;t<n*4&&n>0;t++){const x=rnd(o[0],o[0]+o[2]-1),y=rnd(o[1],o[1]+o[3]-1),k=y*fl.w+x;if(ob[k]==='1'||taken.has(gdKey(x,y))||near(x,y)&&ri===0)continue;
+  rooms.forEach((o,ri)=>{if((fl.houses||[]).some(h=>h[0]===o[0]&&h[1]===o[1]))return;let n=Math.round(o[2]*o[3]*s.obs[1]);for(let t=0;t<n*4&&n>0;t++){const x=rnd(o[0],o[0]+o[2]-1),y=rnd(o[1],o[1]+o[3]-1),k=y*fl.w+x;if(!(+fl.tiles[y][x]>0)||ob[k]==='1'||taken.has(gdKey(x,y))||near(x,y)&&ri===0)continue;
    if(x===o[0]||y===o[1]||x===o[0]+o[2]-1||y===o[1]+o[3]-1){if([[1,0],[-1,0],[0,1],[0,-1]].some(([dx,dy])=>+fl.tiles[y+dy]?.[x+dx]===2))continue}
    if(goal.some(([gx,gy])=>gx===x&&gy===y)||(fl.stairs[0]===x&&fl.stairs[1]===y))continue;ob[k]='1';fl.ob=ob.join('');
    const reach=gdBFS(fl,start,()=>false,999);if(goal.some(g=>!reach.has(gdKey(...g)))||!reach.has(gdKey(...fl.stairs))){ob[k]='0';fl.ob=ob.join('');continue}
    if(--n<=0)break}})}
  // hazards: on open room tiles away from where your team starts
  if(s.fx.hz){const [kind,n]=s.fx.hz;for(let t=0;t<n*6&&Object.keys(hz).length<n;t++){const ri=rnd(1,rooms.length-1),o=rooms[ri];if(!o)break;const x=rnd(o[0],o[0]+o[2]-1),y=rnd(o[1],o[1]+o[3]-1),key=gdKey(x,y);
-   if(taken.has(key)||hz[key]||(fl.ob&&fl.ob[y*fl.w+x]==='1')||(fl.stairs[0]===x&&fl.stairs[1]===y))continue;hz[key]=kind}fl.hz=hz}}
+   if(!(+fl.tiles[y][x]>0)||taken.has(key)||hz[key]||(fl.ob&&fl.ob[y*fl.w+x]==='1')||(fl.stairs[0]===x&&fl.stairs[1]===y))continue;hz[key]=kind}fl.hz=hz}}
 // ---------- drawing the floor: patterns, props, obstacles, hazards, wall decorations ----------
 function mdShade(hex,k){const n=parseInt(hex.slice(1),16),c=[n>>16,n>>8&255,n&255].map(v=>Math.max(0,Math.min(255,Math.round(k>1?v+(255-v)*(k-1):v*k))));return '#'+c.map(v=>v.toString(16).padStart(2,'0')).join('')}
 function mdHash(s){let h=2166136261;for(const ch of String(s)){h^=ch.charCodeAt(0);h=Math.imul(h,16777619)}return (h>>>0)||7}

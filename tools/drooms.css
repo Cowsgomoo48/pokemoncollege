@@ -1,0 +1,2 @@
+/* Monster House foes stay hidden until the room springs */
+.gd-u.mh-hide{opacity:0!important;pointer-events:none!important}
