@@ -16,8 +16,13 @@ function twGenMap(r){const [a,b]=TW_LEN[r.diff]||TW_LEN.balanced,len=a+Math.floo
  // links: each room leads to 1–2 nearby rooms on the next row, and every room can be reached
  for(let i=0;i<rows.length-1;i++){const A=rows[i],B=rows[i+1];A.forEach((nd,k)=>{const pos=k/Math.max(1,A.length-1),j=Math.round(pos*(B.length-1));nd.to=[j];if(Math.random()<.45&&B.length>1){const j2=Math.min(B.length-1,Math.max(0,j+(Math.random()<.5?-1:1)));if(!nd.to.includes(j2))nd.to.push(j2)}});
   B.forEach((_,j)=>{if(!A.some(nd=>nd.to.includes(j))){let best=0,bd=9;A.forEach((nd,k)=>{const d=Math.abs(k/Math.max(1,A.length-1)-j/Math.max(1,B.length-1));if(d<bd){bd=d;best=k}});A[best].to.push(j)}})}
- return {seg:r.tmap?r.tmap.seg+1:0,start:(r.cleared||0)+1,len,rows,row:-1,col:null}}
-function twMapEnsure(r){const m=r.tmap;if(!m||(m.row===m.len-1&&(r.cleared||0)>=m.start+m.len-1)){r.tmap=twGenMap(r);save()}return r.tmap}
+ const m={seg:r.tmap?r.tmap.seg+1:0,start:(r.cleared||0)+1,len,rows,row:-1,col:null};twNoForcedElite(m);return m}
+// every room (and the entrance) must lead to at least one room that isn't an Elite
+function twNoForcedElite(m){const R=m.rows,el=(ri,j)=>R[ri][j]&&R[ri][j].t==='elite';
+ if(R[0].every((_,j)=>el(0,j)))R[0][0].t='battle';
+ for(let i=Math.max(0,m.row);i<R.length-1;i++){const B=R[i+1];if(B.every((_,j)=>el(i+1,j)))B[Math.floor(B.length/2)].t='battle';
+  R[i].forEach((nd,k)=>{if(!nd.to||!nd.to.length||!nd.to.every(j=>el(i+1,j)))return;const pos=k/Math.max(1,R[i].length-1);let best=-1,bd=9;B.forEach((b,j)=>{if(b.t==='elite')return;const d=Math.abs(j/Math.max(1,B.length-1)-pos);if(d<bd){bd=d;best=j}});if(best>=0)nd.to.push(best)})}}
+function twMapEnsure(r){const m=r.tmap;if(!m||(m.row===m.len-1&&(r.cleared||0)>=m.start+m.len-1)){r.tmap=twGenMap(r);save()}else if(!m.noForce){twNoForcedElite(m);m.noForce=1;save()}return r.tmap}
 // ---------- the map: the tower itself, one slab per floor, with that floor's rooms on it ----------
 const TW_SWORDS='<svg class="tw-swords" viewBox="0 0 24 24" aria-hidden="true"><g stroke-linecap="round"><path d="M5.5 18.5L18 4.5M18.5 18.5L6 4.5" stroke="#3d4a5c" stroke-width="3.4"/><path d="M5.5 18.5L18 4.5M18.5 18.5L6 4.5" stroke="#e8eef6" stroke-width="1.8"/><path d="M4 15.5l4.5 4.5M20 15.5l-4.5 4.5" stroke="#8a5a2b" stroke-width="2.8"/><path d="M3.6 20.4l1.6-1.6M20.4 20.4l-1.6-1.6" stroke="#d9a441" stroke-width="2.6"/></g></svg>';
 const twIco=t=>t==='battle'?TW_SWORDS:TW_ROOM[t][0];
@@ -36,7 +41,7 @@ function twMapLines(box){const r=runOf(),m=r&&r.tmap,stack=box&&box.querySelecto
 function twMapTeamXY(box,ri,ci){const stack=box.querySelector('.tw-tstack'),B=stack.getBoundingClientRect(),el=ri<0?stack.querySelector('.tw-tslab.ground'):stack.querySelector('.tw-node[data-r="'+ri+'"][data-c="'+ci+'"]');if(!el)return null;const b=el.getBoundingClientRect();return [b.left-B.left+b.width/2,b.top-B.top+(ri<0?b.height*.35:-4)]}
 function twMapTeam(box,ri,ci,anim){const t=box.querySelector('.tw-tteam'),p=twMapTeamXY(box,ri,ci);if(!t||!p)return;t.style.transition=anim?'transform .9s cubic-bezier(.45,0,.25,1)':'none';t.style.transform='translate('+p[0].toFixed(1)+'px,'+p[1].toFixed(1)+'px) translate(-50%,-100%)'}
 function twMapFocus(box,ri,smooth){const sc=box.querySelector('.tw-tscroll'),sl=box.querySelector('.tw-tslab[data-r="'+ri+'"]');if(!sc||!sl)return;const top=sl.offsetTop-sc.clientHeight*.55+sl.offsetHeight/2;sc.scrollTo({top:Math.max(0,top),behavior:smooth&&!dcRM()?'smooth':'auto'})}
-function twMapScreen(){const r=runOf(),st=$('dgStage');if(!r)return;twMapEnsure(r);if(!st)return;st.innerHTML=twMapHTML(r,true);$('dgPanel').innerHTML='';const box=st.querySelector('.tw-tower');requestAnimationFrame(()=>{twMapLines(box);twMapFocus(box,r.tmap.row+1,false)})}
+function twMapScreen(){const r=runOf(),st=$('dgStage');if(!r)return;twMapEnsure(r);if(!st)return;st.innerHTML=twMapHTML(r,true);$('dgPanel').innerHTML='';const box=st.querySelector('.tw-tower');requestAnimationFrame(()=>{twMapLines(box);twMapFocus(box,r.tmap.row+1,false)});if(r.typePick&&typeof dcTypePickShow==='function')dcTypePickShow()}
 function twMapView(){const r=runOf();if(!r||!r.tmap)return;modal('🗺️ TOWER MAP',twMapHTML(r,false)+'<div class="actions"><button class="btn red" onclick="closeModal()">CLOSE</button></div>');setTimeout(()=>{const box=[...document.querySelectorAll('.tw-tower')].pop();twMapLines(box);twMapFocus(box,Math.max(0,r.tmap.row),false)},60)}
 let twMapBusy=false;
 async function twMapGo(ri,ci){const r=runOf(),m=r&&r.tmap;if(!m||ri!==m.row+1||twMapBusy)return;const nd=m.rows[ri][ci],box=document.querySelector('#dgStage .tw-tower');m.row=ri;m.col=ci;nd.visited=true;r.room=null;r.floor=m.start+ri;save();

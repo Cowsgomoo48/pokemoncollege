@@ -1,0 +1,38 @@
+# v1.4.2 (everything since v1.4.0; replaces all the v1.4.1 zips)
+
+- **Card dragging rework.** Cards now move with your finger; the targeting arrow is gone.
+  - Drop a card on an enemy (or on your team, for cards that can target either) to play it there.
+  - Drag an untargeted card up out of your hand to play it.
+  - Drop a card back into your hand to re-order your hand. A yellow line shows where it will land.
+  - Unplayable cards can still be dragged to re-order them.
+  - Tap to select and hold to read still work.
+- **Full-screen rewards.** The card reward, boss relic and potion screens now cover the whole screen, scroll if needed, and show bigger cards. The "Add a card to your deck" heading is readable now.
+- Service worker cache bumped to 1029.
+- Battle particles no longer draw over the draw/discard pile menus or other pop-ups.
+- The battle screen is now locked in place: no scrolling up or down during a fight. Pop-ups and long lists can still scroll.
+- More paths on the Tower map: 4 starting rooms, and 3–5 rooms on each floor after that (was 3, then 2–4). Takes effect on the next new map.
+- **Livelier combat.**
+  - Damage numbers pop bigger for bigger hits, spread out when several land at once, and come with a slash and sparks. Big hits shake the screen.
+  - When enemies hit you, the screen shakes and the edges flash red.
+  - Damage soaked by Block gives a blue shield clink.
+  - Block and healing show a ring and a rising shield or green sparkles.
+  - Debuffs and buffs show a colored ring and particles in that status’s color.
+- **Card movement.**
+  - Drawn cards fly out of the draw pile (or out of the discard pile or Void, if they came from there).
+  - Played and discarded cards arc into the discard pile.
+  - Exiled cards glow purple and spiral into the Void.
+  - The rest of the hand slides over to fill gaps.
+- Fixed: an enemy intent that adds Scorch or Whirlpool broke the battle layout.
+- **Victory question.** Every won fight now asks one study question before the rewards screen. It is asked once per fight, even if you close and reopen the app, and the result is tracked like any other question.
+- **Error log.** iOS hides the details of errors that start in native code (they show as a blank "Script error."). Errors from native plugin results and events, and from the app pause/resume handlers, are now logged with their real message and stack. Any blank ones that remain say which native call came just before.
+- The battle field now fills the screen down to the bottom bar, so the hand and END TURN sit lower and the empty strip under END TURN is gone.
+- Event screens now scroll with the page instead of being boxed in, so all options are reachable.
+- **Aiming.** When you drag a card that needs a target, it shrinks as it leaves your hand, and a spinning red crosshair marks the nearest valid target. Letting go plays the card on that target, so you no longer have to drop it exactly on the enemy.
+- **No forced Elites.** Every room on the Tower map (and the entrance) now always leads to at least one room that isn't an Elite, so you can always go around an Elite. This also fixes a map you're already partway through.
+- **Card art.** All 145 art cards are now WebP with transparent corners and edges, so the black border around the card frame is gone (8.3 MB instead of 12 MB). Service worker cache bumped to 1029.
+- Fixed: Status cards showed raw code (`<span class="dc-kw"…>`) in their text, e.g. Snare's "Exile".
+- **Type picker.** Starting a new Tower run opens a Pokédex-style screen: your team (with their types) on top, and your team's types below. Tap a type to check or uncheck it.
+  - Card rewards, shops and events then only offer cards of the checked types. Signature cards count if either of their types is checked.
+  - Your starter deck is built from the checked types.
+  - Type damage and Block bonuses still count your whole team.
+  - At least one type has to stay checked. Teams with only one type skip the screen, and runs already in progress keep all types.
