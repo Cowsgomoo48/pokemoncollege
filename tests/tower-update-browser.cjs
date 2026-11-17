@@ -66,7 +66,7 @@ const R=await p.evaluate(async()=>{const out=[],ok=(c,m)=>{if(window.__inv){cons
  r.potions=null;ok(JSON.stringify(twPots(r))==='[null,null]','Two empty potion slots');
  const keep=TW_POTION_DROP.battle;TW_POTION_DROP.battle=1;
  for(let k=0;k<2;k++){dcStart(r,'battle',[makeEnemy('Zubat',5)]);dcWin(r);dcTake(null)}ok(r.potions.every(Boolean),'Drops fill empty slots');
- const before=r.potions.slice();dcStart(r,'battle',[makeEnemy('Zubat',5)]);dcWin(r);ok(r.offer.potion&&!!document.querySelector('.tw-potrow'),'Full slots: replace-or-leave screen');
+ const before=r.potions.slice();dcStart(r,'battle',[makeEnemy('Zubat',5)]);dcWin(r);await new Promise(q=>setTimeout(q,30));ok(r.offer.potion&&!!document.querySelector('.tw-potrow'),'Full slots: replace-or-leave screen');
  {const pend=r.offer.potion;db.tower=JSON.parse(JSON.stringify(r));Object.assign(r,db.tower);db.tower=r;dcResume();await W2();ok(r.offer.potion===pend&&!!document.querySelector('.tw-potrow'),'Reload restores the same potion offer');
   twPotionPick(1);twPotionPick(0);ok(r.potions[0]===before[0]&&r.potions[1]===pend&&r.offer.potDone===1&&!!document.querySelector('.dc-offer'),'Replace slot 2, once · then the card reward');dcTake(null)}
  {dcStart(r,'battle',[makeEnemy('Zubat',5)]);dcWin(r);const was=r.potions.slice();twPotionPick(null);twPotionPick(0);ok(JSON.stringify(r.potions)===JSON.stringify(was),'Leave it: inventory unchanged, no duplicate');dcTake(null)}

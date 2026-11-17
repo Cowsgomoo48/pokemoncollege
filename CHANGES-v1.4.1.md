@@ -1,0 +1,26 @@
+# v1.4.1
+
+- **Card dragging rework.** Cards now move with your finger; the targeting arrow is gone.
+  - Drop a card on an enemy (or on your team, for cards that can target either) to play it there.
+  - Drag an untargeted card up out of your hand to play it.
+  - Drop a card back into your hand to re-order your hand. A yellow line shows where it will land.
+  - Unplayable cards can still be dragged to re-order them.
+  - Tap to select and hold to read still work.
+- **Full-screen rewards.** The card reward, boss relic and potion screens now cover the whole screen, scroll if needed, and show bigger cards. The "Add a card to your deck" heading is readable now.
+- Service worker cache bumped to 1027.
+- Battle particles no longer draw over the draw/discard pile menus or other pop-ups.
+- The battle screen is now locked in place: no scrolling up or down during a fight. Pop-ups and long lists can still scroll.
+- More paths on the Tower map: 4 starting rooms, and 3–5 rooms on each floor after that (was 3, then 2–4). Takes effect on the next new map.
+- **Livelier combat.**
+  - Damage numbers pop bigger for bigger hits, spread out when several land at once, and come with a slash and sparks. Big hits shake the screen.
+  - When enemies hit you, the screen shakes and the edges flash red.
+  - Damage soaked by Block gives a blue shield clink.
+  - Block and healing show a ring and a rising shield or green sparkles.
+  - Debuffs and buffs show a colored ring and particles in that status’s color.
+- **Card movement.**
+  - Drawn cards fly out of the draw pile (or out of the discard pile or Void, if they came from there).
+  - Played and discarded cards arc into the discard pile.
+  - Exiled cards glow purple and spiral into the Void.
+  - The rest of the hand slides over to fill gaps.
+- Fixed: an enemy intent that adds Scorch or Whirlpool broke the battle layout.
+- **Victory question.** Every won fight now asks one study question before the rewards screen. It is asked once per fight, even if you close and reopen the app, and the result is tracked like any other question.

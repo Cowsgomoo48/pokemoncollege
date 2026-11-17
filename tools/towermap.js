@@ -5,7 +5,7 @@ const TW_LEN={easy:[8,10],balanced:[10,12],hard:[8,16]};
 const TW_LEN_NAME={easy:'Easy · 8–10 floors',balanced:'Balanced · 10–12 floors',hard:'Hard · 8–16 floors'};
 const TW_ROOM={battle:['⚔️','Battle'],treasure:['💎','Treasure Room'],event:['❓','? Room'],rest:['🔥','Rest Site'],shop:['🛒','Merchant'],elite:['😈','Elite'],boss:['👑','Boss']};
 function twGenMap(r){const [a,b]=TW_LEN[r.diff]||TW_LEN.balanced,len=a+Math.floor(Math.random()*(b-a+1)),rows=[];
- for(let i=0;i<len;i++){if(i===len-1){rows.push([{t:'boss'}]);continue}const n=i===0?3:2+Math.floor(Math.random()*3),row=[];
+ for(let i=0;i<len;i++){if(i===len-1){rows.push([{t:'boss'}]);continue}const n=i===0?4:3+Math.floor(Math.random()*3),row=[];
   for(let k=0;k<n;k++){let t='battle';const x=Math.random();
    if(i===len-2)t='rest';else if(i>0){if(x<.22)t='event';else if(x<.32&&i>=2)t='treasure';else if(x<.41&&i>=3)t='rest';else if(x<.49&&i>=2)t='shop';else if(x<.6&&i>=3&&i<len-2)t='elite'}
    row.push({t})}rows.push(row)}
