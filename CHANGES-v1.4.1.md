@@ -24,3 +24,4 @@
   - The rest of the hand slides over to fill gaps.
 - Fixed: an enemy intent that adds Scorch or Whirlpool broke the battle layout.
 - **Victory question.** Every won fight now asks one study question before the rewards screen. It is asked once per fight, even if you close and reopen the app, and the result is tracked like any other question.
+- **Error log.** iOS hides the details of errors that start in native code (they show as a blank "Script error."). Errors from native plugin results and events, and from the app pause/resume handlers, are now logged with their real message and stack. Any blank ones that remain say which native call came just before.
