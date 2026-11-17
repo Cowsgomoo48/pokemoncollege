@@ -1,7 +1,7 @@
 // ===================== Battle Tower v2: branching tower maps, rooms, relics, card upgrades =====================
 // Each tower (one environment) is a map of rows; row i is floor start+i and the top row is the boss.
 // After every room you pick a connected room on the next row (Slay-the-Spire style).
-const TW_LEN={easy:[8,10],balanced:[10,12],hard:[8,16]};
+const TW_LEN={easy:[14,18],balanced:[16,20],hard:[14,22]};
 const TW_LEN_NAME={easy:'Easy · 8–10 floors',balanced:'Balanced · 10–12 floors',hard:'Hard · 8–16 floors'};
 const TW_ROOM={battle:['⚔️','Battle'],treasure:['💎','Treasure Room'],event:['❓','? Room'],rest:['🔥','Rest Site'],shop:['🛒','Merchant'],elite:['😈','Elite'],boss:['👑','Boss']};
 function twGenMap(r){const [a,b]=TW_LEN[r.diff]||TW_LEN.balanced,len=a+Math.floor(Math.random()*(b-a+1)),rows=[];
@@ -27,7 +27,7 @@ function twMapEnsure(r){const m=r.tmap;if(!m||(m.row===m.len-1&&(r.cleared||0)>=
 const TW_SWORDS='<svg class="tw-swords" viewBox="0 0 24 24" aria-hidden="true"><g stroke-linecap="round"><path d="M5.5 18.5L18 4.5M18.5 18.5L6 4.5" stroke="#3d4a5c" stroke-width="3.4"/><path d="M5.5 18.5L18 4.5M18.5 18.5L6 4.5" stroke="#e8eef6" stroke-width="1.8"/><path d="M4 15.5l4.5 4.5M20 15.5l-4.5 4.5" stroke="#8a5a2b" stroke-width="2.8"/><path d="M3.6 20.4l1.6-1.6M20.4 20.4l-1.6-1.6" stroke="#d9a441" stroke-width="2.6"/></g></svg>';
 const twIco=t=>t==='battle'?TW_SWORDS:TW_ROOM[t][0];
 function twMapHTML(r,live){const m=r.tmap,e=twEnv(r),env=twEnvKey(r),avail=m.row<0?m.rows[0].map((_,i)=>i):((m.rows[m.row]||[])[m.col]||{}).to||[];
- let h='<div class="tw-tower'+(live?' live':'')+'" style="--envbg:url(./assets/tower/'+env+'.jpg)"><div class="tw-maphead"><b>'+e.icon+' '+esc(e.name)+'</b><small>Floors '+m.start+'–'+(m.start+m.len-1)+' · 🎟️ '+(r.tickets||0)+' · ❤️ '+Math.max(0,r.php)+'/'+r.pmax+'</small>'+twRelicStrip(r)+'</div><div class="tw-tscroll"><div class="tw-tstack">';
+ let h='<div class="tw-tower'+(live?' live':'')+'" style="--envbg:url(./assets/tower/'+env+'.jpg)"><div class="tw-maphead"><b>'+e.icon+' '+esc(e.name)+'</b>'+(live?'<button class="btn smallbtn tw-deckbtn" onclick="dcDeckView()" aria-label="Your deck">🃏 '+(r.deck||[]).length+'</button>':'')+'<small>Floors '+m.start+'–'+(m.start+m.len-1)+' · 🎟️ '+(r.tickets||0)+' · ❤️ '+Math.max(0,r.php)+'/'+r.pmax+'</small>'+twRelicStrip(r)+'</div><div class="tw-tscroll"><div class="tw-tstack">';
  for(let ri=m.rows.length-1;ri>=0;ri--){const row=m.rows[ri],boss=row.length===1&&row[0].t==='boss';
   h+='<div class="tw-tslab'+(boss?' boss':'')+(ri===m.row?' cur':'')+(ri<m.row?' past':'')+'" data-r="'+ri+'" style="background-image:url(./assets/tower/'+env+'.jpg)"><b class="tw-tf">'+(m.start+ri)+'F</b><div class="tw-trow">'+row.map((nd,ci)=>{const can=live&&ri===m.row+1&&avail.includes(ci),here=ri===m.row&&ci===m.col;
    return '<button class="tw-node t-'+nd.t+(can?' can':'')+(nd.visited?' done':'')+(here?' here':'')+'" data-r="'+ri+'" data-c="'+ci+'" '+(can?'onclick="twMapGo('+ri+','+ci+')"':'disabled')+' title="'+TW_ROOM[nd.t][1]+'">'+twIco(nd.t)+'</button>'}).join('')+'</div></div>'}

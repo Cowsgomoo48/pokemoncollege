@@ -6,10 +6,10 @@ const R=await p.evaluate(async()=>{const out=[],ok=(c,m)=>out.push((c?'PASS ':'F
  const ids=[];for(const s of ['Magearna','Magnezone','Tyranitar']){giveMon({...rollMon(false),species:s,tier:INDEX[s].tier});ids.push(db.pokemon.at(-1).id)}
  db.tower={tower:true,diff:'hard',style:'game',sids:[],mode:'smart',quick:false,party:ids.map(id=>({id,hp:60,energy:20,starf:null})),floor:0,cleared:0,bag:{},tickets:0,cogs:0,studyMs:0,rooms:0,startedAt:stamp(),slider:true,battle:null,envs:shuffle(Object.keys(TW_ENVS)),cards:{},perkDone:[],bosses:0,challengesWon:0,log:[]};
  const r=db.tower;dcInitRun(r);dgMode='tower';go('minigames');dgOpen('tower');await W(400);if(!r.tmap){return ['FAIL dbg '+JSON.stringify([typeof twMapScreen,r.v,!!$('dgStage'),runOf()===r,dgMode,!!r.offer,!!r.dc,r.room])]}
- const m=r.tmap;ok(!!m&&m.len>=8&&m.len<=16,'Hard tower: '+(m&&m.len)+' floors (8–16)');ok(m.rows.at(-1).length===1&&m.rows.at(-1)[0].t==='boss','Top floor is the boss');ok(m.rows.at(-2).every(n=>n.t==='rest'),'Floor before the boss: Rest Sites');ok(m.rows[0].every(n=>n.t==='battle'),'First floor: battles');
+ const m=r.tmap;ok(!!m&&m.len>=14&&m.len<=22,'Hard tower: '+(m&&m.len)+' floors (14–22)');ok(m.rows.at(-1).length===1&&m.rows.at(-1)[0].t==='boss','Top floor is the boss');ok(m.rows.at(-2).every(n=>n.t==='rest'),'Floor before the boss: Rest Sites');ok(m.rows[0].every(n=>n.t==='battle'),'First floor: battles');
  let reach=true;for(let i=1;i<m.rows.length;i++)m.rows[i].forEach((_,j)=>{if(!m.rows[i-1].some(n=>n.to.includes(j)))reach=false});ok(reach,'Every room can be reached');
  ok(document.querySelectorAll('#dgStage .tw-node.can').length===m.rows[0].length,'Map screen: first-floor rooms are selectable');
- const lens={easy:[8,10],balanced:[10,12]};let lok=true;for(const k in lens){for(let t=0;t<20;t++){const g=twGenMap({diff:k,cleared:0});if(g.len<lens[k][0]||g.len>lens[k][1])lok=false}}ok(lok,'Easy 8–10 · Balanced 10–12 floors');
+ const lens={easy:[14,18],balanced:[16,20]};let lok=true;for(const k in lens){for(let t=0;t<20;t++){const g=twGenMap({diff:k,cleared:0});if(g.len<lens[k][0]||g.len>lens[k][1])lok=false}}ok(lok,'Easy 14–18 · Balanced 16–20 floors');
  // battle room
  twMapGo(0,0);for(let k=0;k<30&&!r.dc;k++)await W(100);ok(!!r.dc&&r.floor===m.start,'Battle room → fight on floor '+r.floor);
  dcWin(r);await W(50);ok(!!r.offer,'Win → card offer');dcTake(null);await W(80);const av=m.rows[0][0].to;ok(document.querySelectorAll('#dgStage .tw-node.can').length===av.length,'Map: only connected rooms selectable ('+av.length+')');

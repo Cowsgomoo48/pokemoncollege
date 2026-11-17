@@ -28,7 +28,7 @@ const R=await p.evaluate(async()=>{const out=[],ok=(c,m)=>out.push((c?'PASS ':'F
  R=await ev('meloetta',1);ok(r.deck.filter(c=>c.d==='brokenchord').length===1&&/Pleasure/.test(R.msg),'Devil Meloetta: reward + 1 Broken Chord curse');const sc=r.deck.filter(c=>c.d==='brokenchord').length;R=await ev('meloetta',0);ok(r.deck.filter(c=>c.d==='brokenchord').length===sc&&/Be well/.test(R.msg),'Angel Meloetta: no curse');
  R=await ev('spinda',0);ok(R.msg!=null,'Spinda spin');
  r.brews={str:2,ap:2,draw:2};R=await ev('gholdengo',2);await W(300);ok(!!r.dc&&r.dc.kind==='boss'&&r.dc.pst.str>=2&&!r.brews,'Challenge: boss fight, brews applied');
- r.evBonus={tix:20,relic:1};const t0=r.tickets,rl2=r.relics.length;dcWin(r);ok(r.tickets>=t0+20&&r.relics.length===rl2+1,'Event fight bonus paid');dcTake(null);
+ r.evBonus={tix:20,relic:1};const t0=r.tickets,rl2=r.relics.length;dcWin(r);dcRwTake('tix');dcRwTake('rel0');ok(r.tickets>=t0+20&&r.relics.length===rl2+1,'Event fight bonus paid');dcTake(null);
  const seen=new Set();r.seenEv=[];for(let k=0;k<200;k++)seen.add(twPickEvent(r));ok(seen.size===Object.keys(TW_EVENTS).length+1,'All events reachable');
  const fq={species:'Slugma',types:['fire'],atk:10,maxhp:50,hp:50,st:{burn:0,poison:0,chill:0,weak:0,str:0,vuln:0,enf:0,toxin:0},blk:0};const fs=new Set();for(let k=0;k<100;k++)fs.add(dcPlan(r,fq,0).name);ok([...fs].every(n=>DC_MOVES.fire.some(m=>m[0]===n)),'Fire enemy only uses Fire moves');
  fq.next={k:'atk',name:'Solar Beam',dmg:20};ok(dcPlan(r,fq,0).name==='Solar Beam'&&!fq.next,'Charged move fires next turn');
@@ -44,6 +44,6 @@ const R=await p.evaluate(async()=>{const out=[],ok=(c,m)=>out.push((c?'PASS ':'F
  F0=EL('Genesect');const dn=[F0.it.name,dcPlan(r,F0,0).name,dcPlan(r,F0,0).name,dcPlan(r,F0,0).name];ok(dn.join()==='Burn Drive,Chill Drive,Shock Drive,Techno Blast','Genesect cycles Drives, then Techno Blast');
  F0=EL('Celebi');F0.hp=F0.maxhp-10;dcPlan(r,F0,0);F0.hp=F0.maxhp-40;const cr=dcPlan(r,F0,0);ok(cr.k==='rewind'&&cr.n===F0.hist[0],'Celebi: Time Travel rewinds HP');
  F0=EL('Manaphy');F0.st.poison=3;r.dc.pst.weak=2;F0.it={k:'swap',name:'Heart Swap'};await dcAct(r,F0,0);ok(r.dc.pst.toxin===3&&F0.st.weak===2&&F0.st.poison===0,'Manaphy: Heart Swap trades debuffs');
- const rl3=(r.relics||[]).length;r.dc.kind='elite';dcWin(r);ok(r.relics.length===rl3+1||Object.keys(TW_RELICS).length===rl3,'Elite win: Relic');dcTake(null);
+ const rl3=(r.relics||[]).length;r.dc.kind='elite';dcWin(r);dcRwTake('rel0');ok(r.relics.length===rl3+1||Object.keys(TW_RELICS).length===rl3,'Elite win: Relic');dcTake(null);
  return out});
 R.forEach(x=>console.log(x));console.log('errs',errs);await b.close();if(R.some(x=>x.startsWith('FAIL'))||errs.length)process.exit(1)})();

@@ -65,10 +65,10 @@ const R=await p.evaluate(async()=>{const out=[],ok=(c,m)=>{if(window.__inv){cons
  // ---- Potions
  r.potions=null;ok(JSON.stringify(twPots(r))==='[null,null]','Two empty potion slots');
  const keep=TW_POTION_DROP.battle;TW_POTION_DROP.battle=1;
- for(let k=0;k<2;k++){dcStart(r,'battle',[makeEnemy('Zubat',5)]);dcWin(r);dcTake(null)}ok(r.potions.every(Boolean),'Drops fill empty slots');
- const before=r.potions.slice();dcStart(r,'battle',[makeEnemy('Zubat',5)]);dcWin(r);await new Promise(q=>setTimeout(q,30));ok(r.offer.potion&&!!document.querySelector('.tw-potrow'),'Full slots: replace-or-leave screen');
- {const pend=r.offer.potion;db.tower=JSON.parse(JSON.stringify(r));Object.assign(r,db.tower);db.tower=r;dcResume();await W2();ok(r.offer.potion===pend&&!!document.querySelector('.tw-potrow'),'Reload restores the same potion offer');
-  twPotionPick(1);twPotionPick(0);ok(r.potions[0]===before[0]&&r.potions[1]===pend&&r.offer.potDone===1&&!!document.querySelector('.dc-offer'),'Replace slot 2, once · then the card reward');dcTake(null)}
+ for(let k=0;k<2;k++){dcStart(r,'battle',[makeEnemy('Zubat',5)]);dcWin(r);dcRwTake('pot');dcTake(null)}ok(r.potions.every(Boolean),'Drops fill empty slots');
+ const before=r.potions.slice();dcStart(r,'battle',[makeEnemy('Zubat',5)]);dcWin(r);await new Promise(q=>setTimeout(q,30));dcRwTake('pot');ok(r.offer.potion&&!!document.querySelector('.tw-potrow'),'Full slots: replace-or-leave screen');
+ {const pend=r.offer.potion;db.tower=JSON.parse(JSON.stringify(r));Object.assign(r,db.tower);db.tower=r;dcResume();await W2();ok(r.offer.potion===pend&&!!document.querySelector('.dc-vict'),'Reload restores the same potion offer');dcRwTake('pot');
+  twPotionPick(1);twPotionPick(0);ok(r.potions[0]===before[0]&&r.potions[1]===pend&&r.offer.potDone===1&&!!document.querySelector('.dc-vict'),'Replace slot 2, once · then back to the victory screen');dcTake(null)}
  {dcStart(r,'battle',[makeEnemy('Zubat',5)]);dcWin(r);const was=r.potions.slice();twPotionPick(null);twPotionPick(0);ok(JSON.stringify(r.potions)===JSON.stringify(was),'Leave it: inventory unchanged, no duplicate');dcTake(null)}
  TW_POTION_DROP.battle=keep;{let n=0;for(let k=0;k<4000;k++)if(twPotionDrop('battle'))n++;ok(Math.abs(n/4000-TW_POTION_DROP.battle)<.03&&!twPotionDrop('boss'),'Drop rate '+(n/40).toFixed(1)+'% after normal fights · none from bosses')}
  dcStart(r,'battle',[makeEnemy('Zubat',5),makeEnemy('Zubat',5)]);dcRender();reset();const D=dc();D.phase='player';dcLock=false;

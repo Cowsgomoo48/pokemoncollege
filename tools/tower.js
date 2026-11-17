@@ -109,7 +109,7 @@ function twFloor(f){const r=runOf();r.floor=f;save();const st=$('dgStage');if(!s
  if(newEnv&&r.envShown!==f){r.envShown=f;save();const e=twEnv(r);st.innerHTML='<div class="dg-room tw-room" style="background-image:url(./assets/tower/'+twEnvKey(r)+'.jpg)"><span class="dg-big">'+e.icon+'</span><h3>'+e.name+'</h3><p>'+e.desc+'</p><p class="small">Floors '+f+'–'+(f+9)+'</p><button class="btn red" onclick="twFloor('+f+')">FIGHT ▶</button></div>';$('dgPanel').innerHTML=twPanel();return}
  twBattle(boss?r.chalPick&&r.chalAccepted===f?r.chalPick:null:null)}
 function twGo(ch){const r=runOf();if(ch)r.chalAccepted=r.floor;save();twBattle(ch)}
-function twBattle(ch){const r=runOf(),f=r.floor,avg=partyAvgLv(),boss=r.v>=2&&r.tmap?twKind(r,f)==='boss':f%10===0,en=[],k=Math.min(4,Math.floor(f/12)),lvl=avg+Math.floor(f*.6)-2,hp=(1.25+f*.03)*.75,atk=1.05+f*.012,rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1));let kind='battle';
+function twBattle(ch){const r=runOf(),f=r.floor,avg=partyAvgLv(),boss=r.v>=2&&r.tmap?twKind(r,f)==='boss':f%10===0,en=[],k=Math.min(4,Math.floor(f/12)),lvl=r.v>=2?Math.round(10+f*1.3):avg+Math.floor(f*.6)-2,hp=(1.25+f*.03)*.75,atk=1.05+f*.012,rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1));let kind='battle';
  if(boss)kind=f>=30&&Math.random()<.35?'alpha':f>=10&&Math.random()<.4?'totem':'boss';else if(f>2&&Math.random()<.15)kind='swarm';if(r.v>=2&&r.tmap&&twKind(r,f)==='elite')kind='elite';const evF=r.v>=2&&!!r.evFight;if(r.v>=2&&r.evFight){kind=r.evFight;r.evFight=null}
  // handcrafted bosses: Boss rooms on the map only (not event fights), half the time, ones you haven't met first
  let hb=null;if(boss&&!evF&&r.v>=2&&r.tmap&&Math.random()<.5){const all=Object.keys(DC_BOSSES).filter(s=>typeof SPECIES_DATA==='undefined'||SPECIES_DATA[s]);let seen=(r.seenHB||[]).filter(x=>all.includes(x));if(seen.length>=all.length)seen=[];const pool=all.filter(x=>!seen.includes(x));if(pool.length){hb=pool[Math.floor(Math.random()*pool.length)];r.seenHB=seen.concat(hb);kind='boss'}}
@@ -118,7 +118,7 @@ function twBattle(ch){const r=runOf(),f=r.floor,avg=partyAvgLv(),boss=r.v>=2&&r.
   if(sp==='Melmetal'){en.push(Object.assign(makeEnemy(sp,lvl+2,{hpMul:eh*DC_ET.Melmetal.hp,atkMul:atk*1.1,boss:'elite'}),{mech:sp}));for(let q=0;q<2;q++)en.push(makeEnemy('Meltan',lvl-2,{hpMul:hp*.6,atkMul:atk*DC_ET.Melmetal.meltanAtk}))}
   else en.push(Object.assign(makeEnemy(sp,lvl+2,{hpMul:eh,atkMul:atk*1.1,boss:'elite'}),{mech:sp}))}
  else if(kind==='battle'){const n=rnd(1,Math.min(4,2+Math.floor(f/8)));for(let i=0;i<n;i++)en.push(makeEnemy(twSp(0,Math.min(4,1+k)),Math.max(1,lvl+rnd(-3,2)),{hpMul:hp,atkMul:atk}))}
- else if(kind==='swarm'){const sp=twSp(0,Math.min(1,k)),n=rnd(4,6);for(let i=0;i<n;i++)en.push(makeEnemy(sp,Math.max(1,lvl-5+rnd(-2,1)),{hpMul:hp*.6,atkMul:atk*.8}))}
+ else if(kind==='swarm'){const sp=twSp(0,Math.min(1,k)),n=f<8?rnd(3,4):f<20?rnd(4,5):rnd(4,6);for(let i=0;i<n;i++)en.push(makeEnemy(sp,Math.max(1,lvl-5+rnd(-2,1)),{hpMul:hp*.6,atkMul:atk*.8}))}
  else{const evolved=MONS.filter(m=>PRE_EVO[m[0]]&&m[2]>=1),sp=kind==='boss'?speciesOfTier(2,4):evolved[Math.floor(Math.random()*evolved.length)][0],bh=2.4*(1+f/40);
   if(kind==='alpha')en.push(makeEnemy(sp,lvl+4,{hpMul:bh*1.2,atkMul:atk*1.3,boss:'alpha',twice:true}));
   else{en.push(makeEnemy(sp,lvl+3,{hpMul:bh*(kind==='totem'?.85:1),atkMul:atk*1.2,boss:kind}));if(kind==='totem'){const pre=PRE_EVO[sp]||sp;for(let i=0;i<rnd(2,3);i++)en.push(makeEnemy(pre,lvl-1,{hpMul:hp*.8,atkMul:atk}))}}}
