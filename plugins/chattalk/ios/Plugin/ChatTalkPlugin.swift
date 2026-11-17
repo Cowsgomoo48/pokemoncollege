@@ -18,7 +18,9 @@ public class ChatTalkPlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "remove", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "folder", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "splice", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "export", returnType: CAPPluginReturnPromise)
+        CAPPluginMethod(name: "export", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "backupAudio", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "restoreAudio", returnType: CAPPluginReturnPromise)
     ]
 
     private var recorder: AVAudioRecorder?
@@ -57,9 +59,12 @@ public class ChatTalkPlugin: CAPPlugin, CAPBridgedPlugin {
             if self.recorder?.isRecording == true { call.reject("Already recording"); return }
             do {
                 let session = AVAudioSession.sharedInstance()
-                try session.setCategory(.playAndRecord, mode: .default, options: [.defaultToSpeaker, .allowBluetooth])
+                // A2DP only (not .allowBluetooth): Bluetooth headsets' call mic records at phone-call quality, so always use the iPhone's own mic.
+                try session.setCategory(.playAndRecord, mode: .default, options: [.defaultToSpeaker, .allowBluetoothA2DP])
                 try session.setActive(true)
-                let settings: [String: Any] = [AVFormatIDKey: Int(kAudioFormatMPEG4AAC), AVSampleRateKey: 16000, AVNumberOfChannelsKey: 1, AVEncoderAudioQualityKey: AVAudioQuality.medium.rawValue]
+                if let mic = session.availableInputs?.first(where: { $0.portType == .builtInMic }) { try? session.setPreferredInput(mic) }
+                // 44.1 kHz / 64 kbps AAC: clear speech for a far-away teacher (~29 MB per hour).
+                let settings: [String: Any] = [AVFormatIDKey: Int(kAudioFormatMPEG4AAC), AVSampleRateKey: 44100, AVNumberOfChannelsKey: 1, AVEncoderBitRateKey: 64000, AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue]
                 let r = try AVAudioRecorder(url: self.fileURL(id), settings: settings)
                 r.isMeteringEnabled = true
                 guard r.record() else { call.reject("The microphone could not start. Check Settings > PokemonCollege > Microphone."); return }
@@ -126,6 +131,41 @@ public class ChatTalkPlugin: CAPPlugin, CAPBridgedPlugin {
         guard let id = call.getString("id") else { call.reject("Missing id"); return }
         try? FileManager.default.removeItem(at: fileURL(id))
         call.resolve()
+    }
+
+    // Backups/Recordings mirrors every recording's audio next to the JSON backups (hard links: no extra space).
+    private func backupDir() -> URL {
+        let d = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("Backups", isDirectory: true).appendingPathComponent("Recordings", isDirectory: true)
+        try? FileManager.default.createDirectory(at: d, withIntermediateDirectories: true)
+        return d
+    }
+    @objc func backupAudio(_ call: CAPPluginCall) {
+        let ids = Set((call.getArray("ids", String.self) ?? []).filter { !$0.isEmpty })
+        let fm = FileManager.default, dir = backupDir()
+        var n = 0
+        for id in ids {
+            let src = fileURL(id), dst = dir.appendingPathComponent(id + ".m4a")
+            guard fm.fileExists(atPath: src.path) else { continue }
+            let a = (try? fm.attributesOfItem(atPath: src.path)[.size] as? Int) ?? -1, b = (try? fm.attributesOfItem(atPath: dst.path)[.size] as? Int) ?? -2
+            if a != b { try? fm.removeItem(at: dst); do { try fm.linkItem(at: src, to: dst) } catch { try? fm.copyItem(at: src, to: dst) } }
+            n += 1
+        }
+        for f in (try? fm.contentsOfDirectory(atPath: dir.path)) ?? [] where f.hasSuffix(".m4a") && !ids.contains(String(f.dropLast(4))) {
+            try? fm.removeItem(at: dir.appendingPathComponent(f))
+        }
+        call.resolve(["count": n])
+    }
+    // Puts back any recording audio that's missing from ChatTalk but present in Backups/Recordings.
+    @objc func restoreAudio(_ call: CAPPluginCall) {
+        let fm = FileManager.default, dir = backupDir()
+        var n = 0
+        for id in call.getArray("ids", String.self) ?? [] where !id.isEmpty {
+            let src = dir.appendingPathComponent(id + ".m4a"), dst = fileURL(id)
+            guard !fm.fileExists(atPath: dst.path), fm.fileExists(atPath: src.path) else { continue }
+            do { try fm.linkItem(at: src, to: dst) } catch { try? fm.copyItem(at: src, to: dst) }
+            n += 1
+        }
+        call.resolve(["count": n])
     }
 
     // Rebuilds Documents/ChatTalk Exports: one file per recording named by its title, inside a subfolder per in-app folder.

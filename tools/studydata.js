@@ -11,6 +11,7 @@ function sdItems(s){const Q=db.qstats||{},out=[],get=k=>Q[k]||null;
  termsFor(s).forEach(t=>out.push({kind:'Term',key:s.id+'|t|'+t.term,name:t.term,detail:t.definition,st:[get(s.id+'|t|'+t.term)]}));
  (s.quiz||[]).forEach(q=>out.push({kind:'Quiz',key:s.id+'|q|'+q.question,name:q.question,detail:q.answer,st:[get(s.id+'|q|'+q.question)]}));
  prOf(s).forEach(id=>out.push({kind:'Practice',name:PR[id].name,detail:PR[id].subject||'',gid:id,st:Object.keys(Q).filter(k=>k.startsWith(s.id+'|g|'+id+'|')&&/^\d+$/.test(k.slice((s.id+'|g|'+id+'|').length))).map(get)}));
+ if(s.eqbank&&(s.eqbank.problems||[]).length){const id='ueq:'+s.id;out.push({kind:'Practice',name:'Your equations',detail:s.eqbank.formulas.length+' equations from your '+(typeof eqUserSrc==='function'?eqUserSrc(s):'notes'),gid:id,st:Object.keys(Q).filter(k=>k.startsWith(s.id+'|g|'+id+'|')&&/^\d+$/.test(k.slice((s.id+'|g|'+id+'|').length))).map(get)})}
  return out.map(it=>{const S=it.st.filter(Boolean),sum=k=>S.reduce((a,x)=>a+(x[k]||0),0);
   return Object.assign(it,{r:sum('r'),w:sum('w'),ft:sum('ft'),mk:sum('mk'),h:sum('h'),g:sum('g'),miss:Math.max(0,...S.map(x=>x.miss||0)),last:Math.max(0,...S.map(x=>x.last||0)),wp:S.flatMap(x=>x.wp||[]).sort((a,b)=>b.at-a.at).slice(0,3),seen:S.length>0})})}
 function sdWeak(x){return x.w>0||x.g>0||x.miss>0}

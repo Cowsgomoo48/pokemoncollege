@@ -519,7 +519,7 @@ prDef('energy_units','Physics','Energy units (J, kWh, Calories)',/kilowatt|kwh|c
  const c=prR(1,30)*10,J=c*4184;return prMC('How many joules are in '+c+' food Calories? (1 Cal = 4184 J)',prSig(J)+' J',[prSig(c*4.184)+' J',prSig(c/4184)+' J',prSig(c*1000)+' J'],j=>prSig(prPct(J,j,.2))+' J',c+' × 4184 = '+prSig(J)+' J',[['Each food Calorie is 4184 J. Multiply by that.','J = Cal × 4184'],['Multiply.',c+' × 4184 = '+prSig(J)+' J']])});
 // ---------------- using them ----------------
 // a fresh problem of a type (retries if a random draw ever comes out unusable)
-function prInstance(id){const T=PR[id];if(!T)return null;for(let k=0;k<12;k++){try{const p=T.make();if(p&&prOk(p.a)&&p.w.length===3&&!p.w.includes(p.a))return p}catch(e){}}return null}
+function prInstance(id){if(String(id).startsWith('ueq:'))return typeof eqUserMake==='function'?eqUserMake(String(id).slice(4)):null;if(typeof EQPR!=='undefined'&&EQPR[id]&&Math.random()<.65){const p=eqPrMake(id);if(p)return p}const T=PR[id];if(!T)return null;for(let k=0;k<12;k++){try{const p=T.make();if(p&&prOk(p.a)&&p.w.length===3&&!p.w.includes(p.a))return p}catch(e){}}return null}
 // which practice types a piece of text points to
 function prDetect(text){const t=String(text||'');return Object.values(PR).filter(T=>T.kw.test(t)).map(T=>T.id)}
 // the practice types a study set uses (chosen in the summary editor, or found automatically)

@@ -5,7 +5,8 @@ function mgBank(sids){const out=[];for(const s of db.summaries){if(!sids.include
  termsFor(s).forEach(t=>{const f=cmdSet?uxTermClean(t.term):t.term,cmd=cmdSet&&uxIsCmd(f);if(cmdSet&&!cmd)return;out.push({kind:'term',sid:s.id,key:s.id+'|t|'+t.term,front:f,back:t.definition,cmd})});
  (s.quiz||[]).forEach(q=>out.push({kind:'mc',sid:s.id,key:s.id+'|q|'+q.question,front:q.question,back:q.answer,wrong:(q.wrong||[]).slice(0,3)}));
  // practice problems made in code: two fresh ones per problem type each game
- prOf(s).forEach(id=>{for(let k=0;k<(PR[id].cmd?4:2);k++){const p=prInstance(id);if(p)out.push({kind:'gen',gid:id,sid:s.id,key:s.id+'|g|'+id+'|'+k,front:p.q,back:p.a,wrong:p.w,explain:p.ex,steps:p.steps})}})}return out}
+ prOf(s).forEach(id=>{for(let k=0;k<(PR[id].cmd?4:2);k++){const p=prInstance(id);if(p)out.push({kind:'gen',gid:id,sid:s.id,key:s.id+'|g|'+id+'|'+k,front:p.q,back:p.a,wrong:p.w,explain:p.ex,steps:p.steps})}});
+ if(s.eqbank&&(s.eqbank.problems||[]).length){const id='ueq:'+s.id,n=Math.min(10,Math.max(4,s.eqbank.formulas.length*2));for(let k=0;k<n;k++){const p=prInstance(id);if(p)out.push({kind:'gen',gid:id,sid:s.id,key:s.id+'|g|'+id+'|'+k,front:p.q,back:p.a,wrong:p.w,explain:p.ex,steps:p.steps})}}}return out}
 function qstat(key){const q=db.qstats||(db.qstats={});return q[key]||(q[key]={r:0,w:0,last:0,miss:0})}
 // Every answer is recorded per item (r = right, w = wrong). The extra details (first try or Make-Up, hints used, which wrong
 // answer was picked, a day-by-day tally per study set) feed the Export Study Data sheet.
@@ -31,7 +32,7 @@ function mgPicker(bank,mode){const P={mode,bank,queue:[],phase:1,mastery:{},done
  return P}
 // Multiple-choice question for an item. variant 0 asks one way, 1 the other way (used for Make-Up questions).
 function mgQuestion(item,bank,variant){const others=bank.filter(b=>b!==item),pick=(arr,f)=>shuffle(arr.filter(f)).slice(0,3);
- if(item.kind==='gen'){const p=prInstance(item.gid)||{q:item.front,a:item.back,w:item.wrong,ex:item.explain,steps:item.steps};return {prompt:p.q,sub:(PR[item.gid]?PR[item.gid].name+' · ':'')+'work it out.',options:shuffle([{t:p.a,ok:true},...p.w.map(w=>({t:w,ok:false}))]),explain:p.ex,short:p.a,steps:p.steps||[]}}
+ if(item.kind==='gen'){const p=prInstance(item.gid)||{q:item.front,a:item.back,w:item.wrong,ex:item.explain,steps:item.steps};return {prompt:p.q,sub:(PR[item.gid]?PR[item.gid].name+' · ':String(item.gid).startsWith('ueq:')?'Your equations · ':'')+'work it out.',options:shuffle([{t:p.a,ok:true},...p.w.map(w=>({t:w,ok:false}))]),explain:p.ex,short:p.a,steps:p.steps||[],eqp:p.eqp}}
  if(item.kind==='mc'&&variant===0)return {prompt:item.front,sub:'Choose the right answer.',options:shuffle([{t:item.back,ok:true},...item.wrong.map(w=>({t:w,ok:false}))]),explain:'The answer is “'+item.back+'”.'};
  if(item.kind==='mc'){const tie=bank.find(b=>b.kind==='term'&&b.front.toLowerCase()===String(item.back).toLowerCase());if(tie)return mgQuestion(tie,bank,1);return {prompt:item.front,sub:'Make-Up: think it through once more.',options:shuffle([{t:item.back,ok:true},...item.wrong.map(w=>({t:w,ok:false}))]),explain:'The answer is “'+item.back+'”.'}}
  if(item.kind==='term'&&item.cmd)return uxTermQ(item,bank,variant);

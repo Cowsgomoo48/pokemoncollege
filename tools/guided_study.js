@@ -16,7 +16,7 @@ function guidedPlan(q){
  return method&&substitution?[{label:'1 · Choose the equation',choices:method,hint:q.steps[0][0]}, {label:'2 · Substitute the numbers',choices:substitution,hint:'Match each value in the problem to its place in the equation: '+symbolic}]:null;
 }
 function guidedMount(card,q,opts={}){
- const answers=card.querySelector('.guided-final'),plan=guidedPlan(q);if(!answers)return {engaged:false,complete:false};
+ const answers=card.querySelector('.guided-final');if(!answers)return {engaged:false,complete:false};if(q.eqp&&typeof eqGuide==='function')return eqGuide(card,q,opts,answers);const plan=guidedPlan(q);
  const state={engaged:false,complete:false},panel=document.createElement('div');panel.className='guided-panel';answers.before(panel);
  let step=0,done=false;
  const finish=()=>{if(done)return;done=true;state.complete=true;state.engaged=true;answers.hidden=false;panel.innerHTML='<b>Setup complete</b><p>Now work out your answer.'+(opts.onGuided?' Finish the question for +2 Tickets.':'')+'</p>';if(opts.onGuided)opts.onGuided()};
