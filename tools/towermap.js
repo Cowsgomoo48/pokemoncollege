@@ -25,7 +25,7 @@ function twNoForcedElite(m){const R=m.rows,el=(ri,j)=>R[ri][j]&&R[ri][j].t==='el
 function twMapEnsure(r){const m=r.tmap;if(!m||(m.row===m.len-1&&(r.cleared||0)>=m.start+m.len-1)){r.tmap=twGenMap(r);save()}else if(!m.noForce){twNoForcedElite(m);m.noForce=1;save()}return r.tmap}
 // ---------- the map: the tower itself, one slab per floor, with that floor's rooms on it ----------
 const TW_SWORDS='<svg class="tw-swords" viewBox="0 0 24 24" aria-hidden="true"><g stroke-linecap="round"><path d="M5.5 18.5L18 4.5M18.5 18.5L6 4.5" stroke="#3d4a5c" stroke-width="3.4"/><path d="M5.5 18.5L18 4.5M18.5 18.5L6 4.5" stroke="#e8eef6" stroke-width="1.8"/><path d="M4 15.5l4.5 4.5M20 15.5l-4.5 4.5" stroke="#8a5a2b" stroke-width="2.8"/><path d="M3.6 20.4l1.6-1.6M20.4 20.4l-1.6-1.6" stroke="#d9a441" stroke-width="2.6"/></g></svg>';
-const twIco=t=>t==='battle'?TW_SWORDS:TW_ROOM[t][0];
+const twIco=t=>t==='battle'?TW_SWORDS:t==='elite'?'<img class="tw-elite-skull" src="./assets/ico/elite_skull.png" alt="Elite" draggable="false">':TW_ROOM[t][0];
 function twMapHTML(r,live){const m=r.tmap,e=twEnv(r),env=twEnvKey(r),avail=m.row<0?m.rows[0].map((_,i)=>i):((m.rows[m.row]||[])[m.col]||{}).to||[];
  let h='<div class="tw-tower'+(live?' live':'')+'" style="--envbg:url(./assets/tower/'+env+'.jpg)"><div class="tw-maphead"><b>'+e.icon+' '+esc(e.name)+'</b>'+(live?'<button class="btn smallbtn tw-deckbtn" onclick="dcDeckView()" aria-label="Your deck">🃏 '+(r.deck||[]).length+'</button>':'')+'<small>Floors '+m.start+'–'+(m.start+m.len-1)+' · 🎟️ '+(r.tickets||0)+' · ❤️ '+Math.max(0,r.php)+'/'+r.pmax+'</small>'+twRelicStrip(r)+'</div><div class="tw-tscroll"><div class="tw-tstack">';
  for(let ri=m.rows.length-1;ri>=0;ri--){const row=m.rows[ri],boss=row.length===1&&row[0].t==='boss';
@@ -87,7 +87,7 @@ function twHealP(r,p){const h=Math.min(r.pmax-r.php,twPct(r,p));r.php+=Math.max(
 function twHurt(r,n){const d=Math.min(n,r.php-1);r.php-=Math.max(0,d);return Math.max(0,d)}
 function twMaxHP(r,n){r.pmax=Math.max(10,r.pmax+n);r.php=n>0?r.php+n:Math.min(r.php,r.pmax)}
 function twAddCard(r,d,t,up){r.deck.push({u:uid(),d,t:t||'',up:up?1:0});return dcDefOf(d).name+(up?'+':'')}
-function twXform(r,c,up){const pool=DC_REWARD_POOL.concat(Object.keys(DC_SIG).filter(id=>DC_SIG[id].type===c.t||DC_SIG[id].type2===c.t)).filter(id=>id!==c.d);c.d=pool[Math.floor(Math.random()*pool.length)];c.up=up?1:0;return dcName(c)}
+function twXform(r,c,up){const pool=DC_REWARD_POOL.concat(Object.keys(DC_SIG).filter(id=>!DC_SIG[id].token&&!DC_SIG[id].retired&&(DC_SIG[id].type===c.t||DC_SIG[id].type2===c.t))).filter(id=>id!==c.d);c.d=pool[Math.floor(Math.random()*pool.length)];c.up=up?1:0;return dcName(c)}
 function twRandCard(r,up,notT){let c=null;for(let k=0;k<6&&!c;k++)c=dcRollOffer(r).find(x=>!notT||x.t!==notT)||null;c=c||dcRollOffer(r)[0];return twAddCard(r,c.d,c.t,up)}
 function twRelicGet(r){const id=twRelicRoll(r);if(!id){twTix(r,15);return '+15 🎟️ Tickets'}twGainRelic(r,id);return TW_RELICS[id].icon+' '+TW_RELICS[id].name}
 const twRealCards=r=>r.deck.filter(c=>{const d=dcDefOf(c.d);return d&&!d.status});

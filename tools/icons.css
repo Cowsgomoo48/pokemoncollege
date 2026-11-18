@@ -7,3 +7,6 @@ img.ico.ico{display:inline-block;width:1.25em!important;height:1.25em!important;
 @keyframes sgrass{0%,100%{rotate:0deg}20%{rotate:-6deg}35%{rotate:4deg}50%{rotate:0deg}}
 @media(prefers-reduced-motion:reduce){.safari-grass img{animation:none}}
 .bx-bag{font-size:18px!important;left:-4px!important;bottom:-4px!important;z-index:2}
+
+/* Shiny Elite skull: map node, legend and floor entry. */
+.tw-elite-skull{display:inline-block;width:1.5em;height:1.5em;object-fit:contain;vertical-align:middle;pointer-events:none}.tw-node .tw-elite-skull{width:40px;height:40px}.tw-maplegend .tw-elite-skull{width:22px;height:22px}.tw-mapban .tw-elite-skull{width:64px;height:64px}

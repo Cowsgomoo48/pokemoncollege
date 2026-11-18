@@ -329,6 +329,9 @@ def main():
     emap = {}
     for n, (ems, _) in ICONS.items():
         for e in ems: emap[e] = n
+    extra_path = os.path.join(HERE, 'icons_extra.json')
+    if os.path.exists(extra_path):
+        with open(extra_path) as f: emap.update(json.load(f))
     js_out = ('// ===================== SOFT ICONS =====================\n'
               '// Every emoji listed here is shown as a soft painted icon (assets/ico, drawn by tools/make_icons_soft.py) instead of the system emoji.\n'
               'const ICO_MAP=' + json.dumps(emap, ensure_ascii=False, separators=(',', ':')) + ';\n')

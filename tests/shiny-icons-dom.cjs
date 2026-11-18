@@ -1,0 +1,17 @@
+const fs=require('fs'),path=require('path'),assert=require('assert');
+const {JSDOM}=require(process.env.PC_JSDOM||'jsdom');
+const root=path.resolve(__dirname,'..'),dom=new JSDOM('<!doctype html><body></body>',{runScripts:'outside-only',url:'http://localhost/'}),w=dom.window;
+w.eval(fs.readFileSync(path.join(root,'tools/icons_map.js'),'utf8')+'\n'+fs.readFileSync(path.join(root,'tools/icons.js'),'utf8')+'\nwindow.testMap=ICO_MAP;');
+const wait=()=>new Promise(r=>setTimeout(r,20));let checks=0;const ok=(v,m)=>{assert(v,m);checks++;console.log('PASS '+m)};
+(async()=>{await wait();const host=w.document.createElement('section');w.document.body.append(host);
+const em=Object.keys(w.testMap);host.textContent=em.flatMap(e=>[e,e+'\uFE0F',e+'\uFE0E']).join(' ');await wait();ok(host.querySelectorAll('img').length===em.length*3,'All '+em.length+' emoji mappings support bare, emoji and text selectors');
+ok([...host.querySelectorAll('img')].every(im=>im.alt&&!/\p{Extended_Pictographic}/u.test(im.alt)),'Icons have readable alternative text');
+ok(!/[\uFE0E\uFE0F]/.test(host.textContent),'No orphaned variation selectors');
+const n=host.querySelectorAll('img').length;w.icoize(host);ok(host.querySelectorAll('img').length===n,'Repeated conversion is idempotent');
+host.innerHTML='<select><option value="potion">🧪 Potion</option></select><textarea>🔥 user text</textarea><div contenteditable="true">🧊 user note</div><code>🧬 code</code><svg><text>🌙</text></svg><span id="live">plain</span>';await wait();
+ok(host.querySelector('option').value==='potion'&&host.querySelector('option').textContent==='Potion','Native select uses text and keeps its stored value');
+ok(host.querySelector('textarea').value==='🔥 user text'&&host.querySelector('[contenteditable]').textContent==='🧊 user note'&&host.querySelector('code').textContent==='🧬 code'&&host.querySelector('svg text').textContent==='🌙','Editable text, code and SVG remain untouched');
+host.querySelector('#live').firstChild.nodeValue='🪫 Drained';await wait();ok(host.querySelector('#live img').src.endsWith('/empty_battery.png'),'Observer handles character-data changes');
+host.querySelector('#live').innerHTML='<b>🪽 Fly</b>';await wait();ok(host.querySelector('#live img').src.endsWith('/wing.png'),'Observer handles new nested UI');
+ok(w.icoPlain('🔁 Repeat')==='Repeat Repeat'&&w.icoPlain(undefined)==='','Plain-text fallback handles notifications and absent text');
+console.log(checks+' checks passed');dom.window.close();})().catch(e=>{console.error(e);dom.window.close();process.exitCode=1});

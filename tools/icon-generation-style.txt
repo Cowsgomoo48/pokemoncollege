@@ -1,0 +1,5 @@
+Generated with the built-in image generation tool, one icon per prompt.
+
+Create ONE standalone cutesy game UI icon. Subject: [subject from icons_prompts.json]. Style: glossy hand-painted pastel collectible icon, soft warm mauve outlines, luminous cream highlights, gentle lavender shadows, subtle iridescent color near the lower edges, several small white reflection spots. Rounded charming forms and clear silhouette readable at 32 pixels. Same style as shiny cute fruit inventory icons. Centered single object occupying 80% of a square canvas. TRUE TRANSPARENT background with clean edges. Absolutely NO background glow, NO vignette, NO backdrop, NO ground shadow, NO text, NO letters, NO watermark.
+
+Elite skull: original glossy ivory monster skull with curled plum ram horns, lavender shadows and peach highlights; narrow eye sockets and small pointed teeth. Reference silhouette provided by the user. Second pass removed surrounding glow for a clean transparent cutout. High-resolution source: art-source/elite-skull.png.
