@@ -73,5 +73,11 @@ const R=await p.evaluate(async()=>{const out=[],ok=(c,m)=>{if(window.__inv){cons
  reset();dc().field.push({u:add('oran','grass','disc').u,n:3});dc().disc.pop();for(let k=0;k<3;k++)add('strike','steel','draw');const hp0=dc().hand.length;await play('pruningshears');ok(dc().field[0].n===2&&dc().hand.length===hp0+1,'Pruning Shears: −1 counter each, draw per counter');
  await play('thornwall',null,'p');ok(dc().pb===E(8,'grass','blk'),'Thornwall: +2 Block per Plant counter');
  for(let k=0;k<20;k++){const o=dcRollOffer(r);if(o.some(x=>DC_SIG[x.d]&&(DC_SIG[x.d].token||DC_SIG[x.d].retired)))ok0=false}ok(ok0,'Still no tokens or retired cards in rewards');
+
+ // Revolutionize
+ reset();const iv=add('lurkingivy','grass','disc');dc().disc.pop();dc().field.push({u:iv.u,n:3});dc().buffs.overgrowth=1;dcChooseCards=async(t,ids)=>ids.slice(0,1);await play('revolutionize');const K=dc().cons.find(k=>dcInst(r,k.u).d==='revolutionize');ok(!!K&&K.rev===3&&!dc().field.some(p=>p.u===iv.u),'Revolutionize: Planted card attached with its counters');
+ dc().foes.forEach(f=>f.it={k:'block',n:1});const hpR=F(0).hp;await ET();ok(hpR-F(0).hp===2*E(3,'grass')&&K.rev===2,'Revolutionize: Harvest twice at end of turn, then −1 counter');
+ dc().foes.forEach(f=>{f.it={k:'block',n:1};f.hp=200});await ET();dc().foes.forEach(f=>{f.it={k:'block',n:1};f.hp=200});await ET();const inZ=u=>[...dc().disc,...dc().draw,...dc().hand].includes(u);ok(!dc().cons.some(k=>k.u===K.u)&&!dc().field.some(p=>p.u===iv.u)&&inZ(K.u)&&inZ(iv.u),'Revolutionize: both discarded when counters run out (Overgrowth can’t extend it)');
+ reset();ok(!dcCanPlay(r,add('revolutionize','steel').u),'Revolutionize: unplayable without a Planted card');
  const D=dc(),all=[...D.draw,...D.hand,...D.disc,...D.void,...D.field.map(x=>x.u),...D.cons.flatMap(k=>[k.u,...k.parts]),...D.cocoons.flatMap(k=>k.held?[k.u,k.held]:[k.u]),...D.angel],want=[...r.deck.map(c=>c.u),...D.temp.map(c=>c.u)];ok(all.length===want.length&&new Set(all).size===all.length,'zones invariant after all signature tests '+JSON.stringify([all.length,want.length,new Set(all).size,want.filter(u=>!all.includes(u)).map(u=>(dcInst(r,u)||{}).d),all.filter(u=>!want.includes(u)).length,all.filter((u,k)=>all.indexOf(u)!==k).map(u=>(dcInst(r,u)||{}).d)]));
  return out.join('\n')});console.log(R);console.log('errs',errs.slice(0,6));await b.close()})();
