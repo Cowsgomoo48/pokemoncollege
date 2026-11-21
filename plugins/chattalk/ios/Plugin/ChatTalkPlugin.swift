@@ -1,4 +1,5 @@
 import Foundation
+import UIKit
 import Capacitor
 import AVFoundation
 import Speech
@@ -33,6 +34,27 @@ public class ChatTalkPlugin: CAPPlugin, CAPBridgedPlugin {
     private var lastStop: [String: Any]? = nil
     private var progress: [String: Any] = [:]
     private var observing = false
+    private let activeKey = "ChatTalkActive", stopKey = "ChatTalkLastStop"
+
+    // If the app is closed mid-recording, stop and save the file so it isn't lost. The stop info is kept on disk,
+    // so the app picks it up (and files the recording) the next time it opens.
+    override public func load() {
+        NotificationCenter.default.addObserver(self, selector: #selector(appClosing), name: UIApplication.willTerminateNotification, object: nil)
+        let d = UserDefaults.standard
+        if let s = d.dictionary(forKey: stopKey) { lastStop = s }
+        else if let a = d.dictionary(forKey: activeKey), let id = a["id"] as? String {
+            // closed too suddenly to stop cleanly: still hand back what's on disk
+            let url = fileURL(id)
+            let secs = FileManager.default.fileExists(atPath: url.path) ? CMTimeGetSeconds(AVURLAsset(url: url).duration) : 0
+            let info: [String: Any] = ["id": id, "reason": "closed", "seconds": secs.isFinite ? secs : 0, "path": url.path, "webPath": webPath(url), "endedAt": Date().timeIntervalSince1970 * 1000]
+            lastStop = info; d.set(info, forKey: stopKey)
+        }
+        d.removeObject(forKey: activeKey)
+    }
+    @objc private func appClosing() {
+        if recorder != nil { finish("closed") }
+        UserDefaults.standard.synchronize()
+    }
 
     private func folder() -> URL {
         let dir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("ChatTalk", isDirectory: true)
@@ -69,6 +91,8 @@ public class ChatTalkPlugin: CAPPlugin, CAPBridgedPlugin {
                 r.isMeteringEnabled = true
                 guard r.record() else { call.reject("The microphone could not start. Check Settings > PokemonCollege > Microphone."); return }
                 self.recorder = r; self.currentId = id; self.lastLoud = Date(); self.lastStop = nil
+                UserDefaults.standard.removeObject(forKey: self.stopKey)
+                UserDefaults.standard.set(["id": id, "startedAt": Date().timeIntervalSince1970 * 1000], forKey: self.activeKey)
                 if !self.observing {
                     self.observing = true
                     NotificationCenter.default.addObserver(self, selector: #selector(self.interrupted(_:)), name: AVAudioSession.interruptionNotification, object: nil)
@@ -107,6 +131,7 @@ public class ChatTalkPlugin: CAPPlugin, CAPBridgedPlugin {
         let url = fileURL(currentId)
         let info: [String: Any] = ["id": currentId, "reason": reason, "seconds": seconds, "path": url.path, "webPath": webPath(url), "endedAt": Date().timeIntervalSince1970 * 1000]
         lastStop = info; currentId = ""
+        let d = UserDefaults.standard; d.removeObject(forKey: activeKey); d.set(info, forKey: stopKey)
         return info
     }
 
